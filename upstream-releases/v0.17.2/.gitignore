@@ -350,5 +350,6 @@ MigrationBackup/
 .ionide/
 
 .vscode/settings.json
+.vs/*
 
 .DS_Store

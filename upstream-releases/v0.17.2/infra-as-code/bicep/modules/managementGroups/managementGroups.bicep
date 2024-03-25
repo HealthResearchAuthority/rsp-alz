@@ -6,21 +6,14 @@ metadata description = 'ALZ Bicep Module to set up Management Group structure'
 @sys.description('Prefix used for the management group hierarchy. This management group will be created as part of the deployment.')
 @minLength(2)
 @maxLength(10)
-param parTopLevelManagementGroupPrefix string = 'alz'
+param parTopLevelManagementGroupPrefix string = 'mg-'
 
 @sys.description('Optional suffix for the management group hierarchy. This suffix will be appended to management group names/IDs. Include a preceding dash if required. Example: -suffix')
 @maxLength(10)
-param parTopLevelManagementGroupSuffix string = ''
-
-@sys.description('Display name for top level management group. This name will be applied to the management group prefix defined in parTopLevelManagementGroupPrefix parameter.')
-@minLength(2)
-param parTopLevelManagementGroupDisplayName string = 'Azure Landing Zones'
-
-@sys.description('Optional parent for Management Group hierarchy, used as intermediate root Management Group parent, if specified. If empty, default, will deploy beneath Tenant Root Management Group.')
-param parTopLevelManagementGroupParentId string = ''
+param parTopLevelManagementGroupSuffix string = 'future-iras'
 
 @sys.description('Deploys Corp & Online Management Groups beneath Landing Zones Management Group if set to true.')
-param parLandingZoneMgAlzDefaultsEnable bool = true
+param parLandingZoneMgAlzDefaultsEnable bool = false
 
 @sys.description('Deploys Management, Identity and Connectivity Management Groups beneath Platform Management Group if set to true.')
 param parPlatformMgAlzDefaultsEnable bool = true
@@ -64,22 +57,10 @@ var varLandingZoneMg = {
 
 // Used if parLandingZoneMgAlzDefaultsEnable == true
 var varLandingZoneMgChildrenAlzDefault = {
-  corp: {
-    displayName: 'Corp'
-  }
-  online: {
-    displayName: 'Online'
-  }
 }
 
 // Used if parLandingZoneMgConfidentialEnable == true
 var varLandingZoneMgChildrenConfidential = {
-  'confidential-corp': {
-    displayName: 'Confidential Corp'
-  }
-  'confidential-online': {
-    displayName: 'Confidential Online'
-  }
 }
 
 // Build final onject based on input parameters for child MGs of LZs
@@ -92,10 +73,10 @@ var varSandboxMg = {
   displayName: 'Sandbox'
 }
 
-// Decomissioned Management Group
-var varDecommissionedMg = {
-  name: '${parTopLevelManagementGroupPrefix}-decommissioned${parTopLevelManagementGroupSuffix}'
-  displayName: 'Decommissioned'
+// DevBox Management Group
+var varDevelopmentboxMg = {
+  name: '${parTopLevelManagementGroupPrefix}-sandbox${parTopLevelManagementGroupSuffix}'
+  displayName: 'Development'
 }
 
 // Customer Usage Attribution Id
@@ -114,6 +95,7 @@ resource resTopLevelMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   }
 }
 
+// Skipping top level as we already have it 
 // Level 2
 resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   name: varPlatformMg.name
@@ -151,10 +133,11 @@ resource resSandboxMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   }
 }
 
-resource resDecommissionedMg 'Microsoft.Management/managementGroups@2023-04-01' = {
-  name: varDecommissionedMg.name
+resource resDevelopmentBoxMg 'Microsoft.Management/managementGroups@2023-04-01' = if (parDevBoxMgAlzDefaultsEnable) {
+  scope: tenant()
+  name: varDevelopmentboxMg.name
   properties: {
-    displayName: varDecommissionedMg.displayName
+    displayName: varDevelopmentboxMg.displayName
     details: {
       parent: {
         id: resTopLevelMg.id
@@ -206,8 +189,7 @@ output outLandingZonesManagementGroupId string = resLandingZonesMg.id
 output outLandingZoneChildrenManagementGroupIds array = [for mg in items(varLandingZoneMgChildrenUnioned): '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupPrefix}-landingzones-${mg.key}${parTopLevelManagementGroupSuffix}']
 
 output outSandboxManagementGroupId string = resSandboxMg.id
-
-output outDecommissionedManagementGroupId string = resDecommissionedMg.id
+output outSandboxManagementGroupName string = resDevelopmentBoxMg.id
 
 // Output Management Group Names
 output outTopLevelManagementGroupName string = resTopLevelMg.name
@@ -219,5 +201,4 @@ output outLandingZonesManagementGroupName string = resLandingZonesMg.name
 output outLandingZoneChildrenManagementGroupNames array = [for mg in items(varLandingZoneMgChildrenUnioned): mg.value.displayName]
 
 output outSandboxManagementGroupName string = resSandboxMg.name
-
-output outDecommissionedManagementGroupName string = resDecommissionedMg.name
+output outSandboxManagementGroupName string = resDevelopmentBoxMg.name
