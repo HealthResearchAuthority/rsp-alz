@@ -188,7 +188,7 @@ output outLandingZonesManagementGroupId string = resLandingZonesMg.id
 output outLandingZoneChildrenManagementGroupIds array = [for mg in items(varLandingZoneMgChildrenUnioned): '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupPrefix}-landingzones-${mg.key}${parTopLevelManagementGroupSuffix}']
 
 output outSandboxManagementGroupId string = resSandboxMg.id
-output outSandboxManagementGroupName string = resDevelopmentBoxMg.id
+output outDevelopmentManagementGroupName string = resDevelopmentBoxMg.id
 
 // Output Management Group Names
 output outTopLevelManagementGroupName string = resTopLevelMg.name
@@ -200,4 +200,4 @@ output outLandingZonesManagementGroupName string = resLandingZonesMg.name
 output outLandingZoneChildrenManagementGroupNames array = [for mg in items(varLandingZoneMgChildrenUnioned): mg.value.displayName]
 
 output outSandboxManagementGroupName string = resSandboxMg.name
-output outSandboxManagementGroupName string = resDevelopmentBoxMg.name
+output outDevelopmentManagementGroupName string = resDevelopmentBoxMg.name
