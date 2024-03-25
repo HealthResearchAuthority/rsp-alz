@@ -95,7 +95,6 @@ resource resTopLevelMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   }
 }
 
-// Skipping top level as we already have it 
 // Level 2
 resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   name: varPlatformMg.name
