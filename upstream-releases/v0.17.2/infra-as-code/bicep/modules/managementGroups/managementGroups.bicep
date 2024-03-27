@@ -6,14 +6,14 @@ metadata description = 'ALZ Bicep Module to set up Management Group structure'
 @sys.description('Prefix used for the management group hierarchy. This management group will be created as part of the deployment.')
 @minLength(2)
 @maxLength(10)
-param parTopLevelManagementGroupPrefix string = 'mg-rsp-'
+param parTopLevelManagementGroupPrefix string = 'mg-rsp'
 
 @sys.description('Optional suffix for the management group hierarchy. This suffix will be appended to management group names/IDs. Include a preceding dash if required. Example: -suffix')
 @maxLength(10)
 param parTopLevelManagementGroupSuffix string = ''
 
 @sys.description('Deploys Prod & NonProd Management Groups beneath Landing Zones Management Group if set to true.')
-param parWorkloadsMgAlzDefaultsEnable bool = false
+param parWorkloadsMgAlzDefaultsEnable bool = true
 
 @sys.description('Deploys Management and Connectivity Management Groups beneath Platform Management Group if set to true.')
 param parPlatformMgAlzDefaultsEnable bool = true
@@ -74,8 +74,8 @@ var varSandboxMg = {
 
 // DevBox Management Group
 var varDevelopmentboxMg = {
-  name: '${parTopLevelManagementGroupPrefix}-sandbox${parTopLevelManagementGroupSuffix}'
-  displayName: 'DevBox'
+  name: '${parTopLevelManagementGroupPrefix}-devbox'
+  displayName: 'Dev Box'
 }
 
 // Customer Usage Attribution Id
