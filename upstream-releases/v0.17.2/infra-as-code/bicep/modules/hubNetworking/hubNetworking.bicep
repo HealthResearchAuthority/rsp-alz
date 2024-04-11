@@ -50,7 +50,7 @@ param parGlobalResourceLock lockType = {
 }
 
 @sys.description('The IP address range for Hub Network.')
-param parHubNetworkAddressPrefix string = '10.10.0.0/16'
+param parHubNetworkAddressPrefix string = '10.0.0.0/16'
 
 @sys.description('The name, IP address range, network security group, route table and delegation serviceName for each subnet in the virtual networks.')
 param parSubnets subnetOptionsType = [
@@ -108,7 +108,7 @@ param parPublicIpPrefix string = ''
 param parPublicIpSuffix string = '-PublicIP'
 
 @sys.description('Switch to enable/disable Azure Bastion deployment.')
-param parAzBastionEnabled bool = true
+param parAzBastionEnabled bool = false
 
 @sys.description('Name Associated with Bastion Service.')
 param parAzBastionName string = '${parCompanyPrefix}-bastion'
@@ -238,7 +238,7 @@ param parHubRouteTableLock lockType = {
 }
 
 @sys.description('Switch to enable/disable Private DNS Zones deployment.')
-param parPrivateDnsZonesEnabled bool = true
+param parPrivateDnsZonesEnabled bool = false
 
 @sys.description('Resource Group Name for Private DNS Zones.')
 param parPrivateDnsZonesResourceGroup string = resourceGroup().name
@@ -315,7 +315,7 @@ param parPrivateDnsZones array = [
 ]
 
 @sys.description('Set Parameter to false to skip the addition of a Private DNS Zone for Azure Backup.')
-param parPrivateDnsZoneAutoMergeAzureBackupZone bool = true
+param parPrivateDnsZoneAutoMergeAzureBackupZone bool = false
 
 @sys.description('Resource ID of Failover VNet for Private DNS Zone VNet Failover Links')
 param parVirtualNetworkIdToLinkFailover string = ''
@@ -332,7 +332,7 @@ param parPrivateDNSZonesLock lockType = {
 }
 
 @sys.description('Switch to enable/disable VPN virtual network gateway deployment.')
-param parVpnGatewayEnabled bool = true
+param parVpnGatewayEnabled bool = false
 
 //ASN must be 65515 if deploying VPN & ER for co-existence to work: https://docs.microsoft.com/en-us/azure/expressroute/expressroute-howto-coexist-resource-manager#limits-and-limitations
 @sys.description('Configuration for VPN virtual network gateway to be deployed.')
@@ -356,7 +356,7 @@ param parVpnGatewayConfig object = {
 }
 
 @sys.description('Switch to enable/disable ExpressRoute virtual network gateway deployment.')
-param parExpressRouteGatewayEnabled bool = true
+param parExpressRouteGatewayEnabled bool = false
 
 @sys.description('Configuration for ExpressRoute virtual network gateway to be deployed.')
 param parExpressRouteGatewayConfig object = {

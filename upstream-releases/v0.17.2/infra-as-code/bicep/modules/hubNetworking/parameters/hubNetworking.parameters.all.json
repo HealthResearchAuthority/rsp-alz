@@ -3,13 +3,13 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parLocation": {
-      "value": "eastus"
+      "value": "uksouth"
     },
     "parCompanyPrefix": {
       "value": "alz"
     },
     "parHubNetworkName": {
-      "value": "alz-hub-eastus"
+      "value": "alz-hub-uksouth"
     },
     "parHubNetworkAddressPrefix": {
       "value": "10.20.0.0/16"
@@ -116,10 +116,10 @@
     },
     "parPrivateDnsZones": {
       "value": [
-        "privatelink.xxxxxx.azmk8s.io", // Replace xxxxxx with target region (i.e. eastus)
-        "privatelink.xxxxxx.batch.azure.com", // Replace xxxxxx with target region (i.e. eastus)
-        "privatelink.xxxxxx.kusto.windows.net", // Replace xxxxxx with target region (i.e. eastus)
-        "privatelink.xxxxxx.backup.windowsazure.com", // Replace xxxxxx with target region geo code (i.e. for eastus, the geo code is eus)
+        "privatelink.uksouth.azmk8s.io", // Replace xxxxxx with target region (i.e. eastus)
+        "privatelink.uksouth.batch.azure.com", // Replace xxxxxx with target region (i.e. eastus)
+        "privatelink.uksouth.kusto.windows.net", // Replace xxxxxx with target region (i.e. eastus)
+        "privatelink.uksouth.backup.windowsazure.com", // Replace xxxxxx with target region geo code (i.e. for eastus, the geo code is eus)
         "privatelink.adf.azure.com",
         "privatelink.afs.azure.net",
         "privatelink.agentsvc.azure-automation.net",
