@@ -56,25 +56,25 @@ param parHubNetworkAddressPrefix string = '10.0.0.0/16'
 param parSubnets subnetOptionsType = [
   {
     name: 'AzureBastionSubnet'
-    ipAddressRange: '10.10.15.0/24'
+    ipAddressRange: '10.0.15.0/24'
     networkSecurityGroupId: ''
     routeTableId: ''
   }
   {
     name: 'GatewaySubnet'
-    ipAddressRange: '10.10.252.0/24'
+    ipAddressRange: '10.0.252.0/24'
     networkSecurityGroupId: ''
     routeTableId: ''
   }
   {
     name: 'AzureFirewallSubnet'
-    ipAddressRange: '10.10.254.0/24'
+    ipAddressRange: '10.0.254.0/24'
     networkSecurityGroupId: ''
     routeTableId: ''
   }
   {
     name: 'AzureFirewallManagementSubnet'
-    ipAddressRange: '10.10.253.0/24'
+    ipAddressRange: '10.0.253.0/24'
     networkSecurityGroupId: ''
     routeTableId: ''
   }

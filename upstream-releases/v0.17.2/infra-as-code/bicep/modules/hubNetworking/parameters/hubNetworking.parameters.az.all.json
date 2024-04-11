@@ -3,40 +3,40 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parLocation": {
-      "value": "eastus"
+      "value": "uksouth"
     },
     "parCompanyPrefix": {
-      "value": "alz"
+      "value": "iras"
     },
     "parHubNetworkName": {
-      "value": "alz-hub-eastus"
+      "value": "vwan-iras-uksouth"
     },
     "parHubNetworkAddressPrefix": {
-      "value": "10.20.0.0/16"
+      "value": "10.0.0.0/16"
     },
     "parSubnets": {
       "value": [
         {
           "name": "AzureBastionSubnet",
-          "ipAddressRange": "10.20.0.0/24",
+          "ipAddressRange": "10.0.0.0/24",
           "networkSecurityGroupId": "",
           "routeTableId": ""
         },
         {
           "name": "GatewaySubnet",
-          "ipAddressRange": "10.20.254.0/24",
+          "ipAddressRange": "10.0.254.0/24",
           "networkSecurityGroupId": "",
           "routeTableId": ""
         },
         {
           "name": "AzureFirewallSubnet",
-          "ipAddressRange": "10.20.255.0/24",
+          "ipAddressRange": "10.0.255.0/24",
           "networkSecurityGroupId": "",
           "routeTableId": ""
         },
         {
           "name": "AzureFirewallManagementSubnet",
-          "ipAddressRange": "10.20.253.0/24",
+          "ipAddressRange": "10.0.253.0/24",
           "networkSecurityGroupId": "",
           "routeTableId": ""
         }
@@ -58,7 +58,7 @@
       "value": true
     },
     "parAzBastionName": {
-      "value": "alz-bastion"
+      "value": "vwan-iras-bastion"
     },
     "parAzBastionSku": {
       "value": "Standard"
@@ -73,16 +73,16 @@
       "value": true
     },
     "parDdosPlanName": {
-      "value": "alz-ddos-plan"
+      "value": "vwan-iras-ddos-plan"
     },
     "parAzFirewallEnabled": {
       "value": true
     },
     "parAzFirewallName": {
-      "value": "alz-azfw-eastus"
+      "value": "vwan-iras-azfw-eastus"
     },
     "parAzFirewallPoliciesName": {
-      "value": "alz-azfwpolicy-eastus"
+      "value": "vwan-iras-azfwpolicy-eastus"
     },
     "parAzFirewallTier": {
       "value": "Standard"
@@ -206,7 +206,7 @@
     },
     "parVpnGatewayConfig": {
       "value": {
-        "name": "alz-Vpn-Gateway",
+        "name": "vwan-iras-Vpn-Gateway",
         "gatewayType": "Vpn",
         "sku": "VpnGw1AZ",
         "vpnType": "RouteBased",
@@ -229,7 +229,7 @@
     },
     "parExpressRouteGatewayConfig": {
       "value": {
-        "name": "alz-ExpressRoute-Gateway",
+        "name": "vwan-iras-ExpressRoute-Gateway",
         "gatewayType": "ExpressRoute",
         "sku": "ErGw1Az",
         "vpnType": "RouteBased",
