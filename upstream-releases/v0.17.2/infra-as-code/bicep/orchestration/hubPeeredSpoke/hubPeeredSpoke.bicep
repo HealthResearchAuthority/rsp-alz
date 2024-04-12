@@ -288,36 +288,6 @@ spokes: [for spoke in parSpokeNetworks: {
     }
   }]
 
-
-  //ToDo: Remove this may be ? 
-  // Module - Hub to Spoke peering.
-  module modHubPeeringToSpoke '../../modules/vnetPeering/vnetPeering.bicep' = if (!empty(varHubVirtualNetworkName)) {
-    scope: resourceGroup(varHubVirtualNetworkSubscriptionId, varHubVirtualNetworkResourceGroup)
-    name: varModuleDeploymentNames.modSpokePeeringFromHub
-    params: {
-      parDestinationVirtualNetworkId: (!empty(varHubVirtualNetworkName) ? modSpokeNetworking.outputs.outSpokeVirtualNetworkId : '')
-      parDestinationVirtualNetworkName: (!empty(varHubVirtualNetworkName) ? modSpokeNetworking.outputs.outSpokeVirtualNetworkName : '')
-      parSourceVirtualNetworkName: varHubVirtualNetworkName
-      parAllowForwardedTraffic: parAllowSpokeForwardedTraffic
-      parAllowGatewayTransit: parAllowHubVpnGatewayTransit
-      parTelemetryOptOut: parTelemetryOptOut
-    }
-  }
-
-  //ToDo: Remove this may be ? 
-  // Module - Spoke to Hub peering.
-  module modSpokePeeringToHub '../../modules/vnetPeering/vnetPeering.bicep' = if (!empty(varHubVirtualNetworkName)) {
-    scope: resourceGroup(parPeeredVnetSubscriptionId, parResourceGroupNameForSpokeNetworking)
-    name: varModuleDeploymentNames.modSpokePeeringToHub
-    params: {
-      parDestinationVirtualNetworkId: parHubVirtualNetworkId
-      parDestinationVirtualNetworkName: varHubVirtualNetworkName
-      parSourceVirtualNetworkName: (!empty(varHubVirtualNetworkName) ? modSpokeNetworking.outputs.outSpokeVirtualNetworkName : '')
-      parUseRemoteGateways: parAllowHubVpnGatewayTransit
-      parTelemetryOptOut: parTelemetryOptOut
-    }
-  }
-
   //ToDo:Review
   // Module -  Spoke to Azure Virtual WAN Hub peering.
   module modhubVirtualNetworkConnection '../../modules/vnetPeeringVwan/hubVirtualNetworkConnection.bicep' = if (!empty(varVirtualHubResourceId)) {
