@@ -57,7 +57,7 @@ var varLandingZoneMgChildrenAlzDefault = {
   nonprod: {
     displayName: 'NonProd'
   }
-  Prod: {
+  prod: {
     displayName: 'Prod'
   }
 }

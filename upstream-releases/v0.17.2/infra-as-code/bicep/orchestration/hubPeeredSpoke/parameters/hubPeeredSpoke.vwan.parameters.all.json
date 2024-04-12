@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parLocation": {
-      "value": "westeurope"
+      "value": "uksouth"
     },
     "parTopLevelManagementGroupPrefix": {
-      "value": "alz"
+      "value": "mg-rsp"
     },
     "parTopLevelManagementGroupSuffix": {
       "value": ""
@@ -15,7 +15,7 @@
       "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     },
     "parPeeredVnetSubscriptionMgPlacement": {
-      "value": "alz-platform-connectivity"
+      "value": "mg-rsp-platform-connectivity"
     },
     "parDdosProtectionPlanId": {
       "value": ""
