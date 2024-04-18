@@ -8,6 +8,7 @@ pr:
   branches:
     include:
       - "main"
+      - feature*
   paths:
     include:
       - "**/bicepconfig.json"
@@ -72,5 +73,5 @@ jobs:
             throw $output
           }
         workingDirectory: config/custom-modules
-        condition: eq(variables['CUSTOM_MODULES'], 'true')
+        #condition: eq(variables['CUSTOM_MODULES'], 'true')
         displayName: Bicep Build & Lint All Custom Modules
