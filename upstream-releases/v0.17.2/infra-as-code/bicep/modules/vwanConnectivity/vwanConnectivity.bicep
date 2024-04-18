@@ -127,7 +127,7 @@ param parVirtualWanHubs virtualWanOptionsType = [ {
     parVpnGatewayEnabled: false
     parExpressRouteGatewayEnabled: false
     parAzFirewallEnabled: true
-    parVirtualHubAddressPrefix: '10.100.0.0/22'
+    parVirtualHubAddressPrefix: '10.0.0.0/16'
     parHubLocation: parLocation
     parHubRoutingPreference: 'ExpressRoute'
     parVirtualRouterAutoScaleConfiguration: 2

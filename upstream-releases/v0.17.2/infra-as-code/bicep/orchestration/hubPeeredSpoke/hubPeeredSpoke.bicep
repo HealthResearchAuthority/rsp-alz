@@ -207,37 +207,37 @@ var varVirtualHubSubscriptionId = (!empty(parHubVirtualNetworkId) && contains(pa
 param parSpokeNetworks spokesType = [
   {
     subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //Development
-    ipRange: '10.100.1.0/22'
+    ipRange: '10.1.0.0/17'
     managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
   }
   {
     subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test
-    ipRange: '10.100.2.0/22'
+    ipRange: '10.2.0.0/17'
     managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
   }
   {
     subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test Automation
-    ipRange: '10.100.3.0/22'
+    ipRange: '10.3.0.0/17'
     managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
   }
   {
     subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test Integration
-    ipRange: '10.100.4.0/22'
+    ipRange: '10.4.0.0/17'
     managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
   }
   {
     subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //UAT
-    ipRange: '10.100.5.0/22'
+    ipRange: '10.5.0.0/17'
     managementGroup: managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
   }
   {
     subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //Staging
-    ipRange: '10.100.6.0/22'
+    ipRange: '10.6.0.0/17'
     managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
   }
   {
     subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //Prod
-    ipRange: '10.100.7.0/22'
+    ipRange: '10.7.0.0/17'
     managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
   }
 ]
