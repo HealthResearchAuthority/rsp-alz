@@ -51,7 +51,7 @@
           "parExpressRouteGatewayEnabled": false,
           "parAzFirewallEnabled": true,
           "parVirtualHubAddressPrefix": "10.0.0.0/16",
-          "parHubLocation": "eastus",
+          "parHubLocation": "uksouth",
           "parHubRoutingPreference": "ExpressRoute",
           "parVirtualRouterAutoScaleConfiguration": 2,
           "parVirtualHubRoutingIntentDestinations": []
