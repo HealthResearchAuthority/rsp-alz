@@ -63,7 +63,7 @@ jobs:
         inputs:
           azureSubscription: 'ARM Connection'
           ScriptType: 'InlineScript'
-          Inline: 'Install-Module -Name Az -Repository PSGallery -Force'
+          Inline: 'Update-Module -Name Az -Force'
           azurePowerShellVersion: 'LatestVersion'
 
       - task: AzurePowerShell@5
