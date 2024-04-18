@@ -12,6 +12,13 @@ param parTopLevelManagementGroupPrefix string = 'mg-rsp'
 @maxLength(10)
 param parTopLevelManagementGroupSuffix string = ''
 
+@sys.description('Display name for top level management group. This name will be applied to the management group prefix defined in parTopLevelManagementGroupPrefix parameter.')
+@minLength(2)
+param parTopLevelManagementGroupDisplayName string = 'Azure Landing Zones'
+
+@sys.description('Optional parent for Management Group hierarchy, used as intermediate root Management Group parent, if specified. If empty, default, will deploy beneath Tenant Root Management Group.')
+param parTopLevelManagementGroupParentId string = 'mg-future-iras'
+
 @sys.description('Deploys Prod & NonProd Management Groups beneath Landing Zones Management Group if set to true.')
 param parWorkloadsMgAlzDefaultsEnable bool = true
 
@@ -131,7 +138,7 @@ resource resSandboxMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   }
 }
 
-resource resDevelopmentBoxMg 'Microsoft.Management/managementGroups@2023-04-01' = if (parDevBoxMgAlzDefaultsEnable) {
+resource resDevelopmentBoxMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   scope: tenant()
   name: varDevelopmentboxMg.name
   properties: {
@@ -187,7 +194,7 @@ output outLandingZonesManagementGroupId string = resLandingZonesMg.id
 output outLandingZoneChildrenManagementGroupIds array = [for mg in items(varLandingZoneMgChildrenAlzDefault): '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupPrefix}-workloads-${mg.key}']
 
 output outSandboxManagementGroupId string = resSandboxMg.id
-output outDevelopmentManagementGroupName string = resDevelopmentBoxMg.id
+output outDevelopmentManagementGroupId string = resDevelopmentBoxMg.id
 
 // Output Management Group Names
 output outTopLevelManagementGroupName string = resTopLevelMg.name
