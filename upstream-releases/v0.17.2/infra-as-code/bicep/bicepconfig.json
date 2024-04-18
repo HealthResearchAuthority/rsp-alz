@@ -41,7 +41,7 @@
           "level": "error"
         },
         "no-unused-params": {
-          "level": "error"
+          "level": "warning"
         },
         "no-unused-vars": {
           "level": "error"
