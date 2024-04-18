@@ -25,9 +25,6 @@ param parWorkloadsMgAlzDefaultsEnable bool = true
 @sys.description('Deploys Management and Connectivity Management Groups beneath Platform Management Group if set to true.')
 param parPlatformMgAlzDefaultsEnable bool = true
 
-@sys.description('Deploys Confidential Corp & Confidential Online Management Groups beneath Landing Zones Management Group if set to true.')
-param parLandingZoneMgConfidentialEnable bool = false
-
 @sys.description('Dictionary Object to allow additional or different child Management Groups of Landing Zones Management Group to be deployed.')
 param parLandingZoneMgChildren object = {}
 
@@ -67,10 +64,6 @@ var varLandingZoneMgChildrenAlzDefault = {
   prod: {
     displayName: 'Prod'
   }
-}
-
-// Used if parLandingZoneMgConfidentialEnable == true
-var varLandingZoneMgChildrenConfidential = {
 }
 
 // Sandbox Management Group
