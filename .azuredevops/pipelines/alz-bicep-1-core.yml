@@ -60,13 +60,6 @@ jobs:
         displayName: Set IS_PULL_REQUEST Variable to True
 
       - task: AzurePowerShell@5
-        inputs:
-          azureSubscription: 'ARM Connection'
-          ScriptType: 'InlineScript'
-          Inline: 'Update-Module -Name Az -Force'
-          azurePowerShellVersion: 'LatestVersion'
-
-      - task: AzurePowerShell@5
         displayName: "Management Groups Deployment"
         inputs:
           azureSubscription: ${{ variables.SERVICE_CONNECTION_NAME }}
