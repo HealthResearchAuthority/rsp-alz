@@ -72,6 +72,7 @@ var varCuaid = '9b7965a0-d77c-41d6-85ef-ec3dfea4845b'
 // Level 1
 resource resTopLevelMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   name: 'mg-future-iras'
+  scope: tenant()
   properties: {
     displayName: parTopLevelManagementGroupDisplayName
     details: {
@@ -85,6 +86,7 @@ resource resTopLevelMg 'Microsoft.Management/managementGroups@2023-04-01' = {
 // Level 2
 resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   name: varPlatformMg.name
+  scope: tenant()
   properties: {
     displayName: varPlatformMg.displayName
     details: {
@@ -97,6 +99,7 @@ resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
 
 resource resLandingZonesMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   name: varLandingZoneMg.name
+  scope: tenant()
   properties: {
     displayName: varLandingZoneMg.displayName
     details: {
@@ -109,6 +112,7 @@ resource resLandingZonesMg 'Microsoft.Management/managementGroups@2023-04-01' = 
 
 resource resSandboxMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   name: varSandboxMg.name
+  scope: tenant()
   properties: {
     displayName: varSandboxMg.displayName
     details: {
@@ -135,6 +139,7 @@ resource resDevelopmentBoxMg 'Microsoft.Management/managementGroups@2023-04-01' 
 // Level 3 - Child Management Groups under Landing Zones MG
 resource resLandingZonesChildMgs 'Microsoft.Management/managementGroups@2023-04-01' = [for mg in items(varLandingZoneMgChildrenAlzDefault): if (!empty(varLandingZoneMgChildrenAlzDefault)) {
   name: '${parTopLevelManagementGroupPrefix}-workloads-${mg.key}'
+  scope: tenant()
   properties: {
     displayName: mg.value.displayName
     details: {
@@ -148,6 +153,7 @@ resource resLandingZonesChildMgs 'Microsoft.Management/managementGroups@2023-04-
 //Level 3 - Child Management Groups under Platform MG
 resource resPlatformChildMgs 'Microsoft.Management/managementGroups@2023-04-01' = [for mg in items(varPlatformMgChildrenAlzDefault): if (!empty(varPlatformMgChildrenAlzDefault)) {
   name: '${parTopLevelManagementGroupPrefix}-platform-${mg.key}'
+  scope: tenant()
   properties: {
     displayName: mg.value.displayName
     details: {
