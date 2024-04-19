@@ -19,9 +19,6 @@ param parTopLevelManagementGroupDisplayName string = 'Future IRAS'
 @sys.description('Optional parent for Management Group hierarchy, used as intermediate root Management Group parent, if specified. If empty, default, will deploy beneath Tenant Root Management Group.')
 param parTopLevelManagementGroupParentId string = ''
 
-@sys.description('Set Parameter to true to Opt-out of deployment telemetry.')
-param parTelemetryOptOut bool = true
-
 // Platform and Child Management Groups
 var varPlatformMg = {
   name: '${parTopLevelManagementGroupPrefix}-platform'
@@ -65,9 +62,6 @@ var varDevelopmentboxMg = {
   name: '${parTopLevelManagementGroupPrefix}-devbox'
   displayName: 'Dev Box'
 }
-
-// Customer Usage Attribution Id
-var varCuaid = '9b7965a0-d77c-41d6-85ef-ec3dfea4845b'
 
 // Level 1
 resource resTopLevelMg 'Microsoft.Management/managementGroups@2023-04-01' = {
