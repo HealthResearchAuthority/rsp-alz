@@ -20,7 +20,7 @@ param parTopLevelManagementGroupDisplayName string = 'Future IRAS'
 param parTopLevelManagementGroupParentId string = ''
 
 @sys.description('Set Parameter to true to Opt-out of deployment telemetry.')
-param parTelemetryOptOut bool = false
+param parTelemetryOptOut bool = true
 
 // Platform and Child Management Groups
 var varPlatformMg = {
