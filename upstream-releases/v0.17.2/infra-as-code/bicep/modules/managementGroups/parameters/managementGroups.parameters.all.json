@@ -13,24 +13,6 @@
     },
     "parTopLevelManagementGroupParentId": {
       "value": ""
-    },
-    "parLandingZoneMgAlzDefaultsEnable": {
-      "value": true
-    },
-    "parPlatformMgAlzDefaultsEnable": {
-      "value": true
-    },
-    "parLandingZoneMgConfidentialEnable": {
-      "value": false
-    },
-    "parLandingZoneMgChildren": {
-      "value": {}
-    },
-    "parPlatformMgChildren": {
-      "value": {}
-    },
-    "parTelemetryOptOut": {
-      "value": true
     }
   }
 }
