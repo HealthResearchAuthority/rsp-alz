@@ -19,18 +19,6 @@ param parTopLevelManagementGroupDisplayName string = 'Future IRAS'
 @sys.description('Optional parent for Management Group hierarchy, used as intermediate root Management Group parent, if specified. If empty, default, will deploy beneath Tenant Root Management Group.')
 param parTopLevelManagementGroupParentId string = 'mg-future-iras'
 
-@sys.description('Deploys Prod & NonProd Management Groups beneath Landing Zones Management Group if set to true.')
-param parWorkloadsMgAlzDefaultsEnable bool = true
-
-@sys.description('Deploys Management and Connectivity Management Groups beneath Platform Management Group if set to true.')
-param parPlatformMgAlzDefaultsEnable bool = true
-
-@sys.description('Dictionary Object to allow additional or different child Management Groups of Landing Zones Management Group to be deployed.')
-param parLandingZoneMgChildren object = {}
-
-@sys.description('Dictionary Object to allow additional or different child Management Groups of Platform Management Group to be deployed.')
-param parPlatformMgChildren object = {}
-
 @sys.description('Set Parameter to true to Opt-out of deployment telemetry.')
 param parTelemetryOptOut bool = false
 
