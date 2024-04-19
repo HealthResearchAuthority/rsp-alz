@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parTopLevelManagementGroupPrefix": {
-      "value": "hra"
+      "value": "mg-rsp"
     },
     "parTopLevelManagementGroupSuffix": {
       "value": ""
@@ -13,24 +13,6 @@
     },
     "parTopLevelManagementGroupParentId": {
       "value": ""
-    },
-    "parLandingZoneMgAlzDefaultsEnable": {
-      "value": true
-    },
-    "parPlatformMgAlzDefaultsEnable": {
-      "value": true
-    },
-    "parLandingZoneMgConfidentialEnable": {
-      "value": false
-    },
-    "parLandingZoneMgChildren": {
-      "value": {}
-    },
-    "parPlatformMgChildren": {
-      "value": {}
-    },
-    "parTelemetryOptOut": {
-      "value": false
     }
   }
 }
