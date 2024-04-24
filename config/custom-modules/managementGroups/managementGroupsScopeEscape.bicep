@@ -17,7 +17,7 @@ param parTopLevelManagementGroupSuffix string = ''
 param parTopLevelManagementGroupDisplayName string = 'Future IRAS'
 
 @sys.description('Optional parent for Management Group hierarchy, used as intermediate root Management Group parent, if specified. If empty, default, will deploy beneath Tenant Root Management Group.')
-param parTopLevelManagementGroupParentId string = ''
+param parTopLevelManagementGroupParentId string = 'mg-future-iras'
 
 // Platform and Child Management Groups
 var varPlatformMg = {
