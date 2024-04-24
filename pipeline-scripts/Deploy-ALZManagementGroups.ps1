@@ -30,6 +30,11 @@ if ($NonRootParentManagementGroupId -eq '') {
   New-AzTenantDeployment @inputObject
 }
 
+Write-Host $NonRootParentManagementGroupId
+Write-Host $Location
+Write-Host $TemplateFile + "managementGroupsScopeEscape.bicep"
+Write-Host $TemplateParameterFile
+
 if ($NonRootParentManagementGroupId -ne '') {
   $inputObject = @{
     ManagementGroupId     = $NonRootParentManagementGroupId
