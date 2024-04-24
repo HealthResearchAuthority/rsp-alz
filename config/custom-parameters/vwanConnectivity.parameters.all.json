@@ -24,33 +24,33 @@
       "value": []
     },
     "parVirtualWanName": {
-      "value": "alz-vwan-uksouth"
+      "value": "vwan-rsp-uksouth"
     },
     "parVirtualWanHubName": {
-      "value": "alz-vhub"
+      "value": "vhub-rsp"
     },
     "parVpnGatewayName": {
-      "value": "alz-vpngw"
+      "value": "vpngw-rsp"
     },
     "parExpressRouteGatewayName": {
-      "value": "alz-ergw"
+      "value": "ergw-rsp"
     },
     "parAzFirewallName": {
-      "value": "alz-azfw-uksouth"
+      "value": "fw-vWan-rsp"
     },
     "parAzFirewallAvailabilityZones": {
-      "value": null
+      "value": []
     },
     "parAzFirewallPoliciesName": {
-      "value": "alz-azfwpolicy-uksouth"
+      "value": "azfwpolicy-rsp-uksouth"
     },
     "parVirtualWanHubs": {
       "value": [
         {
-          "parVpnGatewayEnabled": true,
-          "parExpressRouteGatewayEnabled": true,
+          "parVpnGatewayEnabled": false,
+          "parExpressRouteGatewayEnabled": false,
           "parAzFirewallEnabled": true,
-          "parVirtualHubAddressPrefix": "10.100.0.0/23",
+          "parVirtualHubAddressPrefix": "10.0.0.0/16",
           "parHubLocation": "uksouth",
           "parHubRoutingPreference": "ExpressRoute",
           "parVirtualRouterAutoScaleConfiguration": 2,
@@ -75,10 +75,10 @@
     },
     "parPrivateDnsZones": {
       "value": [
-        "privatelink.uksouth.azmk8s.io",
-        "privatelink.uksouth.batch.azure.com",
-        "privatelink.uksouth.kusto.windows.net",
-        "privatelink.uksouth.backup.windowsazure.com",
+        "privatelink.uksouth.azmk8s.io", // Replace xxxxxx with target region (i.e. eastus)
+        "privatelink.uksouth.batch.azure.com", // Replace xxxxxx with target region (i.e. eastus)
+        "privatelink.uksouth.kusto.windows.net", // Replace xxxxxx with target region (i.e. eastus)
+        "privatelink.uksouth.backup.windowsazure.com", // Replace xxxxxx with target region geo code (i.e. for eastus, the geo code is eus)
         "privatelink.adf.azure.com",
         "privatelink.afs.azure.net",
         "privatelink.agentsvc.azure-automation.net",
@@ -149,11 +149,11 @@
       "value": true
     },
     "parVirtualNetworkIdToLink": {
-      "value": ""
+      "value": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/HUB_Networking_POC/providers/Microsoft.Network/virtualNetworks/alz-hub-eastus"
     },
     "parTags": {
       "value": {
-        "Environment": "live"
+        "Environment": "Live"
       }
     },
     "parVirtualNetworkIdToLinkFailover": {
