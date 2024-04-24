@@ -6,7 +6,7 @@ param (
   [String]$Location = "$($env:LOCATION)",
 
   [Parameter()]
-  [String]$TemplateFile = "upstream-releases\$($env:UPSTREAM_RELEASE_VERSION)\infra-as-code\bicep\modules\managementGroups\",
+  [String]$TemplateFile = "config\custom-modules\managementGroups\",
 
   [Parameter()]
   [String]$TemplateParameterFile = "config\custom-parameters\managementGroups.parameters.all.json",
