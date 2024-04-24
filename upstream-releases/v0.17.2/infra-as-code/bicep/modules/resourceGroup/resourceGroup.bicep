@@ -27,7 +27,7 @@ param parResourceGroupName string
 
 ''')
 param parResourceLockConfig lockType = {
-  kind: 'ReadOnly'
+  kind: 'None'
   notes: 'This lock was created by the ALZ Bicep Resource Group Module.'
 }
 

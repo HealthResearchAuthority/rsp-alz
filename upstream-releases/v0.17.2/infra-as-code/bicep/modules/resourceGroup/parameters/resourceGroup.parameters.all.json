@@ -3,13 +3,14 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parLocation": {
-      "value": "uksouth"
+      "value": "eastus"
     },
     "parResourceGroupName": {
       "value": "alz-rg"
     },
     "parTags": {
       "value": {
+        "Environment": "Live"
       }
     },
     "parTelemetryOptOut": {
