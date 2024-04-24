@@ -24,34 +24,34 @@
       "value": []
     },
     "parVirtualWanName": {
-      "value": "alz-vwan-eastus"
+      "value": "vwan-rsp-uksouth"
     },
     "parVirtualWanHubName": {
-      "value": "alz-vhub"
+      "value": "vhub-rsp"
     },
     "parVpnGatewayName": {
-      "value": "alz-vpngw"
+      "value": "vpngw-rsp"
     },
     "parExpressRouteGatewayName": {
-      "value": "alz-ergw"
+      "value": "ergw-rsp"
     },
     "parAzFirewallName": {
-      "value": "alz-fw"
+      "value": "fw-vWan-rsp"
     },
     "parAzFirewallAvailabilityZones": {
       "value": []
     },
     "parAzFirewallPoliciesName": {
-      "value": "alz-azfwpolicy-eastus"
+      "value": "azfwpolicy-rsp-uksouth"
     },
     "parVirtualWanHubs": {
       "value": [
         {
-          "parVpnGatewayEnabled": true,
-          "parExpressRouteGatewayEnabled": true,
+          "parVpnGatewayEnabled": false,
+          "parExpressRouteGatewayEnabled": false,
           "parAzFirewallEnabled": true,
-          "parVirtualHubAddressPrefix": "10.100.0.0/23",
-          "parHubLocation": "eastus",
+          "parVirtualHubAddressPrefix": "10.0.0.0/16",
+          "parHubLocation": "uksouth",
           "parHubRoutingPreference": "ExpressRoute",
           "parVirtualRouterAutoScaleConfiguration": 2,
           "parVirtualHubRoutingIntentDestinations": []

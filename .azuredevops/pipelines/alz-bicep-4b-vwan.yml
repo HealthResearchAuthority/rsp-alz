@@ -22,7 +22,7 @@ pr:
 
 variables:
   ENV_FILE: ".env"
-  SERVICE_CONNECTION_NAME: "ARM Connection"
+  SERVICE_CONNECTION_NAME: ""ARM Connection""
   IS_PULL_REQUEST: "false"
 
 jobs:

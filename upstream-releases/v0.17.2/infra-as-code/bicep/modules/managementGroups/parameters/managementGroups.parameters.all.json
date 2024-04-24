@@ -3,34 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parTopLevelManagementGroupPrefix": {
-      "value": "alz"
+      "value": "mg-rsp"
     },
     "parTopLevelManagementGroupSuffix": {
       "value": ""
     },
     "parTopLevelManagementGroupDisplayName": {
-      "value": "Azure Landing Zones"
+      "value": "Future IRAS"
     },
     "parTopLevelManagementGroupParentId": {
-      "value": ""
-    },
-    "parLandingZoneMgAlzDefaultsEnable": {
-      "value": true
-    },
-    "parPlatformMgAlzDefaultsEnable": {
-      "value": true
-    },
-    "parLandingZoneMgConfidentialEnable": {
-      "value": false
-    },
-    "parLandingZoneMgChildren": {
-      "value": {}
-    },
-    "parPlatformMgChildren": {
-      "value": {}
-    },
-    "parTelemetryOptOut": {
-      "value": false
+      "value": "mg-future-iras"
     }
   }
 }

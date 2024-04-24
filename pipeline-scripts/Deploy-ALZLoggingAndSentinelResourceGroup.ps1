@@ -12,7 +12,7 @@ param (
   [Boolean]$WhatIfEnabled = [System.Convert]::ToBoolean($($env:IS_PULL_REQUEST)),
 
   [Parameter()]
-  [String[]] $SubscriptionIds = @('b83b4631-b51b-4961-86a1-295f539c826b') #Dev environment to start with
+  [String[]] $SubscriptionIds = @('hra-rsp-dev', 'hra-rsp-systemtest-manual', 'hra-rsp-systemtest-automated', 'hra-rsp-system-integration')
 )
 
 # Parameters necessary for deployment

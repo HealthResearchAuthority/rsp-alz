@@ -3,10 +3,10 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parLocation": {
-      "value": "eastus"
+      "value": "uksouth"
     },
     "parCompanyPrefix": {
-      "value": "alz"
+      "value": "hra"
     },
     "parAzFirewallTier": {
       "value": "Standard"
@@ -24,33 +24,33 @@
       "value": []
     },
     "parVirtualWanName": {
-      "value": "vwan-rsp-uksouth"
+      "value": "alz-vwan-uksouth"
     },
     "parVirtualWanHubName": {
-      "value": "vhub-rsp"
+      "value": "alz-vhub"
     },
     "parVpnGatewayName": {
-      "value": "vpngw-rsp"
+      "value": "alz-vpngw"
     },
     "parExpressRouteGatewayName": {
-      "value": "ergw-rsp"
+      "value": "alz-ergw"
     },
     "parAzFirewallName": {
-      "value": "fw-vWan-rsp"
+      "value": "alz-azfw-uksouth"
     },
     "parAzFirewallAvailabilityZones": {
-      "value": []
+      "value": null
     },
     "parAzFirewallPoliciesName": {
-      "value": "azfwpolicy-rsp-uksouth"
+      "value": "alz-azfwpolicy-uksouth"
     },
     "parVirtualWanHubs": {
       "value": [
         {
-          "parVpnGatewayEnabled": false,
-          "parExpressRouteGatewayEnabled": false,
+          "parVpnGatewayEnabled": true,
+          "parExpressRouteGatewayEnabled": true,
           "parAzFirewallEnabled": true,
-          "parVirtualHubAddressPrefix": "10.0.0.0/16",
+          "parVirtualHubAddressPrefix": "10.100.0.0/23",
           "parHubLocation": "uksouth",
           "parHubRoutingPreference": "ExpressRoute",
           "parVirtualRouterAutoScaleConfiguration": 2,
@@ -75,10 +75,10 @@
     },
     "parPrivateDnsZones": {
       "value": [
-        "privatelink.xxxxxx.azmk8s.io", // Replace xxxxxx with target region (i.e. eastus)
-        "privatelink.xxxxxx.batch.azure.com", // Replace xxxxxx with target region (i.e. eastus)
-        "privatelink.xxxxxx.kusto.windows.net", // Replace xxxxxx with target region (i.e. eastus)
-        "privatelink.xxxxxx.backup.windowsazure.com", // Replace xxxxxx with target region geo code (i.e. for eastus, the geo code is eus)
+        "privatelink.uksouth.azmk8s.io",
+        "privatelink.uksouth.batch.azure.com",
+        "privatelink.uksouth.kusto.windows.net",
+        "privatelink.uksouth.backup.windowsazure.com",
         "privatelink.adf.azure.com",
         "privatelink.afs.azure.net",
         "privatelink.agentsvc.azure-automation.net",
@@ -149,11 +149,11 @@
       "value": true
     },
     "parVirtualNetworkIdToLink": {
-      "value": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/HUB_Networking_POC/providers/Microsoft.Network/virtualNetworks/alz-hub-eastus"
+      "value": ""
     },
     "parTags": {
       "value": {
-        "Environment": "Live"
+        "Environment": "live"
       }
     },
     "parVirtualNetworkIdToLinkFailover": {
