@@ -8,9 +8,6 @@
     "parTopLevelManagementGroupSuffix": {
       "value": ""
     },
-    "parTopLevelManagementGroupDisplayName": {
-      "value": "Future IRAS"
-    },
     "parTopLevelManagementGroupParentId": {
       "value": "mg-future-iras"
     }
