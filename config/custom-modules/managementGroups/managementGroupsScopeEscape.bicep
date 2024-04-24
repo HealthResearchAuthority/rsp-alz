@@ -85,7 +85,7 @@ resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
     displayName: varPlatformMg.displayName
     details: {
       parent: {
-        id: parTopLevelManagementGroupParentId
+        id: '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
       }
     }
   }
@@ -98,7 +98,7 @@ resource resLandingZonesMg 'Microsoft.Management/managementGroups@2023-04-01' = 
     displayName: varLandingZoneMg.displayName
     details: {
       parent: {
-        id: parTopLevelManagementGroupParentId
+        id: '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
       }
     }
   }
@@ -124,7 +124,7 @@ resource resDevelopmentBoxMg 'Microsoft.Management/managementGroups@2023-04-01' 
     displayName: varDevelopmentboxMg.displayName
     details: {
       parent: {
-        id: parTopLevelManagementGroupParentId
+        id: '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
       }
     }
   }
