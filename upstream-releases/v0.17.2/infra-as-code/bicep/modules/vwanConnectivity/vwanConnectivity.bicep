@@ -56,7 +56,7 @@ type lockType = {
 param parLocation string = resourceGroup().location
 
 @sys.description('Prefix value which will be prepended to all resource names.')
-param parCompanyPrefix string = 'rsp'
+param parCompanyPrefix string = 'alz'
 
 @sys.description('''Global Resource Lock Configuration used for all resources deployed in this module.
 
@@ -95,7 +95,7 @@ param parAzFirewallDnsProxyEnabled bool = true
 param parAzFirewallDnsServers array = []
 
 @sys.description('Prefix Used for Virtual WAN.')
-param parVirtualWanName string = 'vwan-rsp-${parLocation}'
+param parVirtualWanName string = '${parCompanyPrefix}-vwan-${parLocation}'
 
 @sys.description('''Resource Lock Configuration for Virtual WAN.
 
@@ -109,7 +109,7 @@ param parVirtualWanLock lockType = {
 }
 
 @sys.description('Prefix Used for Virtual WAN Hub.')
-param parVirtualWanHubName string = 'vhub-rsp'
+param parVirtualWanHubName string = '${parCompanyPrefix}-vhub'
 
 @sys.description('''Array Used for multiple Virtual WAN Hubs deployment. Each object in the array represents an individual Virtual WAN Hub configuration. Add/remove additional objects in the array to meet the number of Virtual WAN Hubs required.
 
@@ -124,10 +124,10 @@ param parVirtualWanHubName string = 'vhub-rsp'
 
 ''')
 param parVirtualWanHubs virtualWanOptionsType = [ {
-    parVpnGatewayEnabled: false
-    parExpressRouteGatewayEnabled: false
+    parVpnGatewayEnabled: true
+    parExpressRouteGatewayEnabled: true
     parAzFirewallEnabled: true
-    parVirtualHubAddressPrefix: '10.0.0.0/16'
+    parVirtualHubAddressPrefix: '10.100.0.0/23'
     parHubLocation: parLocation
     parHubRoutingPreference: 'ExpressRoute'
     parVirtualRouterAutoScaleConfiguration: 2
@@ -223,7 +223,7 @@ param parDdosLock lockType = {
 }
 
 @sys.description('Switch to enable/disable Private DNS Zones deployment.')
-param parPrivateDnsZonesEnabled bool = false
+param parPrivateDnsZonesEnabled bool = true
 
 @sys.description('Resource Group Name for Private DNS Zones.')
 param parPrivateDnsZonesResourceGroup string = resourceGroup().name

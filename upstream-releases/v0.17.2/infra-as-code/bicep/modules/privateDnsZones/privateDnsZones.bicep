@@ -87,7 +87,7 @@ param parPrivateDnsZones array = [
 ]
 
 @sys.description('Set Parameter to false to skip the addition of a Private DNS Zone for Azure Backup.')
-param parPrivateDnsZoneAutoMergeAzureBackupZone bool = false
+param parPrivateDnsZoneAutoMergeAzureBackupZone bool = true
 
 @sys.description('Tags you would like to be applied to all resources in this module.')
 param parTags object = {}
