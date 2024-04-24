@@ -3,9 +3,6 @@ param (
   [String]$Location = "$($env:LOCATION)",
 
   [Parameter()]
-  [String]$ManagementSubscriptionId = "$($env:MANAGEMENT_SUBSCRIPTION_ID)",
-
-  [Parameter()]
   [String]$TemplateFile = "upstream-releases\$($env:UPSTREAM_RELEASE_VERSION)\infra-as-code\bicep\modules\resourceGroup\resourceGroup.bicep",
 
   [Parameter()]
@@ -13,6 +10,9 @@ param (
 
   [Parameter()]
   [Boolean]$WhatIfEnabled = [System.Convert]::ToBoolean($($env:IS_PULL_REQUEST))
+
+  [Parameter()]
+  [Boolean] $SubscriptionIds = 'Development', 'System Test Manual', 'System Test Automation', 'System Test Integration'
 )
 
 # Parameters necessary for deployment
@@ -25,6 +25,10 @@ $inputObject = @{
   Verbose               = $true
 }
 
-Select-AzSubscription -SubscriptionId $ManagementSubscriptionId
+foreach ($ManagementSubscriptionId in $SubscriptionIds)
+{
+	Select-AzSubscription -SubscriptionId $ManagementSubscriptionId
 
-New-AzSubscriptionDeployment @inputObject
+	New-AzSubscriptionDeployment @inputObject
+}
+
