@@ -12,9 +12,9 @@ param parTopLevelManagementGroupPrefix string = 'mg-rsp'
 @maxLength(10)
 param parTopLevelManagementGroupSuffix string = ''
 
-@sys.description('Display name for top level management group. This name will be applied to the management group prefix defined in parTopLevelManagementGroupPrefix parameter.')
-@minLength(2)
-param parTopLevelManagementGroupDisplayName string = 'Future IRAS'
+// @sys.description('Display name for top level management group. This name will be applied to the management group prefix defined in parTopLevelManagementGroupPrefix parameter.')
+// @minLength(2)
+// param parTopLevelManagementGroupDisplayName string = 'Future IRAS'
 
 @sys.description('Optional parent for Management Group hierarchy, used as intermediate root Management Group parent, if specified. If empty, default, will deploy beneath Tenant Root Management Group.')
 param parTopLevelManagementGroupParentId string = 'mg-future-iras'
@@ -52,10 +52,10 @@ var varLandingZoneMgChildrenAlzDefault = {
 }
 
 // Sandbox Management Group
-var varSandboxMg = {
-  name: '${parTopLevelManagementGroupPrefix}-sandbox${parTopLevelManagementGroupSuffix}'
-  displayName: 'Sandbox'
-}
+// var varSandboxMg = {
+//   name: '${parTopLevelManagementGroupPrefix}-sandbox${parTopLevelManagementGroupSuffix}'
+//   displayName: 'Sandbox'
+// }
 
 // DevBox Management Group
 var varDevelopmentboxMg = {
@@ -159,7 +159,7 @@ resource resPlatformChildMgs 'Microsoft.Management/managementGroups@2023-04-01' 
 }]
 
 // Output Management Group IDs
-output outTopLevelManagementGroupId string = resTopLevelMg.id
+//output outTopLevelManagementGroupId string = resTopLevelMg.id
 
 output outPlatformManagementGroupId string = resPlatformMg.id
 output outPlatformChildrenManagementGroupIds array = [for mg in items(varPlatformMgChildrenAlzDefault): '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupPrefix}-platform-${mg.key}']
@@ -167,11 +167,11 @@ output outPlatformChildrenManagementGroupIds array = [for mg in items(varPlatfor
 output outLandingZonesManagementGroupId string = resLandingZonesMg.id
 output outLandingZoneChildrenManagementGroupIds array = [for mg in items(varLandingZoneMgChildrenAlzDefault): '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupPrefix}-workloads-${mg.key}']
 
-output outSandboxManagementGroupId string = resSandboxMg.id
+//output outSandboxManagementGroupId string = resSandboxMg.id
 output outDevelopmentManagementGroupId string = resDevelopmentBoxMg.id
 
 // Output Management Group Names
-output outTopLevelManagementGroupName string = resTopLevelMg.name
+//output outTopLevelManagementGroupName string = resTopLevelMg.name
 
 output outPlatformManagementGroupName string = resPlatformMg.name
 output outPlatformChildrenManagementGroupNames array = [for mg in items(varPlatformMgChildrenAlzDefault): mg.value.displayName]
@@ -179,5 +179,5 @@ output outPlatformChildrenManagementGroupNames array = [for mg in items(varPlatf
 output outLandingZonesManagementGroupName string = resLandingZonesMg.name
 output outLandingZoneChildrenManagementGroupNames array = [for mg in items(varLandingZoneMgChildrenAlzDefault): mg.value.displayName]
 
-output outSandboxManagementGroupName string = resSandboxMg.name
+//output outSandboxManagementGroupName string = resSandboxMg.name
 output outDevelopmentManagementGroupName string = resDevelopmentBoxMg.name
