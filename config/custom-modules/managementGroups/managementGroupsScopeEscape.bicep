@@ -64,18 +64,18 @@ var varDevelopmentboxMg = {
 }
 
 // Level 1
-resource resTopLevelMg 'Microsoft.Management/managementGroups@2023-04-01' = {
-  name: 'mg-future-iras'
-  scope: tenant()
-  properties: {
-    displayName: parTopLevelManagementGroupDisplayName
-    details: {
-      parent: {
-        id: empty(parTopLevelManagementGroupParentId) ? '/providers/Microsoft.Management/managementGroups/${tenant().tenantId}' : contains(toLower(parTopLevelManagementGroupParentId), toLower('/providers/Microsoft.Management/managementGroups/')) ? parTopLevelManagementGroupParentId : '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
-      }
-    }
-  }
-}
+// resource resTopLevelMg 'Microsoft.Management/managementGroups@2023-04-01' = {
+//   name: 'mg-future-iras'
+//   scope: tenant()
+//   properties: {
+//     displayName: parTopLevelManagementGroupDisplayName
+//     details: {
+//       parent: {
+//         id: empty(parTopLevelManagementGroupParentId) ? '/providers/Microsoft.Management/managementGroups/${tenant().tenantId}' : contains(toLower(parTopLevelManagementGroupParentId), toLower('/providers/Microsoft.Management/managementGroups/')) ? parTopLevelManagementGroupParentId : '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
+//       }
+//     }
+//   }
+// }
 
 // Level 2
 resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
@@ -85,7 +85,7 @@ resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
     displayName: varPlatformMg.displayName
     details: {
       parent: {
-        id: resTopLevelMg.id
+        id: parTopLevelManagementGroupParentId
       }
     }
   }
@@ -98,24 +98,24 @@ resource resLandingZonesMg 'Microsoft.Management/managementGroups@2023-04-01' = 
     displayName: varLandingZoneMg.displayName
     details: {
       parent: {
-        id: resTopLevelMg.id
+        id: parTopLevelManagementGroupParentId
       }
     }
   }
 }
 
-resource resSandboxMg 'Microsoft.Management/managementGroups@2023-04-01' = {
-  name: varSandboxMg.name
-  scope: tenant()
-  properties: {
-    displayName: varSandboxMg.displayName
-    details: {
-      parent: {
-        id: resTopLevelMg.id
-      }
-    }
-  }
-}
+// resource resSandboxMg 'Microsoft.Management/managementGroups@2023-04-01' = {
+//   name: varSandboxMg.name
+//   scope: tenant()
+//   properties: {
+//     displayName: varSandboxMg.displayName
+//     details: {
+//       parent: {
+//         id: parTopLevelManagementGroupParentId
+//       }
+//     }
+//   }
+// }
 
 resource resDevelopmentBoxMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   scope: tenant()
@@ -124,7 +124,7 @@ resource resDevelopmentBoxMg 'Microsoft.Management/managementGroups@2023-04-01' 
     displayName: varDevelopmentboxMg.displayName
     details: {
       parent: {
-        id: resTopLevelMg.id
+        id: parTopLevelManagementGroupParentId
       }
     }
   }
