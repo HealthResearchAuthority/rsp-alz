@@ -12,7 +12,7 @@ param (
   [Boolean]$WhatIfEnabled = [System.Convert]::ToBoolean($($env:IS_PULL_REQUEST)),
 
   [Parameter()]
-  [String[]] $SubscriptionIds = @('b83b4631-b51b-4961-86a1-295f539c826b') #Starting with Development environment
+  [String[]] $SubscriptionIds = @('9ef9a127-7a6e-452e-b18d-d2e2e89ffa92') #use existing Workspace under Dev-Box subscription
 )
 
 # Parameters necessary for deployment

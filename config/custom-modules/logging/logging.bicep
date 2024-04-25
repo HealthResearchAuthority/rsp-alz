@@ -148,7 +148,7 @@ param parLogAnalyticsWorkspaceTags object = parTags
 param parUseSentinelClassicPricingTiers bool = false
 
 @sys.description('Log Analytics LinkedService name for Automation Account.')
-param parLogAnalyticsLinkedServiceAutomationAccountName string = 'rsp-loganalytics-Automation-link'
+param parLogAnalyticsLinkedServiceAutomationAccountName string = 'rsp-loganalytics-automation-link'
 
 @sys.description('Set Parameter to true to Opt-out of deployment telemetry')
 param parTelemetryOptOut bool = true
