@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parLogAnalyticsWorkspaceName": {
-      "value": "alz-log-analytics"
+      "value": "hra-rsp-log-analytics"
     },
     "parLogAnalyticsWorkspaceLocation": {
       "value": "uksouth"
@@ -23,7 +23,6 @@
         "AntiMalware",
         "ChangeTracking",
         "Security",
-        "SecurityInsights",
         "SQLAdvancedThreatProtection",
         "SQLVulnerabilityAssessment",
         "SQLAssessment",
@@ -50,9 +49,6 @@
       "value": {
         "Environment": "live"
       }
-    },
-    "parUseSentinelClassicPricingTiers": {
-      "value": false
     },
     "parLogAnalyticsLinkedServiceAutomationAccountName": {
       "value": "Automation"
