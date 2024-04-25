@@ -3,7 +3,7 @@ param (
   [String]$Location = "$($env:LOCATION)",
 
   [Parameter()]
-  [String]$TopLevelMGPrefix = "$($env:TOP_LEVEL_MG_PREFIX)",
+  [String]$MGForPolicies = "$($env:WORKLOADS_MG_ID)",
 
   [Parameter()]
   [String]$TemplateFile = "upstream-releases\$($env:UPSTREAM_RELEASE_VERSION)\infra-as-code\bicep\modules\policy\definitions\customPolicyDefinitions.bicep",
@@ -19,7 +19,7 @@ param (
 $inputObject = @{
   DeploymentName        = 'alz-PolicyDefsDeployment-{0}' -f ( -join (Get-Date -Format 'yyyyMMddTHHMMssffffZ')[0..63])
   Location              = $Location
-  ManagementGroupId     = $TopLevelMGPrefix
+  ManagementGroupId     = $MGForPolicies
   TemplateFile          = $TemplateFile
   TemplateParameterFile = $TemplateParameterFile
   WhatIf                = $WhatIfEnabled

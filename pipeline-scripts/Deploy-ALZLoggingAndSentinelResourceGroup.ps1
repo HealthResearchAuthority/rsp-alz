@@ -12,7 +12,7 @@ param (
   [Boolean]$WhatIfEnabled = [System.Convert]::ToBoolean($($env:IS_PULL_REQUEST)),
 
   [Parameter()]
-  [String]$ManagementSubscriptionId = "b83b4631-b51b-4961-86a1-295f539c826b"
+  [String]$ManagementSubscriptionId = "$($env:MANAGEMENT_SUBSCRIPTION_ID)"
 )
 
 # Parameters necessary for deployment
