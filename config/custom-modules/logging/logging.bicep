@@ -143,9 +143,6 @@ param parAutomationAccountTags object = parTags
 @sys.description('Tags you would like to be applied to Log Analytics Workspace.')
 param parLogAnalyticsWorkspaceTags object = parTags
 
-@sys.description('Set Parameter to true to use Sentinel Classic Pricing Tiers, following changes introduced in July 2023 as documented here: https://learn.microsoft.com/azure/sentinel/enroll-simplified-pricing-tier.')
-param parUseSentinelClassicPricingTiers bool = false
-
 @sys.description('Log Analytics LinkedService name for Automation Account.')
 param parLogAnalyticsLinkedServiceAutomationAccountName string = 'rsp-loganalytics-automation-link'
 
