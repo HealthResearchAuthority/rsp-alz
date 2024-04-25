@@ -24,7 +24,7 @@ param parGlobalResourceLock lockType = {
 }
 
 @sys.description('Log Analytics Workspace name.')
-param parLogAnalyticsWorkspaceName string = 'alz-log-analytics'
+param parLogAnalyticsWorkspaceName string = 'rsp-log-analytics'
 
 @sys.description('Log Analytics region name - Ensure the regions selected is a supported mapping as per: https://docs.microsoft.com/azure/automation/how-to/region-mappings.')
 param parLogAnalyticsWorkspaceLocation string = resourceGroup().location
@@ -113,7 +113,7 @@ param parLogAnalyticsWorkspaceSolutionsLock lockType = {
 param parLogAnalyticsWorkspaceLinkAutomationAccount bool = true
 
 @sys.description('Automation account name.')
-param parAutomationAccountName string = 'alz-automation-account'
+param parAutomationAccountName string = 'rsp-automation-account'
 
 @sys.description('Automation Account region name. - Ensure the regions selected is a supported mapping as per: https://docs.microsoft.com/azure/automation/how-to/region-mappings.')
 param parAutomationAccountLocation string = resourceGroup().location
@@ -148,10 +148,10 @@ param parLogAnalyticsWorkspaceTags object = parTags
 param parUseSentinelClassicPricingTiers bool = false
 
 @sys.description('Log Analytics LinkedService name for Automation Account.')
-param parLogAnalyticsLinkedServiceAutomationAccountName string = 'Automation'
+param parLogAnalyticsLinkedServiceAutomationAccountName string = 'rsp-loganalytics-Automation-link'
 
 @sys.description('Set Parameter to true to Opt-out of deployment telemetry')
-param parTelemetryOptOut bool = false
+param parTelemetryOptOut bool = true
 
 // Customer Usage Attribution Id
 var varCuaid = 'f8087c67-cc41-46b2-994d-66e4b661860d'

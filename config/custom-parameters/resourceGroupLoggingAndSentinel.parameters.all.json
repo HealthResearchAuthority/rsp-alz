@@ -6,15 +6,15 @@
       "value": "uksouth"
     },
     "parResourceGroupName": {
-      "value": "rg-hra-logging"
+      "value": "rg-hra-logs"
     },
     "parTags": {
       "value": {
-        "Environment": "live"
+        "Environment": ""
       }
     },
     "parTelemetryOptOut": {
-      "value": false
+      "value": true
     },
     "parResourceLockConfig": {
       "value": {

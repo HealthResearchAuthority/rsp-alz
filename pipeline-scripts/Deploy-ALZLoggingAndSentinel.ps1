@@ -6,7 +6,7 @@ param (
   [String]$LoggingResourceGroup = "$($env:LOGGING_RESOURCE_GROUP)",
 
   [Parameter()]
-  [String]$TemplateFile = "upstream-releases\$($env:UPSTREAM_RELEASE_VERSION)\infra-as-code\bicep\modules\logging\logging.bicep",
+  [String]$TemplateFile = "config\custom-modules\logging\logging.bicep",
 
   [Parameter()]
   [String]$TemplateParameterFile = "config\custom-parameters\logging.parameters.all.json",

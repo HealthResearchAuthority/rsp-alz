@@ -12,7 +12,7 @@ param (
   [Boolean]$WhatIfEnabled = [System.Convert]::ToBoolean($($env:IS_PULL_REQUEST)),
 
   [Parameter()]
-  [String[]] $SubscriptionIds = @('b83b4631-b51b-4961-86a1-295f539c826b') #Starting with Development environment
+  [String]$ManagementSubscriptionId = "b83b4631-b51b-4961-86a1-295f539c826b"
 )
 
 # Parameters necessary for deployment
@@ -25,10 +25,7 @@ $inputObject = @{
   Verbose               = $true
 }
 
-foreach ($ManagementSubscriptionId in $SubscriptionIds)
-{
-	Select-AzSubscription -SubscriptionId $ManagementSubscriptionId
+Select-AzSubscription -SubscriptionId $ManagementSubscriptionId
 
-	New-AzSubscriptionDeployment @inputObject
-}
+New-AzSubscriptionDeployment @inputObject
 
