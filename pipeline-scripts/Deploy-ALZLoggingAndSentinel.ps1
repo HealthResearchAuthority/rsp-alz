@@ -1,8 +1,5 @@
 param (
   [Parameter()]
-  [String]$ManagementSubscriptionId = "$($env:MANAGEMENT_SUBSCRIPTION_ID)",
-
-  [Parameter()]
   [String]$LoggingResourceGroup = "$($env:LOGGING_RESOURCE_GROUP)",
 
   [Parameter()]
@@ -13,6 +10,9 @@ param (
 
   [Parameter()]
   [Boolean]$WhatIfEnabled = [System.Convert]::ToBoolean($($env:IS_PULL_REQUEST))
+
+  [Parameter()]
+  [String] $ManagementSubscriptionId = "9ef9a127-7a6e-452e-b18d-d2e2e89ffa92" #use existing Workspace under Dev-Box subscription
 )
 
 # Parameters necessary for deployment
