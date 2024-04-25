@@ -12,10 +12,6 @@ param parTopLevelManagementGroupPrefix string = 'mg-rsp'
 @maxLength(10)
 param parTopLevelManagementGroupSuffix string = ''
 
-// @sys.description('Display name for top level management group. This name will be applied to the management group prefix defined in parTopLevelManagementGroupPrefix parameter.')
-// @minLength(2)
-// param parTopLevelManagementGroupDisplayName string = 'Future IRAS'
-
 @sys.description('Optional parent for Management Group hierarchy, used as intermediate root Management Group parent, if specified. If empty, default, will deploy beneath Tenant Root Management Group.')
 param parTopLevelManagementGroupParentId string = 'mg-future-iras'
 
@@ -51,31 +47,11 @@ var varLandingZoneMgChildrenAlzDefault = {
   }
 }
 
-// Sandbox Management Group
-// var varSandboxMg = {
-//   name: '${parTopLevelManagementGroupPrefix}-sandbox${parTopLevelManagementGroupSuffix}'
-//   displayName: 'Sandbox'
-// }
-
 // DevBox Management Group
 var varDevelopmentboxMg = {
   name: '${parTopLevelManagementGroupPrefix}-devbox'
   displayName: 'Dev Box'
 }
-
-// Level 1
-// resource resTopLevelMg 'Microsoft.Management/managementGroups@2023-04-01' = {
-//   name: 'mg-future-iras'
-//   scope: tenant()
-//   properties: {
-//     displayName: parTopLevelManagementGroupDisplayName
-//     details: {
-//       parent: {
-//         id: empty(parTopLevelManagementGroupParentId) ? '/providers/Microsoft.Management/managementGroups/${tenant().tenantId}' : contains(toLower(parTopLevelManagementGroupParentId), toLower('/providers/Microsoft.Management/managementGroups/')) ? parTopLevelManagementGroupParentId : '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
-//       }
-//     }
-//   }
-// }
 
 // Level 2
 resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
@@ -103,19 +79,6 @@ resource resLandingZonesMg 'Microsoft.Management/managementGroups@2023-04-01' = 
     }
   }
 }
-
-// resource resSandboxMg 'Microsoft.Management/managementGroups@2023-04-01' = {
-//   name: varSandboxMg.name
-//   scope: tenant()
-//   properties: {
-//     displayName: varSandboxMg.displayName
-//     details: {
-//       parent: {
-//         id: parTopLevelManagementGroupParentId
-//       }
-//     }
-//   }
-// }
 
 resource resDevelopmentBoxMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   scope: tenant()
