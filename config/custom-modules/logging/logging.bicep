@@ -90,7 +90,6 @@ param parLogAnalyticsWorkspaceSolutions array = [
   'AntiMalware'
   'ChangeTracking'
   'Security'
-  'SecurityInsights'
   'SQLAdvancedThreatProtection'
   'SQLVulnerabilityAssessment'
   'SQLAssessment'
@@ -211,12 +210,7 @@ resource resLogAnalyticsWorkspaceSolutions 'Microsoft.OperationsManagement/solut
   name: '${solution}(${resLogAnalyticsWorkspace.name})'
   location: parLogAnalyticsWorkspaceLocation
   tags: parTags
-  properties: solution == 'SecurityInsights' ? {
-    workspaceResourceId: resLogAnalyticsWorkspace.id
-    sku: parUseSentinelClassicPricingTiers ? null : {
-      name: 'Unified'
-    }
-  } : {
+  properties: {
     workspaceResourceId: resLogAnalyticsWorkspace.id
   }
   plan: {
