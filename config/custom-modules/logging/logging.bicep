@@ -24,7 +24,7 @@ param parGlobalResourceLock lockType = {
 }
 
 @sys.description('Log Analytics Workspace name.')
-param parLogAnalyticsWorkspaceName string = 'rsp-log-analytics'
+param parLogAnalyticsWorkspaceName string = 'hra-rsp-log-analytics'
 
 @sys.description('Log Analytics region name - Ensure the regions selected is a supported mapping as per: https://docs.microsoft.com/azure/automation/how-to/region-mappings.')
 param parLogAnalyticsWorkspaceLocation string = resourceGroup().location
