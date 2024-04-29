@@ -9,7 +9,7 @@ param (
   [String]$ManagementSubscriptionId = "$($env:MANAGEMENT_SUBSCRIPTION_ID)",
 
   [Parameter()]
-  [String]$TemplateFile = "upstream-releases\$($env:UPSTREAM_RELEASE_VERSION)\infra-as-code\bicep\orchestration\mgDiagSettingsAll\mgDiagSettingsAll.bicep",
+  [String]$TemplateFile = "config\orchestration\mgDiagSettingsAll\mgDiagSettingsAll.bicep",
 
   [Parameter()]
   [String]$TemplateParameterFile = "config\custom-parameters\mgDiagSettingsAll.parameters.all.json",

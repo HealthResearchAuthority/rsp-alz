@@ -6,7 +6,7 @@ param (
   [String]$TopLevelMGPrefix = "$($env:TOP_LEVEL_MG_PREFIX)",
 
   [Parameter()]
-  [String]$TemplateFile = "upstream-releases\$($env:UPSTREAM_RELEASE_VERSION)\infra-as-code\bicep\orchestration\subPlacementAll\subPlacementAll.bicep",
+  [String]$TemplateFile = "config\orchestration\subPlacementAll\subPlacementAll.bicep",
 
   [Parameter()]
   [String]$TemplateParameterFile = "config\custom-parameters\subPlacementAll.parameters.all.json",
