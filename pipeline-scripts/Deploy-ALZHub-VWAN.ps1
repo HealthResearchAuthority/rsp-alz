@@ -6,7 +6,7 @@ param (
   [String]$ConnectivityResourceGroup = "$($env:CONNECTIVITY_RESOURCE_GROUP)",
 
   [Parameter()]
-  [String]$TemplateFile = "upstream-releases\$($env:UPSTREAM_RELEASE_VERSION)\infra-as-code\bicep\modules\vwanConnectivity\vwanConnectivity.bicep",
+  [String]$TemplateFile = "config\custom-modules\vwanConnectivity\vwanConnectivity.bicep",
 
   [Parameter()]
   [String]$TemplateParameterFile = "config\custom-parameters\vwanConnectivity.parameters.all.json",
