@@ -18,11 +18,7 @@
       "value": false
     },
     "parLogAnalyticsWorkspaceResourceId": {
-<<<<<<< HEAD
-      "value": "/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourcegroups/rg-hra-operationsmanagement/providers/microsoft.operationalinsights/workspaces/alz-log-analytics"
-=======
       "value": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/alz-logging/providers/microsoft.operationalinsights/workspaces/alz-log-analytics"
->>>>>>> parent of 322f32f (updated diagnostic orchestration)
     },
     "parDiagnosticSettingsName": {
       "value": "toLa"
