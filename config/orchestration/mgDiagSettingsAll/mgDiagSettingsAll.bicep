@@ -36,7 +36,7 @@ var varPlatformMgChildrenAlzDefault = {
 // Customer Usage Attribution Id
 var varCuaid = 'f49c8dfb-c0ce-4ee0-b316-5e4844474dd0'
 
-module modMgDiagSet '../../modules/mgDiagSettings/mgDiagSettings.bicep' = [for mgId in items(varMgIds): {
+module modMgDiagSet '../../custom-modules/mgDiagSettings/mgDiagSettings.bicep' = [for mgId in items(varMgIds): {
   scope: managementGroup(mgId.value)
   name: 'mg-diag-set-${mgId.value}'
   params: {
@@ -47,7 +47,7 @@ module modMgDiagSet '../../modules/mgDiagSettings/mgDiagSettings.bicep' = [for m
 }]
 
 // Default Children Landing Zone Management Groups
-module modMgLandingZonesDiagSet '../../modules/mgDiagSettings/mgDiagSettings.bicep' = [for childMg in items(varLandingZoneMgChildrenAlzDefault): {
+module modMgLandingZonesDiagSet '../../custom-modules/mgDiagSettings/mgDiagSettings.bicep' = [for childMg in items(varLandingZoneMgChildrenAlzDefault): {
   scope: managementGroup(childMg.value)
   name: 'mg-diag-set-${childMg.value}'
   params: {
@@ -58,7 +58,7 @@ module modMgLandingZonesDiagSet '../../modules/mgDiagSettings/mgDiagSettings.bic
 }]
 
 // Default Children Platform Management Groups
-module modMgPlatformDiagSet '../../modules/mgDiagSettings/mgDiagSettings.bicep' = [for childMg in items(varPlatformMgChildrenAlzDefault): {
+module modMgPlatformDiagSet '../../custom-modules/mgDiagSettings/mgDiagSettings.bicep' = [for childMg in items(varPlatformMgChildrenAlzDefault): {
   scope: managementGroup(childMg.value)
   name: 'mg-diag-set-${childMg.value}'
   params: {
@@ -69,7 +69,7 @@ module modMgPlatformDiagSet '../../modules/mgDiagSettings/mgDiagSettings.bicep' 
 }]
 
 // Optional Deployment for Customer Usage Attribution
-module modCustomerUsageAttribution '../../CRML/customerUsageAttribution/cuaIdManagementGroup.bicep' = if (!parTelemetryOptOut) {
+module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttribution/cuaIdManagementGroup.bicep' = if (!parTelemetryOptOut) {
   #disable-next-line no-loc-expr-outside-params //Only to ensure telemetry data is stored in same location as deployment. See https://github.com/Azure/ALZ-Bicep/wiki/FAQ#why-are-some-linter-rules-disabled-via-the-disable-next-line-bicep-function for more information //Only to ensure telemetry data is stored in same location as deployment. See https://github.com/Azure/ALZ-Bicep/wiki/FAQ#why-are-some-linter-rules-disabled-via-the-disable-next-line-bicep-function for more information
   name: 'pid-${varCuaid}-${uniqueString(deployment().location)}'
   scope: managementGroup()
