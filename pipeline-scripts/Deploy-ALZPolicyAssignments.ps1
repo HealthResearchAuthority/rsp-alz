@@ -6,7 +6,7 @@ param (
   [String]$TopLevelMGPrefix = "$($env:TOP_LEVEL_MG_PREFIX)",
 
   [Parameter()]
-  [String]$TemplateFile = "upstream-releases\$($env:UPSTREAM_RELEASE_VERSION)\infra-as-code\bicep\modules\policy\assignments\alzDefaults\alzDefaultPolicyAssignments.bicep",
+  [String]$TemplateFile = "config\custom-modules\policy\assignments\alzDefaults\alzDefaultPolicyAssignments.bicep",
 
   [Parameter()]
   [String]$TemplateParameterFile = "config\custom-parameters\alzDefaultPolicyAssignments.parameters.all.json",
