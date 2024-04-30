@@ -458,24 +458,12 @@ var varCustomPolicyDefinitionsArray = [
     libDefinition: loadJsonContent('lib/policy_definitions/policy_definition_es_Deploy-FirewallPolicy.json')
   }
   {
-    name: 'Deploy-MDFC-Arc-SQL-DCR-Association'
-    libDefinition: loadJsonContent('lib/policy_definitions/policy_definition_es_Deploy-MDFC-Arc-SQL-DCR-Association.json')
-  }
-  {
-    name: 'Deploy-MDFC-Arc-Sql-DefenderSQL-DCR'
-    libDefinition: loadJsonContent('lib/policy_definitions/policy_definition_es_Deploy-MDFC-Arc-Sql-DefenderSQL-DCR.json')
-  }
-  {
     name: 'Deploy-MDFC-SQL-AMA'
     libDefinition: loadJsonContent('lib/policy_definitions/policy_definition_es_Deploy-MDFC-SQL-AMA.json')
   }
   {
     name: 'Deploy-MDFC-SQL-DefenderSQL-DCR'
     libDefinition: loadJsonContent('lib/policy_definitions/policy_definition_es_Deploy-MDFC-SQL-DefenderSQL-DCR.json')
-  }
-  {
-    name: 'Deploy-MDFC-SQL-DefenderSQL'
-    libDefinition: loadJsonContent('lib/policy_definitions/policy_definition_es_Deploy-MDFC-SQL-DefenderSQL.json')
   }
   {
     name: 'Deploy-MySQL-sslEnforcement'
@@ -1318,21 +1306,9 @@ var varCustomPolicySetDefinitionsArray = [
         definitionGroups: []
       }
       {
-        definitionReferenceId: 'defenderForSqlArcDcrAssociation'
-        definitionId: '${varTargetManagementGroupResourceId}/providers/Microsoft.Authorization/policyDefinitions/Deploy-MDFC-Arc-SQL-DCR-Association'
-        definitionParameters: varPolicySetDefinitionEsDeployMDFCDefenderSQLAMAParameters.defenderForSqlArcDcrAssociation.parameters
-        definitionGroups: []
-      }
-      {
         definitionReferenceId: 'defenderForSqlArcMdsql'
         definitionId: '/providers/Microsoft.Authorization/policyDefinitions/65503269-6a54-4553-8a28-0065a8e6d929'
         definitionParameters: varPolicySetDefinitionEsDeployMDFCDefenderSQLAMAParameters.defenderForSqlArcMdsql.parameters
-        definitionGroups: []
-      }
-      {
-        definitionReferenceId: 'defenderForSqlArcMdsqlDcr'
-        definitionId: '${varTargetManagementGroupResourceId}/providers/Microsoft.Authorization/policyDefinitions/Deploy-MDFC-Arc-Sql-DefenderSQL-DCR'
-        definitionParameters: varPolicySetDefinitionEsDeployMDFCDefenderSQLAMAParameters.defenderForSqlArcMdsqlDcr.parameters
         definitionGroups: []
       }
       {

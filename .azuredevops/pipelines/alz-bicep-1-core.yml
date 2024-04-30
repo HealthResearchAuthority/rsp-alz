@@ -89,15 +89,15 @@ jobs:
           Inline: |
             .\pipeline-scripts\Deploy-ALZLoggingAndSentinel.ps1
 
-      - task: AzurePowerShell@5
-        displayName: "Custom Policy Definitions Deployment"
-        inputs:
-          azureSubscription: ${{ variables.SERVICE_CONNECTION_NAME }}
-          azurePowerShellVersion: "LatestVersion"
-          pwsh: true
-          ScriptType: "InlineScript"
-          Inline: |
-            .\pipeline-scripts\Deploy-ALZCustomPolicyDefinitions.ps1
+      # - task: AzurePowerShell@5
+      #   displayName: "Custom Policy Definitions Deployment"
+      #   inputs:
+      #     azureSubscription: ${{ variables.SERVICE_CONNECTION_NAME }}
+      #     azurePowerShellVersion: "LatestVersion"
+      #     pwsh: true
+      #     ScriptType: "InlineScript"
+      #     Inline: |
+      #       .\pipeline-scripts\Deploy-ALZCustomPolicyDefinitions.ps1
 
       - task: AzurePowerShell@5
         displayName: "Custom Role Definitions Deployment"
