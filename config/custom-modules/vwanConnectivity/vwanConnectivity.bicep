@@ -574,12 +574,12 @@ module modPrivateDnsZones '../privateDnsZones/privateDnsZones.bicep' = if (parPr
 }
 
 // Optional Deployments for Customer Usage Attribution
-module modCustomerUsageAttribution '../../CRML/customerUsageAttribution/cuaIdResourceGroup.bicep' = if (!parTelemetryOptOut) {
+module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttribution/cuaIdResourceGroup.bicep' = if (!parTelemetryOptOut) {
   name: 'pid-${varCuaid}-${uniqueString(parLocation)}'
   params: {}
 }
 
-module modCustomerUsageAttributionZtnP1 '../../CRML/customerUsageAttribution/cuaIdResourceGroup.bicep' = if (!parTelemetryOptOut && varZtnP1Trigger) {
+module modCustomerUsageAttributionZtnP1 '../../custom-modules/CRML/customerUsageAttribution/cuaIdResourceGroup.bicep' = if (!parTelemetryOptOut && varZtnP1Trigger) {
   name: 'pid-${varZtnP1CuaId}-${uniqueString(parLocation)}'
   params: {}
 }
