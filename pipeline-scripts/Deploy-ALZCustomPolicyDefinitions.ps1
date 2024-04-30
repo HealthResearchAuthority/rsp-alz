@@ -3,7 +3,7 @@ param (
   [String]$Location = "$($env:LOCATION)",
 
   [Parameter()]
-  [String]$MGForPolicies = "$($env:WORKLOADS_MG_ID)",
+  [String]$MGForPolicies = "$($env:INTERMEDIATE_MG_ID)",
 
   [Parameter()]
   [String]$TemplateFile = "config\custom-modules\policy\definitions\customPolicyDefinitions.bicep",
