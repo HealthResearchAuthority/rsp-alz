@@ -6,7 +6,7 @@ param (
   [String]$MGForPolicies = "$($env:WORKLOADS_MG_ID)",
 
   [Parameter()]
-  [String]$TemplateFile = "upstream-releases\$($env:UPSTREAM_RELEASE_VERSION)\infra-as-code\bicep\modules\policy\definitions\customPolicyDefinitions.bicep",
+  [String]$TemplateFile = "config\custom-modules\policy\definitions\customPolicyDefinitions.bicep",
 
   [Parameter()]
   [String]$TemplateParameterFile = "config\custom-parameters\customPolicyDefinitions.parameters.all.json",
