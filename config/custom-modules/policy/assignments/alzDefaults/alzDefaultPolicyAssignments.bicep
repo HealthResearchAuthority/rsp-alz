@@ -47,9 +47,6 @@ param parTopLevelPolicyAssignmentSovereigntyGlobal policyAssignmentSovereigntyGl
 @sys.description('Management, Identity and Connectivity Management Groups beneath Platform Management Group have been deployed. If set to false, platform policies are assigned to the Platform Management Group; otherwise policies are assigned to the child management groups.')
 param parPlatformMgAlzDefaultsEnable bool = true
 
-@sys.description('Confidential Corp & Confidential Online Management Groups beneath Landing Zones Management Group have been deployed. If set to false, policies will not try to be assigned to Confidential Corp & Confidential Online Management Groups')
-param parLandingZoneMgConfidentialEnable bool = false
-
 @sys.description('The region where the Log Analytics Workspace & Automation Account are deployed.')
 param parLogAnalyticsWorkSpaceAndAutomationAccountLocation string = 'uksouth'
 
@@ -67,9 +64,6 @@ param parMsDefenderForCloudEmailSecurityContact string = 'security_contact@repla
 
 @sys.description('ID of the DdosProtectionPlan which will be applied to the Virtual Networks. If left empty, the policy Enable-DDoS-VNET will not be assigned at connectivity or landing zone Management Groups to avoid VNET deployment issues.')
 param parDdosProtectionPlanId string = ''
-
-@sys.description('Resource ID of the Resource Group that conatin the Private DNS Zones. If left empty, the policy Deploy-Private-DNS-Zones will not be assigned to the corp Management Group.')
-param parPrivateDnsResourceGroupId string = ''
 
 @sys.description('Set Enforcement Mode of all default Policies assignments to Do Not Enforce.')
 param parDisableAlzDefaultPolicies bool = false
