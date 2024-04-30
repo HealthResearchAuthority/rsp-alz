@@ -3,31 +3,16 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parTopLevelManagementGroupPrefix": {
-      "value": "hra"
+      "value": "mg-rsp"
     },
     "parTopLevelManagementGroupSuffix": {
       "value": ""
-    },
-    "parLandingZoneMgAlzDefaultsEnable": {
-      "value": true
-    },
-    "parPlatformMgAlzDefaultsEnable": {
-      "value": true
-    },
-    "parLandingZoneMgConfidentialEnable": {
-      "value": false
     },
     "parLogAnalyticsWorkspaceResourceId": {
       "value": "/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourcegroups/rg-hra-operationsmanagement/providers/microsoft.operationalinsights/workspaces/alz-log-analytics"
     },
     "parDiagnosticSettingsName": {
       "value": "toLa"
-    },
-    "parLandingZoneMgChildren": {
-      "value": []
-    },
-    "parPlatformMgChildren": {
-      "value": []
     },
     "parTelemetryOptOut": {
       "value": false

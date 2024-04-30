@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parTopLevelManagementGroupPrefix": {
-      "value": "hra"
+      "value": "mg-rsp"
     },
     "parTopLevelManagementGroupSuffix": {
       "value": ""
@@ -15,19 +15,13 @@
       "value": []
     },
     "parPlatformManagementMgSubs": {
-      "value": [
-        "00000000-0000-0000-0000-000000000000"
-      ]
+      "value": []
     },
     "parPlatformConnectivityMgSubs": {
-      "value": [
-        "00000000-0000-0000-0000-000000000000"
-      ]
+      "value": []
     },
     "parPlatformIdentityMgSubs": {
-      "value": [
-        "00000000-0000-0000-0000-000000000000"
-      ]
+      "value": []
     },
     "parLandingZonesMgSubs": {
       "value": []
