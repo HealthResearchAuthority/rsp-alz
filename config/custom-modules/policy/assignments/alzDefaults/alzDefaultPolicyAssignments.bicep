@@ -356,6 +356,7 @@ var varManagementGroupIds = {
 }
 
 var varTopLevelManagementGroupResourceId = '/providers/Microsoft.Management/managementGroups/${varManagementGroupIds.intRoot}'
+var varManagementSubscriptionID = '8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a'
 
 // **Scope**
 targetScope = 'managementGroup'
