@@ -6,6 +6,9 @@ param (
   [String]$TopLevelMGPrefix = "$($env:TOP_LEVEL_MG_PREFIX)",
 
   [Parameter()]
+  [String]$IntermediateMG = "$($env:INTERMEDIATE_MG_ID)",
+
+  [Parameter()]
   [String]$TemplateFile = "config\orchestration\subPlacementAll\subPlacementAll.bicep",
 
   [Parameter()]
@@ -19,7 +22,7 @@ param (
 $inputObject = @{
   DeploymentName        = 'alz-SubscriptionPlacementDeployment-{0}' -f ( -join (Get-Date -Format 'yyyyMMddTHHMMssffffZ')[0..63])
   Location              = $Location
-  ManagementGroupId     = $TopLevelMGPrefix
+  ManagementGroupId     = $IntermediateMG
   TemplateFile          = $TemplateFile
   TemplateParameterFile = $TemplateParameterFile
   WhatIf                = $WhatIfEnabled
