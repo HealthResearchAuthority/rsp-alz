@@ -1716,42 +1716,6 @@ var varCustomPolicySetDefinitionsArray = [
     ]
   }
   {
-    name: 'Enforce-ALZ-Decomm'
-    libSetDefinition: loadJsonContent('lib/policy_set_definitions/policy_set_definition_es_Enforce-ALZ-Decomm.json')
-    libSetChildDefinitions: [
-      {
-        definitionReferenceId: 'DecomDenyResources'
-        definitionId: '/providers/Microsoft.Authorization/policyDefinitions/a08ec900-254a-4555-9bf5-e42af04b5c5c'
-        definitionParameters: varPolicySetDefinitionEsEnforceALZDecommParameters.DecomDenyResources.parameters
-        definitionGroups: []
-      }
-      {
-        definitionReferenceId: 'DecomShutdownMachines'
-        definitionId: '${varTargetManagementGroupResourceId}/providers/Microsoft.Authorization/policyDefinitions/Deploy-Vm-autoShutdown'
-        definitionParameters: varPolicySetDefinitionEsEnforceALZDecommParameters.DecomShutdownMachines.parameters
-        definitionGroups: []
-      }
-    ]
-  }
-  {
-    name: 'Enforce-ALZ-Sandbox'
-    libSetDefinition: loadJsonContent('lib/policy_set_definitions/policy_set_definition_es_Enforce-ALZ-Sandbox.json')
-    libSetChildDefinitions: [
-      {
-        definitionReferenceId: 'SandboxDenyVnetPeering'
-        definitionId: '${varTargetManagementGroupResourceId}/providers/Microsoft.Authorization/policyDefinitions/Deny-VNET-Peer-Cross-Sub'
-        definitionParameters: varPolicySetDefinitionEsEnforceALZSandboxParameters.SandboxDenyVnetPeering.parameters
-        definitionGroups: []
-      }
-      {
-        definitionReferenceId: 'SandboxNotAllowed'
-        definitionId: '/providers/Microsoft.Authorization/policyDefinitions/6c112d4e-5bc7-47ae-a041-ea2d9dccd749'
-        definitionParameters: varPolicySetDefinitionEsEnforceALZSandboxParameters.SandboxNotAllowed.parameters
-        definitionGroups: []
-      }
-    ]
-  }
-  {
     name: 'Enforce-Encryption-CMK'
     libSetDefinition: loadJsonContent('lib/policy_set_definitions/policy_set_definition_es_Enforce-Encryption-CMK.json')
     libSetChildDefinitions: [
@@ -2062,10 +2026,6 @@ var varPolicySetDefinitionEsDeployPrivateDNSZonesParameters = loadJsonContent('l
 var varPolicySetDefinitionEsDeploySqlSecurityParameters = loadJsonContent('lib/policy_set_definitions/policy_set_definition_es_Deploy-Sql-Security.parameters.json')
 
 var varPolicySetDefinitionEsEnforceACSBParameters = loadJsonContent('lib/policy_set_definitions/policy_set_definition_es_Enforce-ACSB.parameters.json')
-
-var varPolicySetDefinitionEsEnforceALZDecommParameters = loadJsonContent('lib/policy_set_definitions/policy_set_definition_es_Enforce-ALZ-Decomm.parameters.json')
-
-var varPolicySetDefinitionEsEnforceALZSandboxParameters = loadJsonContent('lib/policy_set_definitions/policy_set_definition_es_Enforce-ALZ-Sandbox.parameters.json')
 
 var varPolicySetDefinitionEsEnforceEncryptionCMKParameters = loadJsonContent('lib/policy_set_definitions/policy_set_definition_es_Enforce-Encryption-CMK.parameters.json')
 
