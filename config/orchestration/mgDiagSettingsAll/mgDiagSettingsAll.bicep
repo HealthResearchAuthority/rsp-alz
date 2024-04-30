@@ -20,7 +20,6 @@ param parTelemetryOptOut bool = false
 var varMgIds = {
   intRoot: 'mg-future-iras'
   platform: '${parTopLevelManagementGroupPrefix}-platform'
-  landingZones: '${parTopLevelManagementGroupPrefix}-landingzones'
 }
 
 var varLandingZoneMgChildrenAlzDefault = {
