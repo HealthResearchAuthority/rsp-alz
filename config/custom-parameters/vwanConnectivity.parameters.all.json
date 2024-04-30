@@ -71,7 +71,7 @@
       "value": "alz-ddos-plan"
     },
     "parPrivateDnsZonesEnabled": {
-      "value": true
+      "value": false
     },
     "parPrivateDnsZones": {
       "value": [
@@ -146,7 +146,7 @@
       ]
     },
     "parPrivateDnsZoneAutoMergeAzureBackupZone": {
-      "value": true
+      "value": false
     },
     "parVirtualNetworkIdToLink": {
       "value": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourceGroups/HUB_Networking_POC/providers/Microsoft.Network/virtualNetworks/alz-hub-eastus"
