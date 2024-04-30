@@ -5,12 +5,6 @@
     "parTopLevelManagementGroupPrefix": {
       "value": "mg-rsp"
     },
-    "parTopLevelManagementGroupSuffix": {
-      "value": ""
-    },
-    "parIntRootMgSubs": {
-      "value": []
-    },
     "parPlatformMgSubs": {
       "value": []
     },
@@ -20,34 +14,10 @@
     "parPlatformConnectivityMgSubs": {
       "value": []
     },
-    "parPlatformIdentityMgSubs": {
+    "parLandingZonesProdMgSubs": {
       "value": []
     },
-    "parLandingZonesMgSubs": {
-      "value": []
-    },
-    "parLandingZonesCorpMgSubs": {
-      "value": []
-    },
-    "parLandingZonesOnlineMgSubs": {
-      "value": []
-    },
-    "parLandingZonesConfidentialCorpMgSubs": {
-      "value": []
-    },
-    "parLandingZonesConfidentialOnlineMgSubs": {
-      "value": []
-    },
-    "parLandingZoneMgChildrenSubs": {
-      "value": {}
-    },
-    "parPlatformMgChildrenSubs": {
-      "value": {}
-    },
-    "parDecommissionedMgSubs": {
-      "value": []
-    },
-    "parSandboxMgSubs": {
+    "parLandingZonesNonProdMgSubs": {
       "value": []
     },
     "parTelemetryOptOut": {
