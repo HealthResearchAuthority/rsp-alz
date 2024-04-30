@@ -6,6 +6,9 @@ param (
   [String]$TopLevelMGPrefix = "$($env:TOP_LEVEL_MG_PREFIX)",
 
   [Parameter()]
+  [String]$IntermediateMGPrefix = "$($env:INTERMEDIATE_MG_ID)",
+
+  [Parameter()]
   [String]$ManagementSubscriptionId = "$($env:MANAGEMENT_SUBSCRIPTION_ID)",
 
   [Parameter()]
@@ -22,7 +25,7 @@ param (
 $inputObject = @{
   DeploymentName        = 'alz-MGDiagnosticSettings-{0}' -f ( -join (Get-Date -Format 'yyyyMMddTHHMMssffffZ')[0..63])
   Location              = $Location
-  #ManagementGroupId     = $TopLevelMGPrefix
+  ManagementGroupId     = $IntermediateMGPrefix
   TemplateFile          = $TemplateFile
   TemplateParameterFile = $TemplateParameterFile
   WhatIf                = $WhatIfEnabled
