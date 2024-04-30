@@ -3,7 +3,7 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parTopLevelManagementGroupPrefix": {
-      "value": "hra"
+      "value": "mg-rsp"
     },
     "parTopLevelManagementGroupSuffix": {
       "value": ""
@@ -36,7 +36,7 @@
       "value": "uksouth"
     },
     "parLogAnalyticsWorkspaceResourceId": {
-      "value": "/subscriptions/00000000-0000-0000-0000-000000000000/resourcegroups/rg-hra-logging/providers/microsoft.operationalinsights/workspaces/alz-log-analytics"
+      "value": "/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourcegroups/rg-hra-operationsmanagement/providers/microsoft.operationalinsights/workspaces/alz-log-analytics"
     },
     "parLogAnalyticsWorkspaceLogRetentionInDays": {
       "value": "365"
