@@ -11,7 +11,7 @@
         "value": "DeployIfNotExists"
       },
       "logAnalyticsWorkspaceId": {
-        "value": "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/${parTopLevelManagementGroupPrefix}-mgmt/providers/Microsoft.OperationalInsights/workspaces/${parTopLevelManagementGroupPrefix}-la"
+        "value": "/subscriptions/${varManagementSubscriptionID}/resourceGroups/${parTopLevelManagementGroupPrefix}-mgmt/providers/Microsoft.OperationalInsights/workspaces/${parTopLevelManagementGroupPrefix}-la"
       }
     },
     "policyDefinitionId": "/providers/Microsoft.Authorization/policyDefinitions/25da7dfb-0666-4a15-a8f5-402127efd8bb",
