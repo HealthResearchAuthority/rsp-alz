@@ -50,9 +50,9 @@ var varDeploymentNames = {
   modPlatformMgSubPlacement: take('modPlatformMgSubPlacement-${uniqueString(varMgIds.platform, string(length(parPlatformMgSubs)), deployment().name)}', 64)
   modPlatformManagementMgSubPlacement: take('modPlatformManagementMgSubPlacement-${uniqueString(varMgIds.platformManagement, string(length(parPlatformManagementMgSubs)), deployment().name)}', 64)
   modPlatformConnectivityMgSubPlacement: take('modPlatformConnectivityMgSubPlacement-${uniqueString(varMgIds.platformConnectivity, string(length(parPlatformConnectivityMgSubs)), deployment().name)}', 64)
-  modLandingZonesProdMgSubPlacement: take('modLandingZonesCorpMgSubPlacement-${uniqueString(varMgIds.landingZonesProd, string(length(parLandingZonesProdMgSubs)), deployment().name)}', 64)
-  modLandingZonesNonProdMgSubPlacement: take('modLandingZonesOnlineMgSubPlacement-${uniqueString(varMgIds.landingZonesNonProd, string(length(parLandingZonesNonProdMgSubs)), deployment().name)}', 64)
-  modDevBoxMgSubPlacement: take('modLandingZonesConfidentialCorpMgSubPlacement-${uniqueString(varMgIds.DevBox, string(length(parDevBoxMgSubs)), deployment().name)}', 64)
+  modLandingZonesProdMgSubPlacement: take('modLandingZonesProdMgSubPlacement-${uniqueString(varMgIds.landingZonesProd, string(length(parLandingZonesProdMgSubs)), deployment().name)}', 64)
+  modLandingZonesNonProdMgSubPlacement: take('modLandingZonesNonProdMgSubPlacement-${uniqueString(varMgIds.landingZonesNonProd, string(length(parLandingZonesNonProdMgSubs)), deployment().name)}', 64)
+  modDevBoxMgSubPlacement: take('modDevBoxMgSubPlacement-${uniqueString(varMgIds.DevBox, string(length(parDevBoxMgSubs)), deployment().name)}', 64)
 }
 
 // Customer Usage Attribution Id
