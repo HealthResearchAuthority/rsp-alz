@@ -26,7 +26,10 @@ type virtualWanOptionsType = ({
   parVirtualRouterAutoScaleConfiguration: int
 
   @sys.description('The Virtual WAN Hub routing intent destinations, leave empty if not wanting to enable routing intent. The allowed values are `Internet`, `PrivateTraffic`.')
-  parVirtualHubRoutingIntentDestinations: ('Internet' | 'PrivateTraffic')[]
+  parVirtualHubRoutingIntentDestinations: [
+    'Internet'
+    'PrivateTraffic'
+  ]
 
   @sys.description('This parameter is used to specify a custom name for the VPN Gateway.')
   parVpnGatewayCustomName: string?

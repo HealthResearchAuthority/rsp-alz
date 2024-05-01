@@ -33,16 +33,16 @@ param parLocation string = deployment().location
 @sys.description('Prefix used for the management group hierarchy.')
 @minLength(2)
 @maxLength(10)
-param parTopLevelManagementGroupPrefix string = 'mg-rsp-'
+param parTopLevelManagementGroupPrefix string = 'mg-rsp'
 
 @sys.description('Prefix used for the "Workloads" management group hierarchy.')
-param parWorkloadsManagementGroupPrefix string = 'workloads-'
+param parWorkloadsManagementGroupPrefix string = '-workloads'
 
 @sys.description('Prefix used for the child "Prod" under "Workloads" management group hierarchy.')
-param parProdManagementGroupPrefix string = 'prod'
+param parProdManagementGroupPrefix string = '-prod'
 
 @sys.description('Prefix used for the child "NonProd" under "Workloads" management group hierarchy.')
-param parNonProdManagementGroupPrefix string = 'nonprod'
+param parNonProdManagementGroupPrefix string = '-nonprod'
 
 @sys.description('Array of Tags to be applied to all resources in module. Default: Empty Object')
 param parTags object = {}
@@ -77,7 +77,7 @@ param parResourceGroupLock lockType = {
 
 // Spoke Networking Module Parameters
 @sys.description('Existing DDoS Protection plan to utilize. Default: Empty string')
-param parDdosProtectionPlanId string = ''
+param parDdosProtectionPlanId string = 'alz-ddos-plan'
 
 // @sys.description('The Resource IDs of the Private DNS Zones to associate with spokes. Default: Empty Array')
 // param parPrivateDnsZoneResourceIds array = []
@@ -89,7 +89,7 @@ param parSpokeNetworkName string = 'vnet-spoke-${parLocation}'
 param parDnsServerIps array = []
 
 @sys.description('IP Address where network traffic should route to. Default: Empty string')
-param parNextHopIpAddress string = ''
+param parNextHopIpAddress string = '' //ToDo
 
 @sys.description('Switch which allows BGP Route Propogation to be disabled on the route table.')
 param parDisableBgpRoutePropagation bool = false
@@ -134,7 +134,7 @@ param parSpokeRouteTableLock lockType = {
 //TODO: It does appear that we need to have deployed Hub and know Hub network ID to be able to orchestrate peering between Spokes and Hub. Deployment will need to be in phase. 
 // Peering Modules Parameters
 @sys.description('Virtual Network ID of Hub Virtual Network, or Azure Virtuel WAN hub ID.')
-param parHubVirtualNetworkId string
+param parHubVirtualNetworkId string = 'vhub-rsp-uksouth'
 
 // VWAN Module Parameters
 
@@ -177,40 +177,40 @@ var varVirtualHubSubscriptionId = (!empty(parHubVirtualNetworkId) && contains(pa
 @sys.description('SubscriptionID, vNetName, ipRange and managementGroup for creating Spoke vNet, placing subscription under the right management group')
 param parSpokeNetworks spokesType = [
   {
-    subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //Development
+    subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b' //Development
     ipRange: '10.1.0.0/17'
     managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
   }
-  {
-    subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test
-    ipRange: '10.2.0.0/17'
-    managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
-  }
-  {
-    subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test Automation
-    ipRange: '10.3.0.0/17'
-    managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
-  }
-  {
-    subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test Integration
-    ipRange: '10.4.0.0/17'
-    managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
-  }
-  {
-    subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //UAT
-    ipRange: '10.5.0.0/17'
-    managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
-  }
-  {
-    subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //Staging
-    ipRange: '10.6.0.0/17'
-    managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
-  }
-  {
-    subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //Prod
-    ipRange: '10.7.0.0/17'
-    managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
-  }
+  // {
+  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test
+  //   ipRange: '10.2.0.0/17'
+  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
+  // }
+  // {
+  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test Automation
+  //   ipRange: '10.3.0.0/17'
+  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
+  // }
+  // {
+  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test Integration
+  //   ipRange: '10.4.0.0/17'
+  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
+  // }
+  // {
+  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //UAT
+  //   ipRange: '10.5.0.0/17'
+  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
+  // }
+  // {
+  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //Staging
+  //   ipRange: '10.6.0.0/17'
+  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
+  // }
+  // {
+  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //Prod
+  //   ipRange: '10.7.0.0/17'
+  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
+  // }
 ]
 
 //Do we need telemetry ? 
