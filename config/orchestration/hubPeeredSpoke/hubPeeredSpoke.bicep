@@ -23,7 +23,62 @@ type spokesType = ({
 
   @description('managementGroup for subscription placement')
   managementGroup: string
+
+  @description('managementGroup for subscription placement')
+  spokeNetworkName: string
+
+  @description('Subnet information')
+  subnets: subnetsType
+
+  @description('Name of NSG')
+  nsgName: string
 })[]
+
+type subnetsType = ({
+  @description('Subnet Name')
+  name: string
+
+  @description('Address prefix for Subnet')
+  addressPrefix: string
+
+  @description('list of services to connect to from the subnet for private access and not having to go through public IP')
+  serviceEndpoints: array
+
+  @description('list of locations of services to connect to from the subnet for private access and not having to go through public IP')
+  serviceEndpointsLocation: array
+
+  @description('Policies for service endpoints')
+  serviceEndpointPolicies: array
+})[]
+
+param lzsecurityRules array = [
+  { 
+    name: 'Allow-from-HRA-PA-Only'
+    properties: {
+      priority: 1000
+      access: 'Allow'
+      direction: 'Inbound'
+      destinationPortRange: '*'
+      protocol: '*'
+      sourcePortRange: '*'
+      sourceAddressPrefix: '217.38.8.142, 194.75.196.200, 80.169.67.56'
+      destinationAddressPrefix: 'VirtualNetwork'
+      }
+  }
+  {
+    name: 'Deny-All-Inbound'
+    properties: {
+      priority: 1100
+      access: 'Deny'
+      direction: 'Inbound'
+      destinationPortRange: '*'
+      protocol: '*'
+      sourcePortRange: '*'
+      sourceAddressPrefix: '*'
+      destinationAddressPrefix: 'VirtualNetwork'
+      }
+  }  
+]
 
 // **Parameters**
 // Generic Parameters - Used in multiple modules
@@ -37,9 +92,6 @@ param parTopLevelManagementGroupPrefix string = 'mg-rsp'
 
 @sys.description('Prefix used for the "Workloads" management group hierarchy.')
 param parWorkloadsManagementGroupPrefix string = '-workloads'
-
-@sys.description('Prefix used for the child "Prod" under "Workloads" management group hierarchy.')
-param parProdManagementGroupPrefix string = '-prod'
 
 @sys.description('Prefix used for the child "NonProd" under "Workloads" management group hierarchy.')
 param parNonProdManagementGroupPrefix string = '-nonprod'
@@ -77,19 +129,16 @@ param parResourceGroupLock lockType = {
 
 // Spoke Networking Module Parameters
 @sys.description('Existing DDoS Protection plan to utilize. Default: Empty string')
-param parDdosProtectionPlanId string = 'alz-ddos-plan'
+param parDdosProtectionPlanId string = 'rsp-ddos-plan'
 
 // @sys.description('The Resource IDs of the Private DNS Zones to associate with spokes. Default: Empty Array')
 // param parPrivateDnsZoneResourceIds array = []
-
-@sys.description('The Name of the Spoke Virtual Network.')
-param parSpokeNetworkName string = 'vnet-spoke-${parLocation}'
 
 @sys.description('Array of DNS Server IP addresses for VNet. Default: Empty Array')
 param parDnsServerIps array = []
 
 @sys.description('IP Address where network traffic should route to. Default: Empty string')
-param parNextHopIpAddress string = '' //ToDo
+param parNextHopIpAddress string = '' //Hub firewall IP Address
 
 @sys.description('Switch which allows BGP Route Propogation to be disabled on the route table.')
 param parDisableBgpRoutePropagation bool = false
@@ -126,15 +175,11 @@ param parSpokeRouteTableLock lockType = {
 - `notes` - Notes about this lock.
 
 ''')
-// param parPrivateDnsZoneVirtualNetworkLinkLock lockType = {
-//   kind: 'None'
-//   notes: 'This lock was created by the ALZ Bicep Hub Peered Spoke Orchestration Networking Module.'
-// }
 
 //TODO: It does appear that we need to have deployed Hub and know Hub network ID to be able to orchestrate peering between Spokes and Hub. Deployment will need to be in phase. 
 // Peering Modules Parameters
 @sys.description('Virtual Network ID of Hub Virtual Network, or Azure Virtuel WAN hub ID.')
-param parHubVirtualNetworkId string = 'vhub-rsp-uksouth'
+param parHubVirtualNetworkId string = ''
 
 // VWAN Module Parameters
 
@@ -178,39 +223,23 @@ var varVirtualHubSubscriptionId = (!empty(parHubVirtualNetworkId) && contains(pa
 param parSpokeNetworks spokesType = [
   {
     subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b' //Development
-    ipRange: '10.1.0.0/17'
+    ipRange: '10.1.0.0/16'
     managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
+    spokeNetworkName: 'vnet-development-spoke-${parLocation}'
+    nsgName: 'rsp-nsg-development'
+    subnets: [
+        {
+          name: 'default-development-subnet'
+          addressPrefix: '10.1.0.0/18'
+          serviceEndpoints: [
+          ]
+          serviceEndpointsLocation: [
+            'uksouth'
+          ]
+          serviceEndpointPolicies: []
+        }
+    ] 
   }
-  // {
-  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test
-  //   ipRange: '10.2.0.0/17'
-  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
-  // }
-  // {
-  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test Automation
-  //   ipRange: '10.3.0.0/17'
-  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
-  // }
-  // {
-  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //System Test Integration
-  //   ipRange: '10.4.0.0/17'
-  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
-  // }
-  // {
-  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //UAT
-  //   ipRange: '10.5.0.0/17'
-  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
-  // }
-  // {
-  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //Staging
-  //   ipRange: '10.6.0.0/17'
-  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
-  // }
-  // {
-  //   subscriptionId: 'xxxxxxxxxxxxxxxxxxx' //Prod
-  //   ipRange: '10.7.0.0/17'
-  //   managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parProdManagementGroupPrefix}'
-  // }
 ]
 
 //Do we need telemetry ? 
@@ -223,7 +252,7 @@ param parSpokeNetworks spokesType = [
   // }
 
   // Module - Subscription Placement - Management
-  module modSubscriptionPlacement '../../modules/subscriptionPlacement/subscriptionPlacement.bicep' = [for spokenew in parSpokeNetworks: {
+  module modSubscriptionPlacement '../../custom-modules/subscriptionPlacement/subscriptionPlacement.bicep' = [for spokenew in parSpokeNetworks: {
     scope: managementGroup(spokenew.managementGroup)
     name: varModuleDeploymentNames.modSubscriptionPlacement
     params: {
@@ -236,7 +265,7 @@ param parSpokeNetworks spokesType = [
   }]
 
   // Module - Resource Group
-  module modResourceGroup '../../modules/resourceGroup/resourceGroup.bicep' = [for spokenew in parSpokeNetworks: {
+  module modResourceGroup '../../custom-modules/resourceGroup/resourceGroup.bicep' = [for spokenew in parSpokeNetworks: {
     scope: subscription(spokenew.subscriptionId)
     name: varModuleDeploymentNames.modResourceGroup
     params: {
@@ -249,14 +278,14 @@ param parSpokeNetworks spokesType = [
   }]
 
   // Module - Spoke Virtual Network
-  module modSpokeNetworking '../../modules/spokeNetworking/spokeNetworking.bicep' = [for spokenew in parSpokeNetworks: {
+  module modSpokeNetworking '../../custom-modules/spokeNetworking/spokeNetworking.bicep' = [for spokenew in parSpokeNetworks: {
     scope: resourceGroup(spokenew.subscriptionId, parResourceGroupNameForSpokeNetworking)
     name: varModuleDeploymentNames.modSpokeNetworking
     dependsOn: [
       modResourceGroup
     ]
     params: {
-      parSpokeNetworkName: parSpokeNetworkName
+      parSpokeNetworkName: spokenew.spokeNetworkName
       parSpokeNetworkAddressPrefix: spokenew.ipRange
       parDdosProtectionPlanId: parDdosProtectionPlanId
       parDnsServerIps: parDnsServerIps
@@ -269,6 +298,8 @@ param parSpokeNetworks spokesType = [
       parGlobalResourceLock: parGlobalResourceLock
       parSpokeNetworkLock: parSpokeNetworkLock
       parSpokeRouteTableLock: parSpokeRouteTableLock
+      parNSGName: spokenew.nsgName
+      parNSGRules: lzsecurityRules
     }
   }]
 
@@ -286,7 +317,7 @@ param parSpokeNetworks spokesType = [
 
   //ToDo:Review
   // Module -  Spoke to Azure Virtual WAN Hub peering.
-  module modhubVirtualNetworkConnection '../../modules/vnetPeeringVwan/hubVirtualNetworkConnection.bicep' = [for i in range(0, length(parSpokeNetworks)): if (!empty(varVirtualHubResourceId)) {
+  module modhubVirtualNetworkConnection '../../custom-modules/vnetPeeringVwan/hubVirtualNetworkConnection.bicep' = [for i in range(0, length(parSpokeNetworks)): if (!empty(varVirtualHubResourceId)) {
     scope: resourceGroup(varVirtualHubSubscriptionId, varVirtualHubResourceGroup)
     name: varModuleDeploymentNames.modVnetPeeringVwan
     params: {

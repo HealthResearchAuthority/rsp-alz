@@ -3,14 +3,31 @@ metadata description = 'This module creates spoke networking resources'
 
 type lockType = {
   @description('Optional. Specify the name of lock.')
-  name: string?
-
-  @description('Optional. The lock settings of the service.')
-  kind: ('CanNotDelete' | 'ReadOnly' | 'None')
+  kind: string
 
   @description('Optional. Notes about this lock.')
   notes: string?
 }
+
+type subnetsType = ({
+  @description('Subnet Name')
+  name: string
+
+  @description('Address prefix for Subnet')
+  addressPrefix: string
+
+  @description('managementGroup for subscription placement')
+  managementGroup: string
+
+  @description('list of services to connect to from the subnet for private access and not having to go through public IP')
+  serviceEndpoints: array
+
+  @description('list of locations of services to connect to from the subnet for private access and not having to go through public IP')
+  serviceEndpointsLocation: array
+
+  @description('Policies for service endpoints')
+  serviceEndpointPolicies: array
+})[]
 
 @sys.description('The Azure Region to deploy the resources into.')
 param parLocation string = resourceGroup().location
@@ -33,10 +50,16 @@ param parGlobalResourceLock lockType = {
 }
 
 @sys.description('The IP address range for all virtual networks to use.')
-param parSpokeNetworkAddressPrefix string = '10.11.0.0/16'
+param parSpokeNetworkAddressPrefix string = ''
 
 @sys.description('The Name of the Spoke Virtual Network.')
 param parSpokeNetworkName string = 'vnet-spoke'
+
+@sys.description('The Name of the Network Security Group.')
+param parNSGName string = ''
+
+@description('list of network security rules')
+param parNSGRules array
 
 @sys.description('''Resource Lock Configuration for Spoke Network
 
@@ -69,6 +92,9 @@ param parSpokeRouteTableLock lockType = {
   notes: 'This lock was created by the ALZ Bicep Spoke Networking Module.'
 }
 
+@description('Optional. An Array of subnets to deploy to the Virtual Network.')
+param subnets subnetsType = []
+
 @sys.description('Tags you would like to be applied to all resources in this module.')
 param parTags object = {}
 
@@ -97,6 +123,29 @@ resource resSpokeVirtualNetwork 'Microsoft.Network/virtualNetworks@2023-02-01' =
     dhcpOptions: (!empty(parDnsServerIps) ? true : false) ? {
       dnsServers: parDnsServerIps
     } : null
+    subnets: [for subnet in subnets: {
+      name: subnet.name
+      properties: {
+        addressPrefix: subnet.addressPrefix
+        networkSecurityGroup: {
+          id: nsg.id
+        }
+        serviceEndpoints: contains(subnet, 'serviceEndpoints') ? subnet.serviceEndpoints : []
+        serviceEndpointPolicies: contains(subnet, 'serviceEndpointPolicies') ? subnet.serviceEndpointPolicies : []
+      }
+      type: 'Microsoft.Network/virtualNetworks/subnets'
+    }]
+  }
+}
+
+resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
+  name: parNSGName
+  location: parLocation
+  properties: {
+    securityRules: [for rule in parNSGRules: {
+      name: rule.name
+      properties: rule.properties
+    }]
   }
 }
 
@@ -140,7 +189,7 @@ resource resSpokeToHubRouteTableLock 'Microsoft.Authorization/locks@2020-05-01' 
 }
 
 // Optional Deployment for Customer Usage Attribution
-module modCustomerUsageAttribution '../../CRML/customerUsageAttribution/cuaIdResourceGroup.bicep' = if (!parTelemetryOptOut) {
+module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttribution/cuaIdResourceGroup.bicep' = if (!parTelemetryOptOut) {
   name: 'pid-${varCuaid}-${uniqueString(resourceGroup().id)}'
   params: {}
 }
