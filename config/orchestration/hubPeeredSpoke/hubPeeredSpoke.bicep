@@ -198,7 +198,6 @@ var varDeploymentNameWrappers = {
 }
 
 var varModuleDeploymentNames = {
-  modSubscriptionPlacement: take('${varDeploymentNameWrappers.basePrefix}-modSubscriptionPlacement-${parPeeredVnetSubscriptionMgPlacement}-${varDeploymentNameWrappers.baseSuffixManagementGroup}', 64)
   modResourceGroup: take('${varDeploymentNameWrappers.basePrefix}-modResourceGroup-${varDeploymentNameWrappers.baseSuffixSubscription}', 64)
   modSpokeNetworking: take('${varDeploymentNameWrappers.basePrefix}-modSpokeNetworking-${varDeploymentNameWrappers.baseSuffixResourceGroup}', 61)
   modSpokePeeringToHub: take('${varDeploymentNameWrappers.basePrefix}-modVnetPeering-ToHub-${varDeploymentNameWrappers.baseSuffixResourceGroup}', 61)

@@ -152,7 +152,6 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
 // Create a virtual network resource lock if parGlobalResourceLock.kind != 'None' or if parSpokeNetworkLock.kind != 'None'
 resource resSpokeVirtualNetworkLock 'Microsoft.Authorization/locks@2020-05-01' = if (parSpokeNetworkLock.kind != 'None' || parGlobalResourceLock.kind != 'None') {
   scope: resSpokeVirtualNetwork
-  name: parSpokeNetworkLock.?name ?? '${resSpokeVirtualNetwork.name}-lock'
   properties: {
     level: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.kind : parSpokeNetworkLock.kind
     notes: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.?notes : parSpokeNetworkLock.?notes
