@@ -3,24 +3,27 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
     "parLocation": {
-      "value": "westeurope"
+      "value": "uksouth"
     },
     "parTopLevelManagementGroupPrefix": {
-      "value": "alz"
+      "value": "mg-rsp"
     },
     "parTopLevelManagementGroupSuffix": {
       "value": ""
     },
-    "parPeeredVnetSubscriptionMgPlacement": {
-      "value": "alz-platform-connectivity"
+    "parPeeredVnetSubscriptionId": {
+      "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
     },
     "parDdosProtectionPlanId": {
       "value": ""
     },
-    "parDnsServerIps": {
-      "value": []
+    "parSpokeNetworkName": {
+      "value": ""
     },
-    "parPrivateDnsZoneResourceIds":{
+    "parSpokeNetworkAddressPrefix": {
+      "value": ""
+    },
+    "parDnsServerIps": {
       "value": []
     },
     "parNextHopIpAddress": {
@@ -33,7 +36,7 @@
       "value": "rtb-spoke-to-hub"
     },
     "parHubVirtualNetworkId": {
-      "value": "/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualNetworks/vhub-rsp-uksouth"
+      "value": "/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth"
     },
     "parAllowSpokeForwardedTraffic": {
       "value": false
@@ -52,7 +55,7 @@
     },
     "parTags": {
       "value": {
-        "Environment": "Live"
+        "Environment": ""
       }
     },
     "parTelemetryOptOut": {

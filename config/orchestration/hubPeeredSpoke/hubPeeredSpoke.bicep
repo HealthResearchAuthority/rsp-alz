@@ -113,10 +113,6 @@ param parGlobalResourceLock lockType = {
   notes: 'This lock was created by the ALZ Bicep Hub Peered Spoke Orchestration Networking Module.'
 }
 
-// Subscription Module Parameters
-@sys.description('The Management Group Id to place the subscription in. Default: Empty String')
-param parPeeredVnetSubscriptionMgPlacement string = ''
-
 // Resource Group Module Parameters
 @sys.description('Name of Resource Group to be created to contain spoke networking resources like the virtual network.')
 param parResourceGroupNameForSpokeNetworking string = 'rg-rsp-spoke-networking'
@@ -250,19 +246,6 @@ param parSpokeNetworks spokesType = [
   //   name: 'pid-${varCuaid}-${uniqueString(parLocation, parPeeredVnetSubscriptionId)}'
   //   params: {}
   // }
-
-  // Module - Subscription Placement - Management
-  module modSubscriptionPlacement '../../custom-modules/subscriptionPlacement/subscriptionPlacement.bicep' = [for spokenew in parSpokeNetworks: {
-    scope: managementGroup(spokenew.managementGroup)
-    name: varModuleDeploymentNames.modSubscriptionPlacement
-    params: {
-      parTargetManagementGroupId: spokenew.managementGroup
-      parSubscriptionIds: [
-        spokenew.subscriptionId
-      ]
-      parTelemetryOptOut: parTelemetryOptOut
-    }
-  }]
 
   // Module - Resource Group
   module modResourceGroup '../../custom-modules/resourceGroup/resourceGroup.bicep' = [for spokenew in parSpokeNetworks: {
