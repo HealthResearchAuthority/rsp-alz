@@ -3,7 +3,7 @@ param (
   [String]$ConnectivitySubscriptionId = "$($env:CONNECTIVITY_SUBSCRIPTION_ID)",
 
   [Parameter()]
-  [String]$TemplateFile = "config\custom-modules\orchestration\hubPeeredSpoke\hubPeeredSpoke.bicep",
+  [String]$TemplateFile = "config\orchestration\hubPeeredSpoke\hubPeeredSpoke.bicep",
 
   [Parameter()]
   [String]$TemplateParameterFile = "config\custom-parameters\hubPeeredSpoke.vwan.parameters.all.json",
