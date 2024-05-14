@@ -6,10 +6,10 @@ param (
   [String]$ConnectivityResourceGroup = "$($env:CONNECTIVITY_RESOURCE_GROUP)",
 
   [Parameter()]
-  [String]$TemplateFile = "config\custom-modules\vwanConnectivity\vwanConnectivity.bicep",
+  [String]$TemplateFile = "config\custom-modules\orchestration\hubPeeredSpoke\hubPeeredSpoke.bicep",
 
   [Parameter()]
-  [String]$TemplateParameterFile = "config\custom-parameters\vwanConnectivity.parameters.all.json",
+  [String]$TemplateParameterFile = "config\custom-parameters\hubPeeredSpoke.vwan.parameters.all.json",
 
   [Parameter()]
   [Boolean]$WhatIfEnabled = [System.Convert]::ToBoolean($($env:IS_PULL_REQUEST))
@@ -24,7 +24,5 @@ $inputObject = @{
   WhatIf                = $WhatIfEnabled
   Verbose               = $true
 }
-
-Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
 
 New-AzResourceGroupDeployment @inputObject

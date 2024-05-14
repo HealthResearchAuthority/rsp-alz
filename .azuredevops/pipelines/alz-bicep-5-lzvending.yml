@@ -1,4 +1,4 @@
-name: ALZ-Bicep-4B-VWAN
+name: ALZ-Bicep-5-lzVending
 
 trigger:
 # YAML PR triggers are supported only in GitHub and Bitbucket Cloud.
