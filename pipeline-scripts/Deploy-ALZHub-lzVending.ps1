@@ -3,6 +3,9 @@ param (
   [String]$ConnectivitySubscriptionId = "$($env:CONNECTIVITY_SUBSCRIPTION_ID)",
 
   [Parameter()]
+  [String]$Location = "$($env:LOCATION)",
+
+  [Parameter()]
   [String]$TemplateFile = "config\orchestration\hubPeeredSpoke\hubPeeredSpoke.bicep",
 
   [Parameter()]
@@ -16,6 +19,7 @@ param (
 $inputObject = @{
   DeploymentName        = 'alz-VWANDeploy-{0}' -f ( -join (Get-Date -Format 'yyyyMMddTHHMMssffffZ')[0..63])
   TemplateFile          = $TemplateFile
+  Location              = $Location
   TemplateParameterFile = $TemplateParameterFile
   WhatIf                = $WhatIfEnabled
   Verbose               = $true
