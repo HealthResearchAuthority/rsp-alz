@@ -114,7 +114,6 @@ var varCuaid = '0c428583-f2a1-4448-975c-2d6262fd193a'
 //If Azure Firewall is enabled and Network DNS Proxy is enabled DNS will be configured to point to AzureFirewall
 resource resSpokeVirtualNetwork 'Microsoft.Network/virtualNetworks@2023-02-01' = {
   name: parSpokeNetworkName
-  scope: resourceGroup(parSubscriptionId, parResourceGroup)
   location: parLocation
   tags: parTags
   properties: {
@@ -147,7 +146,6 @@ resource resSpokeVirtualNetwork 'Microsoft.Network/virtualNetworks@2023-02-01' =
 
 resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
   name: parNSGName
-  scope: subscription(parSubscriptionId)
   location: parLocation
   properties: {
     securityRules: [for rule in parNSGRules: {
@@ -169,7 +167,6 @@ resource resSpokeVirtualNetworkLock 'Microsoft.Authorization/locks@2020-05-01' =
 
 resource resSpokeToHubRouteTable 'Microsoft.Network/routeTables@2023-02-01' = if (!empty(parNextHopIpAddress)) {
   name: parSpokeToHubRouteTableName
-  scope: subscription(parSubscriptionId)
   location: parLocation
   tags: parTags
   properties: {
