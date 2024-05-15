@@ -129,18 +129,6 @@ resource resSpokeVirtualNetwork 'Microsoft.Network/virtualNetworks@2023-02-01' =
     dhcpOptions: (!empty(parDnsServerIps) ? true : false) ? {
       dnsServers: parDnsServerIps
     } : null
-    subnets: [for subnet in subnets: {
-      name: subnet.name
-      properties: {
-        addressPrefix: subnet.addressPrefix
-        networkSecurityGroup: {
-          id: nsg.id
-        }
-        serviceEndpoints: contains(subnet, 'serviceEndpoints') ? subnet.serviceEndpoints : []
-        serviceEndpointPolicies: contains(subnet, 'serviceEndpointPolicies') ? subnet.serviceEndpointPolicies : []
-      }
-      type: 'Microsoft.Network/virtualNetworks/subnets'
-    }]
   }
 }
 
@@ -154,6 +142,21 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
     }]
   }
 }
+
+resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = [for subnet in subnets: {
+  name: subnet.name
+  parent: resSpokeVirtualNetwork
+  properties: {
+    addressPrefix: subnet.addressPrefix
+    networkSecurityGroup: {
+      id: nsg.id
+    }
+    serviceEndpoints: contains(subnet, 'serviceEndpoints') ? subnet.serviceEndpoints : []
+    serviceEndpointPolicies: contains(subnet, 'serviceEndpointPolicies') ? subnet.serviceEndpointPolicies : []
+  }
+}]
+
+
 
 // Create a virtual network resource lock if parGlobalResourceLock.kind != 'None' or if parSpokeNetworkLock.kind != 'None'
 resource resSpokeVirtualNetworkLock 'Microsoft.Authorization/locks@2020-05-01' = if (parSpokeNetworkLock.kind != 'None' || parGlobalResourceLock.kind != 'None') {
