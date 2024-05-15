@@ -180,6 +180,7 @@ resource resSpokeToHubRouteTable 'Microsoft.Network/routeTables@2023-02-01' = if
 // Create a Route Table if parAzFirewallEnabled is true and parGlobalResourceLock.kind != 'None' or if parHubRouteTableLock.kind != 'None'
 resource resSpokeToHubRouteTableLock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(parNextHopIpAddress) && (parSpokeRouteTableLock.kind != 'None' || parGlobalResourceLock.kind != 'None')) {
   scope: resSpokeToHubRouteTable
+  name: parSpokeRouteTableLock.?name ?? '${resSpokeToHubRouteTable.name}-lock'
   properties: {
     level: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.kind : parSpokeRouteTableLock.kind
     notes: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.?notes : parSpokeRouteTableLock.?notes
