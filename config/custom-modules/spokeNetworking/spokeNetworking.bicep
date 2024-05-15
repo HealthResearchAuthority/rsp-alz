@@ -16,9 +16,6 @@ type subnetsType = ({
   @description('Address prefix for Subnet')
   addressPrefix: string
 
-  @description('managementGroup for subscription placement')
-  managementGroup: string
-
   @description('list of services to connect to from the subnet for private access and not having to go through public IP')
   serviceEndpoints: array
 
