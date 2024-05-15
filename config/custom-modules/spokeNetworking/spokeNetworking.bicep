@@ -143,7 +143,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
   }
 }
 
-resource subnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = [for subnet in subnets: {
+resource rspsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = [for subnet in subnets: {
   name: subnet.name
   parent: resSpokeVirtualNetwork
   properties: {
@@ -205,3 +205,6 @@ module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttri
 
 output outSpokeVirtualNetworkName string = resSpokeVirtualNetwork.name
 output outSpokeVirtualNetworkId string = resSpokeVirtualNetwork.id
+
+output outSpokeSubnetName string = rspsubnet.name
+output outSpokeSubnetId string = rspsubnet.Id
