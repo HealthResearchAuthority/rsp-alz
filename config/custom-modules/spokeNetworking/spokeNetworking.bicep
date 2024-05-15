@@ -93,7 +93,7 @@ param parSpokeRouteTableLock lockType = {
 }
 
 @description('Optional. An Array of subnets to deploy to the Virtual Network.')
-param subnets subnetsType = []
+param parSubnets subnetsType = []
 
 @sys.description('Tags you would like to be applied to all resources in this module.')
 param parTags object = {}
@@ -137,7 +137,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
   }
 }
 
-resource rspsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = [for subnet in subnets: {
+resource rspsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = [for subnet in parSubnets: {
   name: subnet.name
   parent: resSpokeVirtualNetwork
   properties: {
