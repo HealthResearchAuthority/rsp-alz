@@ -3,6 +3,9 @@ param (
   [String]$ConnectivitySubscriptionId = "$($env:CONNECTIVITY_SUBSCRIPTION_ID)",
 
   [Parameter()]
+  [String]$ConnectivityResourceGroup = "$($env:CONNECTIVITY_RESOURCE_GROUP)",
+
+  [Parameter()]
   [String]$TemplateFile = "config\orchestration\hubPeeredSpoke\hubPeeredSpoke.bicep",
 
   [Parameter()]
@@ -15,6 +18,7 @@ param (
 # Parameters necessary for deployment
 $inputObject = @{
   DeploymentName        = 'alz-VWANDeploy-{0}' -f ( -join (Get-Date -Format 'yyyyMMddTHHMMssffffZ')[0..63])
+  ResourceGroupName     = $ConnectivityResourceGroup
   TemplateFile          = $TemplateFile
   TemplateParameterFile = $TemplateParameterFile
   WhatIf                = $WhatIfEnabled
