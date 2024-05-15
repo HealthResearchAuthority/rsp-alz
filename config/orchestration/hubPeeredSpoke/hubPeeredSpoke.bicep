@@ -51,34 +51,7 @@ type subnetsType = ({
   serviceEndpointPolicies: array
 })[]
 
-param lzsecurityRules array = [
-  { 
-    name: 'Allow-from-HRA-PA-Only'
-    properties: {
-      priority: 1000
-      access: 'Allow'
-      direction: 'Inbound'
-      destinationPortRange: '*'
-      protocol: '*'
-      sourcePortRange: '*'
-      sourceAddressPrefix: '217.38.8.142, 194.75.196.200, 80.169.67.56'
-      destinationAddressPrefix: 'VirtualNetwork'
-      }
-  }
-  {
-    name: 'Deny-All-Inbound'
-    properties: {
-      priority: 1100
-      access: 'Deny'
-      direction: 'Inbound'
-      destinationPortRange: '*'
-      protocol: '*'
-      sourcePortRange: '*'
-      sourceAddressPrefix: '*'
-      destinationAddressPrefix: 'VirtualNetwork'
-      }
-  }  
-]
+param lzsecurityRules array = []
 
 // **Parameters**
 // Generic Parameters - Used in multiple modules
