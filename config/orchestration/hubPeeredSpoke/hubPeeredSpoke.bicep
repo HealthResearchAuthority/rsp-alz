@@ -282,6 +282,8 @@ param parSpokeNetworks spokesType = [
       parSpokeRouteTableLock: parSpokeRouteTableLock
       parNSGName: spokenew.nsgName
       parNSGRules: lzsecurityRules
+      parResourceGroup: parResourceGroupNameForSpokeNetworking
+      parSubscriptionId: spokenew.subscriptionId
     }
   }]
 
