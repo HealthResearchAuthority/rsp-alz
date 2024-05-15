@@ -8,19 +8,7 @@
     "parTopLevelManagementGroupPrefix": {
       "value": "mg-rsp"
     },
-    "parTopLevelManagementGroupSuffix": {
-      "value": ""
-    },
-    "parPeeredVnetSubscriptionId": {
-      "value": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
-    },
     "parDdosProtectionPlanId": {
-      "value": ""
-    },
-    "parSpokeNetworkName": {
-      "value": ""
-    },
-    "parSpokeNetworkAddressPrefix": {
       "value": ""
     },
     "parDnsServerIps": {
@@ -38,17 +26,8 @@
     "parHubVirtualNetworkId": {
       "value": "/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth"
     },
-    "parAllowSpokeForwardedTraffic": {
-      "value": false
-    },
-    "parAllowHubVPNGatewayTransit": {
-      "value": true
-    },
     "parVirtualHubConnectionPrefix": {
       "value": ""
-    },
-    "parVirtualHubConnectionSuffix": {
-      "value": "-vhc"
     },
     "parEnableInternetSecurity": {
       "value": false
@@ -80,12 +59,6 @@
       }
     },
     "parSpokeRouteTableLock": {
-      "value": {
-        "kind": "None",
-        "notes": "This lock was created by the ALZ Bicep Hub Peered Spoke Orchestration Networking Module."
-      }
-    },
-    "parPrivateDnsZoneVirtualNetworkLinkLock": {
       "value": {
         "kind": "None",
         "notes": "This lock was created by the ALZ Bicep Hub Peered Spoke Orchestration Networking Module."
