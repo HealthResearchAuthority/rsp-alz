@@ -25,4 +25,5 @@ $inputObject = @{
   Verbose               = $true
 }
 
+Select-AzSubscription -SubscriptionId $ConnectivitySubscriptionId
 New-AzResourceGroupDeployment @inputObject
