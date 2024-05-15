@@ -101,12 +101,6 @@ param parTags object = {}
 @sys.description('Set Parameter to true to Opt-out of deployment telemetry.')
 param parTelemetryOptOut bool = false
 
-@sys.description('Tags you would like to be applied to all resources in this module.')
-param parSubscriptionId string
-
-@sys.description('Set Parameter to true to Opt-out of deployment telemetry.')
-param parResourceGroup string
-
 // Customer Usage Attribution Id
 var varCuaid = '0c428583-f2a1-4448-975c-2d6262fd193a'
 
