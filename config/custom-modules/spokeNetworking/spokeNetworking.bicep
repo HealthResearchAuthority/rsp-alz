@@ -152,6 +152,7 @@ resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
 // Create a virtual network resource lock if parGlobalResourceLock.kind != 'None' or if parSpokeNetworkLock.kind != 'None'
 resource resSpokeVirtualNetworkLock 'Microsoft.Authorization/locks@2020-05-01' = if (parSpokeNetworkLock.kind != 'None' || parGlobalResourceLock.kind != 'None') {
   scope: resSpokeVirtualNetwork
+  name: '${resSpokeVirtualNetwork.name}-lock'
   properties: {
     level: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.kind : parSpokeNetworkLock.kind
     notes: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.?notes : parSpokeNetworkLock.?notes
@@ -180,7 +181,7 @@ resource resSpokeToHubRouteTable 'Microsoft.Network/routeTables@2023-02-01' = if
 // Create a Route Table if parAzFirewallEnabled is true and parGlobalResourceLock.kind != 'None' or if parHubRouteTableLock.kind != 'None'
 resource resSpokeToHubRouteTableLock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(parNextHopIpAddress) && (parSpokeRouteTableLock.kind != 'None' || parGlobalResourceLock.kind != 'None')) {
   scope: resSpokeToHubRouteTable
-  name: parSpokeRouteTableLock.?name ?? '${resSpokeToHubRouteTable.name}-lock'
+  name: '${resSpokeToHubRouteTable.name}-lock'
   properties: {
     level: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.kind : parSpokeRouteTableLock.kind
     notes: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.?notes : parSpokeRouteTableLock.?notes
