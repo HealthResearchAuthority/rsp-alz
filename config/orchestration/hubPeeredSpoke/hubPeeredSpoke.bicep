@@ -191,7 +191,7 @@ param parEnableInternetSecurity bool = false
 
 // Orchestration Module Variables
 var varDeploymentNameWrappers = {
-  basePrefix: 'ALZBicep'
+  basePrefix: 'rsp'
   baseSuffixManagementGroup: '${parLocation}-${uniqueString(parLocation, parTopLevelManagementGroupPrefix)}-mg'
   baseSuffixSubscription: '${parLocation}-${uniqueString(parLocation, parTopLevelManagementGroupPrefix)}-sub'
   baseSuffixResourceGroup: '${parLocation}-${uniqueString(parLocation, parTopLevelManagementGroupPrefix)}-rg'
@@ -301,7 +301,7 @@ param parSpokeNetworks spokesType = [
   // Module -  Spoke to Azure Virtual WAN Hub peering.
   module modhubVirtualNetworkConnection '../../custom-modules/vnetPeeringVwan/hubVirtualNetworkConnection.bicep' = [for i in range(0, length(parSpokeNetworks)): if (!empty(varVirtualHubResourceId)) {
     scope: resourceGroup(varVirtualHubSubscriptionId, varVirtualHubResourceGroup)
-    name: varModuleDeploymentNames.modVnetPeeringVwan
+    name: '${varModuleDeploymentNames.modVnetPeeringVwan}${i}'
     params: {
       parVirtualWanHubResourceId: varVirtualHubResourceId
       parRemoteVirtualNetworkResourceId: modSpokeNetworking[i].outputs.outSpokeVirtualNetworkId
