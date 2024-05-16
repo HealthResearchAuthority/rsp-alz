@@ -234,7 +234,7 @@ param parSpokeNetworks spokesType = [
 
   // Module - Spoke Virtual Network
   module modSpokeNetworking '../../custom-modules/spokeNetworking/spokeNetworking.bicep' = [for spokenew in parSpokeNetworks: {
-    scope: resourceGroup(spokenew.subscriptionId, modResourceGroup.outputs.outResourceGroupName)
+    scope: resourceGroup(spokenew.subscriptionId, spokenew.resourceGroup)
     name: varModuleDeploymentNames.modSpokeNetworking
     dependsOn: [
       modResourceGroup
