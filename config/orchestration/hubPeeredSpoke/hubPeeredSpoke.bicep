@@ -24,6 +24,9 @@ type spokesType = ({
   @description('managementGroup for subscription placement')
   managementGroup: string
 
+  @description('resourceGroup for container app deployment')
+  resourceGroup: string
+
   @description('managementGroup for subscription placement')
   spokeNetworkName: string
 
@@ -85,10 +88,6 @@ param parGlobalResourceLock lockType = {
   kind: 'None'
   notes: 'This lock was created by the ALZ Bicep Hub Peered Spoke Orchestration Networking Module.'
 }
-
-// Resource Group Module Parameters
-@sys.description('Name of Resource Group to be created to contain spoke networking resources like the virtual network.')
-param parResourceGroupNameForSpokeNetworking string = 'rg-rsp-spoke-networking'
 
 @sys.description('Resource Group Lock Configuration.')
 param parResourceGroupLock lockType = {
@@ -195,9 +194,10 @@ param parSpokeNetworks spokesType = [
     managementGroup: '${parTopLevelManagementGroupPrefix}${parWorkloadsManagementGroupPrefix}${parNonProdManagementGroupPrefix}'
     spokeNetworkName: 'vnet-development-spoke-${parLocation}'
     nsgName: 'rsp-nsg-development'
+    resourceGroup:'rg-rsp-container-app-development'
     subnets: [
         {
-          name: 'default-development-subnet'
+          name: 'development-containerapp-subnet'
           addressPrefix: '10.1.0.0/18'
           serviceEndpoints: [
           ]
@@ -225,7 +225,7 @@ param parSpokeNetworks spokesType = [
     name: varModuleDeploymentNames.modResourceGroup
     params: {
       parLocation: parLocation
-      parResourceGroupName: parResourceGroupNameForSpokeNetworking
+      parResourceGroupName: spokenew.resourceGroup
       parTags: parTags
       parTelemetryOptOut: parTelemetryOptOut
       parResourceLockConfig: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock : parResourceGroupLock
@@ -234,7 +234,7 @@ param parSpokeNetworks spokesType = [
 
   // Module - Spoke Virtual Network
   module modSpokeNetworking '../../custom-modules/spokeNetworking/spokeNetworking.bicep' = [for spokenew in parSpokeNetworks: {
-    scope: resourceGroup(spokenew.subscriptionId, parResourceGroupNameForSpokeNetworking)
+    scope: resourceGroup(spokenew.subscriptionId, modResourceGroup.outputs.outResourceGroupName)
     name: varModuleDeploymentNames.modSpokeNetworking
     dependsOn: [
       modResourceGroup
