@@ -37,7 +37,7 @@ type spokesType = ({
   nsgName: string
 
   @description('Name of environment')
-  environment: string
+  parEnvironment: string
 })[]
 
 type subnetsType = ({
