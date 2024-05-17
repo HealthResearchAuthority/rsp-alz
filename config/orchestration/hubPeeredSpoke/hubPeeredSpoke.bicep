@@ -35,6 +35,9 @@ type spokesType = ({
 
   @description('Name of NSG')
   nsgName: string
+
+  @description('Name of environment')
+  environment: string
 })[]
 
 type subnetsType = ({
@@ -195,6 +198,7 @@ param parSpokeNetworks spokesType = [
     spokeNetworkName: 'vnet-development-spoke-${parLocation}'
     nsgName: 'rsp-nsg-development'
     resourceGroup:'rg-rsp-container-app-development'
+    parEnvironment: 'development'
     subnets: [
         {
           name: 'development-containerapp-subnet'

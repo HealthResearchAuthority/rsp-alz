@@ -52,8 +52,17 @@ param parSpokeNetworkAddressPrefix string = ''
 @sys.description('The Name of the Spoke Virtual Network.')
 param parSpokeNetworkName string = 'vnet-spoke'
 
+@sys.description('SubscriptionID to target')
+param subscriptionId string = ''
+
+@sys.description('ResourceGroup to target')
+param resourceGroup string = ''
+
 @sys.description('The Name of the Network Security Group.')
 param parNSGName string = ''
+
+@sys.description('The Name of the environment')
+param parEnvironment string = ''
 
 @description('list of network security rules')
 param parNSGRules array
@@ -193,6 +202,17 @@ module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttri
   name: 'pid-${varCuaid}-${uniqueString(resourceGroup().id)}'
   params: {}
 }
+
+// Optional Deployment for Customer Usage Attribution
+module modcontainerApps 'ContainerApp/containerApp.bicep' = {
+  scope: resourceGroup(subscriptionId, resourceGroup)
+  name: ''
+  params: {
+      parLocation: parLocation
+      parEnvironment: parEnvironment
+  }
+}
+
 
 output outSpokeVirtualNetworkName string = resSpokeVirtualNetwork.name
 output outSpokeVirtualNetworkId string = resSpokeVirtualNetwork.id
