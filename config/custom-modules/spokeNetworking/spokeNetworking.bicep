@@ -55,8 +55,8 @@ param parSpokeNetworkName string = 'vnet-spoke'
 @sys.description('SubscriptionID to target')
 param subscriptionId string = ''
 
-@sys.description('ResourceGroup to target')
-param resourceGroup string = ''
+// @sys.description('ResourceGroup to target')
+// param parResourceGroup string = ''
 
 @sys.description('The Name of the Network Security Group.')
 param parNSGName string = ''
@@ -213,7 +213,7 @@ module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttri
 
 // Optional Deployment for Customer Usage Attribution
 module modcontainerApps 'ContainerApp/containerApp.bicep' = {
-  scope: resourceGroup(subscriptionId, resourceGroup)
+  scope: resourceGroup(subscriptionId, resourceGroup().name)
   name: ''
   params: {
       parLocation: parLocation
