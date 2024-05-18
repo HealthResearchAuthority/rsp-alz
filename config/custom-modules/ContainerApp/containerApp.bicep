@@ -51,15 +51,15 @@ resource logAnalyticWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-
 resource environment 'Microsoft.App/managedEnvironments@2023-11-02-preview' = {
   name: 'cae-rsp-${parEnvironment}'
   location: parlocation
-  properties: {
-    appLogsConfiguration: {
-      destination: 'log-analytics'
-      logAnalyticsConfiguration: {
-        customerId: logAnalyticWorkspace.list().properties.customerId
-        sharedKey: logAnalyticWorkspace.listKeys().primarySharedKey
-      }
-    }
-  }
+  // properties: {
+  //   appLogsConfiguration: {
+  //     destination: 'log-analytics'
+  //     logAnalyticsConfiguration: {
+  //       customerId: logAnalyticWorkspace.list().properties.customerId
+  //       sharedKey: logAnalyticWorkspace.listKeys().primarySharedKey
+  //     }
+  //   }
+  // }
   sku: {
     name: 'Consumption'
   }
