@@ -9,8 +9,14 @@ param parlocation string = ''
 @sys.description('Name of the environment')
 param parEnvironment string = ''
 
+@sys.description('list of registries')
+param parRegistries []
+
+@sys.description('list of containers')
+param parContainers []
+
 @sys.description('Name of the Log Analyticws workspace')
-var logAnalyticsWorkspaceName = readEnvironmentVariable('LOG_ANALYTICS_WORKSPACE_NAME')
+var logAnalyticsWorkspaceName = 'hra-rsp-log-analytics'
 
 resource name_resource 'Microsoft.App/containerApps@2023-11-02-preview' = {
   name: 'ca-rsp-applicationservice-${parEnvironment}'
@@ -18,12 +24,15 @@ resource name_resource 'Microsoft.App/containerApps@2023-11-02-preview' = {
   properties: {
     environmentId: environment.id
     configuration: {
-      registries: registries
+      registries: parRegistries
       activeRevisionsMode: 'Single'
-      ingress: ingress
+      ingress: {
+        external: true
+        targetPort: 80
+      }
     }
     template: {
-      containers: containers
+      containers: parContainers
       scale: {
         minReplicas: 0
       }
@@ -36,7 +45,7 @@ resource name_resource 'Microsoft.App/containerApps@2023-11-02-preview' = {
 
 resource environment 'Microsoft.App/managedEnvironments@2023-11-02-preview' = {
   name: 'cae-rsp-${parEnvironment}'
-  location: location
+  location: parlocation
   properties: {
     appLogsConfiguration: {
       destination: 'log-analytics'

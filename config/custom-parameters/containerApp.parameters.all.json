@@ -9,10 +9,7 @@
     "parlocation": {
       "value": "uksouth"
     },
-    "environmentId": {
-      "value": "/subscriptions/d988cbee-043f-4c46-9a59-dedb2119e48c/resourceGroups/azinsider_demo/providers/Microsoft.App/managedEnvironments/managedEnvironment-azinsiderdemo"
-    },
-    "containers": {
+    "parContainers": {
       "value": [
         {
           "name": "simple-hello-world-container",
@@ -25,28 +22,13 @@
         }
       ]
     },
-    "registries": {
+    "parRegistries": {
       "value": []
     },
     "secrets": {
       "value": {
         "arrayValue": []
       }
-    },
-    "ingress": {
-      "value": {
-        "external": true,
-        "targetPort": 80
-      }
-    },
-    "environmentName": {
-      "value": "managedEnvironment-azinsiderdemo"
-    },
-    "workspaceName": {
-      "value": "workspaceazinsiderdemo"
-    },
-    "workspaceLocation": {
-      "value": "eastus"
     }
   }
 }

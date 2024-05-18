@@ -216,8 +216,10 @@ module modcontainerApps '../ContainerApp/containerApp.bicep' = {
   scope: resourceGroup(subscriptionId, resourceGroup().name)
   name: ''
   params: {
-      parLocation: parLocation
+      parlocation: parLocation
       parEnvironment: parEnvironment
+      parContainers: []
+      parRegistries: []
   }
 }
 
