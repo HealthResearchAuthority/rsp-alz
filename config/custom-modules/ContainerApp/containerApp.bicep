@@ -30,33 +30,33 @@ resource logAnalyticWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
-        customerId: logAnalyticWorkspace.list().properties.customerId
+        customerId: logAnalyticWorkspace.properties.customerId
         sharedKey: logAnalyticWorkspace.listKeys().primarySharedKey
       }
     }
   }
 }
 
-// resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
-//   name: 'ca-rsp-applicationservice-${parEnvironment}'
-//   location: parlocation
-//   properties: {
-//     environmentId: environment.id
-//     configuration: {
-//       registries: parRegistries
-//       activeRevisionsMode: 'Single'
-//       ingress: {
-//         external: true
-//         targetPort: 80
-//       }
-//     }
-//     template: {
-//       containers: parContainers
-//       scale: {
-//         minReplicas: 0
-//       }
-//     }
-//   }
-// }
+resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
+  name: 'ca-rsp-applicationservice-${parEnvironment}'
+  location: parlocation
+  properties: {
+    environmentId: environment.id
+    configuration: {
+      registries: parRegistries
+      activeRevisionsMode: 'Single'
+      ingress: {
+        external: true
+        targetPort: 80
+      }
+    }
+    template: {
+      containers: parContainers
+      scale: {
+        minReplicas: 0
+      }
+    }
+  }
+}
 
 
