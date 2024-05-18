@@ -227,7 +227,8 @@ module modcontainerApps '../ContainerApp/containerApp.bicep' = {
 output outSpokeVirtualNetworkName string = resSpokeVirtualNetwork.name
 output outSpokeVirtualNetworkId string = resSpokeVirtualNetwork.id
 
-output outlaName string = modcontainerApps.outputs.outlaname
+output outlacustId string = modcontainerApps.outputs.outlacustId
+output outlasharedkey string = modcontainerApps.outputs.outlakey
 
 // output outSpokeSubnetName string = rspsubnet.name
 // output outSpokeSubnetId string = rspsubnet.Id

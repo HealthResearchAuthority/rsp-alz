@@ -37,7 +37,9 @@ resource logAnalyticWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-
 //   }
 // }
 
-output outlaname string = logAnalyticWorkspace.properties.createdDate
+output outlacustId string = logAnalyticWorkspace.properties.customerId
+output outlakey string = logAnalyticWorkspace.listKeys().primarySharedKey
+
 // resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
 //   name: 'ca-rsp-applicationservice-${parEnvironment}'
 //   location: parlocation
