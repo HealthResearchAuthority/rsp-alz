@@ -43,14 +43,15 @@ resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
   ]
 }
 
-resource logAnalyticWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
-  name: logAnalyticsWorkspaceName
-  scope: resourceGroup('rg-hra-operationsmanagement')
-}
+// resource logAnalyticWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-01' existing = {
+//   name: logAnalyticsWorkspaceName
+//   scope: resourceGroup('rg-hra-operationsmanagement')
+// }
 
 resource environment 'Microsoft.App/managedEnvironments@2023-11-02-preview' = {
   name: 'cae-rsp-${parEnvironment}'
   location: parlocation
+  properties: {}
   // properties: {
   //   appLogsConfiguration: {
   //     destination: 'log-analytics'
