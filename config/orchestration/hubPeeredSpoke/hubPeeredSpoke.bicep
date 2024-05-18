@@ -297,14 +297,6 @@ param parSpokeNetworks spokesType = [
     id: modSpokeNetworking[i].outputs.outSpokeVirtualNetworkId
   }]
 
-  output outlacustIdspokenetwork array = [for i in range(0, length(parSpokeNetworks)): {
-    Name: modSpokeNetworking[i].outputs.outlacustId
-  }]
-
-  output outlasharedKeyspokenetwork array = [for i in range(0, length(parSpokeNetworks)): {
-    Name: modSpokeNetworking[i].outputs.outlasharedkey
-  }]
-
 
   // output outSpokeSubnetNames array = [for i in range(0, length(parSpokeNetworks)): {
   //   Name: modSpokeNetworking[i].outputs.outSpokeSubnetName

@@ -9,6 +9,9 @@
     "parlocation": {
       "value": "uksouth"
     },
+    "parEnvironment": {
+      "value": "development"
+    },
     "parContainers": {
       "value": [
         {
