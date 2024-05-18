@@ -23,6 +23,8 @@ resource logAnalyticWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-
   scope: resourceGroup('rg-hra-operationsmanagement')
 }
 
+//output outlacustomerID string = logAnalyticWorkspace.list().properties.customerId
+
 // resource environment 'Microsoft.App/managedEnvironments@2023-11-02-preview' = {
 //   name: 'cae-rsp-${parEnvironment}'
 //   location: parlocation
