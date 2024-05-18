@@ -54,7 +54,7 @@ resource environment 'Microsoft.App/managedEnvironments@2023-11-02-preview' = {
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
-        customerId: logAnalyticsWorkspaceName.customerId
+        customerId: logAnalyticWorkspace.list().properties.customerId
         sharedKey: logAnalyticWorkspace.listKeys().primarySharedKey
       }
     }
