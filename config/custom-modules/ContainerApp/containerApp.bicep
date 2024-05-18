@@ -23,42 +23,40 @@ resource logAnalyticWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-
   scope: resourceGroup('8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a','rg-hra-operationsmanagement')
 }
 
-output outlaname string = logAnalyticWorkspace.properties.customerId
+ resource environment 'Microsoft.App/managedEnvironments@2023-11-02-preview' = {
+  name: 'cae-rsp-${parEnvironment}'
+  location: parlocation
+  properties: {
+    appLogsConfiguration: {
+      destination: 'log-analytics'
+      logAnalyticsConfiguration: {
+        customerId: logAnalyticWorkspace.list().properties.customerId
+        sharedKey: logAnalyticWorkspace.listKeys().primarySharedKey
+      }
+    }
+  }
+}
 
-//  resource environment 'Microsoft.App/managedEnvironments@2023-11-02-preview' = {
-//   name: 'cae-rsp-${parEnvironment}'
-//   location: parlocation
-//   properties: {
-//     appLogsConfiguration: {
-//       destination: 'log-analytics'
-//       logAnalyticsConfiguration: {
-//         customerId: logAnalyticWorkspace.list().properties.customerId
-//         sharedKey: logAnalyticWorkspace.listKeys().primarySharedKey
-//       }
-//     }
-//   }
-// }
-
-// resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
-//   name: 'ca-rsp-applicationservice-${parEnvironment}'
-//   location: parlocation
-//   properties: {
-//     environmentId: environment.id
-//     configuration: {
-//       registries: parRegistries
-//       activeRevisionsMode: 'Single'
-//       ingress: {
-//         external: true
-//         targetPort: 80
-//       }
-//     }
-//     template: {
-//       containers: parContainers
-//       scale: {
-//         minReplicas: 0
-//       }
-//     }
-//   }
-// }
+resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
+  name: 'ca-rsp-applicationservice-${parEnvironment}'
+  location: parlocation
+  properties: {
+    environmentId: environment.id
+    configuration: {
+      registries: parRegistries
+      activeRevisionsMode: 'Single'
+      ingress: {
+        external: true
+        targetPort: 80
+      }
+    }
+    template: {
+      containers: parContainers
+      scale: {
+        minReplicas: 0
+      }
+    }
+  }
+}
 
 
