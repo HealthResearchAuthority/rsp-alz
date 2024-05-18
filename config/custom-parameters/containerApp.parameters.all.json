@@ -3,14 +3,8 @@
   "contentVersion": "1.0.0.0",
   "parameters": {
 
-    "name": {
-      "value": "rspapplications"
-    },
     "parlocation": {
       "value": "uksouth"
-    },
-    "parEnvironment": {
-      "value": "development"
     },
     "parContainers": {
       "value": [
@@ -27,11 +21,6 @@
     },
     "parRegistries": {
       "value": []
-    },
-    "secrets": {
-      "value": {
-        "arrayValue": []
-      }
     }
   }
 }
