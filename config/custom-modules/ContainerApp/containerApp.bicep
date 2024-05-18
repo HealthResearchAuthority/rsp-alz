@@ -1,6 +1,6 @@
 targetScope = 'resourceGroup'
 
-metadata name = 'ALZ Bicep - Management Groups Module'
+metadata name = 'ALZ Bicep - Container App Module'
 metadata description = 'ALZ Bicep Module to configure Container App'
 
 @sys.description('Prefix used for the management group hierarchy. This management group will be created as part of the deployment.')
@@ -18,7 +18,7 @@ param parContainers []
 @sys.description('Name of the Log Analyticws workspace')
 var logAnalyticsWorkspaceName = 'hra-rsp-log-analytics'
 
-resource name_resource 'Microsoft.App/containerApps@2023-11-02-preview' = {
+resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
   name: 'ca-rsp-applicationservice-${parEnvironment}'
   location: parlocation
   properties: {
