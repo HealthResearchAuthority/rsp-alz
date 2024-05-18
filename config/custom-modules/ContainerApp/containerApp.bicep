@@ -50,8 +50,8 @@ resource environment 'Microsoft.App/managedEnvironments@2023-11-02-preview' = {
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
-        customerId: reference('Microsoft.OperationalInsights/workspaces/${logAnalyticsWorkspaceName}', '2020-08-01').customerId
-        sharedKey: listKeys('Microsoft.OperationalInsights/workspaces/${logAnalyticsWorkspaceName}', '2020-08-01').primarySharedKey
+        customerId: reference('${logAnalyticsWorkspaceName}', '2020-08-01').customerId
+        sharedKey: listKeys('${logAnalyticsWorkspaceName}', '2020-08-01').primarySharedKey
       }
     }
   }
