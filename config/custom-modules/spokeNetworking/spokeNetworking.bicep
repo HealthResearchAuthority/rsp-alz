@@ -212,16 +212,16 @@ module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttri
 }
 
 // Optional Deployment for Customer Usage Attribution
-module modcontainerApps '../ContainerApp/containerApp.bicep' = {
-  scope: resourceGroup(subscriptionId, resourceGroup().name)
-  name: 'containerAppdeployment-${parEnvironment}'
-  params: {
-      parlocation: parLocation
-      parEnvironment: parEnvironment
-      parContainers: []
-      parRegistries: []
-  }
-}
+// module modcontainerApps '../ContainerApp/containerApp.bicep' = {
+//   scope: resourceGroup(subscriptionId, resourceGroup().name)
+//   name: 'containerAppdeployment-${parEnvironment}'
+//   params: {
+//       parlocation: parLocation
+//       parEnvironment: parEnvironment
+//       parContainers: []
+//       parRegistries: []
+//   }
+// }
 
 
 output outSpokeVirtualNetworkName string = resSpokeVirtualNetwork.name
