@@ -40,7 +40,7 @@ resource acrResource 'Microsoft.ContainerRegistry/registries@2023-01-01-preview'
 
 // Create identtiy
 resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview'  = {
-  name: 'mi-rsp-applicationservice-user-${parEnvironment}'
+  name: 'id-rsp-applicationservice-user-${parEnvironment}'
   location: parlocation
 }
 
