@@ -28,7 +28,7 @@ resource appInsights 'Microsoft.Insights/components@2020-02-02' = {
 }
 
 resource acrResource 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
-  name: 'acr-rsp-${parEnvironment}'
+  name: 'acrrsp${parEnvironment}'
   location: parlocation
   sku: {
     name: 'standard'
