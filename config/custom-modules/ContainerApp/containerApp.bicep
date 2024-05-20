@@ -9,9 +9,6 @@ param parlocation string = ''
 @sys.description('Name of the environment')
 param parEnvironment string = ''
 
-@sys.description('list of registries')
-param parRegistries []
-
 @sys.description('list of containers')
 param parContainers []
 
@@ -43,7 +40,7 @@ resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
   properties: {
     environmentId: environment.id
     configuration: {
-      registries: []]
+      //registries: []
       activeRevisionsMode: 'Single'
       ingress: {
         external: true
