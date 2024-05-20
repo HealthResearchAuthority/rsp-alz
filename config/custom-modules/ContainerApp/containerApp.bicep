@@ -46,7 +46,7 @@ resource identity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-p
 
 // Create role assignment
 resource roleAssignment 'Microsoft.Authorization/roleAssignments@2020-04-01-preview' = {
-  name: 'ra-rsp-containerapp-useridentity'
+  name: guid(resourceGroup().id, acrResource.id, 'AcrPullSystemAssigned')
   scope: acrResource
   properties: {
     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '7f951dda-4ed3-4680-a7ca-43fe172d538d') //RoleID from: https://learn.microsoft.com/en-us/azure/role-based-access-control/built-in-roles/containers#acrpull
