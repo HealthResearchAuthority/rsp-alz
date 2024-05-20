@@ -260,6 +260,8 @@ param parSpokeNetworks spokesType = [
       parNSGName: spokenew.nsgName
       parNSGRules: lzsecurityRules
       parSubnets: spokenew.subnets
+      parEnvironment: spokenew.parEnvironment
+      subscriptionId: spokenew.subscriptionId
     }
   }]
 

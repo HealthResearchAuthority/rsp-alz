@@ -9,11 +9,11 @@ param parlocation string = ''
 @sys.description('Name of the environment')
 param parEnvironment string = ''
 
-// @sys.description('list of registries')
-// param parRegistries []
+@sys.description('list of registries')
+param parRegistries []
 
-// @sys.description('list of containers')
-// param parContainers []
+@sys.description('list of containers')
+param parContainers []
 
 // @sys.description('Name of the Log Analyticws workspace')
 var logAnalyticsWorkspaceName = 'hra-rsp-log-analytics'
@@ -37,26 +37,26 @@ resource logAnalyticWorkspace 'Microsoft.OperationalInsights/workspaces@2021-06-
   }
 }
 
-// resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
-//   name: 'ca-rsp-applicationservice-${parEnvironment}'
-//   location: parlocation
-//   properties: {
-//     environmentId: environment.id
-//     configuration: {
-//       registries: parRegistries
-//       activeRevisionsMode: 'Single'
-//       ingress: {
-//         external: true
-//         targetPort: 80
-//       }
-//     }
-//     template: {
-//       containers: parContainers
-//       scale: {
-//         minReplicas: 0
-//       }
-//     }
-//   }
-// }
+resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
+  name: 'ca-rsp-applicationservice-${parEnvironment}'
+  location: parlocation
+  properties: {
+    environmentId: environment.id
+    configuration: {
+      registries: []]
+      activeRevisionsMode: 'Single'
+      ingress: {
+        external: true
+        targetPort: 80
+      }
+    }
+    template: {
+      containers: parContainers
+      scale: {
+        minReplicas: 0
+      }
+    }
+  }
+}
 
 
