@@ -96,6 +96,17 @@ resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
         targetPort: 80
       }
     }
+    template: {
+      containers: [
+        {
+          name: 'simple-hello-world-container'
+          image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+        }
+      ]
+      scale: {
+        minReplicas: 0
+      }
+    }
   }
 }
 
