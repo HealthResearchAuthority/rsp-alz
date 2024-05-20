@@ -218,8 +218,8 @@ module modcontainerApps '../ContainerApp/containerApp.bicep' = {
   params: {
       parlocation: parLocation
       parEnvironment: parEnvironment
-      parContainers: []
-      parRegistries: []
+      // parContainers: []
+      // parRegistries: []
   }
 }
 
