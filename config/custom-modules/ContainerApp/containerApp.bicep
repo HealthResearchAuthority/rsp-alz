@@ -9,9 +9,6 @@ param parlocation string = ''
 @sys.description('Name of the environment')
 param parEnvironment string = ''
 
-@sys.description('list of containers')
-param parContainers []
-
 // @sys.description('Name of the Log Analyticws workspace')
 var logAnalyticsWorkspaceName = 'hra-rsp-log-analytics'
 
@@ -48,7 +45,12 @@ resource containerapp 'Microsoft.App/containerApps@2023-11-02-preview' = {
       }
     }
     template: {
-      containers: parContainers
+      containers: [
+        {
+          name: 'simple-hello-world-container'
+          image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+        }
+      ]
       scale: {
         minReplicas: 0
       }
