@@ -9,11 +9,11 @@ param parlocation string = ''
 @sys.description('Name of the environment')
 param parEnvironment string = ''
 
-@sys.description('list of registries')
-param parRegistries []
+// @sys.description('list of registries')
+// param parRegistries []
 
-@sys.description('list of containers')
-param parContainers []
+// @sys.description('list of containers')
+// param parContainers []
 
 // @sys.description('Name of the Log Analyticws workspace')
 var logAnalyticsWorkspaceName = 'hra-rsp-log-analytics'
