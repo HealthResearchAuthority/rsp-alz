@@ -198,7 +198,7 @@ param parSpokeNetworks spokesType = [
     spokeNetworkName: 'vnet-development-spoke-${parLocation}'
     nsgName: 'rsp-nsg-development'
     resourceGroup:'rg-rsp-container-app-development'
-    parEnvironment: 'development'
+    parEnvironment: 'dev'
     subnets: [
         {
           name: 'development-containerapp-subnet'
