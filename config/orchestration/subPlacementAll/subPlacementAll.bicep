@@ -22,10 +22,14 @@ param parLandingZonesProdMgSubs array = []
 
 @sys.description('An array of Subscription IDs to place in the NONPROD Management Group. Default: Empty Array')
 param parLandingZonesNonProdMgSubs array = [
-    'b83b4631-b51b-4961-86a1-295f539c826b' //Development
     '66482e26-764b-4717-ae2f-fab6b8dd1379' //System Test Manual
     'c9d1b222-c47a-43fc-814a-33083b8d3375' //System Test integration
     '75875981-b04d-42c7-acc5-073e2e5e2e65' //System Test Automated
+]
+
+@sys.description('An array of Subscription IDs to place in the NONPROD Management Group. Default: Empty Array')
+param parLandingZonesNonProdMgdevelopmentSubs array = [
+    'b83b4631-b51b-4961-86a1-295f539c826b' //Development
 ]
 
 @sys.description('An array of Subscription IDs to place in the Confidential Corp (Landing Zones) Management Group. Default: Empty Array')
@@ -42,19 +46,8 @@ var varMgIds = {
   landingZones: '${parTopLevelManagementGroupPrefix}-workloads'
   landingZonesProd: '${parTopLevelManagementGroupPrefix}-workloads-prod'
   landingZonesNonProd: '${parTopLevelManagementGroupPrefix}-workloads-nonprod'
+  landingZonesNonProdDevelopment: '${parTopLevelManagementGroupPrefix}-workloads-nonprod-development'
   DevBox: '${parTopLevelManagementGroupPrefix}-devbox'
-}
-
-
-var varMgNames = {
-  intRoot: 'mg-future-iras'
-  platform: 'Platform'
-  platformManagement: 'Management'
-  platformConnectivity: 'Connectivity'
-  landingZones: 'Workloads'
-  landingZonesProd: 'NonProd'
-  landingZonesNonProd: 'Prod'
-  DevBox: 'Dev Box'
 }
 
 var varDeploymentNames = {
@@ -63,6 +56,7 @@ var varDeploymentNames = {
   modPlatformConnectivityMgSubPlacement: take('modPlatformConnectivityMgSubPlacement-${uniqueString(varMgIds.platformConnectivity, string(length(parPlatformConnectivityMgSubs)), deployment().name)}', 64)
   modLandingZonesProdMgSubPlacement: take('modLandingZonesProdMgSubPlacement-${uniqueString(varMgIds.landingZonesProd, string(length(parLandingZonesProdMgSubs)), deployment().name)}', 64)
   modLandingZonesNonProdMgSubPlacement: take('modLandingZonesNonProdMgSubPlacement-${uniqueString(varMgIds.landingZonesNonProd, string(length(parLandingZonesNonProdMgSubs)), deployment().name)}', 64)
+  modLandingZonesNonProdMgDevelopmentSubPlacement: take('modLandingZonesNonProdMgSubPlacement-${uniqueString(varMgIds.landingZonesNonProdDevelopment, string(length(parLandingZonesNonProdMgdevelopmentSubs)), deployment().name)}', 64)
   modDevBoxMgSubPlacement: take('modDevBoxMgSubPlacement-${uniqueString(varMgIds.DevBox, string(length(parDevBoxMgSubs)), deployment().name)}', 64)
 }
 
@@ -125,16 +119,27 @@ module modLandingZonesNonProdMgSubPlacement '../../custom-modules/subscriptionPl
   }
 }
 
-// // DevBox
-// module modDevBoxMgSubPlacement '../../custom-modules/subscriptionPlacement/subscriptionPlacement.bicep' = if (!empty(parDevBoxMgSubs)) {
-//   name: varDeploymentNames.modDevBoxMgSubPlacement
-//   scope: managementGroup(varMgIds.DevBox)
-//   params: {
-//     parTargetManagementGroupId: varMgIds.DevBox
-//     parSubscriptionIds: parDevBoxMgSubs
-//     parTelemetryOptOut: parTelemetryOptOut
-//   }
-// }
+module modLandingZonesNonProdMgDevelopmentSubPlacement '../../custom-modules/subscriptionPlacement/subscriptionPlacement.bicep' = if (!empty(parLandingZonesNonProdMgdevelopmentSubs)) {
+  name: varDeploymentNames.modLandingZonesNonProdMgDevelopmentSubPlacement
+  scope: managementGroup(varMgIds.landingZonesNonProdDevelopment)
+  params: {
+    parTargetManagementGroupId: varMgIds.landingZonesNonProdDevelopment
+    parSubscriptionIds: parLandingZonesNonProdMgdevelopmentSubs
+    parTelemetryOptOut: parTelemetryOptOut
+    //parTargetManagementGroupName: varMgNames.landingZonesNonProd
+  }
+}
+
+// DevBox
+module modDevBoxMgSubPlacement '../../custom-modules/subscriptionPlacement/subscriptionPlacement.bicep' = if (!empty(parDevBoxMgSubs)) {
+  name: varDeploymentNames.modDevBoxMgSubPlacement
+  scope: managementGroup(varMgIds.DevBox)
+  params: {
+    parTargetManagementGroupId: varMgIds.DevBox
+    parSubscriptionIds: parDevBoxMgSubs
+    parTelemetryOptOut: parTelemetryOptOut
+  }
+}
 
 // Optional Deployment for Customer Usage Attribution
 module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttribution/cuaIdManagementGroup.bicep' = if (!parTelemetryOptOut) {
