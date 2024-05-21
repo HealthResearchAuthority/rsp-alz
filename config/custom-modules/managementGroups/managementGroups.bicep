@@ -171,7 +171,7 @@ resource targetManagementGroup 'Microsoft.Management/managementGroups@2023-04-01
 
 //Level 4 - Child Management Groups under NonProd
 resource resLandingZoneNonProdChildMgs 'Microsoft.Management/managementGroups@2023-04-01' = [for mg in items(varLandingZoneNonProdMgChildrenAlzDefault): if (!empty(varLandingZoneNonProdMgChildrenAlzDefault)) {
-  name: '${parTopLevelManagementGroupPrefix}-platform-nonprod-${mg.key}'
+  name: '${parTopLevelManagementGroupPrefix}-workloads-nonprod-${mg.key}'
   properties: {
     displayName: mg.value.displayName
     details: {
@@ -197,6 +197,8 @@ output outPlatformChildrenManagementGroupIds array = [for mg in items(varPlatfor
 
 output outLandingZonesManagementGroupId string = resLandingZonesMg.id
 output outLandingZoneChildrenManagementGroupIds array = [for mg in items(varLandingZoneMgChildrenAlzDefault): '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupPrefix}-workloads-${mg.key}']
+
+output outLandingZoneNonProdChildrenManagementGroupIds array = [for mg in items(varLandingZoneNonProdMgChildrenAlzDefault): '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupPrefix}-workloads-nonprod-${mg.key}']
 
 output outSandboxManagementGroupId string = resSandboxMg.id
 output outDevelopmentManagementGroupId string = resDevelopmentBoxMg.id
