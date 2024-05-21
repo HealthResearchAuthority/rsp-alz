@@ -109,16 +109,16 @@ module modLandingZonesNonProdMgSubPlacement '../../custom-modules/subscriptionPl
   }
 }
 
-// DevBox
-module modDevBoxMgSubPlacement '../../custom-modules/subscriptionPlacement/subscriptionPlacement.bicep' = if (!empty(parDevBoxMgSubs)) {
-  name: varDeploymentNames.modDevBoxMgSubPlacement
-  scope: managementGroup(varMgIds.DevBox)
-  params: {
-    parTargetManagementGroupId: varMgIds.DevBox
-    parSubscriptionIds: parDevBoxMgSubs
-    parTelemetryOptOut: parTelemetryOptOut
-  }
-}
+// // DevBox
+// module modDevBoxMgSubPlacement '../../custom-modules/subscriptionPlacement/subscriptionPlacement.bicep' = if (!empty(parDevBoxMgSubs)) {
+//   name: varDeploymentNames.modDevBoxMgSubPlacement
+//   scope: managementGroup(varMgIds.DevBox)
+//   params: {
+//     parTargetManagementGroupId: varMgIds.DevBox
+//     parSubscriptionIds: parDevBoxMgSubs
+//     parTelemetryOptOut: parTelemetryOptOut
+//   }
+// }
 
 // Optional Deployment for Customer Usage Attribution
 module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttribution/cuaIdManagementGroup.bicep' = if (!parTelemetryOptOut) {
