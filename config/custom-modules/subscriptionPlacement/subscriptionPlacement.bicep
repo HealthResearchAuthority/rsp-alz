@@ -9,15 +9,22 @@ param parSubscriptionIds array = []
 @sys.description('Target management group for the subscription. This management group must exist.')
 param parTargetManagementGroupId string
 
+@sys.description('Target management group for the subscription. This management group must exist.')
+param parTargetManagementGroupName string
+
 @sys.description('Set Parameter to true to Opt-out of deployment telemetry.')
 param parTelemetryOptOut bool = false
 
 // Customer Usage Attribution Id
 var varCuaid = '3dfa9e81-f0cf-4b25-858e-167937fd380b'
 
+resource targetManagementGroup 'Microsoft.Management/managementGroups@2023-04-01' existing = {
+  name: parTargetManagementGroupName
+}
+
 resource resSubscriptionPlacement 'Microsoft.Management/managementGroups/subscriptions@2023-04-01' = [for subscriptionId in parSubscriptionIds: {
   name: '${subscriptionId}'
-  parent: parTargetManagementGroupId
+  parent: targetManagementGroup
 }]
 
 // Optional Deployment for Customer Usage Attribution

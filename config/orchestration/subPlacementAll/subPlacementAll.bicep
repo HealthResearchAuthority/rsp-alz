@@ -43,7 +43,18 @@ var varMgIds = {
   landingZonesProd: '${parTopLevelManagementGroupPrefix}-workloads-prod'
   landingZonesNonProd: '${parTopLevelManagementGroupPrefix}-workloads-nonprod'
   DevBox: '${parTopLevelManagementGroupPrefix}-devbox'
+}
 
+
+var varMgNames = {
+  intRoot: 'mg-future-iras'
+  platform: 'Platform'
+  platformManagement: 'Management'
+  platformConnectivity: 'Connectivity'
+  landingZones: 'Workloads'
+  landingZonesProd: 'NonProd'
+  landingZonesNonProd: 'Prod'
+  DevBox: 'Dev Box'
 }
 
 var varDeploymentNames = {
@@ -66,6 +77,7 @@ module modPlatformMgSubPlacement '../../custom-modules/subscriptionPlacement/sub
     parTargetManagementGroupId: varMgIds.platform
     parSubscriptionIds: parPlatformMgSubs
     parTelemetryOptOut: parTelemetryOptOut
+    parTargetManagementGroupName: varMgNames.platform
   }
 }
 
@@ -76,6 +88,7 @@ module modPlatformManagementMgSubPlacement '../../custom-modules/subscriptionPla
     parTargetManagementGroupId: varMgIds.platformManagement
     parSubscriptionIds: parPlatformManagementMgSubs
     parTelemetryOptOut: parTelemetryOptOut
+    parTargetManagementGroupName: varMgNames.platformManagement
   }
 }
 
@@ -86,6 +99,7 @@ module modplatformConnectivityMgSubPlacement '../../custom-modules/subscriptionP
     parTargetManagementGroupId: varMgIds.platformConnectivity
     parSubscriptionIds: parPlatformConnectivityMgSubs
     parTelemetryOptOut: parTelemetryOptOut
+    parTargetManagementGroupName: varMgNames.platformConnectivity
   }
 }
 
@@ -96,6 +110,7 @@ module modLandingZonesProdMgSubPlacement '../../custom-modules/subscriptionPlace
     parTargetManagementGroupId: varMgIds.landingZonesProd
     parSubscriptionIds: parLandingZonesProdMgSubs
     parTelemetryOptOut: parTelemetryOptOut
+    parTargetManagementGroupName: varMgNames.landingZones
   }
 }
 
@@ -106,6 +121,7 @@ module modLandingZonesNonProdMgSubPlacement '../../custom-modules/subscriptionPl
     parTargetManagementGroupId: varMgIds.landingZonesNonProd
     parSubscriptionIds: parLandingZonesNonProdMgSubs
     parTelemetryOptOut: parTelemetryOptOut
+    parTargetManagementGroupName: varMgNames.landingZonesNonProd
   }
 }
 
