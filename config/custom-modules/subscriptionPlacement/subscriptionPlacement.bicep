@@ -16,8 +16,8 @@ param parTelemetryOptOut bool = false
 var varCuaid = '3dfa9e81-f0cf-4b25-858e-167937fd380b'
 
 resource resSubscriptionPlacement 'Microsoft.Management/managementGroups/subscriptions@2023-04-01' = [for subscriptionId in parSubscriptionIds: {
-  scope: tenant()
-  name: '${parTargetManagementGroupId}/${subscriptionId}'
+  name: '${subscriptionId}'
+  parent: parTargetManagementGroupId
 }]
 
 // Optional Deployment for Customer Usage Attribution
