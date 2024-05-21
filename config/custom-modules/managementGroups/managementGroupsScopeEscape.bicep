@@ -47,6 +47,12 @@ var varLandingZoneMgChildrenAlzDefault = {
   }
 }
 
+var varLandingZoneNonProdMgChildrenAlzDefault = {
+  development: {
+    displayName: 'Development'
+  }
+}
+
 // DevBox Management Group
 var varDevelopmentboxMg = {
   name: '${parTopLevelManagementGroupPrefix}-devbox'
@@ -121,6 +127,25 @@ resource resPlatformChildMgs 'Microsoft.Management/managementGroups@2023-04-01' 
   }
 }]
 
+resource nonprodtargetManagementGroup 'Microsoft.Management/managementGroups@2023-04-01' existing = {
+  scope: tenant()
+  name: '${parTopLevelManagementGroupPrefix}-workloads-nonprod'
+}
+
+//Level 4 - Child Management Groups under NonProd
+resource resLandingZoneNonProdChildMgs 'Microsoft.Management/managementGroups@2023-04-01' = [for mg in items(varLandingZoneNonProdMgChildrenAlzDefault): if (!empty(varLandingZoneNonProdMgChildrenAlzDefault)) {
+  name: '${parTopLevelManagementGroupPrefix}-workloads-nonprod-${mg.key}'
+  scope: tenant()
+  properties: {
+    displayName: mg.value.displayName
+    details: {
+      parent: {
+        id: nonprodtargetManagementGroup.id
+      }
+    }
+  }
+}]
+
 // Output Management Group IDs
 //output outTopLevelManagementGroupId string = resTopLevelMg.id
 
@@ -129,6 +154,7 @@ output outPlatformChildrenManagementGroupIds array = [for mg in items(varPlatfor
 
 output outLandingZonesManagementGroupId string = resLandingZonesMg.id
 output outLandingZoneChildrenManagementGroupIds array = [for mg in items(varLandingZoneMgChildrenAlzDefault): '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupPrefix}-workloads-${mg.key}']
+output outLandingZoneNonProdChildrenManagementGroupIds array = [for mg in items(varLandingZoneNonProdMgChildrenAlzDefault): '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupPrefix}-workloads-nonprod-${mg.key}']
 
 //output outSandboxManagementGroupId string = resSandboxMg.id
 output outDevelopmentManagementGroupId string = resDevelopmentBoxMg.id
@@ -141,6 +167,7 @@ output outPlatformChildrenManagementGroupNames array = [for mg in items(varPlatf
 
 output outLandingZonesManagementGroupName string = resLandingZonesMg.name
 output outLandingZoneChildrenManagementGroupNames array = [for mg in items(varLandingZoneMgChildrenAlzDefault): mg.value.displayName]
+output outLandingZoneNonProdChildrenManagementGroupNames array = [for mg in items(varLandingZoneNonProdMgChildrenAlzDefault): mg.value.displayName]
 
 //output outSandboxManagementGroupName string = resSandboxMg.name
 output outDevelopmentManagementGroupName string = resDevelopmentBoxMg.name
