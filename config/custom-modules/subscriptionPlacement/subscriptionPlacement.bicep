@@ -6,8 +6,8 @@ metadata description = 'Module used to place subscriptions in management groups'
 @sys.description('Array of Subscription Ids that should be moved to the new management group.')
 param parSubscriptionIds array = []
 
-@sys.description('Target management group for the subscription. This management group must exist.')
-param parTargetManagementGroupId string
+// @sys.description('Target management group for the subscription. This management group must exist.')
+// param parTargetManagementGroupId string
 
 @sys.description('Target management group for the subscription. This management group must exist.')
 param parTargetManagementGroupName string
@@ -19,6 +19,7 @@ param parTelemetryOptOut bool = false
 var varCuaid = '3dfa9e81-f0cf-4b25-858e-167937fd380b'
 
 resource targetManagementGroup 'Microsoft.Management/managementGroups@2023-04-01' existing = {
+  scope: tenant()
   name: parTargetManagementGroupName
 }
 
