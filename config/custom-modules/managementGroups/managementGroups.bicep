@@ -166,7 +166,7 @@ resource resPlatformChildMgs 'Microsoft.Management/managementGroups@2023-04-01' 
 
 resource targetManagementGroup 'Microsoft.Management/managementGroups@2023-04-01' existing = {
   scope: tenant()
-  name: '${parTopLevelManagementGroupPrefix}-workloads-${varLandingZoneMgChildrenAlzDefault.nonprod.displayName}'
+  name: '${parTopLevelManagementGroupPrefix}-workloads-nonprod'
 }
 
 //Level 4 - Child Management Groups under NonProd
