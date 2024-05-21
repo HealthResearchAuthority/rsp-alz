@@ -74,10 +74,10 @@ module modPlatformMgSubPlacement '../../custom-modules/subscriptionPlacement/sub
   name: varDeploymentNames.modPlatformMgSubPlacement
   scope: managementGroup(varMgIds.platform)
   params: {
-    //parTargetManagementGroupId: varMgIds.platform
+    parTargetManagementGroupId: varMgIds.platform
     parSubscriptionIds: parPlatformMgSubs
     parTelemetryOptOut: parTelemetryOptOut
-    parTargetManagementGroupName: varMgNames.platform
+    //parTargetManagementGroupName: varMgNames.platform
   }
 }
 
@@ -85,10 +85,10 @@ module modPlatformManagementMgSubPlacement '../../custom-modules/subscriptionPla
   name: varDeploymentNames.modPlatformManagementMgSubPlacement
   scope: managementGroup(varMgIds.platformManagement)
   params: {
-    //parTargetManagementGroupId: varMgIds.platformManagement
+    parTargetManagementGroupId: varMgIds.platformManagement
     parSubscriptionIds: parPlatformManagementMgSubs
     parTelemetryOptOut: parTelemetryOptOut
-    parTargetManagementGroupName: varMgNames.platformManagement
+    //parTargetManagementGroupName: varMgNames.platformManagement
   }
 }
 
@@ -96,10 +96,10 @@ module modplatformConnectivityMgSubPlacement '../../custom-modules/subscriptionP
   name: varDeploymentNames.modPlatformConnectivityMgSubPlacement
   scope: managementGroup(varMgIds.platformConnectivity)
   params: {
-    //parTargetManagementGroupId: varMgIds.platformConnectivity
+    parTargetManagementGroupId: varMgIds.platformConnectivity
     parSubscriptionIds: parPlatformConnectivityMgSubs
     parTelemetryOptOut: parTelemetryOptOut
-    parTargetManagementGroupName: varMgNames.platformConnectivity
+    //parTargetManagementGroupName: varMgNames.platformConnectivity
   }
 }
 
@@ -107,10 +107,10 @@ module modLandingZonesProdMgSubPlacement '../../custom-modules/subscriptionPlace
   name: varDeploymentNames.modLandingZonesProdMgSubPlacement
   scope: managementGroup(varMgIds.landingZonesProd)
   params: {
-    //parTargetManagementGroupId: varMgIds.landingZonesProd
+    parTargetManagementGroupId: varMgIds.landingZonesProd
     parSubscriptionIds: parLandingZonesProdMgSubs
     parTelemetryOptOut: parTelemetryOptOut
-    parTargetManagementGroupName: varMgNames.landingZones
+    //parTargetManagementGroupName: varMgNames.landingZones
   }
 }
 
@@ -118,10 +118,10 @@ module modLandingZonesNonProdMgSubPlacement '../../custom-modules/subscriptionPl
   name: varDeploymentNames.modLandingZonesNonProdMgSubPlacement
   scope: managementGroup(varMgIds.landingZonesNonProd)
   params: {
-    //parTargetManagementGroupId: varMgIds.landingZonesNonProd
+    parTargetManagementGroupId: varMgIds.landingZonesNonProd
     parSubscriptionIds: parLandingZonesNonProdMgSubs
     parTelemetryOptOut: parTelemetryOptOut
-    parTargetManagementGroupName: varMgNames.landingZonesNonProd
+    //parTargetManagementGroupName: varMgNames.landingZonesNonProd
   }
 }
 
