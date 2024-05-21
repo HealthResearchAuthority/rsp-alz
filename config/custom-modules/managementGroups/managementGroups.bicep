@@ -54,6 +54,12 @@ var varLandingZoneMgChildrenAlzDefault = {
   }
 }
 
+var varLandingZoneNonProdMgChildrenAlzDefault = {
+  development: {
+    displayName: 'Development'
+  }
+}
+
 // Sandbox Management Group
 var varSandboxMg = {
   name: '${parTopLevelManagementGroupPrefix}-sandbox${parTopLevelManagementGroupSuffix}'
@@ -158,8 +164,26 @@ resource resPlatformChildMgs 'Microsoft.Management/managementGroups@2023-04-01' 
   }
 }]
 
+resource targetManagementGroup 'Microsoft.Management/managementGroups@2023-04-01' existing = {
+  scope: tenant()
+  name: '${parTopLevelManagementGroupPrefix}-workloads-${varLandingZoneMgChildrenAlzDefault.nonprod.displayName}'
+}
+
+//Level 4 - Child Management Groups under NonProd
+resource resLandingZoneNonProdChildMgs 'Microsoft.Management/managementGroups@2023-04-01' = [for mg in items(varLandingZoneNonProdMgChildrenAlzDefault): if (!empty(varLandingZoneNonProdMgChildrenAlzDefault)) {
+  name: '${parTopLevelManagementGroupPrefix}-platform-nonprod-${mg.key}'
+  properties: {
+    displayName: mg.value.displayName
+    details: {
+      parent: {
+        id: targetManagementGroup.id
+      }
+    }
+  }
+}]
+
 // Optional Deployment for Customer Usage Attribution
-module modCustomerUsageAttribution '../../CRML/customerUsageAttribution/cuaIdTenant.bicep' = if (!parTelemetryOptOut) {
+module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttribution/cuaIdTenant.bicep' = if (!parTelemetryOptOut) {
   #disable-next-line no-loc-expr-outside-params //Only to ensure telemetry data is stored in same location as deployment. See https://github.com/Azure/ALZ-Bicep/wiki/FAQ#why-are-some-linter-rules-disabled-via-the-disable-next-line-bicep-function for more information //Only to ensure telemetry data is stored in same location as deployment. See https://github.com/Azure/ALZ-Bicep/wiki/FAQ#why-are-some-linter-rules-disabled-via-the-disable-next-line-bicep-function for more information
   name: 'pid-${varCuaid}-${uniqueString(deployment().location)}'
   params: {}
