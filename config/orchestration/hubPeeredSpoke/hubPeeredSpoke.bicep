@@ -67,8 +67,8 @@ param lzsecurityRules array = [
       destinationPortRange: '65200-65535'
       protocol: 'TCP'
       sourcePortRange: '*'
-      sourceAddressPrefix: '*'
-      destinationAddressPrefix: 'GatewayManager'
+      sourceAddressPrefix: 'GatewayManager'
+      destinationAddressPrefix: '*'
       }
   } 
 ]
