@@ -153,14 +153,6 @@ resource rspsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = [for
     }
     serviceEndpoints: contains(subnet, 'serviceEndpoints') ? subnet.serviceEndpoints : []
     serviceEndpointPolicies: contains(subnet, 'serviceEndpointPolicies') ? subnet.serviceEndpointPolicies : []
-    delegations: [
-      {
-        name: 'Microsoft.App/environments'
-        properties: {
-          serviceName: 'Microsoft.App/environments'
-        }
-      }
-    ]
   }
 }]
 
