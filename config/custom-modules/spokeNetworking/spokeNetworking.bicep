@@ -222,7 +222,7 @@ module modcontainerApps '../ContainerApp/containerApp.bicep' = {
 
 module applicationGatewayWAFv2 '../wafWithApplicationGateway/wafWithApplicationGateway.bicep' = {
   scope: resourceGroup(subscriptionId, resourceGroup().name)
-  name: 'containerAppdeployment-${parEnvironment}'
+  name: 'applicationgatewayWAFv2-${parEnvironment}'
   params: {
       autoScaleMaxCapacity: 10
       location: parLocation
