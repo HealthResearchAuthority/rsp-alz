@@ -232,7 +232,7 @@ module applicationGatewayWAFv2 '../wafWithApplicationGateway/wafWithApplicationG
       subnetName: rspsubnet[0].name
       zones: ['1']
       capacity: 0
-      vnetId: resSpokeVirtualNetwork.id
+      vnetName: resSpokeVirtualNetwork.name
 
   }
 }
@@ -241,7 +241,7 @@ module applicationGatewayWAFv2 '../wafWithApplicationGateway/wafWithApplicationG
 output outSpokeVirtualNetworkName string = resSpokeVirtualNetwork.name
 output outSpokeVirtualNetworkId string = resSpokeVirtualNetwork.id
 
-output outapplicationGatewayWAFv2 string = applicationGatewayWAFv2.name
+output outapplicationGatewayWAFv2Name string = applicationGatewayWAFv2.name
 
 // output outSpokeSubnetName string = rspsubnet.name
 // output outSpokeSubnetId string = rspsubnet.Id

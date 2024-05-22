@@ -6,7 +6,7 @@ param publicIpZones array
 param sku array
 param autoScaleMaxCapacity int
 param parEnvironment string
-param vnetId string = '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-container-app-development/providers/Microsoft.Network/virtualNetworks/vnet-development-spoke-uksouth'
+param vnetName string
 
 
 var wafPolicyName = 'waf-applicationgateway-development'
@@ -15,7 +15,6 @@ var applicationGatewayName = 'agw-rsp-applicationservice-${parEnvironment}'
 var publicIPRef = [
   publicIpAddress.id
 ]
-var subnetRef = '${vnetId}/subnets/${subnetName}'
 
 resource applicationGateway 'Microsoft.Network/applicationGateways@2023-02-01' = {
   name: applicationGatewayName
@@ -32,7 +31,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2023-02-01' =
         name: 'appGatewayIpConfig'
         properties: {
           subnet: {
-            id: subnetRef
+            id: resourceId('Microsoft.Network/virtualNetworks/subnets', vnetName, subnetName)
           }
         }
       }
@@ -42,7 +41,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2023-02-01' =
         name: 'appGwPublicFrontendIpIPv4'
         properties: {
           publicIPAddress: {
-            id: publicIPRef[0]
+            id: resourceId('Microsoft.Network/publicIPAddresses', publicIpAddress.name)
           }
         }
       }
@@ -125,7 +124,7 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2023-02-01' =
       maxCapacity: autoScaleMaxCapacity
     }
     firewallPolicy: {
-      id: '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-container-app-development/providers/Microsoft.Network/applicationGatewayWebApplicationFirewallPolicies/waf-applicationgateway-development'
+      id: resourceId('Microsoft.Network/applicationGatewayWebApplicationFirewallPolicies',wafPolicyName)
     }
   }
   dependsOn: [
