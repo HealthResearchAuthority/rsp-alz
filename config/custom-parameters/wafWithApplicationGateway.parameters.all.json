@@ -1,0 +1,63 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "location": {
+            "value": "uksouth"
+        },
+        "applicationGatewayName": {
+            "value": "agw-rsp-applicationservice-dev"
+        },
+        "tier": {
+            "value": "WAF_v2"
+        },
+        "skuSize": {
+            "value": "WAF_v2"
+        },
+        "capacity": {
+            "value": 0
+        },
+        "subnetName": {
+            "value": "development-containerapp-subnet"
+        },
+        "zones": {
+            "value": [
+                "1"
+            ]
+        },
+        "wafPolicyName": {
+            "value": "waf-applicationgateway-development"
+        },
+        "publicIpZones": {
+            "value": [
+                "1"
+            ]
+        },
+        "publicIpAddressName": {
+            "value": [
+                "applicationservicepublicip"
+            ]
+        },
+        "sku": {
+            "value": [
+                "Standard"
+            ]
+        },
+        "allocationMethod": {
+            "value": [
+                "Static"
+            ]
+        },
+        "ipAddressVersion": {
+            "value": [
+                "IPv4"
+            ]
+        },
+        "privateIpAddress": {
+            "value": []
+        },
+        "autoScaleMaxCapacity": {
+            "value": 10
+        }
+    }
+}
