@@ -57,7 +57,21 @@ type subnetsType = ({
   serviceEndpointPolicies: array
 })[]
 
-param lzsecurityRules array = []
+param lzsecurityRules array = [
+  { 
+    name: 'Allow-GatewayManager-V2-Ports'
+    properties: {
+      priority: 1000
+      access: 'Allow'
+      direction: 'Inbound'
+      destinationPortRange: '65200-65535'
+      protocol: 'TCP'
+      sourcePortRange: '*'
+      sourceAddressPrefix: '*'
+      destinationAddressPrefix: 'GatewayManager'
+      }
+  } 
+]
 
 // **Parameters**
 // Generic Parameters - Used in multiple modules
