@@ -1,21 +1,19 @@
 param location string
-param applicationGatewayName string
-param tier string
-param skuSize string
 param capacity int = 2
 param subnetName string
 param zones array
 param publicIpZones array
-param publicIpAddressName array
 param sku array
-param allocationMethod array
-param ipAddressVersion array
 param autoScaleMaxCapacity int
-var wafPolicyName = 'waf-applicationgateway-development'
+param parEnvironment string
+param vnetId string = '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-container-app-development/providers/Microsoft.Network/virtualNetworks/vnet-development-spoke-uksouth'
 
-var vnetId = '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-container-app-development/providers/Microsoft.Network/virtualNetworks/vnet-development-spoke-uksouth'
+
+var wafPolicyName = 'waf-applicationgateway-development'
+var applicationGatewayName = 'agw-rsp-applicationservice-${parEnvironment}'
+
 var publicIPRef = [
-  publicIpAddressName_0.id
+  publicIpAddress.id
 ]
 var subnetRef = '${vnetId}/subnets/${subnetName}'
 
@@ -26,8 +24,8 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2023-02-01' =
   tags: {}
   properties: {
     sku: {
-      name: skuSize
-      tier: tier
+      name: 'WAF_v2'
+      tier: 'WAF_v2'
     }
     gatewayIPConfigurations: [
       {
@@ -161,15 +159,15 @@ resource waf_applicationgateway_development 'Microsoft.Network/ApplicationGatewa
   }
 }
 
-resource publicIpAddressName_0 'Microsoft.Network/publicIPAddresses@2020-08-01' = {
-  name: publicIpAddressName[0]
+resource publicIpAddress 'Microsoft.Network/publicIPAddresses@2020-08-01' = {
+  name: 'pip-rsp-applicationgateway-${parEnvironment}'
   location: location
   sku: {
     name: sku[0]
   }
   zones: publicIpZones
   properties: {
-    publicIPAddressVersion: ipAddressVersion[0]
-    publicIPAllocationMethod: allocationMethod[0]
+    publicIPAddressVersion: 'IPv4'
+    publicIPAllocationMethod: 'static'
   }
 }

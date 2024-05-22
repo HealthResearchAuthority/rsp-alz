@@ -314,6 +314,10 @@ param parSpokeNetworks spokesType = [
   }]
 
 
+  output outapplicationgatewaynames array = [for i in range(0, length(parSpokeNetworks)): {
+    Name: modSpokeNetworking[i].outputs.outapplicationGatewayWAFv2Name
+  }]
+
   // output outSpokeSubnetNames array = [for i in range(0, length(parSpokeNetworks)): {
   //   Name: modSpokeNetworking[i].outputs.outSpokeSubnetName
   // }]

@@ -211,7 +211,6 @@ module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttri
   params: {}
 }
 
-//Optional Deployment for Customer Usage Attribution
 module modcontainerApps '../ContainerApp/containerApp.bicep' = {
   scope: resourceGroup(subscriptionId, resourceGroup().name)
   name: 'containerAppdeployment-${parEnvironment}'
@@ -221,9 +220,28 @@ module modcontainerApps '../ContainerApp/containerApp.bicep' = {
   }
 }
 
+module applicationGatewayWAFv2 '../wafWithApplicationGateway/wafWithApplicationGateway.bicep' = {
+  scope: resourceGroup(subscriptionId, resourceGroup().name)
+  name: 'containerAppdeployment-${parEnvironment}'
+  params: {
+      autoScaleMaxCapacity: 10
+      location: parLocation
+      parEnvironment: parEnvironment
+      publicIpZones: ['1']
+      sku: ['standard']
+      subnetName: rspsubnet[0].name
+      zones: ['1']
+      capacity: 0
+      vnetId: resSpokeVirtualNetwork.id
+
+  }
+}
+
 
 output outSpokeVirtualNetworkName string = resSpokeVirtualNetwork.name
 output outSpokeVirtualNetworkId string = resSpokeVirtualNetwork.id
+
+output outapplicationGatewayWAFv2 string = applicationGatewayWAFv2.name
 
 // output outSpokeSubnetName string = rspsubnet.name
 // output outSpokeSubnetId string = rspsubnet.Id
