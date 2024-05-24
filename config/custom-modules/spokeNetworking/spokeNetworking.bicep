@@ -101,6 +101,9 @@ param parSpokeRouteTableLock lockType = {
 @description('Optional. An Array of subnets to deploy to the Virtual Network.')
 param parSubnets subnetsType = []
 
+@description('Optional. An Array of subnets to deploy to the Virtual Network.')
+param parAppGatewaySubnetName string = ''
+
 @sys.description('Tags you would like to be applied to all resources in this module.')
 param parTags object = {}
 
@@ -221,11 +224,10 @@ module applicationGatewayWAFv2 '../wafWithApplicationGateway/wafWithApplicationG
       parEnvironment: parEnvironment
       publicIpZones: ['1']
       sku: ['standard']
-      subnetName: rspsubnet[0].name
+      subnetName: parAppGatewaySubnetName
       zones: ['1']
       capacity: 0
       vnetName: resSpokeVirtualNetwork.name
-
   }
 }
 

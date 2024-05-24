@@ -8,13 +8,8 @@ param autoScaleMaxCapacity int
 param parEnvironment string
 param vnetName string
 
-
 var wafPolicyName = 'waf-applicationgateway-development'
 var applicationGatewayName = 'agw-rsp-applicationservice-${parEnvironment}'
-
-var publicIPRef = [
-  publicIpAddress.id
-]
 
 resource applicationGateway 'Microsoft.Network/applicationGateways@2023-02-01' = {
   name: applicationGatewayName

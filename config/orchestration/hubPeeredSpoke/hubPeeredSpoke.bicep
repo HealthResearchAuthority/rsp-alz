@@ -38,6 +38,9 @@ type spokesType = ({
 
   @description('Name of environment')
   parEnvironment: string
+
+  @description('Name of the subnet under which App Gateway will be created')
+  appGatewaySubnetName: string
 })[]
 
 type subnetsType = ({
@@ -213,10 +216,21 @@ param parSpokeNetworks spokesType = [
     nsgName: 'rsp-nsg-development'
     resourceGroup:'rg-rsp-container-app-development'
     parEnvironment: 'dev'
+    appGatewaySubnetName: 'snet-agw-dev'
     subnets: [
         {
-          name: 'development-containerapp-subnet'
+          name: 'snet-ca-dev'
           addressPrefix: '10.1.0.0/18'
+          serviceEndpoints: [
+          ]
+          serviceEndpointsLocation: [
+            'uksouth'
+          ]
+          serviceEndpointPolicies: []
+        },
+        {
+          name: 'snet-agw-dev'
+          addressPrefix: '10.1.64.0/24'
           serviceEndpoints: [
           ]
           serviceEndpointsLocation: [
@@ -276,6 +290,7 @@ param parSpokeNetworks spokesType = [
       parSubnets: spokenew.subnets
       parEnvironment: spokenew.parEnvironment
       subscriptionId: spokenew.subscriptionId
+      parAppGatewaySubnetName: spokenew.appGatewaySubnetName
     }
   }]
 
