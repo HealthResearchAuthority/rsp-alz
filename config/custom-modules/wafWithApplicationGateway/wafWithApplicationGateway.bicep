@@ -66,8 +66,8 @@ resource applicationGateway 'Microsoft.Network/applicationGateways@2023-02-01' =
       {
         name: 'agw-routing-fe-be-applicationservice-besetting-development'
         properties: {
-          port: 443
-          protocol: 'Https'
+          port: 80
+          protocol: 'Http'
           cookieBasedAffinity: 'Disabled'
           requestTimeout: 20
           pickHostNameFromBackendAddress: true
