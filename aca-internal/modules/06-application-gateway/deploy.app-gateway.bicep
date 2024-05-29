@@ -77,7 +77,7 @@ var applicationGatewayCertificatePath = 'configuration/acahello.demoapp.com.pfx'
 // ------------------
 
 @description('User-configured naming rules')
-module naming '../../../../shared/bicep/naming/naming.module.bicep' = {
+module naming '../../../shared/bicep/naming/naming.module.bicep' = {
   name: take('06-sharedNamingDeployment-${deployment().name}', 64)
   params: {
     uniqueId: uniqueString(resourceGroup().id)
@@ -89,7 +89,7 @@ module naming '../../../../shared/bicep/naming/naming.module.bicep' = {
 
 // TODO: Check if this is required if enableApplicationCertificate is false
 @description('A user-assigned managed identity that enables Application Gateway to access Key Vault for its TLS certs.')
-module userAssignedIdentity '../../../../shared/bicep/managed-identity.bicep' = {
+module userAssignedIdentity '../../../shared/bicep/managed-identity.bicep' = {
   name: take('appGwUserAssignedIdentity-Deployment-${uniqueString(resourceGroup().id)}', 64)
   params: {
     name: naming.outputs.resourcesNames.applicationGatewayUserAssignedIdentity
@@ -117,7 +117,7 @@ module appGatewayAddCertificates './modules/app-gateway-cert.bicep' = if (enable
 }
 
 
-module applicationGatewayPublicIp '../../../../shared/bicep/network/pip.bicep' = {
+module applicationGatewayPublicIp '../../../shared/bicep/network/pip.bicep' = {
   name: take('applicationGatewayPublicIp-Deployment-${uniqueString(resourceGroup().id)}', 64)
   params: {
     location: location
@@ -135,7 +135,7 @@ module applicationGatewayPublicIp '../../../../shared/bicep/network/pip.bicep' =
   }
 }
 
-module applicationGateway '../../../../shared/bicep/network/application-gateway.bicep' = {
+module applicationGateway '../../../shared/bicep/network/application-gateway.bicep' = {
   name: take('applicationGateway-Deployment-${uniqueString(resourceGroup().id)}', 64)
   params: {
     name: naming.outputs.resourcesNames.applicationGateway
