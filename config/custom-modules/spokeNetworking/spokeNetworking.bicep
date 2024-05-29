@@ -135,29 +135,29 @@ resource resSpokeVirtualNetwork 'Microsoft.Network/virtualNetworks@2023-02-01' =
   }
 }
 
-resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
-  name: parNSGName
-  location: parLocation
-  properties: {
-    securityRules: [for rule in parNSGRules: {
-      name: rule.name
-      properties: rule.properties
-    }]
-  }
-}
+// resource nsg 'Microsoft.Network/networkSecurityGroups@2021-02-01' = {
+//   name: parNSGName
+//   location: parLocation
+//   properties: {
+//     securityRules: [for rule in parNSGRules: {
+//       name: rule.name
+//       properties: rule.properties
+//     }]
+//   }
+// }
 
-resource rspsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = [for subnet in parSubnets: {
-  name: subnet.name
-  parent: resSpokeVirtualNetwork
-  properties: {
-    addressPrefix: subnet.addressPrefix
-    networkSecurityGroup: {
-      id: nsg.id
-    }
-    serviceEndpoints: contains(subnet, 'serviceEndpoints') ? subnet.serviceEndpoints : []
-    serviceEndpointPolicies: contains(subnet, 'serviceEndpointPolicies') ? subnet.serviceEndpointPolicies : []
-  }
-}]
+// resource rspsubnet 'Microsoft.Network/virtualNetworks/subnets@2021-05-01' = [for subnet in parSubnets: {
+//   name: subnet.name
+//   parent: resSpokeVirtualNetwork
+//   properties: {
+//     addressPrefix: subnet.addressPrefix
+//     networkSecurityGroup: {
+//       id: nsg.id
+//     }
+//     serviceEndpoints: contains(subnet, 'serviceEndpoints') ? subnet.serviceEndpoints : []
+//     serviceEndpointPolicies: contains(subnet, 'serviceEndpointPolicies') ? subnet.serviceEndpointPolicies : []
+//   }
+// }]
 
 
 
@@ -171,34 +171,34 @@ resource resSpokeVirtualNetworkLock 'Microsoft.Authorization/locks@2020-05-01' =
   }
 }
 
-resource resSpokeToHubRouteTable 'Microsoft.Network/routeTables@2023-02-01' = if (!empty(parNextHopIpAddress)) {
-  name: parSpokeToHubRouteTableName
-  location: parLocation
-  tags: parTags
-  properties: {
-    routes: [
-      {
-        name: 'udr-default-to-hub-nva'
-        properties: {
-          addressPrefix: '0.0.0.0/0'
-          nextHopType: 'VirtualAppliance'
-          nextHopIpAddress: parNextHopIpAddress
-        }
-      }
-    ]
-    disableBgpRoutePropagation: parDisableBgpRoutePropagation
-  }
-}
+// resource resSpokeToHubRouteTable 'Microsoft.Network/routeTables@2023-02-01' = if (!empty(parNextHopIpAddress)) {
+//   name: parSpokeToHubRouteTableName
+//   location: parLocation
+//   tags: parTags
+//   properties: {
+//     routes: [
+//       {
+//         name: 'udr-default-to-hub-nva'
+//         properties: {
+//           addressPrefix: '0.0.0.0/0'
+//           nextHopType: 'VirtualAppliance'
+//           nextHopIpAddress: parNextHopIpAddress
+//         }
+//       }
+//     ]
+//     disableBgpRoutePropagation: parDisableBgpRoutePropagation
+//   }
+// }
 
 // Create a Route Table if parAzFirewallEnabled is true and parGlobalResourceLock.kind != 'None' or if parHubRouteTableLock.kind != 'None'
-resource resSpokeToHubRouteTableLock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(parNextHopIpAddress) && (parSpokeRouteTableLock.kind != 'None' || parGlobalResourceLock.kind != 'None')) {
-  scope: resSpokeToHubRouteTable
-  name: '${resSpokeToHubRouteTable.name}-lock'
-  properties: {
-    level: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.kind : parSpokeRouteTableLock.kind
-    notes: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.?notes : parSpokeRouteTableLock.?notes
-  }
-}
+// resource resSpokeToHubRouteTableLock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty(parNextHopIpAddress) && (parSpokeRouteTableLock.kind != 'None' || parGlobalResourceLock.kind != 'None')) {
+//   scope: resSpokeToHubRouteTable
+//   name: '${resSpokeToHubRouteTable.name}-lock'
+//   properties: {
+//     level: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.kind : parSpokeRouteTableLock.kind
+//     notes: (parGlobalResourceLock.kind != 'None') ? parGlobalResourceLock.?notes : parSpokeRouteTableLock.?notes
+//   }
+// }
 
 // Optional Deployment for Customer Usage Attribution
 module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttribution/cuaIdResourceGroup.bicep' = if (!parTelemetryOptOut) {
@@ -206,36 +206,36 @@ module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttri
   params: {}
 }
 
-module modcontainerApps '../ContainerApp/containerApp.bicep' = {
-  scope: resourceGroup(subscriptionId, resourceGroup().name)
-  name: 'containerAppdeployment-${parEnvironment}'
-  params: {
-      parlocation: parLocation
-      parEnvironment: parEnvironment
-  }
-}
+// module modcontainerApps '../ContainerApp/containerApp.bicep' = {
+//   scope: resourceGroup(subscriptionId, resourceGroup().name)
+//   name: 'containerAppdeployment-${parEnvironment}'
+//   params: {
+//       parlocation: parLocation
+//       parEnvironment: parEnvironment
+//   }
+// }
 
-module applicationGatewayWAFv2 '../wafWithApplicationGateway/wafWithApplicationGateway.bicep' = {
-  scope: resourceGroup(subscriptionId, resourceGroup().name)
-  name: 'applicationgatewayWAFv2-${parEnvironment}'
-  params: {
-      autoScaleMaxCapacity: 10
-      location: parLocation
-      parEnvironment: parEnvironment
-      publicIpZones: ['1']
-      sku: ['standard']
-      subnetName: parAppGatewaySubnetName
-      zones: ['1']
-      capacity: 0
-      vnetName: resSpokeVirtualNetwork.name
-  }
-}
+// module applicationGatewayWAFv2 '../wafWithApplicationGateway/wafWithApplicationGateway.bicep' = {
+//   scope: resourceGroup(subscriptionId, resourceGroup().name)
+//   name: 'applicationgatewayWAFv2-${parEnvironment}'
+//   params: {
+//       autoScaleMaxCapacity: 10
+//       location: parLocation
+//       parEnvironment: parEnvironment
+//       publicIpZones: ['1']
+//       sku: ['standard']
+//       subnetName: parAppGatewaySubnetName
+//       zones: ['1']
+//       capacity: 0
+//       vnetName: resSpokeVirtualNetwork.name
+//   }
+// }
 
 
 output outSpokeVirtualNetworkName string = resSpokeVirtualNetwork.name
 output outSpokeVirtualNetworkId string = resSpokeVirtualNetwork.id
 
-output outapplicationGatewayWAFv2Name string = applicationGatewayWAFv2.name
+//output outapplicationGatewayWAFv2Name string = applicationGatewayWAFv2.name
 
 // output outSpokeSubnetName string = rspsubnet.name
 // output outSpokeSubnetId string = rspsubnet.Id

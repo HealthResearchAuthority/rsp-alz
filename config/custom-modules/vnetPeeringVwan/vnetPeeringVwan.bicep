@@ -46,7 +46,7 @@ module modhubVirtualNetworkConnection 'hubVirtualNetworkConnection.bicep' = if (
 }
 
 // Optional Deployment for Customer Usage Attribution
-module modCustomerUsageAttribution '../../CRML/customerUsageAttribution/cuaIdSubscription.bicep' = if (!parTelemetryOptOut) {
+module modCustomerUsageAttribution '../../custom-modules/CRML/customerUsageAttribution/cuaIdSubscription.bicep' = if (!parTelemetryOptOut) {
   name: 'pid-${varCuaid}-${uniqueString(subscription().id, varSpokeVnetName)}'
   params: {}
 }

@@ -58,6 +58,9 @@ type subnetsType = ({
 
   @description('Policies for service endpoints')
   serviceEndpointPolicies: array
+
+  @description('delegations')
+  delegations: array
 })[]
 
 param lzsecurityRules array = [
@@ -227,7 +230,15 @@ param parSpokeNetworks spokesType = [
             'uksouth'
           ]
           serviceEndpointPolicies: []
-        },
+          delegations: [
+            {
+              name: 'envdelegation'
+              properties: {
+                serviceName: 'Microsoft.App/environments'
+              }
+            }
+          ]
+        }
         {
           name: 'snet-agw-dev'
           addressPrefix: '10.1.64.0/24'
@@ -237,6 +248,7 @@ param parSpokeNetworks spokesType = [
             'uksouth'
           ]
           serviceEndpointPolicies: []
+          delegations: []
         }
     ] 
   }
@@ -315,7 +327,6 @@ param parSpokeNetworks spokesType = [
       parVirtualWanHubResourceId: varVirtualHubResourceId
       parRemoteVirtualNetworkResourceId: modSpokeNetworking[i].outputs.outSpokeVirtualNetworkId
       parVirtualHubConnectionPrefix: parVirtualHubConnectionPrefix
-      parVirtualHubConnectionSuffix: modSpokeNetworking[i].outputs.outSpokeVirtualNetworkName
       parEnableInternetSecurity: parEnableInternetSecurity
     }
   }]
@@ -329,9 +340,9 @@ param parSpokeNetworks spokesType = [
   }]
 
 
-  output outapplicationgatewaynames array = [for i in range(0, length(parSpokeNetworks)): {
-    Name: modSpokeNetworking[i].outputs.outapplicationGatewayWAFv2Name
-  }]
+  // output outapplicationgatewaynames array = [for i in range(0, length(parSpokeNetworks)): {
+  //   Name: modSpokeNetworking[i].outputs.outapplicationGatewayWAFv2Name
+  // }]
 
   // output outSpokeSubnetNames array = [for i in range(0, length(parSpokeNetworks)): {
   //   Name: modSpokeNetworking[i].outputs.outSpokeSubnetName

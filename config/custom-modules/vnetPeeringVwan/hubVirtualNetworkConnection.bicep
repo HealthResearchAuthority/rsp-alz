@@ -8,10 +8,7 @@ param parVirtualWanHubResourceId string
 param parRemoteVirtualNetworkResourceId string
 
 @sys.description('Optional Virtual Hub Connection Name Prefix.')
-param parVirtualHubConnectionPrefix string = ''
-
-@sys.description('Optional Virtual Hub Connection Name Suffix. Example: -vhc')
-param parVirtualHubConnectionSuffix string = '-vhc'
+param parVirtualHubConnectionPrefix string = 'vhc-'
 
 @sys.description('Enable Internet Security for the Virtual Hub Connection.')
 param parEnableInternetSecurity bool = false
@@ -20,7 +17,7 @@ var varVwanHubName = split(parVirtualWanHubResourceId, '/')[8]
 
 var varSpokeVnetName = split(parRemoteVirtualNetworkResourceId, '/')[8]
 
-var varVnetPeeringVwanName = '${varVwanHubName}/${parVirtualHubConnectionPrefix}${varSpokeVnetName}${parVirtualHubConnectionSuffix}'
+var varVnetPeeringVwanName = '${varVwanHubName}/${parVirtualHubConnectionPrefix}${varSpokeVnetName}'
 
 resource resVnetPeeringVwan 'Microsoft.Network/virtualHubs/hubVirtualNetworkConnections@2023-02-01' = if (!empty(parVirtualWanHubResourceId) && !empty(parRemoteVirtualNetworkResourceId)) {
   name: varVnetPeeringVwanName
