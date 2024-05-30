@@ -28,23 +28,17 @@ param spokeResourceGroupName string = ''
 @description('Central Log Analytics Workspace ID')
 param logAnalyticsWorkspaceId string = '9555d5c1-d493-4666-8a25-4ab7d506b061'
 
-// @description('Enable or disable the createion of Application Insights.')
-// param enableApplicationInsights bool
+@description('Enable or disable the deployment of the Hello World Sample App. If disabled, the Application Gateway will not be deployed.')
+param deployHelloWorldSample bool
 
-// @description('Enable or disable Dapr Application Instrumentation Key used for Dapr telemetry. If Application Insights is not enabled, this parameter is ignored.')
-// param enableDaprInstrumentation bool
+@description('The FQDN of the Application Gateway. Must match the TLS Certificate.')
+param applicationGatewayFqdn string
 
-// @description('Enable or disable the deployment of the Hello World Sample App. If disabled, the Application Gateway will not be deployed.')
-// param deployHelloWorldSample bool
+@description('Enable or disable Application Gateway Certificate (PFX).')
+param enableApplicationGatewayCertificate bool
 
-// @description('The FQDN of the Application Gateway. Must match the TLS Certificate.')
-// param applicationGatewayFqdn string
-
-// @description('Enable or disable Application Gateway Certificate (PFX).')
-// param enableApplicationGatewayCertificate bool
-
-// @description('The name of the certificate key to use for Application Gateway certificate.')
-// param applicationGatewayCertificateKeyName string
+@description('The name of the certificate key to use for Application Gateway certificate.')
+param applicationGatewayCertificateKeyName string
 
 // @description('Enable usage and telemetry feedback to Microsoft.')
 // param enableTelemetry bool = true
@@ -74,6 +68,9 @@ type spokesType = ({
 
   @description('Name of environment')
   zoneRedundancy: bool
+
+  @description('Name of environment. Allowed Valued: "Disabled","Enabled", "VirtualNetworkInherited", "null"')
+  ddosProtectionEnabled: string
   
 })[]
 
@@ -87,6 +84,7 @@ param parSpokeNetworks spokesType = [
     parEnvironment: 'dev'
     workloadName: 'container-app'
     zoneRedundancy: false
+    ddosProtectionEnabled: 'Enabled'
     rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-dev-uks'
     subnets: {
       infraSubnet: {
@@ -179,36 +177,36 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 }]
 
-// module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.bicep' = if (deployHelloWorldSample) {
-//   name: take('helloWorlSampleApp-${deployment().name}-deployment', 64)
-//   scope: spokeResourceGroup
-//   params: {
-//     location: location
-//     tags: tags
-//     containerRegistryUserAssignedIdentityId: supportingServices.outputs.containerRegistryUserAssignedIdentityId
-//     containerAppsEnvironmentId: containerAppsEnvironment.outputs.containerAppsEnvironmentId
-//   }
-// }
+module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('helloWorlSampleApp-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].rgSpokeName)
+  params: {
+    location: location
+    tags: tags
+    containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+    containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
+  }
+}]
 
-// module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bicep' = if (deployHelloWorldSample) {
-//   name: take('applicationGateway-${deployment().name}-deployment', 64)
-//   scope: spokeResourceGroup
-//   params: {
-//     location: location
-//     tags: tags
-//     environment: environment
-//     workloadName: workloadName
-//     applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
-//     applicationGatewayFqdn: applicationGatewayFqdn
-//     applicationGatewayPrimaryBackendEndFqdn: (deployHelloWorldSample) ? helloWorlSampleApp.outputs.helloWorldAppFqdn : '' // To fix issue when hello world is not deployed
-//     applicationGatewaySubnetId: spoke.outputs.spokeApplicationGatewaySubnetId
-//     enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
-//     keyVaultId: supportingServices.outputs.keyVaultId
-//     deployZoneRedundantResources: deployZoneRedundantResources
-//     ddosProtectionMode: ddosProtectionMode
-//     applicationGatewayLogAnalyticsId: spoke.outputs.logAnalyticsWorkspaceId
-//   }
-// }
+module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('applicationGateway-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].rgSpokeName)
+  params: {
+    location: location
+    tags: tags
+    environment: parSpokeNetworks[i].parEnvironment
+    workloadName: workloadName
+    applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
+    applicationGatewayFqdn: applicationGatewayFqdn
+    applicationGatewayPrimaryBackendEndFqdn: (deployHelloWorldSample) ? helloWorlSampleApp[i].outputs.helloWorldAppFqdn : '' // To fix issue when hello world is not deployed
+    applicationGatewaySubnetId: spoke[i].outputs.spokeApplicationGatewaySubnetId
+    enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
+    keyVaultId: supportingServices[i].outputs.keyVaultId
+    deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
+    ddosProtectionMode: 'Disabled'
+    applicationGatewayLogAnalyticsId: logAnalyticsWorkspaceId
+  }
+}]
 
 // ------------------
 // OUTPUTS
