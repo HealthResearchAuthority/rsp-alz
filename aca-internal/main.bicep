@@ -6,7 +6,7 @@ targetScope = 'subscription'
 @description('The name of the workload that is being deployed. Up to 10 characters long.')
 @minLength(2)
 @maxLength(10)
-param workloadName string = 'aca-lza'
+param workloadName string = 'aca'
 
 @description('The location where the resources will be created.')
 param location string =  deployment().location
