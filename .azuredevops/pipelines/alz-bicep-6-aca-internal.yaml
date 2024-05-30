@@ -1,7 +1,15 @@
 # This workflow will deploy the LZA in ADO
 name: LZA_Deployment
 
-trigger: none
+trigger:
+
+branches:
+    include:
+      - "main"
+  paths:
+    include:
+      - ./aca-internal/
+      - ./shared/
 
 pr:
   branches:
@@ -9,10 +17,8 @@ pr:
       - main
   paths:
     include:
-    - scenarios/aca-internal/bicep
-
-variables:
-  - group: "ACA-LZA"
+    - ./aca-internal/
+    - ./shared/
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
