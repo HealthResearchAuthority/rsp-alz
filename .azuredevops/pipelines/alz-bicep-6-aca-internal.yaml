@@ -2,23 +2,10 @@
 name: LZA_Deployment
 
 trigger:
-
-  branches:
-      include:
-        - "main"
-  paths:
-    include:
-      - ./aca-internal/
-      - ./shared/
-
+  - "main"
+  
 pr:
-  branches:
-    include:
-      - main
-  paths:
-    include:
-    - ./aca-internal/
-    - ./shared/
+  - main
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
