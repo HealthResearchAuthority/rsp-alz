@@ -3,13 +3,13 @@ name: LZA_Deployment
 
 trigger:
 
-branches:
-    include:
-      - "main"
-  paths:
-    include:
-      - ./aca-internal/
-      - ./shared/
+  branches:
+      include:
+        - "main"
+    paths:
+      include:
+        - ./aca-internal/
+        - ./shared/
 
 pr:
   branches:
