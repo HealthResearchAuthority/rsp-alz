@@ -2,8 +2,8 @@
 name: LZA_Deployment
 
 trigger:
-  - "main"
-  
+  - main
+
 pr:
   - main
 
