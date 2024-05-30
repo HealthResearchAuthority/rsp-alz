@@ -26,7 +26,7 @@ param networkApplianceIpAddress string = '10.0.64.4' //Hub firewall IP Address
 param spokeResourceGroupName string = ''
 
 @description('Central Log Analytics Workspace ID')
-param logAnalyticsWorkspaceId string = '9555d5c1-d493-4666-8a25-4ab7d506b061'
+param logAnalyticsWorkspaceId string = '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-operationsmanagement/providers/Microsoft.OperationalInsights/workspaces/hra-rsp-log-analytics'
 
 @description('Enable or disable the deployment of the Hello World Sample App. If disabled, the Application Gateway will not be deployed.')
 param deployHelloWorldSample bool
