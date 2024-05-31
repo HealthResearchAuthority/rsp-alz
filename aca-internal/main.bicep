@@ -302,6 +302,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
     containerRegistryTier: parSpokeNetworks[i].containerRegistryTier
     privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
+    subscriptionId: parSpokeNetworks[i].subscriptionId
   }
 }]
 
@@ -327,36 +328,36 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 }]
 
-// module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-//   name: take('helloWorlSampleApp-${deployment().name}-deployment', 64)
-//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
-//   params: {
-//     location: location
-//     tags: tags
-//     containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
-//     containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-//   }
-// }]
+module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('helloWorlSampleApp-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
+  params: {
+    location: location
+    tags: tags
+    containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+    containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
+  }
+}]
 
-// module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-//   name: take('applicationGateway-${deployment().name}-deployment', 64)
-//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
-//   params: {
-//     location: location
-//     tags: tags
-//     environment: parSpokeNetworks[i].parEnvironment
-//     workloadName: workloadName
-//     applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
-//     applicationGatewayFqdn: applicationGatewayFqdn
-//     applicationGatewayPrimaryBackendEndFqdn: (deployHelloWorldSample) ? helloWorlSampleApp[i].outputs.helloWorldAppFqdn : '' // To fix issue when hello world is not deployed
-//     applicationGatewaySubnetId: spoke[i].outputs.spokeApplicationGatewaySubnetId
-//     enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
-//     keyVaultId: supportingServices[i].outputs.keyVaultId
-//     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
-//     ddosProtectionMode: 'Disabled'
-//     applicationGatewayLogAnalyticsId: logAnalyticsWorkspaceId
-//   }
-// }]
+module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('applicationGateway-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
+  params: {
+    location: location
+    tags: tags
+    environment: parSpokeNetworks[i].parEnvironment
+    workloadName: workloadName
+    applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
+    applicationGatewayFqdn: applicationGatewayFqdn
+    applicationGatewayPrimaryBackendEndFqdn: (deployHelloWorldSample) ? helloWorlSampleApp[i].outputs.helloWorldAppFqdn : '' // To fix issue when hello world is not deployed
+    applicationGatewaySubnetId: spoke[i].outputs.spokeApplicationGatewaySubnetId
+    enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
+    keyVaultId: supportingServices[i].outputs.keyVaultId
+    deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
+    ddosProtectionMode: 'Disabled'
+    applicationGatewayLogAnalyticsId: logAnalyticsWorkspaceId
+  }
+}]
 
 // ------------------
 // OUTPUTS
