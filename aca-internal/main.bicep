@@ -414,10 +414,10 @@ output spokeApplicationGatewaySubnetNames array = [for i in range(0, length(parS
 //   Name: supportingServices[i].outputs.containerRegistryLoginServer
 // }]
 
-@description('The resource ID of the user assigned managed identity for the container registry to be able to pull images from it.')
-output containerRegistryUserAssignedIdentityIds array = [for i in range(0, length(parSpokeNetworks)): {
-  Name: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
-}]
+// @description('The resource ID of the user assigned managed identity for the container registry to be able to pull images from it.')
+// output containerRegistryUserAssignedIdentityIds array = [for i in range(0, length(parSpokeNetworks)): {
+//   Name: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+// }]
 
 @description('The resource ID of the key vault.')
 output keyVaultIds array = [for i in range(0, length(parSpokeNetworks)): {
