@@ -328,7 +328,6 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
     hubVNetName: varHubVirtualNetworkName
     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
     privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
-    spokeInfraResourceGroupName: spokeResourceGroup[i].name
   }
 }]
 
@@ -409,15 +408,15 @@ output spokeApplicationGatewaySubnetNames array = [for i in range(0, length(parS
 //   Name: supportingServices[i].outputs.containerRegistryId
 // }]
 
-@description('The name of the container registry.')
-output containerRegistryNames array = [for i in range(0, length(parSpokeNetworks)): {
-  Name: supportingServices[i].outputs.containerRegistryName
-}]
+// @description('The name of the container registry.')
+// output containerRegistryNames array = [for i in range(0, length(parSpokeNetworks)): {
+//   Name: supportingServices[i].outputs.containerRegistryName
+// }]
 
-@description('The name of the container registry login server.')
-output containerRegistryLoginServers array = [for i in range(0, length(parSpokeNetworks)): {
-  Name: supportingServices[i].outputs.containerRegistryLoginServer
-}]
+// @description('The name of the container registry login server.')
+// output containerRegistryLoginServers array = [for i in range(0, length(parSpokeNetworks)): {
+//   Name: supportingServices[i].outputs.containerRegistryLoginServer
+// }]
 
 @description('The resource ID of the user assigned managed identity for the container registry to be able to pull images from it.')
 output containerRegistryUserAssignedIdentityIds array = [for i in range(0, length(parSpokeNetworks)): {

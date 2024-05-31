@@ -122,7 +122,7 @@ resource acaEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
     appLogsConfiguration:  {
       destination: 'azure-monitor'
     }
-    infrastructureResourceGroup: empty(infrastructureResourceGroupName) ? take('ME_${resourceGroup().name}_${name}', 63) : infrastructureResourceGroupName
+    infrastructureResourceGroup: empty(infrastructureResourceGroupName) ? take('${resourceGroup().name}_ME_${name}', 63) : infrastructureResourceGroupName
   }
 }
 
