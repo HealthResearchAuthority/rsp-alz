@@ -97,8 +97,8 @@ module keyVault './modules/key-vault.bicep' = {
 // OUTPUTS
 // ------------------
 
-@description('The resource ID of the Azure Container Registry.')
-output containerRegistryId string = containerRegistry.outputs.containerRegistryId
+// @description('The resource ID of the Azure Container Registry.')
+// output containerRegistryId string = containerRegistry.outputs.containerRegistryId
 
 @description('The name of the Azure Container Registry.')
 output containerRegistryName string = containerRegistry.outputs.containerRegistryName

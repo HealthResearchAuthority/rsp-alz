@@ -51,7 +51,6 @@ param hubResourceGroupName string = ''
 @description('The name of the hub virtual network.')
 param hubVNetName string = ''
 
-@description('The name of the hub virtual network.')
 param privateDNSEnabled bool = false
 
 // ------------------

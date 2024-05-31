@@ -403,10 +403,10 @@ output spokeApplicationGatewaySubnetNames array = [for i in range(0, length(parS
 }]
 
 // Supporting Services
-@description('The resource ID of the container registry.')
-output containerRegistryIds array = [for i in range(0, length(parSpokeNetworks)): {
-  Name: supportingServices[i].outputs.containerRegistryId
-}]
+// @description('The resource ID of the container registry.')
+// output containerRegistryIds array = [for i in range(0, length(parSpokeNetworks)): {
+//   Name: supportingServices[i].outputs.containerRegistryId
+// }]
 
 @description('The name of the container registry.')
 output containerRegistryNames array = [for i in range(0, length(parSpokeNetworks)): {
