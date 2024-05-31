@@ -88,6 +88,12 @@ resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2
   name: spokePrivateEndpointSubnetName
 }
 
+resource containerRegistryUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
+  name: containerRegistryUserAssignedIdentityName
+  location: location
+  tags: tags
+}
+
 module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
   name: take('containerRegistryNameDeployment-${deployment().name}', 64)
   scope: resourceGroup(spokeSubscriptionId,spokeResourceGroupName)
@@ -101,27 +107,22 @@ module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
     publicNetworkAccess: acrTier == 'Premium' ? 'Disabled': 'Enabled'
     networkRuleBypassOptions: 'AzureServices'
     diagnosticWorkspaceId: diagnosticWorkspaceId
+    userAssignedIdentities: containerRegistryUserAssignedIdentity
   }
 }
 
-// module containerRegistryNetwork '../../../../shared/bicep/network/private-networking.bicep' = if(acrTier == 'Premium') {
-//   name:take('containerRegistryNetworkDeployment-${deployment().name}', 64)
-//   params: {
-//     location: location
-//     azServicePrivateDnsZoneName: privateDnsZoneNames
-//     azServiceId: containerRegistry.outputs.resourceId
-//     privateEndpointName: containerRegistryPrivateEndpointName
-//     privateEndpointSubResourceName: containerRegistryResourceName
-//     virtualNetworkLinks: spokeVNetLinks
-//     subnetId: spokePrivateEndpointSubnet.id
-//     vnetHubResourceId: hubVNetId
-//   }
-// }
-
-resource containerRegistryUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
-  name: containerRegistryUserAssignedIdentityName
-  location: location
-  tags: tags
+module containerRegistryNetwork '../../../../shared/bicep/network/private-networking.bicep' = if(acrTier == 'Premium') {
+  name:take('containerRegistryNetworkDeployment-${deployment().name}', 64)
+  params: {
+    location: location
+    azServicePrivateDnsZoneName: privateDnsZoneNames
+    azServiceId: containerRegistry.outputs.resourceId
+    privateEndpointName: containerRegistryPrivateEndpointName
+    privateEndpointSubResourceName: containerRegistryResourceName
+    virtualNetworkLinks: spokeVNetLinks
+    subnetId: spokePrivateEndpointSubnet.id
+    vnetHubResourceId: hubVNetId
+  }
 }
 
 

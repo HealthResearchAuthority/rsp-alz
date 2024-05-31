@@ -181,7 +181,7 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
 var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentities) ? 'SystemAssigned,UserAssigned' : 'SystemAssigned') : (!empty(userAssignedIdentities) ? 'UserAssigned' : 'None')
 
 var identity = identityType != 'None' ? {
-  type: identityType
+  type: 'UserAssigned'
   userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : null
 } : null
 

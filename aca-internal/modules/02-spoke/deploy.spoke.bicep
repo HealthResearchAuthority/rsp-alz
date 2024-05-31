@@ -53,20 +53,6 @@ param logAnalyticsWorkspaceId string
 @description('Optional, default value is true. If true, Azure Policies will be deployed')
 param deployAzurePolicies bool = true
 
-//Hub
-@description('The ID of the subscription containing the hub virtual network.')
-param hubSubscriptionId string = ''
-
-@description('The name of the resource group containing the hub virtual network.')
-param hubResourceGroupName string = ''
-
-@description('The name of the hub virtual network.')
-param hubVNetName string = ''
-
-param parVirtualHubResourceGroup string = ''
-param parVirtualHubSubscriptionId string = ''
-param parVirtualHubResourceId string = ''
-
 // ------------------
 // VARIABLES
 // ------------------
