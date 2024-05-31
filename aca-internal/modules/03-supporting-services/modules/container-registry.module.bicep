@@ -97,7 +97,7 @@ module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
     acrSku: acrTier
     zoneRedundancy: deployZoneRedundantResources ? 'Enabled' : 'Disabled'
     acrAdminUserEnabled: false
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: acrTier == 'Premium' ? 'Disabled': 'Enabled'
     networkRuleBypassOptions: 'AzureServices'
     diagnosticWorkspaceId: diagnosticWorkspaceId
   }
