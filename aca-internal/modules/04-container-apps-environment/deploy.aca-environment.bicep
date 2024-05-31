@@ -69,17 +69,23 @@ resource vnetHub 'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
   name: hubVNetName
 }
 
+// @description('The existing spoke virtual network.')
+// resource spokeVNet 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
+//   name: spokeVNetName
+
+//   resource infraSubnet 'subnets' existing = {
+//     name: spokeInfraSubnetName
+//   }
+// }
+
 @description('The existing spoke virtual network.')
 resource spokeVNet 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   name: spokeVNetName
-
-  resource infraSubnet 'subnets' existing = {
-    name: spokeInfraSubnetName
-  }
 }
 
 resource spokeInfraSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
   name: spokeInfraSubnetName
+  parent: spokeVNet
 }
 // ------------------
 // RESOURCES

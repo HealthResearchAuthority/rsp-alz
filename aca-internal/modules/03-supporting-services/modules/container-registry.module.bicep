@@ -139,8 +139,8 @@ module containerRegistryPullRoleAssignment '../../../../shared/bicep/role-assign
 // OUTPUTS
 // ------------------
 
-// @description('The resource ID of the container registry.')
-// output containerRegistryId string = containerRegistry.outputs.resourceId
+@description('The resource ID of the container registry.')
+output containerRegistryId string = containerRegistry.outputs.resourceId
 
 @description('The name of the container registry.')
 output containerRegistryName string = containerRegistry.outputs.name
