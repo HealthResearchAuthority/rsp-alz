@@ -285,9 +285,6 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
     networkApplianceIpAddress: networkApplianceIpAddress
     deployAzurePolicies: deployAzurePolicies
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    hubResourceGroupName: varVirtualHubResourceGroup
-    hubSubscriptionId: varVirtualHubSubscriptionId
-    parVirtualHubResourceId: varVirtualHubResourceId
   }
 }]
 
