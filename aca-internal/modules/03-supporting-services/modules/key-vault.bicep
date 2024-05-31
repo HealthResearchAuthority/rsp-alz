@@ -147,7 +147,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
     }
-    enableSoftDelete: false
+    enableSoftDelete: true
     softDeleteRetentionInDays: 7
     enablePurgeProtection: true  // It seems that you cannot set it to False even the first time. workaround is not to set it at all: https://github.com/Azure/bicep/issues/5223
     publicNetworkAccess: 'Disabled'
