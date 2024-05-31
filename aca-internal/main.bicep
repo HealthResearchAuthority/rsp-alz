@@ -110,144 +110,144 @@ param parSpokeNetworks spokesType = [
       }
     }
   }
-  {
-    subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379' //System Test Manual
-    ipRange: '10.2.0.0/16'
-    parEnvironment: 'manualtest'
-    workloadName: 'container-app'
-    zoneRedundancy: false
-    ddosProtectionEnabled: 'Disabled'
-    containerRegistryTier: 'Basic'
-    deploy: false
-    configurePrivateDNS: false
-    rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-manualtest-uks'
-    subnets: {
-      infraSubnet: {
-        addressPrefix: '10.2.0.0/18'
-      }
-      appGatewaySubnet: {
-        addressPrefix: '10.2.64.0/24'
-      }
-      privateEndPointSubnet: {
-        addressPrefix: '10.2.65.0/24'
-      }
-    }
-  }
-  {
-    subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65' //System Test Automated
-    ipRange: '10.3.0.0/16'
-    parEnvironment: 'automationtest'
-    workloadName: 'container-app'
-    zoneRedundancy: false
-    ddosProtectionEnabled: 'Disabled'
-    containerRegistryTier: 'Basic'
-    deploy: false
-    configurePrivateDNS: false
-    rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-automationtest-uks'
-    subnets: {
-      infraSubnet: {
-        addressPrefix: '10.3.0.0/18'
-      }
-      appGatewaySubnet: {
-        addressPrefix: '10.3.64.0/24'
-      }
-      privateEndPointSubnet: {
-        addressPrefix: '10.3.65.0/24'
-      }
-    }
-  }
-  {
-    subscriptionId: 'c9d1b222-c47a-43fc-814a-33083b8d3375' //System Test Integration
-    ipRange: '10.4.0.0/16'
-    parEnvironment: 'integrationtest'
-    workloadName: 'container-app'
-    zoneRedundancy: false
-    ddosProtectionEnabled: 'Disabled'
-    containerRegistryTier: 'Basic'
-    deploy: false
-    configurePrivateDNS: false
-    rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-integrationtest-uks'
-    subnets: {
-      infraSubnet: {
-        addressPrefix: '10.4.0.0/18'
-      }
-      appGatewaySubnet: {
-        addressPrefix: '10.4.64.0/24'
-      }
-      privateEndPointSubnet: {
-        addressPrefix: '10.4.65.0/24'
-      }
-    }
-  }
-  {
-    subscriptionId: '' //UAT
-    ipRange: '10.5.0.0/16'
-    parEnvironment: 'uat'
-    workloadName: 'container-app'
-    zoneRedundancy: true
-    ddosProtectionEnabled: 'Enabled'
-    containerRegistryTier: 'Premium'
-    deploy: false
-    configurePrivateDNS: true
-    rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-uat-uks'
-    subnets: {
-      infraSubnet: {
-        addressPrefix: '10.5.0.0/18'
-      }
-      appGatewaySubnet: {
-        addressPrefix: '10.5.64.0/24'
-      }
-      privateEndPointSubnet: {
-        addressPrefix: '10.5.65.0/24'
-      }
-    }
-  }
-  {
-    subscriptionId: '' //PreProd
-    ipRange: '10.6.0.0/16'
-    parEnvironment: 'preprod'
-    workloadName: 'container-app'
-    zoneRedundancy: true
-    ddosProtectionEnabled: 'Enabled'
-    containerRegistryTier: 'Premium'
-    deploy: false
-    configurePrivateDNS: true
-    rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-preprod-uks'
-    subnets: {
-      infraSubnet: {
-        addressPrefix: '10.6.0.0/18'
-      }
-      appGatewaySubnet: {
-        addressPrefix: '10.6.64.0/24'
-      }
-      privateEndPointSubnet: {
-        addressPrefix: '10.6.65.0/24'
-      }
-    }
-  }
-  {
-    subscriptionId: '' //Prod
-    ipRange: '10.7.0.0/16'
-    parEnvironment: 'prod'
-    workloadName: 'container-app'
-    zoneRedundancy: true
-    ddosProtectionEnabled: 'Enabled'
-    containerRegistryTier: 'Premium'
-    deploy: false
-    configurePrivateDNS: true
-    rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-prod-uks'
-    subnets: {
-      infraSubnet: {
-        addressPrefix: '10.7.0.0/18'
-      }
-      appGatewaySubnet: {
-        addressPrefix: '10.7.64.0/24'
-      }
-      privateEndPointSubnet: {
-        addressPrefix: '10.7.65.0/24'
-      }
-    }
-  }
+  // {
+  //   subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379' //System Test Manual
+  //   ipRange: '10.2.0.0/16'
+  //   parEnvironment: 'manualtest'
+  //   workloadName: 'container-app'
+  //   zoneRedundancy: false
+  //   ddosProtectionEnabled: 'Disabled'
+  //   containerRegistryTier: 'Basic'
+  //   deploy: false
+  //   configurePrivateDNS: false
+  //   rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-manualtest-uks'
+  //   subnets: {
+  //     infraSubnet: {
+  //       addressPrefix: '10.2.0.0/18'
+  //     }
+  //     appGatewaySubnet: {
+  //       addressPrefix: '10.2.64.0/24'
+  //     }
+  //     privateEndPointSubnet: {
+  //       addressPrefix: '10.2.65.0/24'
+  //     }
+  //   }
+  // }
+  // {
+  //   subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65' //System Test Automated
+  //   ipRange: '10.3.0.0/16'
+  //   parEnvironment: 'automationtest'
+  //   workloadName: 'container-app'
+  //   zoneRedundancy: false
+  //   ddosProtectionEnabled: 'Disabled'
+  //   containerRegistryTier: 'Basic'
+  //   deploy: false
+  //   configurePrivateDNS: false
+  //   rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-automationtest-uks'
+  //   subnets: {
+  //     infraSubnet: {
+  //       addressPrefix: '10.3.0.0/18'
+  //     }
+  //     appGatewaySubnet: {
+  //       addressPrefix: '10.3.64.0/24'
+  //     }
+  //     privateEndPointSubnet: {
+  //       addressPrefix: '10.3.65.0/24'
+  //     }
+  //   }
+  // }
+  // {
+  //   subscriptionId: 'c9d1b222-c47a-43fc-814a-33083b8d3375' //System Test Integration
+  //   ipRange: '10.4.0.0/16'
+  //   parEnvironment: 'integrationtest'
+  //   workloadName: 'container-app'
+  //   zoneRedundancy: false
+  //   ddosProtectionEnabled: 'Disabled'
+  //   containerRegistryTier: 'Basic'
+  //   deploy: false
+  //   configurePrivateDNS: false
+  //   rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-integrationtest-uks'
+  //   subnets: {
+  //     infraSubnet: {
+  //       addressPrefix: '10.4.0.0/18'
+  //     }
+  //     appGatewaySubnet: {
+  //       addressPrefix: '10.4.64.0/24'
+  //     }
+  //     privateEndPointSubnet: {
+  //       addressPrefix: '10.4.65.0/24'
+  //     }
+  //   }
+  // }
+  // {
+  //   subscriptionId: '' //UAT
+  //   ipRange: '10.5.0.0/16'
+  //   parEnvironment: 'uat'
+  //   workloadName: 'container-app'
+  //   zoneRedundancy: true
+  //   ddosProtectionEnabled: 'Enabled'
+  //   containerRegistryTier: 'Premium'
+  //   deploy: false
+  //   configurePrivateDNS: true
+  //   rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-uat-uks'
+  //   subnets: {
+  //     infraSubnet: {
+  //       addressPrefix: '10.5.0.0/18'
+  //     }
+  //     appGatewaySubnet: {
+  //       addressPrefix: '10.5.64.0/24'
+  //     }
+  //     privateEndPointSubnet: {
+  //       addressPrefix: '10.5.65.0/24'
+  //     }
+  //   }
+  // }
+  // {
+  //   subscriptionId: '' //PreProd
+  //   ipRange: '10.6.0.0/16'
+  //   parEnvironment: 'preprod'
+  //   workloadName: 'container-app'
+  //   zoneRedundancy: true
+  //   ddosProtectionEnabled: 'Enabled'
+  //   containerRegistryTier: 'Premium'
+  //   deploy: false
+  //   configurePrivateDNS: true
+  //   rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-preprod-uks'
+  //   subnets: {
+  //     infraSubnet: {
+  //       addressPrefix: '10.6.0.0/18'
+  //     }
+  //     appGatewaySubnet: {
+  //       addressPrefix: '10.6.64.0/24'
+  //     }
+  //     privateEndPointSubnet: {
+  //       addressPrefix: '10.6.65.0/24'
+  //     }
+  //   }
+  // }
+  // {
+  //   subscriptionId: '' //Prod
+  //   ipRange: '10.7.0.0/16'
+  //   parEnvironment: 'prod'
+  //   workloadName: 'container-app'
+  //   zoneRedundancy: true
+  //   ddosProtectionEnabled: 'Enabled'
+  //   containerRegistryTier: 'Premium'
+  //   deploy: false
+  //   configurePrivateDNS: true
+  //   rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-prod-uks'
+  //   subnets: {
+  //     infraSubnet: {
+  //       addressPrefix: '10.7.0.0/18'
+  //     }
+  //     appGatewaySubnet: {
+  //       addressPrefix: '10.7.64.0/24'
+  //     }
+  //     privateEndPointSubnet: {
+  //       addressPrefix: '10.7.65.0/24'
+  //     }
+  //   }
+  // }
 ]
 
 // ------------------
@@ -263,13 +263,13 @@ var varHubVirtualNetworkName = (!empty(hubVNetId) && contains(hubVNetId, '/provi
 // RESOURCES
 // ------------------
 
-resource spokeResourceGroup 'Microsoft.Resources/resourceGroups@2020-06-01' = [for i in range(0, length(parSpokeNetworks)): if(parSpokeNetworks[i].deploy) {
+resource spokeResourceGroup 'Microsoft.Resources/resourceGroups@2020-06-01' = [for i in range(0, length(parSpokeNetworks)): {
   name: parSpokeNetworks[i].rgSpokeName
   location: location
   tags: tags
 }]
 
-module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(parSpokeNetworks)): if(parSpokeNetworks[i].deploy) {
+module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('spoke-${deployment().name}-deployment-${i}', 64)
   scope: subscription(parSpokeNetworks[i].subscriptionId)
   params: {
@@ -291,7 +291,7 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
   }
 }]
 
-module supportingServices 'modules/03-supporting-services/deploy.supporting-services.bicep' = [for i in range(0, length(parSpokeNetworks)): if(parSpokeNetworks[i].deploy) {
+module supportingServices 'modules/03-supporting-services/deploy.supporting-services.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('supportingServices-${deployment().name}-deployment-${i}', 64)
   scope: resourceGroup(parSpokeNetworks[i].rgSpokeName)
   params: {
@@ -307,7 +307,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
   }
 }]
 
-module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.aca-environment.bicep' = [for i in range(0, length(parSpokeNetworks)): if(parSpokeNetworks[i].deploy) {
+module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.aca-environment.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('containerAppsEnvironment-${deployment().name}-deployment', 64)
   scope: resourceGroup(parSpokeNetworks[i].rgSpokeName)
   params: {
@@ -329,7 +329,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 }]
 
-module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.bicep' = [for i in range(0, length(parSpokeNetworks)): if(parSpokeNetworks[i].deploy) {
+module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('helloWorlSampleApp-${deployment().name}-deployment', 64)
   scope: resourceGroup(parSpokeNetworks[i].rgSpokeName)
   params: {
@@ -340,7 +340,7 @@ module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.
   }
 }]
 
-module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): if(parSpokeNetworks[i].deploy) {
+module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('applicationGateway-${deployment().name}-deployment', 64)
   scope: resourceGroup(parSpokeNetworks[i].rgSpokeName)
   params: {
