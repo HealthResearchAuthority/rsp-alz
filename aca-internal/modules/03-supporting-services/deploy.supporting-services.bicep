@@ -97,17 +97,17 @@ module keyVault './modules/key-vault.bicep' = {
 // OUTPUTS
 // ------------------
 
-@description('The resource ID of the Azure Container Registry.')
-output containerRegistryId string = containerRegistry.outputs.containerRegistryId
+// @description('The resource ID of the Azure Container Registry.')
+// output containerRegistryId string = containerRegistry.outputs.containerRegistryId
 
-@description('The name of the Azure Container Registry.')
-output containerRegistryName string = containerRegistry.outputs.containerRegistryName
+// @description('The name of the Azure Container Registry.')
+// output containerRegistryName string = containerRegistry.outputs.containerRegistryName
 
-@description('The name of the container registry login server.')
-output containerRegistryLoginServer string = containerRegistry.outputs.containerRegistryLoginServer
+// @description('The name of the container registry login server.')
+// output containerRegistryLoginServer string = containerRegistry.outputs.containerRegistryLoginServer
 
- @description('The resource ID of the user-assigned managed identity for the Azure Container Registry to be able to pull images from it.')
- output containerRegistryUserAssignedIdentityId string = containerRegistry.outputs.containerRegistryUserAssignedIdentityId
+//  @description('The resource ID of the user-assigned managed identity for the Azure Container Registry to be able to pull images from it.')
+//  output containerRegistryUserAssignedIdentityId string = containerRegistry.outputs.containerRegistryUserAssignedIdentityId
 
 @description('The resource ID of the Azure Key Vault.')
 output keyVaultId string = keyVault.outputs.keyVaultId
