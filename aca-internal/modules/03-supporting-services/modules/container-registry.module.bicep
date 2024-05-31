@@ -104,19 +104,19 @@ module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
   }
 }
 
-module containerRegistryNetwork '../../../../shared/bicep/network/private-networking.bicep' = if(acrTier == 'Premium') {
-  name:take('containerRegistryNetworkDeployment-${deployment().name}', 64)
-  params: {
-    location: location
-    azServicePrivateDnsZoneName: privateDnsZoneNames
-    azServiceId: containerRegistry.outputs.resourceId
-    privateEndpointName: containerRegistryPrivateEndpointName
-    privateEndpointSubResourceName: containerRegistryResourceName
-    virtualNetworkLinks: spokeVNetLinks
-    subnetId: spokePrivateEndpointSubnet.id
-    vnetHubResourceId: hubVNetId
-  }
-}
+// module containerRegistryNetwork '../../../../shared/bicep/network/private-networking.bicep' = if(acrTier == 'Premium') {
+//   name:take('containerRegistryNetworkDeployment-${deployment().name}', 64)
+//   params: {
+//     location: location
+//     azServicePrivateDnsZoneName: privateDnsZoneNames
+//     azServiceId: containerRegistry.outputs.resourceId
+//     privateEndpointName: containerRegistryPrivateEndpointName
+//     privateEndpointSubResourceName: containerRegistryResourceName
+//     virtualNetworkLinks: spokeVNetLinks
+//     subnetId: spokePrivateEndpointSubnet.id
+//     vnetHubResourceId: hubVNetId
+//   }
+// }
 
 resource containerRegistryUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
   name: containerRegistryUserAssignedIdentityName

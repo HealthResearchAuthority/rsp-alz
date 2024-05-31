@@ -25,6 +25,9 @@ param spokeVNetName string
 @description('The name of the existing spoke infrastructure subnet.')
 param spokeInfraSubnetName string
 
+@description('The name of the existing spoke RG for deploying workload')
+param spokeInfraResourceGroupName string
+
 // Telemetry
 @description('Enable or disable the createion of Application Insights.')
 param enableApplicationInsights bool
@@ -125,7 +128,7 @@ module containerAppsEnvironment '../../../shared/bicep/aca-environment.bicep' = 
     vnetEndpointInternal: true
     appInsightsInstrumentationKey: (enableApplicationInsights && enableDaprInstrumentation) ? applicationInsights.outputs.appInsInstrumentationKey : ''
     zoneRedundant: deployZoneRedundantResources
-    infrastructureResourceGroupName: ''
+    infrastructureResourceGroupName: spokeInfraResourceGroupName
   }
 }
 

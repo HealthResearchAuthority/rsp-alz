@@ -328,6 +328,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
     hubVNetName: varHubVirtualNetworkName
     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
     privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
+    spokeInfraResourceGroupName: spokeResourceGroup[i].name
   }
 }]
 
