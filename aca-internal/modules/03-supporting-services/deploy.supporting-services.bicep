@@ -40,8 +40,6 @@ param containerRegistryTier string = ''
 
 param privateDNSEnabled bool = false
 
-param subscriptionId string = ''
-
 // ------------------
 // RESOURCES
 // ------------------
@@ -60,7 +58,7 @@ module naming '../../../shared/bicep/naming/naming.module.bicep' = {
 @description('Azure Container Registry, where all workload images should be pulled from.')
 module containerRegistry './modules/container-registry.module.bicep' = {
   name: 'containerRegistry-${uniqueString(resourceGroup().id)}'
-  scope: resourceGroup(subscriptionId,resourceGroup().id)
+  scope: resourceGroup(resourceGroup().id)
   params: {
     containerRegistryName: naming.outputs.resourcesNames.containerRegistry
     location: location
@@ -79,7 +77,7 @@ module containerRegistry './modules/container-registry.module.bicep' = {
 @description('Azure Key Vault used to hold items like TLS certs and application secrets that your workload will need.')
 module keyVault './modules/key-vault.bicep' = {
   name: 'keyVault-${uniqueString(resourceGroup().id)}'
-  scope: resourceGroup(subscriptionId,resourceGroup().id)
+  scope: resourceGroup(resourceGroup().id)
   params: {
     keyVaultName: naming.outputs.resourcesNames.keyVault
     location: location

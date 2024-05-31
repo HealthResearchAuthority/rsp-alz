@@ -302,7 +302,6 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
     containerRegistryTier: parSpokeNetworks[i].containerRegistryTier
     privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
-    subscriptionId: parSpokeNetworks[i].subscriptionId
   }
 }]
 
