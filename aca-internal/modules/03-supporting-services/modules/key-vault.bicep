@@ -149,19 +149,10 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     }
     enableSoftDelete: false
     softDeleteRetentionInDays: 7
-    enablePurgeProtection: null  // It seems that you cannot set it to False even the first time. workaround is not to set it at all: https://github.com/Azure/bicep/issues/5223
+    enablePurgeProtection: true  // It seems that you cannot set it to False even the first time. workaround is not to set it at all: https://github.com/Azure/bicep/issues/5223
     publicNetworkAccess: 'Disabled'
     enableRbacAuthorization: true
     enabledForTemplateDeployment: true
-  }
-}
-
-resource lock 'Microsoft.Authorization/locks@2020-05-01' = {
-  name: 'lock-${keyVaultName}'
-  scope: keyVault
-  properties: {
-    level: 'CanNotDelete'
-    notes: 'Cannot delete resource'
   }
 }
 

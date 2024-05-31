@@ -9,7 +9,7 @@ param location string
 @description('Optional. Tags of the resource.')
 param tags object = {}
 
-resource muai 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
+resource muai 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: name    //3-128, can contain '-' and '_'.
   location: location
   tags: tags
