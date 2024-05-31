@@ -90,6 +90,7 @@ resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2
 
 module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
   name: take('containerRegistryNameDeployment-${deployment().name}', 64)
+  scope: resourceGroup(spokeSubscriptionId,spokeResourceGroupName)
   params: {
     location: location
     tags: tags    
