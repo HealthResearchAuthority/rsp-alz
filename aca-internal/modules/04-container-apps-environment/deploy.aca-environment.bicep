@@ -83,7 +83,7 @@ resource spokeVNet 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   name: spokeVNetName
 }
 
-resource spokeInfraSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
+resource spokeInfraSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' existing = {
   name: spokeInfraSubnetName
   parent: spokeVNet
 }
