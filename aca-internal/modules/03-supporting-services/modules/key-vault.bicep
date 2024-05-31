@@ -62,6 +62,8 @@ param diagnosticMetricsToEnable array = [
 @description('Optional. The name of the diagnostic setting, if deployed. If left empty, it defaults to "<resourceName>-diagnosticSettings".')
 param diagnosticSettingsName string = ''
 
+param privateDNSEnabled bool = false
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -154,6 +156,15 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   }
 }
 
+resource lock 'Microsoft.Authorization/locks@2020-05-01' = {
+  name: 'lock-${keyVaultName}'
+  scope: keyVault
+  properties: {
+    level: 'CanNotDelete'
+    notes: 'Cannot delete resource'
+  }
+}
+
 resource keyVault_diagnosticSettings 'Microsoft.Insights/diagnosticsettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
   name: !empty(diagnosticSettingsName) ? diagnosticSettingsName : '${keyVaultName}-diagnosticSettings'
   properties: {
@@ -168,7 +179,7 @@ resource keyVault_diagnosticSettings 'Microsoft.Insights/diagnosticsettings@2021
 }
 
 
-module keyVaultNetwork '../../../../shared/bicep/network/private-networking.bicep' = {
+module keyVaultNetwork '../../../../shared/bicep/network/private-networking.bicep' = if(privateDNSEnabled) {
   name: 'keyVaultNetwork-${uniqueString(keyVault.id)}'
   params: {
     location: location

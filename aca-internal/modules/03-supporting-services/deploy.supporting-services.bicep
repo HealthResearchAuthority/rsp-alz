@@ -38,6 +38,8 @@ param deployZoneRedundantResources bool = true
 @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param containerRegistryTier string = ''
 
+param privateDNSEnabled bool = false
+
 // ------------------
 // RESOURCES
 // ------------------
@@ -83,6 +85,7 @@ module keyVault './modules/key-vault.bicep' = {
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     keyVaultPrivateEndpointName: naming.outputs.resourcesNames.keyVaultPep
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
+    privateDNSEnabled: privateDNSEnabled
   }
 }
 

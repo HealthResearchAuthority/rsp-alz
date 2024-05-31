@@ -304,6 +304,8 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     hubVNetId: hubVNetId
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
+    containerRegistryTier: parSpokeNetworks[i].containerRegistryTier
+    privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
   }
 }]
 
