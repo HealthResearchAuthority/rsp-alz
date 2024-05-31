@@ -114,7 +114,6 @@ resource acaEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
   tags: tags
   properties: {
     zoneRedundant: zoneRedundant
-    daprAIInstrumentationKey: appInsightsInstrumentationKey
     vnetConfiguration: {
       internal: vnetEndpointInternal
       infrastructureSubnetId: subnetId

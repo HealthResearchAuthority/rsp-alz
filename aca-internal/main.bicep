@@ -278,8 +278,8 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
     tags: tags
     environment: parSpokeNetworks[i].parEnvironment
     workloadName: workloadName
-    spokeApplicationGatewaySubnetAddressPrefix: parSpokeNetworks[i].subnets.infraSubnet.addressPrefix
-    spokeInfraSubnetAddressPrefix: parSpokeNetworks[i].subnets.appGatewaySubnet.addressPrefix
+    spokeApplicationGatewaySubnetAddressPrefix: parSpokeNetworks[i].subnets.appGatewaySubnet.addressPrefix
+    spokeInfraSubnetAddressPrefix: parSpokeNetworks[i].subnets.infraSubnet.addressPrefix
     spokePrivateEndpointsSubnetAddressPrefix: parSpokeNetworks[i].subnets.privateEndPointSubnet.addressPrefix
     spokeVNetAddressPrefixes: [parSpokeNetworks[i].ipRange]
     networkApplianceIpAddress: networkApplianceIpAddress

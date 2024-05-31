@@ -79,6 +79,9 @@ resource spokeVNet 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   }
 }
 
+resource spokeInfraSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01' = {
+  name: spokeInfraSubnetName
+}
 // ------------------
 // RESOURCES
 // ------------------
@@ -113,7 +116,7 @@ module containerAppsEnvironment '../../../shared/bicep/aca-environment.bicep' = 
     location: location
     tags: tags
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
-    subnetId: spokeVNet::infraSubnet.id
+    subnetId: spokeInfraSubnet.id
     vnetEndpointInternal: true
     appInsightsInstrumentationKey: (enableApplicationInsights && enableDaprInstrumentation) ? applicationInsights.outputs.appInsInstrumentationKey : ''
     zoneRedundant: deployZoneRedundantResources
