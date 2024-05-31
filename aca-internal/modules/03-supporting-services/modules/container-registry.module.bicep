@@ -34,6 +34,9 @@ param diagnosticWorkspaceId string = ''
 @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param deployZoneRedundantResources bool = true
 
+@description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
+param acrTier string = ''
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -91,7 +94,7 @@ module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
     location: location
     tags: tags    
     name: containerRegistryName
-    acrSku: 'Premium'
+    acrSku: acrTier
     zoneRedundancy: deployZoneRedundantResources ? 'Enabled' : 'Disabled'
     acrAdminUserEnabled: false
     publicNetworkAccess: 'Disabled'
@@ -100,7 +103,7 @@ module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
   }
 }
 
-module containerRegistryNetwork '../../../../shared/bicep/network/private-networking.bicep' = {
+module containerRegistryNetwork '../../../../shared/bicep/network/private-networking.bicep' = if(acrTier == 'Premium') {
   name:take('containerRegistryNetworkDeployment-${deployment().name}', 64)
   params: {
     location: location

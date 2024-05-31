@@ -33,8 +33,10 @@ param spokePrivateEndpointSubnetName string
 @description('Optional. Resource ID of the diagnostic log analytics workspace. If left empty, no diagnostics settings will be defined.')
 param logAnalyticsWorkspaceId string = ''
 
-@description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param deployZoneRedundantResources bool = true
+
+@description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
+param containerRegistryTier string = ''
 
 // ------------------
 // RESOURCES
@@ -60,6 +62,7 @@ module containerRegistry './modules/container-registry.module.bicep' = {
     tags: tags
     spokeVNetId: spokeVNetId
     hubVNetId: hubVNetId
+    acrTier: containerRegistryTier
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     containerRegistryPrivateEndpointName: naming.outputs.resourcesNames.containerRegistryPep
     containerRegistryUserAssignedIdentityName: naming.outputs.resourcesNames.containerRegistryUserAssignedIdentity
