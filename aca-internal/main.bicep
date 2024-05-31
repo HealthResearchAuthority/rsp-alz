@@ -293,7 +293,7 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
 
 module supportingServices 'modules/03-supporting-services/deploy.supporting-services.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('supportingServices-${deployment().name}-deployment-${i}', 64)
-  scope: resourceGroup(parSpokeNetworks[i].rgSpokeName)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
   params: {
     location: location
     tags: tags
@@ -309,7 +309,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
 
 module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.aca-environment.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('containerAppsEnvironment-${deployment().name}-deployment', 64)
-  scope: resourceGroup(parSpokeNetworks[i].rgSpokeName)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
   params: {
     location: location
     tags: tags
@@ -331,7 +331,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
 
 module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('helloWorlSampleApp-${deployment().name}-deployment', 64)
-  scope: resourceGroup(parSpokeNetworks[i].rgSpokeName)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
   params: {
     location: location
     tags: tags
@@ -342,7 +342,7 @@ module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.
 
 module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('applicationGateway-${deployment().name}-deployment', 64)
-  scope: resourceGroup(parSpokeNetworks[i].rgSpokeName)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
   params: {
     location: location
     tags: tags
