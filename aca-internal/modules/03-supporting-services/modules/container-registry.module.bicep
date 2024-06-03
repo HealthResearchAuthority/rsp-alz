@@ -88,7 +88,7 @@ resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2
   name: spokePrivateEndpointSubnetName
 }
 
-resource containerRegistryUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2022-01-31-preview' = {
+resource containerRegistryUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: containerRegistryUserAssignedIdentityName
   location: location
   tags: tags
@@ -107,7 +107,9 @@ module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
     publicNetworkAccess: acrTier == 'Premium' ? 'Disabled': 'Enabled'
     networkRuleBypassOptions: 'AzureServices'
     diagnosticWorkspaceId: diagnosticWorkspaceId
-    userAssignedIdentities: containerRegistryUserAssignedIdentity
+    userAssignedIdentities: {
+      '${containerRegistryUserAssignedIdentity.id}': {}
+    }
   }
 }
 
