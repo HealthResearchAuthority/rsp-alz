@@ -57,7 +57,7 @@ module naming '../../../shared/bicep/naming/naming.module.bicep' = {
 
 @description('Azure Container Registry, where all workload images should be pulled from.')
 module containerRegistry './modules/container-registry.module.bicep' = {
-  name: 'containerRegistry-${uniqueString(resourceGroup().id)}'
+  name: 'containerRegistry-rsp-${uniqueString(resourceGroup().id)}'
   params: {
     containerRegistryName: naming.outputs.resourcesNames.containerRegistry
     location: location
