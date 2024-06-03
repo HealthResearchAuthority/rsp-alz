@@ -88,7 +88,7 @@ resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2
   name: spokePrivateEndpointSubnetName
 }
 
-resource containerRegistryUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+resource containerRegistryUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
   name: containerRegistryUserAssignedIdentityName
   location: location
   tags: tags
