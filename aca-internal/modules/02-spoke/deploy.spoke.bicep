@@ -53,6 +53,15 @@ param logAnalyticsWorkspaceId string
 @description('Optional, default value is true. If true, Azure Policies will be deployed')
 param deployAzurePolicies bool = true
 
+@description('Hub Subscription ID')
+param parHubSubscriptionId string
+
+@description('Hub Subscription ID')
+param parHubResourceGroup string
+
+@description('Hub Subscription ID')
+param parHubResourceId string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -211,16 +220,16 @@ module egressLockdownUdr '../../../shared/bicep/routeTables/main.bicep' = {
 }
 
   // Module -  Spoke to Azure Virtual WAN Hub peering.
-  // module modhubVirtualNetworkConnection '../../../config/custom-modules/vnetPeeringVwan/hubVirtualNetworkConnection.bicep' = {
-  //   scope: resourceGroup(parVirtualHubSubscriptionId, parVirtualHubResourceGroup)
-  //   //name: take('vWanPeering-${deployment().name}', 64)
-  //   name: take('vWanPeering-nikhil-test', 64)
-  //   params: {
-  //     parVirtualWanHubResourceId: parVirtualHubResourceId
-  //     parRemoteVirtualNetworkResourceId: vnetSpoke.outputs.vnetId
-  //     parEnableInternetSecurity: false
-  //   }
-  // }
+  module modhubVirtualNetworkConnection '../../../config/custom-modules/vnetPeeringVwan/hubVirtualNetworkConnection.bicep' = {
+    scope: resourceGroup(parHubSubscriptionId, parHubResourceGroup)
+    //name: take('vWanPeering-${deployment().name}', 64)
+    name: take('vWanPeering-nikhil-test', 64)
+    params: {
+      parVirtualWanHubResourceId: parHubResourceId
+      parRemoteVirtualNetworkResourceId: vnetSpoke.outputs.vnetId
+      parEnableInternetSecurity: false
+    }
+  }
 
 @description('Assign built-in and custom (container-apps related) policies to the spoke subscription.')
 module policyAssignments './modules/policy/policy-definition.module.bicep' = if (deployAzurePolicies) {

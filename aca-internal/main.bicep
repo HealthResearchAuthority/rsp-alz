@@ -94,7 +94,7 @@ param parSpokeNetworks spokesType = [
     workloadName: 'container-app'
     zoneRedundancy: false
     ddosProtectionEnabled: 'Disabled'
-    containerRegistryTier: 'Basic'
+    containerRegistryTier: 'Premium'
     deploy: true
     configurePrivateDNS: false
     rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-dev-uks'
@@ -117,7 +117,7 @@ param parSpokeNetworks spokesType = [
   //   workloadName: 'container-app'
   //   zoneRedundancy: false
   //   ddosProtectionEnabled: 'Disabled'
-  //   containerRegistryTier: 'Basic'
+  //   containerRegistryTier: 'Premium'
   //   deploy: false
   //   configurePrivateDNS: false
   //   rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-manualtest-uks'
@@ -140,7 +140,7 @@ param parSpokeNetworks spokesType = [
   //   workloadName: 'container-app'
   //   zoneRedundancy: false
   //   ddosProtectionEnabled: 'Disabled'
-  //   containerRegistryTier: 'Basic'
+  //   containerRegistryTier: 'Premium'
   //   deploy: false
   //   configurePrivateDNS: false
   //   rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-automationtest-uks'
@@ -163,7 +163,7 @@ param parSpokeNetworks spokesType = [
   //   workloadName: 'container-app'
   //   zoneRedundancy: false
   //   ddosProtectionEnabled: 'Disabled'
-  //   containerRegistryTier: 'Basic'
+  //   containerRegistryTier: 'Premium'
   //   deploy: false
   //   configurePrivateDNS: false
   //   rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-integrationtest-uks'
@@ -284,6 +284,9 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
     networkApplianceIpAddress: networkApplianceIpAddress
     deployAzurePolicies: deployAzurePolicies
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    parHubResourceGroup: varVirtualHubResourceGroup
+    parHubSubscriptionId: varVirtualHubSubscriptionId
+    parHubResourceId: hubVNetId
   }
 }]
 
