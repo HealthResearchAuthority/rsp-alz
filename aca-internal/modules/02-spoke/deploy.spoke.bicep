@@ -222,8 +222,7 @@ module egressLockdownUdr '../../../shared/bicep/routeTables/main.bicep' = {
   // Module -  Spoke to Azure Virtual WAN Hub peering.
   module modhubVirtualNetworkConnection '../../../config/custom-modules/vnetPeeringVwan/hubVirtualNetworkConnection.bicep' = {
     scope: resourceGroup(parHubSubscriptionId, parHubResourceGroup)
-    //name: take('vWanPeering-${deployment().name}', 64)
-    name: take('vWanPeering-nikhil-test', 64)
+    name: take('vWanPeering-${deployment().name}', 64)
     params: {
       parVirtualWanHubResourceId: parHubResourceId
       parRemoteVirtualNetworkResourceId: vnetSpoke.outputs.vnetId
