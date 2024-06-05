@@ -71,10 +71,10 @@ param privateDNSEnabled bool = false
 var privateDnsZoneNames = 'privatelink.vaultcore.azure.net'
 var keyVaultResourceName = 'vault'
 
-var hubVNetIdTokens = split(hubVNetId, '/')
-var hubSubscriptionId = hubVNetIdTokens[2]
-var hubResourceGroupName = hubVNetIdTokens[4]
-var hubVNetName = hubVNetIdTokens[8]
+//var hubVNetIdTokens = split(hubVNetId, '/')
+// var hubSubscriptionId = hubVNetIdTokens[2]
+// var hubResourceGroupName = hubVNetIdTokens[4]
+// var hubVNetName = hubVNetIdTokens[8]
 
 var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]

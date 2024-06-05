@@ -29,9 +29,6 @@ param spokeInfraSubnetName string
 @description('Enable or disable the createion of Application Insights.')
 param enableApplicationInsights bool
 
-@description('Enable or disable Dapr application instrumentation using Application Insights. If enableApplicationInsights is false, this parameter is ignored.')
-param enableDaprInstrumentation bool
-
 @description('Enable sending usage and telemetry feedback to Microsoft.')
 param enableTelemetry bool = true
 
@@ -48,8 +45,8 @@ param hubSubscriptionId string = ''
 @description('The name of the resource group containing the hub virtual network.')
 param hubResourceGroupName string = ''
 
-@description('The name of the hub virtual network.')
-param hubVNetName string = ''
+// @description('The name of the hub virtual network.')
+// param hubVNetName string = ''
 
 param privateDNSEnabled bool = false
 
@@ -63,19 +60,10 @@ var telemetryId = '9b4433d6-924a-4c07-b47c-7478619759c7-${location}-acasb'
 // EXISTING RESOURCES
 // ------------------
 
-@description('The existing hub virtual network.')
-resource vnetHub 'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
-  scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
-  name: hubVNetName
-}
-
-// @description('The existing spoke virtual network.')
-// resource spokeVNet 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
-//   name: spokeVNetName
-
-//   resource infraSubnet 'subnets' existing = {
-//     name: spokeInfraSubnetName
-//   }
+// @description('The existing hub virtual network.')
+// resource vnetHub 'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
+//   scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
+//   name: hubVNetName
 // }
 
 @description('The existing spoke virtual network.')
@@ -123,7 +111,7 @@ module containerAppsEnvironment '../../../shared/bicep/aca-environment.bicep' = 
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
     subnetId: spokeInfraSubnet.id
     vnetEndpointInternal: true
-    appInsightsInstrumentationKey: (enableApplicationInsights && enableDaprInstrumentation) ? applicationInsights.outputs.appInsInstrumentationKey : ''
+    //appInsightsInstrumentationKey: (enableApplicationInsights && enableDaprInstrumentation) ? applicationInsights.outputs.appInsInstrumentationKey : ''
     zoneRedundant: deployZoneRedundantResources
     infrastructureResourceGroupName: ''
   }
