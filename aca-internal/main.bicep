@@ -256,7 +256,7 @@ param parSpokeNetworks spokesType = [
 
 var varVirtualHubResourceGroup = (!empty(hubVNetId) && contains(hubVNetId, '/providers/Microsoft.Network/virtualHubs/') ? split(hubVNetId, '/')[4] : '')
 var varVirtualHubSubscriptionId = (!empty(hubVNetId) && contains(hubVNetId, '/providers/Microsoft.Network/virtualHubs/') ? split(hubVNetId, '/')[2] : '')
-var varHubVirtualNetworkName = (!empty(hubVNetId) && contains(hubVNetId, '/providers/Microsoft.Network/virtualHubs/') ? split(hubVNetId, '/')[8] : '')
+//var varHubVirtualNetworkName = (!empty(hubVNetId) && contains(hubVNetId, '/providers/Microsoft.Network/virtualHubs/') ? split(hubVNetId, '/')[8] : '')
 
 // ------------------
 // RESOURCES
