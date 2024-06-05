@@ -7,18 +7,10 @@ trigger:
   branches:
     include:
       - "main"
-  paths:
-    include:
-      - "config/custom-parameters/resourceGroupConnectivity.parameters.all.json"
-      - "config/custom-parameters/vwanConnectivity.parameters.all.json"
 pr:
   branches:
     include:
       - "main"
-  paths:
-    include:
-      - "config/custom-parameters/resourceGroupConnectivity.parameters.all.json"
-      - "config/custom-parameters/vwanConnectivity.parameters.all.json"
 
 variables:
   ENV_FILE: ".env"

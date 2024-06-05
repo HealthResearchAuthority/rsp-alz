@@ -500,6 +500,32 @@ resource resFirewallPolicies 'Microsoft.Network/firewallPolicies@2023-02-01' = i
   }
 }
 
+// resource fwRuleCollection 'Microsoft.Network/firewallPolicies/ruleCollectionGroups@2023-11-01' = {
+//   name: 'string'
+//   parent: resFirewallPolicies
+//   properties: {
+//     priority: 200
+//     ruleCollections: [
+//       {
+//         name: 'string'
+//         priority: 101
+//         ruleCollectionType: 'FirewallPolicyFilterRuleCollection'
+//         action: {
+//           type: 'Allow'
+//         }
+//         rules: [
+//           {
+//             description: 'string'
+//             name: 'fierwalldnsrulecollection'
+//             ruleType: 'NetworkRule'
+//             // For remaining properties, see FirewallPolicyRule objects
+//           }
+//         ]
+//       }
+//     ]
+//   }
+// }
+
 // Create Azure Firewall Policy resource lock if parAzFirewallEnabled is true and parGlobalResourceLock.kind != 'None' or if parAzureFirewallLock.kind != 'None'
 resource resFirewallPoliciesLock 'Microsoft.Authorization/locks@2020-05-01' = if ((parVirtualHubEnabled && parVirtualWanHubs[0].parAzFirewallEnabled) && (parAzureFirewallLock.kind != 'None' || parGlobalResourceLock.kind != 'None')) {
   scope: resFirewallPolicies

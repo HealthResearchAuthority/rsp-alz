@@ -141,11 +141,11 @@ module containerAppsEnvironmentPrivateDnsZone '../../../shared/bicep/network/pri
         vnetId: spokeVNet.id
         registrationEnabled: false
       }
-      {
-        vnetName: vnetHub.name  /* Link to hub */
-        vnetId: vnetHub.id
-        registrationEnabled: false
-      }
+      // {
+      //   vnetName: vnetHub.name  /* Link to hub */
+      //   vnetId: vnetHub.id
+      //   registrationEnabled: false
+      // }
     ]
     tags: tags
     aRecords: [

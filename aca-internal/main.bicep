@@ -96,7 +96,7 @@ param parSpokeNetworks spokesType = [
     ddosProtectionEnabled: 'Disabled'
     containerRegistryTier: 'Premium'
     deploy: true
-    configurePrivateDNS: false
+    configurePrivateDNS: true
     rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-dev-uks'
     subnets: {
       infraSubnet: {

@@ -88,11 +88,11 @@ var spokeVNetLinks = [
     vnetId: vnetSpoke.id
     registrationEnabled: false
   }
-  {
-    vnetName: vnetHub.name
-    vnetId: vnetHub.id
-    registrationEnabled: false
-  }
+  // {
+  //   vnetName: vnetHub.name
+  //   vnetId: vnetHub.id
+  //   registrationEnabled: false
+  // }
 ]
 
 var diagnosticsLogsSpecified = [for category in filter(diagnosticLogCategoriesToEnable, item => item != 'allLogs'): {
@@ -118,10 +118,10 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
 // RESOURCES
 // ------------------
 
-resource vnetHub  'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
-  scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
-  name: hubVNetName
-}
+// resource vnetHub  'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
+//   scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
+//   name: hubVNetName
+// }
 
 resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)  
@@ -170,7 +170,7 @@ resource keyVault_diagnosticSettings 'Microsoft.Insights/diagnosticsettings@2021
 }
 
 
-module keyVaultNetwork '../../../../shared/bicep/network/private-networking.bicep' = if(privateDNSEnabled) {
+module keyVaultNetwork '../../../../shared/bicep/network/private-networking-spoke.bicep' = if(privateDNSEnabled) {
   name: 'keyVaultNetwork-${uniqueString(keyVault.id)}'
   params: {
     location: location
@@ -180,7 +180,7 @@ module keyVaultNetwork '../../../../shared/bicep/network/private-networking.bice
     privateEndpointSubResourceName: keyVaultResourceName
     virtualNetworkLinks: spokeVNetLinks
     subnetId: spokePrivateEndpointSubnet.id
-    vnetHubResourceId: hubVNetId
+    vnetSpokeResourceId: hubVNetId
   }
 }
 
