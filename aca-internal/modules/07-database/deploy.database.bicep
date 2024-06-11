@@ -36,7 +36,7 @@ param hubVNetId string
 // VARIABLES
 // ------------------
 
-var privateDnsZoneNames = '${environment}.privatelink.${az.environment().suffixes.sqlServerHostname}'
+var privateDnsZoneNames = '${environment}.privatelink${az.environment().suffixes.sqlServerHostname}'
 var sqlServerResourceName = 'sqlServer'
 
 var spokeVNetIdTokens = split(spokeVNetId, '/')
@@ -114,16 +114,6 @@ resource database 'Microsoft.Sql/servers/databases@2023-05-01-preview' = [for i 
     zoneRedundant: false
   }
 }]
-
-// Firewall
-resource DB_Firewall 'Microsoft.Sql/servers/firewallRules@2021-11-01-preview' = {
-  name: 'AllowAllWindowsAzureIps'
-  parent: SQL_Server
-  properties: {
-    endIpAddress: '0.0.0.0'
-    startIpAddress: '0.0.0.0'
-  }
-}
 
 module sqlServerNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = {
   name: 'sqlServerNetwork-${uniqueString(SQL_Server.id)}'
