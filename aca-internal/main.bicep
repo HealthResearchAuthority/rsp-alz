@@ -48,9 +48,9 @@ param applicationGatewayCertificateKeyName string
 
 //Database
 
-// param adminLogin string = ''
-// @secure()
-// param adminPassword string
+param adminLogin string = ''
+@secure()
+param adminPassword string
 
 type spokesType = ({
   @description('SubscriptionId for spokeNetworking')
@@ -366,22 +366,22 @@ module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bic
   }
 }]
 
-// module databaseserver 'modules/07-database/deploy.database.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-//   name: take('database-${deployment().name}-deployment', 64)
-//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
-//   params: {
-//     location: location
-//     sqlServerName: 'rspsqlserver'
-//     adminLogin: adminLogin
-//     adminPassword: adminPassword
-//     databases : ['applicationservice']
-//     environment: parSpokeNetworks[i].parEnvironment
-//     hubVNetId: hubVNetId
-//     spokePrivateEndpointSubnetName: spoke[i].outputs.spokeInfraSubnetName
-//     spokeVNetId: spoke[i].outputs.spokeVNetId
-//     workloadName: workloadName
-//   }
-// }]
+module databaseserver 'modules/07-database/deploy.database.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('database-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
+  params: {
+    location: location
+    sqlServerName: 'rspsqlserver'
+    adminLogin: adminLogin
+    adminPassword: adminPassword
+    databases : ['applicationservice']
+    environment: parSpokeNetworks[i].parEnvironment
+    hubVNetId: hubVNetId
+    spokePrivateEndpointSubnetName: spoke[i].outputs.spokeInfraSubnetName
+    spokeVNetId: spoke[i].outputs.spokeVNetId
+    workloadName: workloadName
+  }
+}]
 
 // ------------------
 // OUTPUTS
