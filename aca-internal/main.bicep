@@ -48,7 +48,7 @@ param applicationGatewayCertificateKeyName string
 
 //Database
 
-param adminLogin string = ''
+//param adminLogin string = ''
 //param parAdminPassword string
 //param adminLoginKey string = ''
 

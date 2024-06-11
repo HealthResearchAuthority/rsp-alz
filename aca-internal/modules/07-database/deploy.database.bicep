@@ -139,31 +139,6 @@ module sqlServerNetwork '../../../shared/bicep/network/private-networking-spoke.
   }
 }
 
-// Private Endpoint Resource
-// resource Private_Endpoint 'Microsoft.Network/privateEndpoints@2021-02-01' = {
-//   name: privateEndpointName
-//   location: serverLocation
-//   properties: {
-//     subnet: {
-//       id: resourceId('Microsoft.Network/VirtualNetworks/subnets', virtualNetworkName, subnetName)
-//     }
-//     privateLinkServiceConnections: [
-//       {
-//         name: 'sqlServerConnection'
-//         properties: {
-//           privateLinkServiceConnectionState: {
-//             status: 'Approved'
-//           }
-//           privateLinkServiceId: SQL_Server.id
-//           groupIds: [
-//             'sqlServer'
-//           ]
-//         }
-//       }
-//     ]
-//   }
-// }
-
 // Outputs
 output sqlServer_name string = SQL_Server.name
 
