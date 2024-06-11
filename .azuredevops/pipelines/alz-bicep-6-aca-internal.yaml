@@ -40,7 +40,7 @@ jobs:
               --template-file ./aca-internal/main.bicep \
               --parameters ./aca-internal/main.parameters.jsonc \
               --parameters adminLogin=$(rspsqladminloginname) \
-              --parameters adminLoginKey=$(rspsqladminloginkey)
+              --parameters adminLoginKey='rspsqladminloginkey'
 
   - job: preview
     pool: 
