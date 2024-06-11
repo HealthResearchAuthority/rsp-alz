@@ -49,7 +49,7 @@ param applicationGatewayCertificateKeyName string
 //Database
 
 param adminLogin string = ''
-param adminPass string = ''
+param adminPassword string = ''
 
 type spokesType = ({
   @description('SubscriptionId for spokeNetworking')
