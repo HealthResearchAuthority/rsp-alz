@@ -50,6 +50,7 @@ param applicationGatewayCertificateKeyName string
 
 param adminLogin string = ''
 //param parAdminPassword string
+param adminLoginKey string = ''
 
 type spokesType = ({
   @description('SubscriptionId for spokeNetworking')
@@ -372,7 +373,7 @@ module databaseserver 'modules/07-database/deploy.database.bicep' = [for i in ra
     location: location
     sqlServerName: 'rspsqlserver'
     adminLogin: adminLogin
-    adminPassword: 'parAdminPassword'
+    adminPassword: adminLoginKey
     databases : ['applicationservice']
     environment: parSpokeNetworks[i].parEnvironment
     hubVNetId: hubVNetId
