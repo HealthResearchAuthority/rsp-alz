@@ -6,7 +6,7 @@ param (
   [String]$ConnectivitySubscriptionId = "$($env:CONNECTIVITY_SUBSCRIPTION_ID)",
 
   [Parameter()]
-  [String]$TemplateFile = "upstream-releases\$($env:UPSTREAM_RELEASE_VERSION)\infra-as-code\bicep\modules\resourceGroup\resourceGroup.bicep",
+  [String]$TemplateFile = "config\custom-modules\resourceGroup\resourceGroup.bicep",
 
   [Parameter()]
   [String]$TemplateParameterFile = "config\custom-parameters\resourceGroupConnectivity.parameters.all.json",

@@ -34,7 +34,9 @@
         "azureAISearch": "srch",
         "documentIntelligence": "di",
         "eventGridSystemTopic": "egst",
-        "eventGridSubscription": "evgs"
+        "eventGridSubscription": "evgs",
+        "azuresqlserver": "sql",
+        "azuresqldatabase": "sqldb"
     },
 
     //copied from here: https://github.com/nianton/azure-naming/blob/main/datafiles/regionAbbreviations.json

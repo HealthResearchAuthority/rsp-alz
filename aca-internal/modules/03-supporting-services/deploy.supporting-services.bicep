@@ -66,7 +66,7 @@ module containerRegistry './modules/container-registry.module.bicep' = {
     hubVNetId: hubVNetId
     acrTier: containerRegistryTier
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
-     containerRegistryPrivateEndpointName: naming.outputs.resourcesNames.containerRegistryPep
+    containerRegistryPrivateEndpointName: naming.outputs.resourcesNames.containerRegistryPep
     containerRegistryUserAssignedIdentityName: naming.outputs.resourcesNames.containerRegistryUserAssignedIdentity
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
     deployZoneRedundantResources: deployZoneRedundantResources

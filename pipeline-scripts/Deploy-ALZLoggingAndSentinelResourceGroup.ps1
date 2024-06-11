@@ -3,7 +3,7 @@ param (
   [String]$Location = "$($env:LOCATION)",
 
   [Parameter()]
-  [String]$TemplateFile = "upstream-releases\$($env:UPSTREAM_RELEASE_VERSION)\infra-as-code\bicep\modules\resourceGroup\resourceGroup.bicep",
+  [String]$TemplateFile = "config\custom-modules\resourceGroup\resourceGroup.bicep",
 
   [Parameter()]
   [String]$TemplateParameterFile = "config\custom-parameters\resourceGroupLoggingAndSentinel.parameters.all.json",

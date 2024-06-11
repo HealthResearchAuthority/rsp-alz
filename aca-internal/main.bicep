@@ -46,6 +46,11 @@ param applicationGatewayCertificateKeyName string
 // @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 // param deployZoneRedundantResources bool = true
 
+//Database
+
+param adminLogin string = ''
+@secure()
+param adminPassword string
 
 type spokesType = ({
   @description('SubscriptionId for spokeNetworking')
@@ -319,7 +324,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
     spokeVNetName: spoke[i].outputs.spokeVNetName
     spokeInfraSubnetName: spoke[i].outputs.spokeInfraSubnetName
     enableApplicationInsights: true
-    //enableDaprInstrumentation: false
+    enableDaprInstrumentation: true
     enableTelemetry: false
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     hubResourceGroupName: varVirtualHubResourceGroup
@@ -358,6 +363,23 @@ module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bic
     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
     ddosProtectionMode: 'Disabled'
     applicationGatewayLogAnalyticsId: logAnalyticsWorkspaceId
+  }
+}]
+
+module databaseserver 'modules/07-database/deploy.database.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('database-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
+  params: {
+    location: location
+    sqlServerName: 'rspsqlserver'
+    adminLogin: adminLogin
+    adminPassword: adminPassword
+    databases : ['applicationservice']
+    environment: parSpokeNetworks[i].parEnvironment
+    hubVNetId: hubVNetId
+    spokePrivateEndpointSubnetName: spoke[i].outputs.spokeInfraSubnetName
+    spokeVNetId: spoke[i].outputs.spokeVNetId
+    workloadName: workloadName
   }
 }]
 
