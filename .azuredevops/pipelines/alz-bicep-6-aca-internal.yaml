@@ -60,7 +60,7 @@ jobs:
               --parameters ./aca-internal/main.parameters.jsonc \
               --parameters deployHelloWorldSample=true 
               --parameters adminLogin=$(rspsqladminloginname) 
-              --parameters adminLoginKey=$(rspsqladminloginkey)
+              --parameters adminLoginKey='rspsqladminloginkey'
   - job: deploy
     pool: 
       vmImage: 'ubuntu-latest'
