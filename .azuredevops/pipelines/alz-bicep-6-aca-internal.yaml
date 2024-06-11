@@ -34,7 +34,7 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
-            az deployment sub validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ./aca-internal/main.bicep --parameters ./aca-internal/main.parameters.jsonc --parameters adminLogin=$(rspsqladminloginname) adminPassword=$(rspsqladminloginpassword)
+            az deployment sub validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ./aca-internal/main.bicep --parameters ./aca-internal/main.parameters.jsonc
 
   - job: preview
     pool: 
