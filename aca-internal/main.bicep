@@ -49,7 +49,6 @@ param applicationGatewayCertificateKeyName string
 //Database
 
 param adminLogin string = ''
-@secure()
 param parAdminPassword string
 
 type spokesType = ({
