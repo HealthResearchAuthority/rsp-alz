@@ -80,7 +80,7 @@ jobs:
               --location $(location) \
               --template-file ./aca-internal/main.bicep \
               --parameters ./aca-internal/main.parameters.jsonc \
-              --parameters deployHelloWorldSample=true 
+              --parameters deployHelloWorldSample=true \
               --parameters adminLogin=$(rspsqladminloginname) \
               --parameters adminLoginKey=$(rspsqladminloginkey)
             echo $output | jq .
