@@ -34,7 +34,7 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
-            az deployment sub validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ./aca-internal/main.bicep --parameters ./aca-internal/main.parameters.jsonc --parameters adminLogin=$(rspsqladminloginname) adminPassword=$(rspsqladminloginpassword)
+            az deployment sub validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ./aca-internal/main.bicep --parameters ./aca-internal/main.parameters.jsonc --parameters adminLogin=$(rspsqladminloginname)
 
   - job: preview
     pool: 
@@ -52,7 +52,7 @@ jobs:
               --location $(location) \
               --template-file ./aca-internal/main.bicep \
               --parameters ./aca-internal/main.parameters.jsonc \
-              --parameters deployHelloWorldSample=true adminLogin=$(rspsqladminloginname) adminPassword=$(rspsqladminloginpassword)
+              --parameters deployHelloWorldSample=true adminLogin=$(rspsqladminloginname) 
   - job: deploy
     pool: 
       vmImage: 'ubuntu-latest'
@@ -72,7 +72,7 @@ jobs:
               --location $(location) \
               --template-file ./aca-internal/main.bicep \
               --parameters ./aca-internal/main.parameters.jsonc \
-              --parameters deployHelloWorldSample=true adminLogin=$(rspsqladminloginname) adminPassword=$(rspsqladminloginpassword))
+              --parameters deployHelloWorldSample=true adminLogin=$(rspsqladminloginname) 
             echo $output | jq .
             spokeResourceGroup=$(echo $output | jq -r '.properties.outputs.spokeResourceGroupName.value')
             hubResourceGroup=$(echo $output | jq -r '.properties.outputs.hubResourceGroupName.value')
