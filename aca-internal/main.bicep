@@ -48,7 +48,7 @@ param applicationGatewayCertificateKeyName string
 
 //Database
 
-//param adminLogin string = ''
+param parAdminLogin string = ''
 //param parAdminPassword string
 //param adminLoginKey string = ''
 
@@ -372,7 +372,7 @@ module databaseserver 'modules/07-database/deploy.database.bicep' = [for i in ra
   params: {
     location: location
     sqlServerName: 'rspsqlserver'
-    adminLogin: 'rspsqladmin'
+    adminLogin: parAdminLogin
     adminPassword: 'adminLoginKey'
     databases : ['applicationservice']
     environment: parSpokeNetworks[i].parEnvironment
