@@ -377,7 +377,7 @@ module databaseserver 'modules/07-database/deploy.database.bicep' = [for i in ra
     databases : ['applicationservice']
     environment: parSpokeNetworks[i].parEnvironment
     hubVNetId: hubVNetId
-    spokePrivateEndpointSubnetName: spoke[i].outputs.spokeInfraSubnetName
+    spokePrivateEndpointSubnetName: spoke[i].outputs.spokePrivateEndpointsSubnetName
     spokeVNetId: spoke[i].outputs.spokeVNetId
     workloadName: workloadName
   }
