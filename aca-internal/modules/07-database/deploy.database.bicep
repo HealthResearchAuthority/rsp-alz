@@ -36,7 +36,7 @@ param hubVNetId string
 // VARIABLES
 // ------------------
 
-var privateDnsZoneNames = '${environment}.privatelink.database.windows.net'
+var privateDnsZoneNames = '${environment}.privatelink.${az.environment().suffixes.sqlServerHostname}'
 var sqlServerResourceName = 'sqlServer'
 
 var spokeVNetIdTokens = split(spokeVNetId, '/')
