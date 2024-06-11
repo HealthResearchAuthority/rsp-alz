@@ -40,7 +40,6 @@ jobs:
               --template-file ./aca-internal/main.bicep \
               --parameters ./aca-internal/main.parameters.jsonc \
               --parameters adminLogin=$(rspsqladminloginname) \
-              --parameters adminLoginKey='rspsqladminloginkey'
 
   - job: preview
     pool: 
@@ -60,7 +59,6 @@ jobs:
               --parameters ./aca-internal/main.parameters.jsonc \
               --parameters deployHelloWorldSample=true \
               --parameters adminLogin=$(rspsqladminloginname) \
-              --parameters adminLoginKey='$(rspsqladminloginkey)'
   - job: deploy
     pool: 
       vmImage: 'ubuntu-latest'
@@ -80,7 +78,7 @@ jobs:
               --location $(location) \
               --template-file ./aca-internal/main.bicep \
               --parameters ./aca-internal/main.parameters.jsonc \
-              --parameters adminLogin=$(rspsqladminloginname) adminLoginKey=$(rspsqladminloginkey)
+              --parameters adminLogin=$(rspsqladminloginname)
             echo $output | jq .
             spokeResourceGroup=$(echo $output | jq -r '.properties.outputs.spokeResourceGroupName.value')
             hubResourceGroup=$(echo $output | jq -r '.properties.outputs.hubResourceGroupName.value')
