@@ -87,6 +87,7 @@ var resourceNames = {
   eventGridSubscription: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.eventGridSubscription )
   azuresqlserver: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azuresqlserver )
   azuresqlserverpep: '${naming.resourceTypeAbbreviations.privateEndpoint}-${replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azuresqlserver)}'
+  azureappconfigurationstore: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.appConfigurationStore )
 }
 
 output resourcesNames object = resourceNames
