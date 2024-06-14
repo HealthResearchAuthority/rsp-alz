@@ -104,7 +104,7 @@ module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
     acrSku: acrTier
     zoneRedundancy: deployZoneRedundantResources ? 'Enabled' : 'Disabled'
     acrAdminUserEnabled: true
-    publicNetworkAccess: acrTier == 'Premium' ? 'Disabled': 'Enabled'
+    publicNetworkAccess: 'Enabled' //Currently we will need this to be open for DevOps to be able to push images to ACR
     networkRuleBypassOptions: 'AzureServices'
     diagnosticWorkspaceId: diagnosticWorkspaceId
     userAssignedIdentities: {

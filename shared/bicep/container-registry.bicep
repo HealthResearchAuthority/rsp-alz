@@ -213,7 +213,7 @@ resource registry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = 
       azureADAuthenticationAsArmPolicy: {
         status: azureADAuthenticationAsArmPolicyStatus
       }
-      exportPolicy: acrSku == 'Premium' ? {
+      exportPolicy: acrSku == 'Premium' && publicNetworkAccess == 'Disabled' ? {
         status: exportPolicyStatus
       } : null
       quarantinePolicy: {
