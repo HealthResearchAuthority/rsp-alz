@@ -273,3 +273,6 @@ output systemAssignedPrincipalId string = systemAssignedIdentity && contains(reg
 
 @description('The location the resource was deployed into.')
 output location string = registry.location
+
+@description('Is Public Access Enabled or Disabled')
+output publicAccess string = registry.properties.publicNetworkAccess
