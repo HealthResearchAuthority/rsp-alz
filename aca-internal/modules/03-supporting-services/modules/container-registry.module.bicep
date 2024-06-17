@@ -155,7 +155,6 @@ output containerRegistryLoginServer string = containerRegistry.outputs.loginServ
 @description('The resource ID of the user assigned managed identity for the container registry to be able to pull images from it.')
 output containerRegistryUserAssignedIdentityId string = containerRegistryUserAssignedIdentity.id
 
-@description('The resource ID of the user assigned managed identity for the container registry to be able to pull images from it.')
-output containerRegistrysecret string = containerRegistry.listCredentials().passwords[0].value
+
 
 
