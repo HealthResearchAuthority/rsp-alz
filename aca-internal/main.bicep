@@ -335,8 +335,8 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 }]
 
-module helloWorlSampleApp 'modules/05-hello-world-sample-app/deploy.hello-world.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-  name: take('helloWorlSampleApp-${deployment().name}-deployment', 64)
+module iraserviceapp 'modules/05-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('iraserviceapp-${deployment().name}-deployment', 64)
   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
   params: {
     location: location
@@ -356,7 +356,7 @@ module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bic
     workloadName: workloadName
     applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
     applicationGatewayFqdn: applicationGatewayFqdn
-    applicationGatewayPrimaryBackendEndFqdn: (deployHelloWorldSample) ? helloWorlSampleApp[i].outputs.helloWorldAppFqdn : '' // To fix issue when hello world is not deployed
+    applicationGatewayPrimaryBackendEndFqdn: (deployHelloWorldSample) ? iraserviceapp[i].outputs.helloWorldAppFqdn : '' // To fix issue when hello world is not deployed
     applicationGatewaySubnetId: spoke[i].outputs.spokeApplicationGatewaySubnetId
     enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
     keyVaultId: supportingServices[i].outputs.keyVaultId
