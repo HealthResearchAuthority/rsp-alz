@@ -27,7 +27,7 @@ param containerAppsEnvironmentId string
 
 @description('The "Hello World" Container App.')
 resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
-  name: helloWorldContainerAppName
+  name: irasServiceCAName
   location: location
   tags: tags
   identity: {
