@@ -72,10 +72,11 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
     template: {
       containers: [
         {
-          name: 'simple-hello'
+          name: 'irasservicecontainer'
           // Production readiness change
           // All workloads should be pulled from your private container registry and not public registries.
-          image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+          //image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+          image: 'crrspacaypvupdevuks.azurecr.io/rsp-irasService:1153'
           resources: {
             cpu: json('0.25')
             memory: '0.5Gi'
