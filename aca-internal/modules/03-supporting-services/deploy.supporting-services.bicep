@@ -89,7 +89,7 @@ module keyVault './modules/key-vault.bicep' = {
   }
 }
 
-@description('Azure Key Vault used to hold items like TLS certs and application secrets that your workload will need.')
+@description('Azure App configuration to hold information required at the application for various environments')
 module appConfiguration './modules/app-configuration.bicep' = {
   name: 'appConfiguration-${uniqueString(resourceGroup().id)}'
   scope: resourceGroup(resourceGroup().name)

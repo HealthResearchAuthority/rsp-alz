@@ -343,6 +343,7 @@ module iraserviceapp 'modules/05-container-app/deploy.container-app.bicep' = [fo
     tags: tags
     containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
     containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
+    acrName: supportingServices[i].outputs.containerRegistryName
   }
 }]
 
