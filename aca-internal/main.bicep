@@ -324,7 +324,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
     spokeVNetName: spoke[i].outputs.spokeVNetName
     spokeInfraSubnetName: spoke[i].outputs.spokeInfraSubnetName
     enableApplicationInsights: true
-    enableDaprInstrumentation: true
+    enableDaprInstrumentation: false
     enableTelemetry: false
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     hubResourceGroupName: varVirtualHubResourceGroup

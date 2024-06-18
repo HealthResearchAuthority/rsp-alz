@@ -128,7 +128,6 @@ module containerRegistryNetwork '../../../../shared/bicep/network/private-networ
   }
 }
 
-
 module containerRegistryPullRoleAssignment '../../../../shared/bicep/role-assignments/role-assignment.bicep' = {
   name: take('containerRegistryPullRoleAssignmentDeployment-${deployment().name}', 64)
   params: {
@@ -136,6 +135,7 @@ module containerRegistryPullRoleAssignment '../../../../shared/bicep/role-assign
     principalId: containerRegistryUserAssignedIdentity.properties.principalId
     resourceId: containerRegistry.outputs.resourceId
     roleDefinitionId: containerRegistryPullRoleGuid
+    principalType: 'ServicePrincipal'
   }
 }
 
