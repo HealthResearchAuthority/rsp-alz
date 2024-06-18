@@ -21,8 +21,8 @@ param containerRegistryUserAssignedIdentityId string
 @description('The resource ID of the existing Container Apps environment in which the Container App will be deployed.')
 param containerAppsEnvironmentId string
 
-@description('Name of the container registry from which Container App to pull images')
-param acrName string
+// @description('Name of the container registry from which Container App to pull images')
+// param acrName string
 
 // ------------------
 // RESOURCES
@@ -58,17 +58,17 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       registries: [
         {
           server: 'crrspacaypvupdevuks.azurecr.io'
-          // username: 'crrspacaypvupdevuks'
-          // passwordSecretRef: 'container-registry-password'
-          identity: containerRegistryUserAssignedIdentityId
+          username: 'crrspacaypvupdevuks'
+          passwordSecretRef: 'container-registry-password'
+          //identity: containerRegistryUserAssignedIdentityId
         }
       ]
-      // secrets: [
-      //   {
-      //     name: 'container-registry-password'
-      //     value: registry.listCredentials().passwords[0].value
-      //   }
-      // ]
+      secrets: [
+        {
+          name: 'container-registry-password'
+          value: 'JxYRGEsMe5j8ZlebQTMdeU1ENQGzFE4fPVKKG0EOoY+ACRDNB+hs'
+        }
+      ]
     }
     environmentId: containerAppsEnvironmentId
     workloadProfileName: 'Consumption'
