@@ -41,6 +41,12 @@ param containerRegistryTier string = ''
 param privateDNSEnabled bool = false
 
 // ------------------
+// Varaibles
+// ------------------
+
+var keyVaultPrivateDnsZoneName = '${environment}.privatelink.vaultcore.azure.net'
+
+// ------------------
 // RESOURCES
 // ------------------
 
@@ -86,6 +92,7 @@ module keyVault './modules/key-vault.bicep' = {
     keyVaultPrivateEndpointName: naming.outputs.resourcesNames.keyVaultPep
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
     privateDNSEnabled: privateDNSEnabled
+    privateDnsZoneName: keyVaultPrivateDnsZoneName
   }
 }
 

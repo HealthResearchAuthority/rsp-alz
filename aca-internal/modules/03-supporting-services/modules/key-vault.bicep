@@ -64,11 +64,12 @@ param diagnosticSettingsName string = ''
 
 param privateDNSEnabled bool = false
 
+param privateDnsZoneName string = ''
+
 // ------------------
 // VARIABLES
 // ------------------
 
-var privateDnsZoneNames = 'privatelink.vaultcore.azure.net'
 var keyVaultResourceName = 'vault'
 
 //var hubVNetIdTokens = split(hubVNetId, '/')
@@ -174,7 +175,7 @@ module keyVaultNetwork '../../../../shared/bicep/network/private-networking-spok
   name: 'keyVaultNetwork-${uniqueString(keyVault.id)}'
   params: {
     location: location
-    azServicePrivateDnsZoneName: privateDnsZoneNames
+    azServicePrivateDnsZoneName: privateDnsZoneName
     azServiceId: keyVault.id
     privateEndpointName: keyVaultPrivateEndpointName
     privateEndpointSubResourceName: keyVaultResourceName
