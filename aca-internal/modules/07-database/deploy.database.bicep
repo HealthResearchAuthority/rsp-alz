@@ -95,7 +95,7 @@ resource SQL_Server 'Microsoft.Sql/servers@2023-05-01-preview' = {
       login: 'nikhil.bharathesh_PA@hra.nhs.uk'
       sid: '9a3eae88-0bf5-41d8-8791-92ddfe098a0b'
       tenantId: '8e1f0aca-d87d-4f20-939e-36243d574267'
-      azureADOnlyAuthentication: false
+      azureADOnlyAuthentication: true
       principalType: 'User'
     }
   }
