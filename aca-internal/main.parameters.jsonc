@@ -11,7 +11,7 @@
     "applicationGatewayCertificateKeyName": {
       "value": "agwcert"
     },
-    "deployHelloWorldSample": {
+    "deployInitialRevision": {
       "value": false
     }
   }

@@ -76,9 +76,6 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       containers: [
         {
           name: 'irasservice'
-          // Production readiness change
-          // All workloads should be pulled from your private container registry and not public registries.
-          //image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
           image: 'crrspacaypvupdevuks.azurecr.io/rsp-irasservice:1153'
           resources: {
             cpu: json('0.5')
@@ -100,4 +97,4 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
 // ------------------
 
 @description('The FQDN of the "Hello World" Container App.')
-output helloWorldAppFqdn string = containerApp.properties.configuration.ingress.fqdn
+output containerAppFqdn string = containerApp.properties.configuration.ingress.fqdn

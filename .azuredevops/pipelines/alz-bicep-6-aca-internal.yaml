@@ -52,7 +52,7 @@ jobs:
               --location $(location) \
               --template-file ./aca-internal/main.bicep \
               --parameters ./aca-internal/main.parameters.jsonc \
-              --parameters deployHelloWorldSample=true parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase)
+              --parameters deployInitialRevision=true parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase)
   - job: deploy
     pool: 
       vmImage: 'ubuntu-latest'
@@ -72,7 +72,7 @@ jobs:
               --location $(location) \
               --template-file ./aca-internal/main.bicep \
               --parameters ./aca-internal/main.parameters.jsonc \
-              --parameters deployHelloWorldSample=true parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase))
+              --parameters deployInitialRevision=true parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase))
             echo $output | jq .
             spokeResourceGroup=$(echo $output | jq -r '.properties.outputs.spokeResourceGroupName.value')
             hubResourceGroup=$(echo $output | jq -r '.properties.outputs.hubResourceGroupName.value')
