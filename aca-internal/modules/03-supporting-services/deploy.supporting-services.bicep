@@ -103,7 +103,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
   params: {
     location: location
     tags: tags
-    configStoreName: naming.outputs.resourcesNames.azureappconfigurationstore
+    configStoreName: '${naming.outputs.resourcesNames.azureappconfigurationstore}-new'
   }
 }
 
