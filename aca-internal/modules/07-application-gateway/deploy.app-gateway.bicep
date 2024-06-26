@@ -29,7 +29,7 @@ param applicationGatewaySubnetId string
 param applicationGatewayPrimaryBackendEndFqdn string
 
 @description('The path to use for Application Gateway\'s backend health probe.')
-param appGatewayBackendHealthProbePath string = '/'
+param appGatewayBackendHealthProbePath string = '/probes/liveness'
 
 @description('Enable or disable Application Gateway certificate (PFX).')
 param enableApplicationGatewayCertificate bool
@@ -306,7 +306,7 @@ module applicationGateway '../../../shared/bicep/network/application-gateway.bic
           minServers: 0
           match: {
             statusCodes: [
-              '200-499'
+              '200-399'
             ]
           }
         }

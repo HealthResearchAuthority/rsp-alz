@@ -22,11 +22,38 @@ param contentType string = 'the-content-type'
 @description('Adds tags for the key-value resources. It\'s optional')
 param tags object = {}
 
+param appConfigurationUserUserAssignedIdentityName string = ''
+
+var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
+
+resource appConfigurationUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: appConfigurationUserUserAssignedIdentityName
+  location: location
+  tags: tags
+}
+
 resource configStore 'Microsoft.AppConfiguration/configurationStores@2021-10-01-preview' = {
   name: configStoreName
   location: location
   sku: {
     name: 'standard'
+  }
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${appConfigurationUserAssignedIdentity.id}': {}
+    }
+  }
+}
+
+module appConfigurationDataReaderAssignment '../../../../shared/bicep/role-assignments/role-assignment.bicep' = {
+  name: take('appConfigurationDataReaderAssignmentDeployment-${deployment().name}', 64)
+  params: {
+    name: 'ra-appConfigurationDataReaderRoleAssignment'
+    principalId: appConfigurationUserAssignedIdentity.properties.principalId
+    resourceId: configStore.id
+    roleDefinitionId: appConfigurationDataReaderRoleGUID
+    principalType: 'ServicePrincipal'
   }
 }
 
@@ -39,3 +66,6 @@ resource configStoreKeyValue 'Microsoft.AppConfiguration/configurationStores/key
     tags: tags
   }
 }]
+
+@description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
+output appConfigurationUserAssignedIdentityId string = appConfigurationUserAssignedIdentity.id

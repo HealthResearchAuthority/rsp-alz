@@ -27,8 +27,6 @@ type virtualWanOptionsType = ({
 
   @sys.description('The Virtual WAN Hub routing intent destinations, leave empty if not wanting to enable routing intent. The allowed values are `Internet`, `PrivateTraffic`.')
   parVirtualHubRoutingIntentDestinations: [
-    'Internet'
-    'PrivateTraffic'
   ]
 
   @sys.description('This parameter is used to specify a custom name for the VPN Gateway.')
@@ -130,7 +128,7 @@ param parVirtualWanHubs virtualWanOptionsType = [ {
     parVpnGatewayEnabled: false
     parExpressRouteGatewayEnabled: false
     parAzFirewallEnabled: true
-    parVirtualHubAddressPrefix: '10.0.0.0/8'
+    parVirtualHubAddressPrefix: '10.1.0.0/8'
     parHubLocation: parLocation
     parHubRoutingPreference: 'ExpressRoute'
     parVirtualRouterAutoScaleConfiguration: 2
@@ -209,7 +207,7 @@ param parVpnGatewayScaleUnit int = 1
 param parExpressRouteGatewayScaleUnit int = 1
 
 @sys.description('Switch to enable/disable DDoS Network Protection deployment.')
-param parDdosEnabled bool = true
+param parDdosEnabled bool = false
 
 @sys.description('DDoS Plan Name.')
 param parDdosPlanName string = '${parCompanyPrefix}-ddos-plan'

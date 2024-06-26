@@ -116,6 +116,20 @@
                 "priority": 150,
                 "direction": "Outbound"
             }
+        },
+        {
+            "name": "Allow_ContainerApps_Container_Registry",
+            "properties": {
+                "description": "Allowing Container App Env Vnet to reach Container Registry in UK South",
+                "protocol": "*",
+                "sourceAddressPrefix": "VirtualNetwork",
+                "sourcePortRange": "*",
+                "destinationAddressPrefix": "AzureContainerRegistry.<location>",
+                "destinationPortRange": "*",
+                "access": "Allow",
+                "priority": 160,
+                "direction": "Outbound"
+            }
         }
     ]
 }

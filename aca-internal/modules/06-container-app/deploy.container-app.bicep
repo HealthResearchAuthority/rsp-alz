@@ -15,11 +15,12 @@ param tags object = {}
 @maxLength(32)
 param irasServiceCAName string = 'irasservice'
 
-@description('The resource ID of the existing user-assigned managed identity to be assigned to the Container App to be able to pull images from the container registry.')
-param containerRegistryUserAssignedIdentityId string
-
 @description('The resource ID of the existing Container Apps environment in which the Container App will be deployed.')
 param containerAppsEnvironmentId string
+
+param sqlServerUserAssignedIdentityName string = ''
+param containerRegistryUserAssignedIdentityId string = ''
+param appConfigurationUserAssignedIdentityId string = ''
 
 // @description('Name of the container registry from which Container App to pull images')
 // param acrName string
@@ -32,6 +33,10 @@ param containerAppsEnvironmentId string
 //   name: acrName
 // }
 
+resource sqlServerUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
+  name: sqlServerUserAssignedIdentityName
+}
+
 
 resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   name: irasServiceCAName
@@ -40,7 +45,9 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${containerRegistryUserAssignedIdentityId}': {}
+        '${sqlServerUserAssignedIdentity.id}': {}
+        '${containerRegistryUserAssignedIdentityId}': {}
+        '${appConfigurationUserAssignedIdentityId}': {}
     }
   }
   properties: {
@@ -49,7 +56,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       ingress: {
         allowInsecure: false
         external: true
-        targetPort: 80
+        targetPort: 8080
         transport: 'auto'
         stickySessions: {
           affinity: 'none'
@@ -58,15 +65,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       registries: [
         {
           server: 'crrspacaypvupdevuks.azurecr.io'
-          username: 'crrspacaypvupdevuks'
-          passwordSecretRef: 'container-registry-password'
-          //identity: containerRegistryUserAssignedIdentityId
-        }
-      ]
-      secrets: [
-        {
-          name: 'container-registry-password'
-          value: 'JxYRGEsMe5j8ZlebQTMdeU1ENQGzFE4fPVKKG0EOoY+ACRDNB+hs'
+          identity: containerRegistryUserAssignedIdentityId
         }
       ]
     }
@@ -76,11 +75,62 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       containers: [
         {
           name: 'irasservice'
-          image: 'crrspacaypvupdevuks.azurecr.io/rsp-irasservice:1153'
+          image: 'crrspacaypvupdevuks.azurecr.io/rsp-irasservice:1283'
           resources: {
             cpu: json('0.5')
             memory: '1Gi'
           }
+          env: [
+            {
+              name: 'AZURE_CLIENT_ID'
+              value: sqlServerUserAssignedIdentity.properties.clientId
+            }
+            {
+              name: 'AZURE_TENANT_ID'
+              value: tenant().tenantId
+            }
+          ]
+          probes: [
+            {
+              failureThreshold: 3
+              httpGet: {
+                path: '/probes/liveness'
+                port: 8080
+                scheme: 'http'
+              }
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 1
+              type: 'Liveness'
+            }
+            {
+              failureThreshold: 3
+              httpGet: {
+                path: '/probes/readiness'
+                port: 8080
+                scheme: 'http'
+              }
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 1
+              type: 'readiness'
+            }
+            {
+              failureThreshold: 3
+              httpGet: {
+                path: '/probes/startup'
+                port: 8080
+                scheme: 'http'
+              }
+              initialDelaySeconds: 10
+              periodSeconds: 10
+              successThreshold: 1
+              timeoutSeconds: 1
+              type: 'startup'
+            }
+          ]
         }
       ]
       scale: {

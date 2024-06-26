@@ -49,7 +49,6 @@ param hubResourceGroupName string = ''
 // param hubVNetName string = ''
 
 param privateDNSEnabled bool = false
-param enableDaprInstrumentation bool = true
 
 // ------------------
 // VARIABLES
@@ -112,7 +111,6 @@ module containerAppsEnvironment '../../../shared/bicep/aca-environment.bicep' = 
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
     subnetId: spokeInfraSubnet.id
     vnetEndpointInternal: true
-    appInsightsInstrumentationKey: (enableApplicationInsights && enableDaprInstrumentation) ? applicationInsights.outputs.appInsInstrumentationKey : ''
     zoneRedundant: deployZoneRedundantResources
     infrastructureResourceGroupName: ''
   }

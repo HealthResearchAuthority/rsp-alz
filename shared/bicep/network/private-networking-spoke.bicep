@@ -7,8 +7,8 @@ targetScope = 'resourceGroup'
 @description('Optional. Array of custom objects describing vNet links of the DNS zone. Each object should contain vnetName, vnetId, registrationEnabled')
 param virtualNetworkLinks array = []
 
-@description('if empty, private dns zone will be deployed in the current RG scope')
-param vnetHubResourceId string
+// @description('if empty, private dns zone will be deployed in the current RG scope')
+// param vnetSpokeResourceId string
 
 @description('Resource Id of the subnet, where the private endpoint and NIC will be attached to')
 param subnetId string
@@ -28,14 +28,14 @@ param privateEndpointSubResourceName string
 @description('The region (location) in which the resource will be deployed. Default: resource group location.')
 param location string = resourceGroup().location
 
-var vnetHubSplitTokens = !empty(vnetHubResourceId) ? split(vnetHubResourceId, '/') : array('')
+//var vnetSpokeSplitTokens = !empty(vnetSpokeResourceId) ? split(vnetSpokeResourceId, '/') : array('')
 
 // ------------------
 // RESOURCES
 // ------------------
 
 module privateDnsZone 'private-dns-zone.bicep' = {
-  scope: resourceGroup(vnetHubSplitTokens[2], vnetHubSplitTokens[4])
+  //scope: resourceGroup(vnetSpokeSplitTokens[2], vnetSpokeSplitTokens[4])
   name: 'privateDnsZoneDeployment-${uniqueString(azServiceId, privateEndpointSubResourceName)}'
   params: {
     name: azServicePrivateDnsZoneName

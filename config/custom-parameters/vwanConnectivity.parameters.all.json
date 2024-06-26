@@ -50,7 +50,7 @@
           "parVpnGatewayEnabled": false,
           "parExpressRouteGatewayEnabled": false,
           "parAzFirewallEnabled": true,
-          "parVirtualHubAddressPrefix": "10.0.0.0/16",
+          "parVirtualHubAddressPrefix": "10.1.0.0/16",
           "parHubLocation": "uksouth",
           "parHubRoutingPreference": "ExpressRoute",
           "parVirtualRouterAutoScaleConfiguration": 2,
@@ -58,6 +58,7 @@
         }
       ]
     },
+    
     "parVpnGatewayScaleUnit": {
       "value": 1
     },
@@ -65,7 +66,7 @@
       "value": 1
     },
     "parDdosEnabled": {
-      "value": true
+      "value": false
     },
     "parDdosPlanName": {
       "value": "alz-ddos-plan"

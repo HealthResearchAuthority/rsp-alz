@@ -36,7 +36,7 @@
                 "sourceAddressPrefix": "*",
                 "sourcePortRange": "*",
                 "destinationAddressPrefix": "*",
-                "destinationPortRange": "80",
+                "destinationPortRange": "8080",
                 "access": "Allow",
                 "priority": 120,
                 "direction": "Inbound"
@@ -50,7 +50,7 @@
                 "sourceAddressPrefix": "AzureLoadBalancer",
                 "sourcePortRange": "*",
                 "destinationAddressPrefix": "*",
-                "destinationPortRange": "80",
+                "destinationPortRange": "8080",
                 "access": "Allow",
                 "priority": 130,
                 "direction": "Inbound"

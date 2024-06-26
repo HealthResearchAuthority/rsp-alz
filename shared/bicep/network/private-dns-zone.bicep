@@ -16,7 +16,7 @@ resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
   tags: tags
 }
 
-resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2018-09-01' = [ for vnet in virtualNetworkLinks: {
+resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = [ for vnet in virtualNetworkLinks: {
   //name:  '${privateDnsZone.name}/${vnet.vnetName}-link'
   parent: privateDnsZone
   name:  '${vnet.vnetName}-link'

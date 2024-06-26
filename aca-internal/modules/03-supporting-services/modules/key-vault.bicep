@@ -13,9 +13,6 @@ param keyVaultName string
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
-@description('The resource ID of the Hub Virtual Network.')
-param hubVNetId string
-
 @description('The resource ID of the VNet to which the private endpoint will be connected.')
 param spokeVNetId string
 
@@ -181,7 +178,7 @@ module keyVaultNetwork '../../../../shared/bicep/network/private-networking-spok
     privateEndpointSubResourceName: keyVaultResourceName
     virtualNetworkLinks: spokeVNetLinks
     subnetId: spokePrivateEndpointSubnet.id
-    vnetHubResourceId: hubVNetId
+    //vnetSpokeResourceId: spokeVNetId
   }
 }
 

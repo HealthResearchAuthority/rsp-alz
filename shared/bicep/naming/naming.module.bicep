@@ -86,8 +86,10 @@ var resourceNames = {
   eventGridSystemTopicPep: '${naming.resourceTypeAbbreviations.privateEndpoint}-${replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.eventGridSystemTopic)}'
   eventGridSubscription: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.eventGridSubscription )
   azuresqlserver: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azuresqlserver )
+  sqlServerUserAssignedIdentity:  '${naming.resourceTypeAbbreviations.managedIdentity}-${toLower( replace ( replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azuresqlserver), '-', '' ) )}'
   azuresqlserverpep: '${naming.resourceTypeAbbreviations.privateEndpoint}-${replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azuresqlserver)}'
   azureappconfigurationstore: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.appConfigurationStore )
+  azureappconfigurationstoreUserAssignedIdentity:  '${naming.resourceTypeAbbreviations.managedIdentity}-${toLower( replace ( replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.appConfigurationStore), '-', '' ) )}-DataReader'
 }
 
 output resourcesNames object = resourceNames

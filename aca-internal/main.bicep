@@ -91,10 +91,11 @@ type spokesType = ({
 @description('Optional, default value is true. If true, Azure Policies will be deployed')
 param deployAzurePolicies bool = true
 
+
 param parSpokeNetworks spokesType = [
   {
     subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b' //Development
-    ipRange: '10.1.0.0/16'
+    ipRange: '10.2.0.0/16'
     parEnvironment: 'dev'
     workloadName: 'container-app'
     zoneRedundancy: false
@@ -105,13 +106,13 @@ param parSpokeNetworks spokesType = [
     rgSpokeName: !empty(spokeResourceGroupName) ? spokeResourceGroupName : 'rg-rsp-${workloadName}-spoke-dev-uks'
     subnets: {
       infraSubnet: {
-        addressPrefix: '10.1.0.0/18'
+        addressPrefix: '10.2.0.0/18'
       }
       appGatewaySubnet: {
-        addressPrefix: '10.1.64.0/24'
+        addressPrefix: '10.2.64.0/24'
       }
       privateEndPointSubnet: {
-        addressPrefix: '10.1.65.0/24'
+        addressPrefix: '10.2.65.0/24'
       }
     }
   }
@@ -273,6 +274,18 @@ resource spokeResourceGroup 'Microsoft.Resources/resourceGroups@2020-06-01' = [f
   tags: tags
 }]
 
+@description('User-configured naming rules')
+module naming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('03-sharedNamingDeployment-${deployment().name}', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,spokeResourceGroup[i].name)
+  params: {
+    uniqueId: uniqueString(spokeResourceGroup[i].id)
+    environment: parSpokeNetworks[i].parEnvironment
+    workloadName: workloadName
+    location: location
+  }
+}]
+
 module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('spoke-${deployment().name}-deployment-${i}', 64)
   scope: subscription(parSpokeNetworks[i].subscriptionId)
@@ -305,7 +318,6 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     environment: parSpokeNetworks[i].parEnvironment
     workloadName: workloadName
     spokeVNetId: spoke[i].outputs.spokeVNetId
-    hubVNetId: hubVNetId
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
     containerRegistryTier: parSpokeNetworks[i].containerRegistryTier
@@ -324,7 +336,6 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
     spokeVNetName: spoke[i].outputs.spokeVNetName
     spokeInfraSubnetName: spoke[i].outputs.spokeInfraSubnetName
     enableApplicationInsights: true
-    enableDaprInstrumentation: false
     enableTelemetry: false
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     hubResourceGroupName: varVirtualHubResourceGroup
@@ -335,19 +346,41 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 }]
 
-module iraserviceapp 'modules/05-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+module databaseserver 'modules/05-database/deploy.database.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('database-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
+  params: {
+    location: location
+    sqlServerName: 'rspsqlserver${parSpokeNetworks[i].parEnvironment}'
+    adminLogin: parAdminLogin
+    adminPassword: parSqlAdminPhrase
+    databases : ['applicationservice']
+    environment: parSpokeNetworks[i].parEnvironment
+    spokePrivateEndpointSubnetName: spoke[i].outputs.spokePrivateEndpointsSubnetName
+    spokeVNetId: spoke[i].outputs.spokeVNetId
+    workloadName: workloadName
+    sqlServerUAIName: naming[i].outputs.resourcesNames.sqlServerUserAssignedIdentity
+  }
+}]
+
+module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('iraserviceapp-${deployment().name}-deployment', 64)
   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
   params: {
     location: location
     tags: tags
     containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+    sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
     containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
+    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     //acrName: supportingServices[i].outputs.containerRegistryName
   }
+  dependsOn: [
+    databaseserver
+  ]
 }]
 
-module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+module applicationGateway 'modules/07-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('applicationGateway-${deployment().name}-deployment', 64)
   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
   params: {
@@ -357,30 +390,13 @@ module applicationGateway 'modules/06-application-gateway/deploy.app-gateway.bic
     workloadName: workloadName
     applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
     applicationGatewayFqdn: applicationGatewayFqdn
-    applicationGatewayPrimaryBackendEndFqdn: (deployInitialRevision) ? iraserviceapp[i].outputs.containerAppFqdn : '' // To fix issue when hello world is not deployed
+    applicationGatewayPrimaryBackendEndFqdn: (deployInitialRevision) ? irasserviceapp[i].outputs.containerAppFqdn : '' // To fix issue when hello world is not deployed
     applicationGatewaySubnetId: spoke[i].outputs.spokeApplicationGatewaySubnetId
     enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
     keyVaultId: supportingServices[i].outputs.keyVaultId
     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
     ddosProtectionMode: 'Disabled'
     applicationGatewayLogAnalyticsId: logAnalyticsWorkspaceId
-  }
-}]
-
-module databaseserver 'modules/07-database/deploy.database.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-  name: take('database-${deployment().name}-deployment', 64)
-  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
-  params: {
-    location: location
-    sqlServerName: 'rspsqlserver'
-    adminLogin: parAdminLogin
-    adminPassword: parSqlAdminPhrase
-    databases : ['applicationservice']
-    environment: parSpokeNetworks[i].parEnvironment
-    hubVNetId: hubVNetId
-    spokePrivateEndpointSubnetName: spoke[i].outputs.spokePrivateEndpointsSubnetName
-    spokeVNetId: spoke[i].outputs.spokeVNetId
-    workloadName: workloadName
   }
 }]
 

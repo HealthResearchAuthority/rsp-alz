@@ -19,10 +19,6 @@ param location string = resourceGroup().location
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
-// Hub
-@description('The resource ID of the existing hub virtual network.')
-param hubVNetId string
-
 // Spoke
 @description('The resource ID of the existing spoke virtual network to which the private endpoint will be connected.')
 param spokeVNetId string
@@ -44,7 +40,7 @@ param privateDNSEnabled bool = false
 // Varaibles
 // ------------------
 
-var keyVaultPrivateDnsZoneName = '${environment}.privatelink.vaultcore.azure.net'
+var keyVaultPrivateDnsZoneName = 'privatelink.vaultcore.azure.net'
 
 // ------------------
 // RESOURCES
@@ -69,7 +65,6 @@ module containerRegistry './modules/container-registry.module.bicep' = {
     location: location
     tags: tags
     spokeVNetId: spokeVNetId
-    hubVNetId: hubVNetId
     acrTier: containerRegistryTier
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     containerRegistryPrivateEndpointName: naming.outputs.resourcesNames.containerRegistryPep
@@ -87,7 +82,6 @@ module keyVault './modules/key-vault.bicep' = {
     location: location
     tags: tags
     spokeVNetId: spokeVNetId
-    hubVNetId: hubVNetId
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     keyVaultPrivateEndpointName: naming.outputs.resourcesNames.keyVaultPep
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
@@ -103,7 +97,8 @@ module appConfiguration './modules/app-configuration.bicep' = {
   params: {
     location: location
     tags: tags
-    configStoreName: '${naming.outputs.resourcesNames.azureappconfigurationstore}-new'
+    configStoreName: naming.outputs.resourcesNames.azureappconfigurationstore
+    appConfigurationUserUserAssignedIdentityName: naming.outputs.resourcesNames.azureappconfigurationstoreUserAssignedIdentity
   }
 }
 
@@ -128,3 +123,6 @@ output keyVaultId string = keyVault.outputs.keyVaultId
 
 @description('The name of the Azure Key Vault.')
 output keyVaultName string = keyVault.outputs.keyVaultName
+
+@description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
+ output appConfigurationUserAssignedIdentityId string = appConfiguration.outputs.appConfigurationUserAssignedIdentityId

@@ -85,9 +85,9 @@ var defaultSubnets = [
       networkSecurityGroup: {
         id: nsgContainerAppsEnvironment.outputs.nsgId
       }
-      routeTable: {
-        id: egressLockdownUdr.outputs.resourceId
-      }
+      // routeTable: {
+      //   id: egressLockdownUdr.outputs.resourceId
+      // }
       delegations: [
         {
           name: 'envdelegation'

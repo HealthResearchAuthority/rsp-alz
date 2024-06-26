@@ -31,9 +31,6 @@ param vnetEndpointInternal bool
 @description('Custome vnet configuration for the nevironment. NOTE: Current GA (Feb 2023): The subnet associated with a Container App Environment requires a CIDR prefix of /23 or larger')
 param subnetId string
 
-@description('optional, default is empty. App Insights instrumentation key provided to Dapr for tracing')
-param appInsightsInstrumentationKey string = ''
-
 @description('optional, default is empty. Resource group for the infrastructure resources (e.g. load balancer, public IP, etc.)')
 param infrastructureResourceGroupName string = ''
 
@@ -114,7 +111,6 @@ resource acaEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
   tags: tags
   properties: {
     zoneRedundant: zoneRedundant
-    daprAIInstrumentationKey: appInsightsInstrumentationKey
     vnetConfiguration: {
       internal: vnetEndpointInternal
       infrastructureSubnetId: subnetId

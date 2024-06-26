@@ -29,20 +29,24 @@ param spokeVNetId string
 @description('The name of the subnet in the VNet to which the private endpoint will be connected.')
 param spokePrivateEndpointSubnetName string
 
-@description('The resource ID of the Hub Virtual Network.')
-param hubVNetId string
+@description('Optional. The tags to be assigned to the created resources.')
+param tags object = {}
+
+param sqlServerUAIName string = ''
 
 // ------------------
 // VARIABLES
 // ------------------
 
-var privateDnsZoneNames = '${environment}.privatelink${az.environment().suffixes.sqlServerHostname}'
+var privateDnsZoneNames = 'privatelink${az.environment().suffixes.sqlServerHostname}'
 var sqlServerResourceName = 'sqlServer'
 
 var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
 var spokeResourceGroupName = spokeVNetIdTokens[4]
 var spokeVNetName = spokeVNetIdTokens[8]
+
+var sqlServerContributorRoleGuid='9b7fa17d-e63e-47b0-bb0a-15c516ac86ec'
 
 var spokeVNetLinks = [
   {
@@ -82,10 +86,22 @@ module naming '../../../shared/bicep/naming/naming.module.bicep' = {
   }
 }
 
+resource sqlServerUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: sqlServerUAIName
+  location: location
+  tags: tags
+}
+
 // SQL Server Resource
 resource SQL_Server 'Microsoft.Sql/servers@2023-05-01-preview' = {
   name: sqlServerName
   location: location
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${sqlServerUserAssignedIdentity.id}': {}  
+    }
+  }
   properties: {
     administratorLogin: adminLogin
     administratorLoginPassword: adminPassword
@@ -98,6 +114,18 @@ resource SQL_Server 'Microsoft.Sql/servers@2023-05-01-preview' = {
       azureADOnlyAuthentication: false
       principalType: 'User'
     }
+    primaryUserAssignedIdentityId: sqlServerUserAssignedIdentity.id
+  }
+}
+
+module sqlserveradminRoleAssignment '../../../shared/bicep/role-assignments/role-assignment.bicep' = {
+  name: take('sqlServerContributorRoleAssignmentDeployment-${deployment().name}', 64)
+  params: {
+    name: 'ra-sqlServerContributorRoleAssignment'
+    principalId: sqlServerUserAssignedIdentity.properties.principalId
+    resourceId: SQL_Server.id
+    roleDefinitionId: sqlServerContributorRoleGuid
+    principalType: 'ServicePrincipal'
   }
 }
 
@@ -125,12 +153,14 @@ module sqlServerNetwork '../../../shared/bicep/network/private-networking-spoke.
     privateEndpointSubResourceName: sqlServerResourceName
     virtualNetworkLinks: spokeVNetLinks
     subnetId: spokePrivateEndpointSubnet.id
-    vnetHubResourceId: hubVNetId
+    //vnetSpokeResourceId: spokeVNetId
   }
 }
 
 // Outputs
 output sqlServer_name string = SQL_Server.name
+output outputsqlServerUAIID string = sqlServerUserAssignedIdentity.id
+output outputsqlServerUAIName string = sqlServerUserAssignedIdentity.name
 
 output database_names array = [for i in range(0, length(databases)): {
   id: database[i].name
