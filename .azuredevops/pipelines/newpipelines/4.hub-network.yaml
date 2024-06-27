@@ -1,5 +1,5 @@
 # This workflow will deploy the LZA in ADO
-name: 3.sub-placement-lza-deployment
+name: 4.hub-network-lza-deployment
 
 trigger:
   - main
