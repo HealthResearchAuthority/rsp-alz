@@ -22,7 +22,7 @@ var opsManagementResourceGroupName = 'rg-hra-operationsmanagement'
 //Logging and Sentinel
 var logAnalyticsWorkspaceName = 'hra-rsp-log-analytics'
 var automationAccountName = 'alz-automation-account'
-var logAnalyticsLinkedServiceAutomationAccountName = 'rsp-loganalytics-automation-link'
+var logAnalyticsLinkedServiceAutomationAccountName = 'automation'
 
 @description('Deploy Management Groups')
 module managementGroup 'modules/managementGroups.bicep' = {
