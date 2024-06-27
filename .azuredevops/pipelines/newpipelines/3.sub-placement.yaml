@@ -70,5 +70,4 @@ jobs:
               --name "sub-placement-$(Build.BuildId)" \
               --location $(location) \
               --template-file ./3.sub-placement/main.bicep \
-              --management-group-id $(management-group-id)
-              --verbose)
+              --management-group-id $(management-group-id))
