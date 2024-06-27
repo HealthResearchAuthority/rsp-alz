@@ -7,6 +7,9 @@ metadata description = 'ALZ Bicep Module to set up Management Group structure, u
 @maxLength(10)
 param parTopLevelManagementGroupPrefix string = ''
 
+@sys.description('Optional parent for Management Group hierarchy, used as intermediate root Management Group parent, if specified. If empty, default, will deploy beneath Tenant Root Management Group.')
+param parTopLevelManagementGroupParentId string
+
 // Platform and Child Management Groups
 var varPlatformMg = {
   name: '${parTopLevelManagementGroupPrefix}-platform'
@@ -60,7 +63,8 @@ resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
     details: {
       parent: {
         //id: '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
-        id: tenantResourceId('Microsoft.Management/managementGroups','mg-future-iras')
+        //id: tenantResourceId('Microsoft.Management/managementGroups','mg-future-iras')
+        id: tenantResourceId('Microsoft.Management/managementGroups',parTopLevelManagementGroupParentId)
       }
     }
   }
@@ -73,7 +77,7 @@ resource resLandingZonesMg 'Microsoft.Management/managementGroups@2023-04-01' = 
     displayName: varLandingZoneMg.displayName
     details: {
       parent: {
-        id: tenantResourceId('Microsoft.Management/managementGroups','mg-future-iras')
+        id: tenantResourceId('Microsoft.Management/managementGroups',parTopLevelManagementGroupParentId)
       }
     }
   }
@@ -86,7 +90,7 @@ resource resDevelopmentBoxMg 'Microsoft.Management/managementGroups@2023-04-01' 
     displayName: varDevelopmentboxMg.displayName
     details: {
       parent: {
-        id: tenantResourceId('Microsoft.Management/managementGroups','mg-future-iras')
+        id: tenantResourceId('Microsoft.Management/managementGroups',parTopLevelManagementGroupParentId)
       }
     }
   }

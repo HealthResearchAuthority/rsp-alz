@@ -16,7 +16,7 @@ param managementSubscriptionId string =  ''
 
 //Management Group
 var topLevelManagementGroupPrefix = 'mg-rsp'
-//var topLevelManagementGroupParentId = 'mg-future-iras'
+var topLevelManagementGroupParentId = 'mg-future-iras'
 var opsManagementResourceGroupName = 'rg-hra-operationsmanagement'
 
 //Logging and Sentinel
@@ -29,6 +29,7 @@ module managementGroup 'modules/managementGroups.bicep' = {
   name: take('01-managementGroup-${deployment().name}', 64)
   params: {
     parTopLevelManagementGroupPrefix: topLevelManagementGroupPrefix
+    parTopLevelManagementGroupParentId: topLevelManagementGroupParentId
   }
 }
 
