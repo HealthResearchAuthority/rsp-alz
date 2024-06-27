@@ -7,9 +7,6 @@ metadata description = 'ALZ Bicep Module to set up Management Group structure, u
 @maxLength(10)
 param parTopLevelManagementGroupPrefix string = ''
 
-@sys.description('Optional parent for Management Group hierarchy, used as intermediate root Management Group parent, if specified. If empty, default, will deploy beneath Tenant Root Management Group.')
-param parTopLevelManagementGroupParentId string = ''
-
 // Platform and Child Management Groups
 var varPlatformMg = {
   name: '${parTopLevelManagementGroupPrefix}-platform'
