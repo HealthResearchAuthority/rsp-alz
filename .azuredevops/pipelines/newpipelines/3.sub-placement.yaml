@@ -71,4 +71,4 @@ jobs:
               --location $(location) \
               --template-file ./3.sub-placement/main.bicep \
               --management-group-id $(management-group-id)
-              --verbose
+              --verbose)
