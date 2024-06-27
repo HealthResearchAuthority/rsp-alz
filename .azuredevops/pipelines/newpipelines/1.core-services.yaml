@@ -35,7 +35,7 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
-            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ../../1.core-services/main.bicep
+            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ../../1.core-services/main.bicep --management-group-id $(management-group-id)
 
   - job: preview
     pool: 
@@ -52,6 +52,7 @@ jobs:
             az deployment mg what-if \
               --location $(location) \
               --template-file ./1.core-services/main.bicep
+              --management-group-id $(management-group-id)
   - job: deploy
     pool: 
       vmImage: 'ubuntu-latest'
@@ -70,4 +71,5 @@ jobs:
               --name "core-services-$(Build.BuildId)" \
               --location $(location) \
               --template-file ./1.core-services/main.bicep
+              --management-group-id $(management-group-id)
               --verbose
