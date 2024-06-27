@@ -62,8 +62,8 @@ resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
     displayName: varPlatformMg.displayName
     details: {
       parent: {
-        id: '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
-        //id: tenantResourceId('Microsoft.Management/managementGroups',parTopLevelManagementGroupParentId)
+        //id: '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
+        id: tenantResourceId('Microsoft.Management/managementGroups','mg-future-iras')
       }
     }
   }
@@ -76,7 +76,7 @@ resource resLandingZonesMg 'Microsoft.Management/managementGroups@2023-04-01' = 
     displayName: varLandingZoneMg.displayName
     details: {
       parent: {
-        id: '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
+        id: tenantResourceId('Microsoft.Management/managementGroups','mg-future-iras')
       }
     }
   }
@@ -89,7 +89,7 @@ resource resDevelopmentBoxMg 'Microsoft.Management/managementGroups@2023-04-01' 
     displayName: varDevelopmentboxMg.displayName
     details: {
       parent: {
-        id: '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
+        id: tenantResourceId('Microsoft.Management/managementGroups','mg-future-iras')
       }
     }
   }
