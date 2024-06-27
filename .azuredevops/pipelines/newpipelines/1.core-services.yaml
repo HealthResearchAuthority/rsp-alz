@@ -35,7 +35,7 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
-            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ./1.core-services/main.bicep --management-group-id $(management-group-id)
+            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ./1.core-services/main.bicep --management-group-id $(management-group-id) --parameters managementSubscriptionId=$(managementSubscriptionId)
 
   - job: preview
     pool: 

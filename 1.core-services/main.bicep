@@ -44,9 +44,9 @@ module opsManagementResourceGroup '../shared/bicep/resourceGroup.bicep' = {
   }
 }
 
-@description('Deploy log analytics and sentinel resources')
-module loganalyticsandSentinel 'modules/logging.bicep' = {
-  name: take('03-loggingAndSentinel-${deployment().name}', 64)
+@description('Deploy log analytics')
+module loganalytics 'modules/logging.bicep' = {
+  name: take('03-logging-${deployment().name}', 64)
   scope: resourceGroup(managementSubscriptionId,opsManagementResourceGroupName)
   params: {
     parLogAnalyticsWorkspaceName: logAnalyticsWorkspaceName
@@ -56,13 +56,13 @@ module loganalyticsandSentinel 'modules/logging.bicep' = {
   }
 }
 
-@description('Deploy log analytics and sentinel resources')
-module diagnostics 'modules/diagnostics/mgDiagSettingsAll.bicep' = {
-  name: take('04-diagnostics-${deployment().name}', 64)
-  params: {
-    parTopLevelManagementGroupPrefix: topLevelManagementGroupPrefix
-    parLogAnalyticsWorkspaceResourceId: loganalyticsandSentinel.outputs.outLogAnalyticsWorkspaceId
-  }
-}
+// @description('Deploy log analytics and sentinel resources')
+// module diagnostics 'modules/diagnostics/mgDiagSettingsAll.bicep' = {
+//   name: take('04-diagnostics-${deployment().name}', 64)
+//   params: {
+//     parTopLevelManagementGroupPrefix: topLevelManagementGroupPrefix
+//     parLogAnalyticsWorkspaceResourceId: loganalyticsandSentinel.outputs.outLogAnalyticsWorkspaceId
+//   }
+// }
 
 
