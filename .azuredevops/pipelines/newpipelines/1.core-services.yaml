@@ -31,6 +31,7 @@ jobs:
       - task: AzureCLI@2
         inputs:
           azureSubscription: $(azureServiceConnection)
+          management-group-id: $(management-group-id)
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
