@@ -20,7 +20,7 @@ jobs:
       - checkout: self
 
       # Runs the Bicep linter to ensure build is successful
-      - bash: az bicep build --file ../../4.hub-network/main.bicep
+      - bash: az bicep build --file ./4.hub-network/main.bicep
 
   - job: validate
     pool: 
@@ -34,7 +34,7 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
-            az deployment sub validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ../../4.hub-network/main.bicep
+            az deployment sub validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ./4.hub-network/main.bicep --parameters parConnectivitySubscriptionId=$(connectivitySubscriptionId)  
 
   - job: preview
     pool: 
@@ -50,7 +50,8 @@ jobs:
           inlineScript: |
             az deployment sub what-if \
               --location $(location) \
-              --template-file ../../4.hub-network/main.bicep
+              --template-file ./4.hub-network/main.bicep \
+              --parameters parConnectivitySubscriptionId=$(connectivitySubscriptionId)
   - job: deploy
     pool: 
       vmImage: 'ubuntu-latest'
@@ -68,5 +69,5 @@ jobs:
             output=$(az deployment sub create \
               --name "hub-network-$(Build.BuildId)" \
               --location $(location) \
-              --template-file ../../4.hub-network/main.bicep
-              --verbose
+              --template-file ./4.hub-network/main.bicep \
+              --parameters parConnectivitySubscriptionId=$(connectivitySubscriptionId))
