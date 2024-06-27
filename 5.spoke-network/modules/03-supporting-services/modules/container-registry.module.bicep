@@ -1,0 +1,157 @@
+targetScope = 'resourceGroup'
+
+// ------------------
+//    PARAMETERS
+// ------------------
+
+@description('The location where the resources will be created.')
+param location string = resourceGroup().location
+
+@description('The name of the container registry.')
+param containerRegistryName string
+
+@description('Optional. The tags to be assigned to the created resources.')
+param tags object = {}
+
+@description('The resource ID of the VNet to which the private endpoint will be connected.')
+param spokeVNetId string
+
+@description('The name of the subnet in the VNet to which the private endpoint will be connected.')
+param spokePrivateEndpointSubnetName string
+
+@description('The name of the private endpoint to be created for Azure Container Registry.')
+param containerRegistryPrivateEndpointName string
+
+@description('The name of the user assigned identity to be created to pull image from Azure Container Registry.')
+param containerRegistryUserAssignedIdentityName string
+
+@description('Optional. Resource ID of the diagnostic log analytics workspace.')
+param diagnosticWorkspaceId string = ''
+
+@description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
+param deployZoneRedundantResources bool = true
+
+@description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
+param acrTier string = ''
+
+// ------------------
+// VARIABLES
+// ------------------
+
+var privateDnsZoneNames = 'privatelink.azurecr.io'
+var containerRegistryResourceName = 'registry'
+
+//var hubVNetIdTokens = split(hubVNetId, '/')
+// var hubSubscriptionId = hubVNetIdTokens[2]
+// var hubResourceGroupName = hubVNetIdTokens[4]
+// var hubVNetName = hubVNetIdTokens[8]
+
+var spokeVNetIdTokens = split(spokeVNetId, '/')
+var spokeSubscriptionId = spokeVNetIdTokens[2]
+var spokeResourceGroupName = spokeVNetIdTokens[4]
+var spokeVNetName = spokeVNetIdTokens[8]
+
+var containerRegistryPullRoleGuid='7f951dda-4ed3-4680-a7ca-43fe172d538d'
+var publicAccess = 'Enabled'
+
+var spokeVNetLinks = [
+  {
+    vnetName: spokeVNetName
+    vnetId: vnetSpoke.id
+    registrationEnabled: false
+  }
+  // {
+  //   vnetName: vnetHub.name
+  //   vnetId: vnetHub.id
+  //   registrationEnabled: false
+  // }
+]
+
+// ------------------
+// RESOURCES
+// ------------------
+
+// resource vnetHub  'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
+//   scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
+//   name: hubVNetName
+// }
+
+resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
+  scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
+  name: spokeVNetName
+}
+
+resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-07-01' existing = {
+  parent: vnetSpoke
+  name: spokePrivateEndpointSubnetName
+}
+
+resource containerRegistryUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: containerRegistryUserAssignedIdentityName
+  location: location
+  tags: tags
+}
+
+module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
+  name: take('containerRegistryNameDeployment-${deployment().name}', 64)
+  scope: resourceGroup(spokeSubscriptionId,spokeResourceGroupName)
+  params: {
+    location: location
+    tags: tags    
+    name: containerRegistryName
+    acrSku: acrTier
+    zoneRedundancy: deployZoneRedundantResources ? 'Enabled' : 'Disabled'
+    acrAdminUserEnabled: true
+    publicNetworkAccess: publicAccess //Currently we will need this to be open for DevOps to be able to push images to ACR
+    networkRuleBypassOptions: 'AzureServices'
+    diagnosticWorkspaceId: diagnosticWorkspaceId
+    userAssignedIdentities: {
+      '${containerRegistryUserAssignedIdentity.id}': {}
+    }
+  }
+}
+
+module containerRegistryNetwork '../../../../shared/bicep/network/private-networking-spoke.bicep' = if(acrTier == 'Premium' && publicAccess == 'Disabled') {
+  name:take('containerRegistryNetworkDeployment-${deployment().name}', 64)
+  params: {
+    location: location
+    azServicePrivateDnsZoneName: privateDnsZoneNames
+    azServiceId: containerRegistry.outputs.resourceId
+    privateEndpointName: containerRegistryPrivateEndpointName
+    privateEndpointSubResourceName: containerRegistryResourceName
+    virtualNetworkLinks: spokeVNetLinks
+    subnetId: spokePrivateEndpointSubnet.id
+    //vnetSpokeResourceId: spokeVNetId
+  }
+}
+
+module containerRegistryPullRoleAssignment '../../../../shared/bicep/role-assignments/role-assignment.bicep' = {
+  name: take('containerRegistryPullRoleAssignmentDeployment-${deployment().name}', 64)
+  params: {
+    name: 'ra-containerRegistryPullRoleAssignment'
+    principalId: containerRegistryUserAssignedIdentity.properties.principalId
+    resourceId: containerRegistry.outputs.resourceId
+    roleDefinitionId: containerRegistryPullRoleGuid
+    principalType: 'ServicePrincipal'
+  }
+}
+
+// ------------------
+// OUTPUTS
+// ------------------
+
+@description('The resource ID of the container registry.')
+output containerRegistryId string = containerRegistry.outputs.resourceId
+
+@description('The name of the container registry.')
+output containerRegistryName string = containerRegistry.outputs.name
+
+@description('The name of the container registry login server.')
+output containerRegistryLoginServer string = containerRegistry.outputs.loginServer
+
+@description('The resource ID of the user assigned managed identity for the container registry to be able to pull images from it.')
+output containerRegistryUserAssignedIdentityId string = containerRegistryUserAssignedIdentity.id
+
+
+
+
