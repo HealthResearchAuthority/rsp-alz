@@ -384,7 +384,7 @@ resource resVhubRouteTable 'Microsoft.Network/virtualHubs/hubRouteTables@2023-04
         ]
         destinationType: 'CIDR'
         nextHop: (parVirtualHubEnabled && hub.parAzFirewallEnabled) ? resAzureFirewall[i].id : ''
-        nextHopType: 'ResourceID'
+        nextHopType: 'ResourceId'
       }
     ]
   }

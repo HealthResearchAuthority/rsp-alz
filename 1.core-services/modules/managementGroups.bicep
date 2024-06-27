@@ -54,11 +54,6 @@ var varDevelopmentboxMg = {
   displayName: 'Dev Box'
 }
 
-resource parent 'Microsoft.Management/managementGroups@2023-04-01' existing = {
-  name: parTopLevelManagementGroupParentId
-  scope: tenant()
-}
-
 // Level 2
 resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
   name: varPlatformMg.name
@@ -68,7 +63,7 @@ resource resPlatformMg 'Microsoft.Management/managementGroups@2023-04-01' = {
     details: {
       parent: {
         //id: '/providers/Microsoft.Management/managementGroups/${parTopLevelManagementGroupParentId}'
-        id: parent.id
+        id: tenantResourceId('Microsoft.Management/managementGroups',parTopLevelManagementGroupParentId)
       }
     }
   }
@@ -81,7 +76,7 @@ resource resLandingZonesMg 'Microsoft.Management/managementGroups@2023-04-01' = 
     displayName: varLandingZoneMg.displayName
     details: {
       parent: {
-        id: parent.id
+        id: tenantResourceId('Microsoft.Management/managementGroups',parTopLevelManagementGroupParentId)
       }
     }
   }
@@ -94,7 +89,7 @@ resource resDevelopmentBoxMg 'Microsoft.Management/managementGroups@2023-04-01' 
     displayName: varDevelopmentboxMg.displayName
     details: {
       parent: {
-        id: parent.id
+        id: tenantResourceId('Microsoft.Management/managementGroups',parTopLevelManagementGroupParentId)
       }
     }
   }
