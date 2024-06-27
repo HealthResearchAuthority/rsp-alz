@@ -56,13 +56,13 @@ module loganalytics 'modules/logging.bicep' = {
   }
 }
 
-// @description('Deploy log analytics and sentinel resources')
-// module diagnostics 'modules/diagnostics/mgDiagSettingsAll.bicep' = {
-//   name: take('04-diagnostics-${deployment().name}', 64)
-//   params: {
-//     parTopLevelManagementGroupPrefix: topLevelManagementGroupPrefix
-//     parLogAnalyticsWorkspaceResourceId: loganalyticsandSentinel.outputs.outLogAnalyticsWorkspaceId
-//   }
-// }
+@description('Deploy log analytics and sentinel resources')
+module diagnostics 'modules/diagnostics/mgDiagSettingsAll.bicep' = {
+  name: take('04-diagnostics-${deployment().name}', 64)
+  params: {
+    parTopLevelManagementGroupPrefix: topLevelManagementGroupPrefix
+    parLogAnalyticsWorkspaceResourceId: loganalytics.outputs.outLogAnalyticsWorkspaceId
+  }
+}
 
 
