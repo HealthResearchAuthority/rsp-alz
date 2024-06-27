@@ -20,7 +20,7 @@ jobs:
       - checkout: self
 
       # Runs the Bicep linter to ensure build is successful
-      - bash: az bicep build --file ../../3.sub-placement/main.bicep
+      - bash: az bicep build --file ./3.sub-placement/main.bicep
 
   - job: validate
     pool: 
@@ -34,7 +34,7 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
-            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ../../3.sub-placement/main.bicep
+            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ./3.sub-placement/main.bicep --management-group-id $(management-group-id)
 
   - job: preview
     pool: 
@@ -50,7 +50,8 @@ jobs:
           inlineScript: |
             az deployment mg what-if \
               --location $(location) \
-              --template-file ../../3.sub-placement/main.bicep
+              --template-file ./3.sub-placement/main.bicep \
+              --management-group-id $(management-group-id)
   - job: deploy
     pool: 
       vmImage: 'ubuntu-latest'
@@ -68,5 +69,6 @@ jobs:
             output=$(az deployment mg create \
               --name "sub-placement-$(Build.BuildId)" \
               --location $(location) \
-              --template-file ../../3.sub-placement/main.bicep
+              --template-file ./3.sub-placement/main.bicep \
+              --management-group-id $(management-group-id)
               --verbose
