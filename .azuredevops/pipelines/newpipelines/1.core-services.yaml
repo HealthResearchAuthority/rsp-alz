@@ -72,5 +72,4 @@ jobs:
               --location $(location) \
               --template-file ./1.core-services/main.bicep \
               --management-group-id $(management-group-id) \
-              --parameters managementSubscriptionId=$(managementSubscriptionId) \
-              --verbose)
+              --parameters managementSubscriptionId=$(managementSubscriptionId))
