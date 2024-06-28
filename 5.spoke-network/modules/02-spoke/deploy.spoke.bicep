@@ -62,6 +62,18 @@ param parHubResourceGroup string
 @description('Hub Subscription ID')
 param parHubResourceId string
 
+// @description('Boolean indicating if Spoke VNet to be peered with DevBox VNet')
+// param parDevBoxVNetPeering bool
+
+// @description('DevBox Subscription ID')
+// param parDevBoxVNetPeeringSubscriptionID string = ''
+
+// @description('DevBox Vnet RG Name')
+// param parDevBoxVNetPeeringResourceGroup string = ''
+
+// @description('DevBox Vnet Name')
+// param parDevBoxVNetPeeringVNetName string = ''
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -219,16 +231,38 @@ module egressLockdownUdr '../../../shared/bicep/routeTables/main.bicep' = {
   }
 }
 
-  // Module -  Spoke to Azure Virtual WAN Hub peering.
-  module modhubVirtualNetworkConnection '../../../config/custom-modules/vnetPeeringVwan/hubVirtualNetworkConnection.bicep' = {
-    scope: resourceGroup(parHubSubscriptionId, parHubResourceGroup)
-    name: take('vWanPeering-${deployment().name}', 64)
-    params: {
-      parVirtualWanHubResourceId: parHubResourceId
-      parRemoteVirtualNetworkResourceId: vnetSpoke.outputs.vnetId
-      parEnableInternetSecurity: false
-    }
+// Module -  Spoke to Azure Virtual WAN Hub peering.
+module modhubVirtualNetworkConnection '../../../shared/bicep/network/hubVirtualNetworkConnection.bicep' = {
+  scope: resourceGroup(parHubSubscriptionId, parHubResourceGroup)
+  name: take('vWanPeering-${deployment().name}', 64)
+  params: {
+    parVirtualWanHubResourceId: parHubResourceId
+    parRemoteVirtualNetworkResourceId: vnetSpoke.outputs.vnetId
+    parEnableInternetSecurity: false
   }
+}
+
+// module spoketoDevBoxPeering '../../../shared/bicep/network/peering.bicep' = if(parDevBoxVNetPeering) {
+//   scope: resourceGroup(spokeResourceGroupName)
+//   name:take('spoketoDevBoxPeering-${deployment().name}', 64)
+//   params: {
+//     localVnetName: vnetSpoke.outputs.vnetName
+//     remoteSubscriptionId: parDevBoxVNetPeeringSubscriptionID
+//     remoteRgName: parDevBoxVNetPeeringResourceGroup
+//     remoteVnetName: parDevBoxVNetPeeringVNetName
+//   }
+// }
+
+// module devBoxToSpokePeering '../../../shared/bicep/network/peering.bicep' = if(parDevBoxVNetPeering) {
+//   scope: resourceGroup(parDevBoxVNetPeeringSubscriptionID, parDevBoxVNetPeeringResourceGroup)
+//   name:take('devBoxToSpokePeering-${deployment().name}', 64)
+//   params: {
+//     localVnetName: parDevBoxVNetPeeringVNetName
+//     remoteSubscriptionId: last(split(subscription().id, '/'))!
+//     remoteRgName: spokeResourceGroupName
+//     remoteVnetName: vnetSpoke.name
+//   }
+// }
 
 @description('Assign built-in and custom (container-apps related) policies to the spoke subscription.')
 module policyAssignments './modules/policy/policy-definition.module.bicep' = if (deployAzurePolicies) {
