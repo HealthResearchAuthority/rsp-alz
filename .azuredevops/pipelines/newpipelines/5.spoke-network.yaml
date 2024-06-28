@@ -1,5 +1,5 @@
 # This workflow will deploy the LZA in ADO
-name: LZA_Deployment
+name: 5.spoke-network-lza-deployment
 
 trigger:
   - main
