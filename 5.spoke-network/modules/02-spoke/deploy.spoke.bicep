@@ -242,16 +242,16 @@ module modhubVirtualNetworkConnection '../../../shared/bicep/network/hubVirtualN
   }
 }
 
-module spoketoDevBoxPeering '../../../shared/bicep/network/peering.bicep' = if(parDevBoxVNetPeering) {
-  scope: resourceGroup(spokeResourceGroupName)
-  name:take('spoketoDevBoxPeering-${deployment().name}', 64)
-  params: {
-    localVnetName: vnetSpoke.outputs.vnetName
-    remoteSubscriptionId: parDevBoxVNetPeeringSubscriptionID
-    remoteRgName: parDevBoxVNetPeeringResourceGroup
-    remoteVnetName: parDevBoxVNetPeeringVNetName
-  }
-}
+// module spoketoDevBoxPeering '../../../shared/bicep/network/peering.bicep' = if(parDevBoxVNetPeering) {
+//   scope: resourceGroup(spokeResourceGroupName)
+//   name:take('spoketoDevBoxPeering-${deployment().name}', 64)
+//   params: {
+//     localVnetName: vnetSpoke.outputs.vnetName
+//     remoteSubscriptionId: parDevBoxVNetPeeringSubscriptionID
+//     remoteRgName: parDevBoxVNetPeeringResourceGroup
+//     remoteVnetName: parDevBoxVNetPeeringVNetName
+//   }
+// }
 
 // module devBoxToSpokePeering '../../../shared/bicep/network/peering.bicep' = if(parDevBoxVNetPeering) {
 //   scope: resourceGroup(parDevBoxVNetPeeringSubscriptionID, parDevBoxVNetPeeringResourceGroup)
