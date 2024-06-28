@@ -62,17 +62,17 @@ param parHubResourceGroup string
 @description('Hub Subscription ID')
 param parHubResourceId string
 
-@description('Boolean indicating if Spoke VNet to be peered with DevBox VNet')
-param parDevBoxVNetPeering bool
+// @description('Boolean indicating if Spoke VNet to be peered with DevBox VNet')
+// param parDevBoxVNetPeering bool
 
-@description('DevBox Subscription ID')
-param parDevBoxVNetPeeringSubscriptionID string = ''
+// @description('DevBox Subscription ID')
+// param parDevBoxVNetPeeringSubscriptionID string = ''
 
-@description('DevBox Vnet RG Name')
-param parDevBoxVNetPeeringResourceGroup string = ''
+// @description('DevBox Vnet RG Name')
+// param parDevBoxVNetPeeringResourceGroup string = ''
 
-@description('DevBox Vnet Name')
-param parDevBoxVNetPeeringVNetName string = ''
+// @description('DevBox Vnet Name')
+// param parDevBoxVNetPeeringVNetName string = ''
 
 // ------------------
 // VARIABLES
