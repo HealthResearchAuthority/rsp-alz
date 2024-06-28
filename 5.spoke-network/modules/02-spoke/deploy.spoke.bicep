@@ -246,7 +246,7 @@ module spoketoDevBoxPeering '../../../shared/bicep/network/peering.bicep' = if(p
   scope: resourceGroup(spokeResourceGroupName)
   name:take('spoketoDevBoxPeering-${deployment().name}', 64)
   params: {
-    localVnetName: vnetSpoke.name
+    localVnetName: vnetSpoke.outputs.vnetName
     remoteSubscriptionId: parDevBoxVNetPeeringSubscriptionID
     remoteRgName: parDevBoxVNetPeeringResourceGroup
     remoteVnetName: parDevBoxVNetPeeringVNetName
