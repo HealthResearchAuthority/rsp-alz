@@ -78,7 +78,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       containers: [
         {
           name: 'irasservice'
-          image: 'crrspacaypvupdevuks.azurecr.io/rsp-irasservice:1283'
+          image: 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-irasservice:initialversion'
           resources: {
             cpu: json('0.5')
             memory: '1Gi'
