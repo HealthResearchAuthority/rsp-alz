@@ -7,7 +7,7 @@
 param workloadName string
 
 @description('The name of the environment (e.g. "dev", "test", "prod", "uat", "dr", "qa") Up to 8 characters long.')
-@maxLength(8)
+@maxLength(12)
 param environment string
 
 @description('Location for all Resources.')

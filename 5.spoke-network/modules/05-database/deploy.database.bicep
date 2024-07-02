@@ -15,7 +15,7 @@ param databases array = []
 param location string = resourceGroup().location
 
 @description('The name of the environment (e.g. "dev", "test", "prod", "uat", "dr", "qa"). Up to 8 characters long.')
-@maxLength(8)
+@maxLength(12)
 param environment string
 
 @description('The resource ID of the VNet to which the private endpoint will be connected.')
