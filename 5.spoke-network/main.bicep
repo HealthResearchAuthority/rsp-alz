@@ -139,7 +139,7 @@ param parSpokeNetworks spokesType = [
   // }
   {
     subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379' //System Test Manual
-    ipRange: '10.2.0.0/16'
+    ipRange: '10.3.0.0/16'
     parEnvironment: 'manualtest'
     workloadName: 'container-app'
     zoneRedundancy: false
@@ -154,13 +154,13 @@ param parSpokeNetworks spokesType = [
     rgStorage: 'rg-rsp-storage-spoke-systemtest-uks'
     subnets: {
       infraSubnet: {
-        addressPrefix: '10.2.0.0/18'
+        addressPrefix: '10.3.0.0/18'
       }
       appGatewaySubnet: {
-        addressPrefix: '10.2.64.0/24'
+        addressPrefix: '10.3.64.0/24'
       }
       privateEndPointSubnet: {
-        addressPrefix: '10.2.65.0/24'
+        addressPrefix: '10.3.65.0/24'
       }
     }
   }

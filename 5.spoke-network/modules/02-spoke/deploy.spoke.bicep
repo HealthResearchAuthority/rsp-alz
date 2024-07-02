@@ -54,7 +54,6 @@ param parHubResourceId string
 param resourcesNames object
 
 param spokeNetworkingRGName string
-
 // @description('Boolean indicating if Spoke VNet to be peered with DevBox VNet')
 // param parDevBoxVNetPeering bool
 
