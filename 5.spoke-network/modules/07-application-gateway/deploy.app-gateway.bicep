@@ -4,15 +4,6 @@ targetScope = 'resourceGroup'
 //    PARAMETERS
 // ------------------
 
-@description('The name of the workload that is being deployed. Up to 10 characters long.')
-@minLength(2)
-@maxLength(10)
-param workloadName string
-
-@description('The name of the environment (e.g. "dev", "test", "prod", "uat", "dr", "qa"). Up to 8 characters long.')
-@maxLength(8)
-param environment string
-
 @description('The location where the resources will be created. This needs to be the same region as the spoke.')
 param location string = resourceGroup().location
 
@@ -54,6 +45,8 @@ param deployZoneRedundantResources bool = true
 ])
 param ddosProtectionMode string = 'Disabled'
 
+param networkingResourceNames object
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -76,23 +69,12 @@ var applicationGatewayCertificatePath = 'configuration/acahello.demoapp.com.pfx'
 // RESOURCES
 // ------------------
 
-@description('User-configured naming rules')
-module naming '../../../shared/bicep/naming/naming.module.bicep' = {
-  name: take('06-sharedNamingDeployment-${deployment().name}', 64)
-  params: {
-    uniqueId: uniqueString(resourceGroup().id)
-    environment: environment
-    workloadName: workloadName
-    location: location
-  }
-}
-
 // TODO: Check if this is required if enableApplicationCertificate is false
 @description('A user-assigned managed identity that enables Application Gateway to access Key Vault for its TLS certs.')
 module userAssignedIdentity '../../../shared/bicep/managed-identity.bicep' = {
   name: take('appGwUserAssignedIdentity-Deployment-${uniqueString(resourceGroup().id)}', 64)
   params: {
-    name: naming.outputs.resourcesNames.applicationGatewayUserAssignedIdentity
+    name: networkingResourceNames.applicationGatewayUserAssignedIdentity
     location: location
     tags: tags
   }
@@ -121,7 +103,7 @@ module applicationGatewayPublicIp '../../../shared/bicep/network/pip.bicep' = {
   name: take('applicationGatewayPublicIp-Deployment-${uniqueString(resourceGroup().id)}', 64)
   params: {
     location: location
-    name: naming.outputs.resourcesNames.applicationGatewayPip
+    name: networkingResourceNames.applicationGatewayPip
     tags: tags
     skuName : 'Standard'
     publicIPAllocationMethod: 'Static'
@@ -138,7 +120,7 @@ module applicationGatewayPublicIp '../../../shared/bicep/network/pip.bicep' = {
 module applicationGateway '../../../shared/bicep/network/application-gateway.bicep' = {
   name: take('applicationGateway-Deployment-${uniqueString(resourceGroup().id)}', 64)
   params: {
-    name: naming.outputs.resourcesNames.applicationGateway
+    name: networkingResourceNames.applicationGateway
     location: location
     tags: tags
     userAssignedIdentities: {
@@ -224,7 +206,7 @@ module applicationGateway '../../../shared/bicep/network/application-gateway.bic
           pickHostNameFromBackendAddress: true
           requestTimeout: 20
           probe: {
-            id: resourceId('Microsoft.Network/applicationGateways/probes', naming.outputs.resourcesNames.applicationGateway, 'webProbe')
+            id: resourceId('Microsoft.Network/applicationGateways/probes', networkingResourceNames.applicationGateway, 'webProbe')
           }
         }
       }
@@ -236,11 +218,11 @@ module applicationGateway '../../../shared/bicep/network/application-gateway.bic
         properties: {
           frontendIPConfiguration: {
             #disable-next-line use-resource-id-functions
-            id: '${resourceId('Microsoft.Network/applicationGateways', naming.outputs.resourcesNames.applicationGateway)}/frontendIPConfigurations/appGwPublicFrontendIp'
+            id: '${resourceId('Microsoft.Network/applicationGateways', networkingResourceNames.applicationGateway)}/frontendIPConfigurations/appGwPublicFrontendIp'
           }
           frontendPort: {
             #disable-next-line use-resource-id-functions
-            id: '${resourceId('Microsoft.Network/applicationGateways', naming.outputs.resourcesNames.applicationGateway)}/frontendPorts/port_80'
+            id: '${resourceId('Microsoft.Network/applicationGateways', networkingResourceNames.applicationGateway)}/frontendPorts/port_80'
           }
           protocol: 'Http'
           hostnames: []
@@ -253,16 +235,16 @@ module applicationGateway '../../../shared/bicep/network/application-gateway.bic
         properties: {
           frontendIPConfiguration: {
             #disable-next-line use-resource-id-functions
-            id: '${resourceId('Microsoft.Network/applicationGateways', naming.outputs.resourcesNames.applicationGateway)}/frontendIPConfigurations/appGwPublicFrontendIp'
+            id: '${resourceId('Microsoft.Network/applicationGateways', networkingResourceNames.applicationGateway)}/frontendIPConfigurations/appGwPublicFrontendIp'
           }
           frontendPort: {
             #disable-next-line use-resource-id-functions
-            id: '${resourceId('Microsoft.Network/applicationGateways', naming.outputs.resourcesNames.applicationGateway)}/frontendPorts/port_443'
+            id: '${resourceId('Microsoft.Network/applicationGateways', networkingResourceNames.applicationGateway)}/frontendPorts/port_443'
           }
           protocol: 'Https'
           sslCertificate: {
             #disable-next-line use-resource-id-functions
-            id: '${resourceId('Microsoft.Network/applicationGateways', naming.outputs.resourcesNames.applicationGateway)}/sslCertificates/${applicationGatewayFqdn}'
+            id: '${resourceId('Microsoft.Network/applicationGateways', networkingResourceNames.applicationGateway)}/sslCertificates/${applicationGatewayFqdn}'
           }
           hostnames: []
           requireServerNameIndication: false
@@ -278,15 +260,15 @@ module applicationGateway '../../../shared/bicep/network/application-gateway.bic
           priority: 100
           httpListener: {
             #disable-next-line use-resource-id-functions
-            id: '${resourceId('Microsoft.Network/applicationGateways', naming.outputs.resourcesNames.applicationGateway)}/httpListeners/httpListener'
+            id: '${resourceId('Microsoft.Network/applicationGateways', networkingResourceNames.applicationGateway)}/httpListeners/httpListener'
           }
           backendAddressPool: {
             #disable-next-line use-resource-id-functions
-            id: '${resourceId('Microsoft.Network/applicationGateways', naming.outputs.resourcesNames.applicationGateway)}/backendAddressPools/acaServiceBackend'
+            id: '${resourceId('Microsoft.Network/applicationGateways', networkingResourceNames.applicationGateway)}/backendAddressPools/acaServiceBackend'
           }
           backendHttpSettings: {
             #disable-next-line use-resource-id-functions
-            id: '${resourceId('Microsoft.Network/applicationGateways', naming.outputs.resourcesNames.applicationGateway)}/backendHttpSettingsCollection/https'
+            id: '${resourceId('Microsoft.Network/applicationGateways', networkingResourceNames.applicationGateway)}/backendHttpSettingsCollection/https'
           }
         }
       }

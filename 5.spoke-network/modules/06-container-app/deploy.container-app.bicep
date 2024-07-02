@@ -37,12 +37,11 @@ resource sqlServerUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedId
   name: sqlServerUserAssignedIdentityName
 }
 
-
 resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   name: irasServiceCAName
   location: location
   tags: tags
-  identity: {
+  identity: { 
     type: 'UserAssigned'
     userAssignedIdentities: {
         '${sqlServerUserAssignedIdentity.id}': {}
