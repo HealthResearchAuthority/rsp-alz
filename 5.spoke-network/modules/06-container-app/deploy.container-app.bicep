@@ -21,6 +21,7 @@ param containerAppsEnvironmentId string
 param sqlServerUserAssignedIdentityName string = ''
 param containerRegistryUserAssignedIdentityId string = ''
 param appConfigurationUserAssignedIdentityId string = ''
+param storageRG string
 
 // @description('Name of the container registry from which Container App to pull images')
 // param acrName string
@@ -35,6 +36,7 @@ param appConfigurationUserAssignedIdentityId string = ''
 
 resource sqlServerUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: sqlServerUserAssignedIdentityName
+  scope: resourceGroup(storageRG)
 }
 
 resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
