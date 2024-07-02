@@ -300,6 +300,7 @@ var varVirtualHubResourceGroup = (!empty(hubVNetId) && contains(hubVNetId, '/pro
 var varVirtualHubSubscriptionId = (!empty(hubVNetId) && contains(hubVNetId, '/providers/Microsoft.Network/virtualHubs/') ? split(hubVNetId, '/')[2] : '')
 //var varHubVirtualNetworkName = (!empty(hubVNetId) && contains(hubVNetId, '/providers/Microsoft.Network/virtualHubs/') ? split(hubVNetId, '/')[8] : '')
 
+var sqlServerNamePrefix = 'rspsqlserver'
 // ------------------
 // RESOURCES
 // ------------------
@@ -422,6 +423,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     containerRegistryTier: parSpokeNetworks[i].containerRegistryTier
     privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
     resourcesNames: sharedServicesNaming[i].outputs.resourcesNames
+    sqlServerName: sqlServerNamePrefix
   }
 }]
 
@@ -451,7 +453,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [for i in ra
   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgStorage)
   params: {
     location: location
-    sqlServerName: 'rspsqlserver${parSpokeNetworks[i].parEnvironment}'
+    sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
     adminLogin: parAdminLogin
     adminPassword: parSqlAdminPhrase
     databases : ['applicationservice']

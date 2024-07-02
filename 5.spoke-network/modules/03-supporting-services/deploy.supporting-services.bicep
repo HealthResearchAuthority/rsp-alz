@@ -28,6 +28,7 @@ param containerRegistryTier string = ''
 param privateDNSEnabled bool = false
 
 param resourcesNames object
+param sqlServerName string
 
 // ------------------
 // Varaibles
@@ -81,6 +82,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     tags: tags
     configStoreName: resourcesNames.azureappconfigurationstore
     appConfigurationUserUserAssignedIdentityName: resourcesNames.azureappconfigurationstoreUserAssignedIdentity
+    sqlServerName: sqlServerName
   }
 }
 
