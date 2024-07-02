@@ -477,6 +477,7 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     storageRG: parSpokeNetworks[i].rgStorage
     appConfigURL: supportingServices[i].outputs.appConfigURL
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+    containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     //acrName: supportingServices[i].outputs.containerRegistryName
   }
   dependsOn: [

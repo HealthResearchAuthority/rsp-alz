@@ -24,6 +24,7 @@ param appConfigurationUserAssignedIdentityId string = ''
 param storageRG string
 param appConfigURL string
 param appConfigIdentityClientID string
+param containerRegistryLoginServer string
 
 // @description('Name of the container registry from which Container App to pull images')
 // param acrName string
@@ -67,7 +68,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       }
       registries: [
         {
-          server: 'crrspacaypvupdevuks.azurecr.io'
+          server: containerRegistryLoginServer
           identity: containerRegistryUserAssignedIdentityId
         }
       ]
