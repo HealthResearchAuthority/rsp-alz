@@ -72,7 +72,7 @@ resource configStoreKeyValue 'Microsoft.AppConfiguration/configurationStores/key
   parent: configStore
   name: keyValue.name
   properties: {
-    value: keyValue.name
+    value: keyValue.value
   }
 }]
 
