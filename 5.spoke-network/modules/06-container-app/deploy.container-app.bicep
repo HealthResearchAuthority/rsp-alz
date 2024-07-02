@@ -22,6 +22,8 @@ param sqlServerUserAssignedIdentityName string = ''
 param containerRegistryUserAssignedIdentityId string = ''
 param appConfigurationUserAssignedIdentityId string = ''
 param storageRG string
+param appConfigURL string
+param appConfigIdentityClientID string
 
 // @description('Name of the container registry from which Container App to pull images')
 // param acrName string
@@ -89,6 +91,14 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
             {
               name: 'AZURE_TENANT_ID'
               value: tenant().tenantId
+            }
+            {
+              name: 'AzureAppConfiguration__Endpoint'
+              value: appConfigURL
+            }
+            {
+              name: 'AzureAppConfiguration__IdentityClientID'
+              value: appConfigIdentityClientID
             }
           ]
           probes: [

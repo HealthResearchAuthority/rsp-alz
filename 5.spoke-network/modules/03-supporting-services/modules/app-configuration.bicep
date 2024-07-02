@@ -32,7 +32,7 @@ resource appConfigurationUserAssignedIdentity 'Microsoft.ManagedIdentity/userAss
   tags: tags
 }
 
-resource configStore 'Microsoft.AppConfiguration/configurationStores@2021-10-01-preview' = {
+resource configStore 'Microsoft.AppConfiguration/configurationStores@2023-03-01' = {
   name: configStoreName
   location: location
   sku: {
@@ -69,3 +69,6 @@ resource configStoreKeyValue 'Microsoft.AppConfiguration/configurationStores/key
 
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
 output appConfigurationUserAssignedIdentityId string = appConfigurationUserAssignedIdentity.id
+
+output appConfigURL string = configStore.properties.endpoint
+output appConfigMIClientID string = appConfigurationUserAssignedIdentity.properties.clientId
