@@ -347,7 +347,7 @@ module applicationsRG '../shared/bicep/resourceGroup.bicep' = [for i in range(0,
 @description('User-configured naming rules')
 module networkingnaming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('03-sharedNamingDeployment-${deployment().name}', 64)
-  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,networkingRG[i].name)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgNetworking)
   params: {
     uniqueId: uniqueString(networkingRG[i].outputs.outResourceGroupId)
     environment: parSpokeNetworks[i].parEnvironment
@@ -359,7 +359,7 @@ module networkingnaming '../shared/bicep/naming/naming.module.bicep' = [for i in
 @description('User-configured naming rules')
 module sharedServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('sharedNamingDeployment-${deployment().name}', 64)
-  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,sharedServicesRG[i].name)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSharedServices)
   params: {
     uniqueId: uniqueString(sharedServicesRG[i].outputs.outResourceGroupId)
     environment: parSpokeNetworks[i].parEnvironment
@@ -371,7 +371,7 @@ module sharedServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for 
 @description('User-configured naming rules')
 module storageServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('storageServicesNaming-${deployment().name}', 64)
-  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,storageRG[i].name)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgStorage)
   params: {
     uniqueId: uniqueString(storageRG[i].outputs.outResourceGroupId)
     environment: parSpokeNetworks[i].parEnvironment
@@ -384,7 +384,7 @@ module storageServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for
 @description('User-configured naming rules')
 module applicationServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('applicationServicesNaming-${deployment().name}', 64)
-  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,applicationsRG[i].name)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgapplications)
   params: {
     uniqueId: uniqueString(applicationsRG[i].outputs.outResourceGroupId)
     environment: parSpokeNetworks[i].parEnvironment
