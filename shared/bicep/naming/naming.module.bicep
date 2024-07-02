@@ -2,7 +2,7 @@
 //    PARAMETERS
 // ------------------
 @minLength(2)
-@maxLength(10)
+@maxLength(12)
 @description('The name of the workloard that is being deployed. Up to 10 characters long.')
 param workloadName string
 

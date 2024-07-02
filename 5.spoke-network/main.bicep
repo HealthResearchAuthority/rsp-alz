@@ -351,7 +351,7 @@ module networkingnaming '../shared/bicep/naming/naming.module.bicep' = [for i in
   params: {
     uniqueId: uniqueString(networkingRG[i].outputs.outResourceGroupId)
     environment: parSpokeNetworks[i].parEnvironment
-    workloadName: workloadName
+    workloadName: 'networking'
     location: location
   }
 }]
@@ -363,7 +363,7 @@ module sharedServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for 
   params: {
     uniqueId: uniqueString(sharedServicesRG[i].outputs.outResourceGroupId)
     environment: parSpokeNetworks[i].parEnvironment
-    workloadName: workloadName
+    workloadName: 'shared'
     location: location
   }
 }]
@@ -380,7 +380,6 @@ module storageServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for
   }
 }]
 
-
 @description('User-configured naming rules')
 module applicationServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('applicationServicesNaming-${deployment().name}', 64)
@@ -388,7 +387,7 @@ module applicationServicesNaming '../shared/bicep/naming/naming.module.bicep' = 
   params: {
     uniqueId: uniqueString(applicationsRG[i].outputs.outResourceGroupId)
     environment: parSpokeNetworks[i].parEnvironment
-    workloadName: workloadName
+    workloadName: 'applications'
     location: location
   }
 }]
