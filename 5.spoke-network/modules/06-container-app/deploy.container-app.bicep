@@ -19,7 +19,6 @@ param irasServiceCAName string = 'irasservice'
 param containerAppsEnvironmentId string
 
 param sqlServerUserAssignedIdentityName string = ''
-param sqlServerName string
 param containerRegistryUserAssignedIdentityId string = ''
 param appConfigurationUserAssignedIdentityId string = ''
 param storageRG string
@@ -37,25 +36,6 @@ param containerRegistryLoginServer string
 // resource registry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
 //   name: acrName
 // }
-
-var keyvalues = [
-  {
-    name: 'AppSettings:AuthSettings:Authority'
-    value: 'https://dev.id.nihr.ac.uk:443/oauth2/token'
-  }
-  {
-    name: 'AppSettings:AuthSettings:ClientId'
-    value: 'aqHE90z281Yff2vf_OTCdlpNSasa'
-  }
-  {
-    name: 'AppSettings:AuthSettings:JwksUri'
-    value: 'https://localhost:56901/jwks'
-  }
-  {
-    name: 'ConnectionStrings:IrasServiceDatabaseConnection'
-    value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=applicationservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
-  }
-]
 
 resource sqlServerUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' existing = {
   name: sqlServerUserAssignedIdentityName
