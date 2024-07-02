@@ -43,6 +43,7 @@ param hubResourceGroupName string = ''
 param privateDNSEnabled bool = false
 
 param resourcesNames object
+param networkRG string
 
 // ------------------
 // VARIABLES
@@ -62,6 +63,7 @@ var telemetryId = '9b4433d6-924a-4c07-b47c-7478619759c7-${location}-acasb'
 
 @description('The existing spoke virtual network.')
 resource spokeVNet 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
+  scope: resourceGroup(networkRG)
   name: spokeVNetName
 }
 

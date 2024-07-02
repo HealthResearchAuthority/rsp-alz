@@ -446,6 +446,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
     privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
     resourcesNames: applicationServicesNaming[i].outputs.resourcesNames
+    networkRG: parSpokeNetworks[i].rgNetworking
   }
 }]
 
