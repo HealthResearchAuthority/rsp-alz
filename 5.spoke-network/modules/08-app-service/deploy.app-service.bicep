@@ -88,7 +88,9 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = {
     systemAssignedIdentity: false
     userAssignedIdentities:  {
       type: 'UserAssigned'
-      '${appConfigmanagedIdentityId}': {}
+      userAssignedIdentities: {
+        '${appConfigmanagedIdentityId}': {}
+      }
     }
     slots: !deploySlot ? [
       {
