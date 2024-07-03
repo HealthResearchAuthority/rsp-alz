@@ -9,8 +9,6 @@ param appServicePlanName string
 param webAppName string 
 
 @description('Required. Name of the managed Identity that will be assigned to the web app.')
-@minLength(3)
-@maxLength(128)
 param appConfigmanagedIdentityId string
 
 @description('Optional S1 is default. Defines the name, tier, size, family and capacity of the App Service Plan. Plans ending to _AZ, are deploying at least three instances in three Availability Zones. EP* is only for functions')
