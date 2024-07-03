@@ -94,11 +94,11 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
               value: tenant().tenantId
             }
             {
-              name: 'AzureAppConfiguration__Endpoint'
+              name: 'AppSettings__AzureAppConfiguration__Endpoint'
               value: appConfigURL
             }
             {
-              name: 'AzureAppConfiguration__IdentityClientID'
+              name: 'AppSettings__AzureAppConfiguration__IdentityClientID'
               value: appConfigIdentityClientID
             }
           ]
