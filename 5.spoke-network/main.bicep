@@ -98,6 +98,9 @@ type spokesType = ({
 
   @description('Boolean to indicate Spoke Vnet Peering with DevBox Vnet')
   devBoxPeering: bool
+
+  @description('Boolean to indicate to deploy web app slot')
+  deployWebAppSlot: bool
   
 })[]
 
@@ -121,10 +124,14 @@ param parSpokeNetworks spokesType = [
   //   rgapplications: 'rg-rsp-applications-spoke-dev-uks'
   //   rgSharedServices: 'rg-rsp-sharedservices-spoke-dev-uks'
   //   rgStorage: 'rg-rsp-storage-spoke-dev-uks'
+  //   deployWebAppSlot: false
   //   subnets: {
   //     infraSubnet: {
   //       addressPrefix: '10.2.0.0/18'
   //     }
+      // webAppSubnet: {
+      //   addressPrefix: '10.2.128.0/18'
+      // }
   //     appGatewaySubnet: {
   //       addressPrefix: '10.2.64.0/24'
   //     }
@@ -148,9 +155,13 @@ param parSpokeNetworks spokesType = [
     rgapplications: 'rg-rsp-applications-spoke-systemtest-uks'
     rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtest-uks'
     rgStorage: 'rg-rsp-storage-spoke-systemtest-uks'
+    deployWebAppSlot: true
     subnets: {
       infraSubnet: {
         addressPrefix: '10.3.0.0/18'
+      }
+      webAppSubnet: {
+        addressPrefix: '10.3.128.0/18'
       }
       appGatewaySubnet: {
         addressPrefix: '10.3.64.0/24'
@@ -398,6 +409,7 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
     spokeApplicationGatewaySubnetAddressPrefix: parSpokeNetworks[i].subnets.appGatewaySubnet.addressPrefix
     spokeInfraSubnetAddressPrefix: parSpokeNetworks[i].subnets.infraSubnet.addressPrefix
     spokePrivateEndpointsSubnetAddressPrefix: parSpokeNetworks[i].subnets.privateEndPointSubnet.addressPrefix
+    spokeWebAppSubnetAddressPrefix: parSpokeNetworks[i].subnets.subnets.webAppSubnet.addressPrefix
     spokeVNetAddressPrefixes: [parSpokeNetworks[i].ipRange]
     networkApplianceIpAddress: networkApplianceIpAddress
     deployAzurePolicies: deployAzurePolicies
@@ -506,21 +518,22 @@ module applicationGateway 'modules/07-application-gateway/deploy.app-gateway.bic
   }
 }]
 
-// module webApp 'modules/08-app-service/deploy.web-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgSpokeName)
-//   name: take('webApp-${deployment().name}-deployment', 64)
-//   params: {
-//     // subnetSpokeAppSvcName: 
-//     // subnetSpokePEPName: 
-//     tags: {
-//     }
-//     //vnetSpokeAddressSpace:
-//     webAppPlanSku: 'B1'
-//     logAnalyticsWsId: logAnalyticsWorkspaceId
-//     parEnvironment: parSpokeNetworks[i].parEnvironment
-//     workloadName: parSpokeNetworks[i].workloadName
-//   }
-// }]
+module webApp 'modules/08-app-service/deploy.app-service.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgapplications)
+  name: take('webApp-${deployment().name}-deployment', 64)
+  params: {
+    tags: {}
+    sku: 'B1'
+    logAnalyticsWsId: logAnalyticsWorkspaceId
+    location: location
+    appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
+    webAppName: applicationServicesNaming[i].outputs.resourcesNames.webApp
+    webAppBaseOs: 'Linux'
+    subnetIdForVnetInjection: spoke[i].outputs.spokeWebAppSubnetId
+    appConfigmanagedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    deploySlot: parSpokeNetworks[i].deployWebAppSlot
+  }
+}]
 
 // ------------------
 // OUTPUTS

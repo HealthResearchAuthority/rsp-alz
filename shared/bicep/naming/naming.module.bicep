@@ -48,6 +48,7 @@ var resourceNames = {
   applicationGatewayUserAssignedIdentity: '${naming.resourceTypeAbbreviations.managedIdentity}-${replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.applicationGateway)}-KeyVaultSecretUser'
   applicationGatewayNsg: '${naming.resourceTypeAbbreviations.networkSecurityGroup}-${replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.applicationGateway)}'
   pepNsg: '${naming.resourceTypeAbbreviations.networkSecurityGroup}-pep'
+  webAppNsg: '${naming.resourceTypeAbbreviations.networkSecurityGroup}-${replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.webApp)}'
   applicationInsights: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.applicationInsights)
   azureFirewall: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.azureFirewall)  
   azureFirewallPip: '${naming.resourceTypeAbbreviations.publicIpAddress}-${replace(namingBaseNoWorkloadName, resourceTypeToken, naming.resourceTypeAbbreviations.azureFirewall)}'  
@@ -90,6 +91,8 @@ var resourceNames = {
   azuresqlserverpep: '${naming.resourceTypeAbbreviations.privateEndpoint}-${replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azuresqlserver)}'
   azureappconfigurationstore: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.appConfigurationStore )
   azureappconfigurationstoreUserAssignedIdentity:  '${naming.resourceTypeAbbreviations.managedIdentity}-${toLower( replace ( replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.appConfigurationStore), '-', '' ) )}-DataReader'
+  appServicePlan: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.appServicePlan)
+  webApp: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.webApp)
 }
 
 output resourcesNames object = resourceNames

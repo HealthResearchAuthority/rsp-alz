@@ -163,14 +163,6 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
   enabled: true
 }]
 
-var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentities) ? 'SystemAssigned,UserAssigned' : 'SystemAssigned') : (!empty(userAssignedIdentities) ? 'UserAssigned' : 'None')
-
-var identity = identityType != 'None' ? {
-  type: identityType
-  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : null
-} : null
-
-
 // ================== //
 // Existing resources //
 // ================== //
@@ -188,7 +180,7 @@ resource slot 'Microsoft.Web/sites/slots@2022-03-01' = {
   location: location
   kind: kind
   tags: tags
-  identity: identity
+  identity: userAssignedIdentities
   properties: {
     serverFarmId: serverFarmResourceId
     clientAffinityEnabled: clientAffinityEnabled

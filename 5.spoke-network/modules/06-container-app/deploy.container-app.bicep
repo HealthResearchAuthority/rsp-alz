@@ -79,7 +79,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       containers: [
         {
           name: 'irasservice'
-          image: '${containerRegistryLoginServer}/rsp-irasservice:initialversion'
+          image: '${containerRegistryLoginServer}/rsp-irasservice:updatedversion'
           resources: {
             cpu: json('0.5')
             memory: '1Gi'
