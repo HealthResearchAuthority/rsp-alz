@@ -409,7 +409,7 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
     spokeApplicationGatewaySubnetAddressPrefix: parSpokeNetworks[i].subnets.appGatewaySubnet.addressPrefix
     spokeInfraSubnetAddressPrefix: parSpokeNetworks[i].subnets.infraSubnet.addressPrefix
     spokePrivateEndpointsSubnetAddressPrefix: parSpokeNetworks[i].subnets.privateEndPointSubnet.addressPrefix
-    spokeWebAppSubnetAddressPrefix: parSpokeNetworks[i].subnets.subnets.webAppSubnet.addressPrefix
+    spokeWebAppSubnetAddressPrefix: parSpokeNetworks[i].subnets.webAppSubnet.addressPrefix
     spokeVNetAddressPrefixes: [parSpokeNetworks[i].ipRange]
     networkApplianceIpAddress: networkApplianceIpAddress
     deployAzurePolicies: deployAzurePolicies
