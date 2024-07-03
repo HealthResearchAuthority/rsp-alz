@@ -142,7 +142,7 @@ param parSpokeNetworks spokesType = [
     ddosProtectionEnabled: 'Disabled'
     containerRegistryTier: 'Premium'
     deploy: false
-    configurePrivateDNS: false
+    configurePrivateDNS: true
     devBoxPeering: false
     rgNetworking: 'rg-rsp-networking-spoke-systemtest-uks'
     rgapplications: 'rg-rsp-applications-spoke-systemtest-uks'
