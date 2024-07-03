@@ -527,7 +527,7 @@ module webApp 'modules/08-app-service/deploy.app-service.bicep' = [for i in rang
     logAnalyticsWsId: logAnalyticsWorkspaceId
     location: location
     appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
-    webAppName: 'irasportal'
+    webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
     webAppBaseOs: 'Linux'
     subnetIdForVnetInjection: spoke[i].outputs.spokeWebAppSubnetId
     appConfigmanagedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
