@@ -189,6 +189,16 @@ var siteConfigConfigurationMap  = {
     netFrameworkVersion: 'v7.0'
     use32BitWorkerProcess: false    
   }
+  windowsNet8 : {
+    metadata :[
+      {
+        name:'CURRENT_STACK'
+        value:'dotnet'
+      }
+    ]
+    netFrameworkVersion: 'v8.0'
+    use32BitWorkerProcess: false    
+  }
   windowsAspNet486 : {
     metadata :[
       {
