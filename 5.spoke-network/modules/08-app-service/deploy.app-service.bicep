@@ -83,7 +83,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = {
     diagnosticWorkspaceId: logAnalyticsWsId   
     virtualNetworkSubnetId: subnetIdForVnetInjection
     appInsightId: appInsights.outputs.appInsResourceId
-    siteConfigSelection:  (webAppBaseOs =~ 'linux') ? 'linuxNet8' : 'windowsNet6'
+    siteConfigSelection:  (webAppBaseOs =~ 'linux') ? 'linuxNet8' : 'windowsNet8'
     hasPrivateLink: !empty (subnetPrivateEndpointId)
     systemAssignedIdentity: false
     userAssignedIdentities:  {

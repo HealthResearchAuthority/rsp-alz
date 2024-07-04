@@ -49,7 +49,7 @@ param storageAccountRequired bool = false
 @description('Optional. Azure Resource Manager ID of the Virtual network and subnet to be joined by Regional VNET Integration. This must be of the form /subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}.')
 param virtualNetworkSubnetId string = ''
 
-@allowed(['windowsNet6', 'windowsNet7', 'windowsAspNet486', 'linuxJava17Se', 'linuxNet8', 'linuxNet7', 'linuxNet6', 'linuxNode18'])
+@allowed(['windowsNet6', 'windowsNet7', 'windowsNet8', 'windowsAspNet486', 'linuxJava17Se', 'linuxNet8', 'linuxNet7', 'linuxNet6', 'linuxNode18'])
 @description('Mandatory. Predefined set of config settings.')
 param siteConfigSelection string 
 
