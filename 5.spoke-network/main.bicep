@@ -109,68 +109,68 @@ param deployAzurePolicies bool = true
 
 
 param parSpokeNetworks spokesType = [
-  {
-    subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b' //Development
-    ipRange: '10.2.0.0/16'
-    parEnvironment: 'dev'
-    workloadName: 'container-app'
-    zoneRedundancy: false
-    ddosProtectionEnabled: 'Disabled'
-    containerRegistryTier: 'Premium'
-    deploy: true
-    configurePrivateDNS: true
-    devBoxPeering: true
-    rgNetworking: 'rg-rsp-networking-spoke-dev-uks'
-    rgapplications: 'rg-rsp-applications-spoke-dev-uks'
-    rgSharedServices: 'rg-rsp-sharedservices-spoke-dev-uks'
-    rgStorage: 'rg-rsp-storage-spoke-dev-uks'
-    deployWebAppSlot: false
-    subnets: {
-      infraSubnet: {
-        addressPrefix: '10.2.0.0/18'
-      }
-      webAppSubnet: {
-        addressPrefix: '10.2.128.0/18'
-      }
-      appGatewaySubnet: {
-        addressPrefix: '10.2.64.0/24'
-      }
-      privateEndPointSubnet: {
-        addressPrefix: '10.2.65.0/24'
-      }
-    }
-  }
   // {
-  //   subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379' //System Test Manual
-  //   ipRange: '10.3.0.0/16'
-  //   parEnvironment: 'manualtest'
+  //   subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b' //Development
+  //   ipRange: '10.2.0.0/16'
+  //   parEnvironment: 'dev'
   //   workloadName: 'container-app'
   //   zoneRedundancy: false
   //   ddosProtectionEnabled: 'Disabled'
   //   containerRegistryTier: 'Premium'
-  //   deploy: false
+  //   deploy: true
   //   configurePrivateDNS: true
-  //   devBoxPeering: false
-  //   rgNetworking: 'rg-rsp-networking-spoke-systemtest-uks'
-  //   rgapplications: 'rg-rsp-applications-spoke-systemtest-uks'
-  //   rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtest-uks'
-  //   rgStorage: 'rg-rsp-storage-spoke-systemtest-uks'
-  //   deployWebAppSlot: true
+  //   devBoxPeering: true
+  //   rgNetworking: 'rg-rsp-networking-spoke-dev-uks'
+  //   rgapplications: 'rg-rsp-applications-spoke-dev-uks'
+  //   rgSharedServices: 'rg-rsp-sharedservices-spoke-dev-uks'
+  //   rgStorage: 'rg-rsp-storage-spoke-dev-uks'
+  //   deployWebAppSlot: false
   //   subnets: {
   //     infraSubnet: {
-  //       addressPrefix: '10.3.0.0/18'
+  //       addressPrefix: '10.2.0.0/18'
   //     }
-  //     webAppSubnet: {
-  //       addressPrefix: '10.3.128.0/18'
-  //     }
+      // webAppSubnet: {
+      //   addressPrefix: '10.2.128.0/18'
+      // }
   //     appGatewaySubnet: {
-  //       addressPrefix: '10.3.64.0/24'
+  //       addressPrefix: '10.2.64.0/24'
   //     }
   //     privateEndPointSubnet: {
-  //       addressPrefix: '10.3.65.0/24'
+  //       addressPrefix: '10.2.65.0/24'
   //     }
   //   }
   // }
+  {
+    subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379' //System Test Manual
+    ipRange: '10.3.0.0/16'
+    parEnvironment: 'manualtest'
+    workloadName: 'container-app'
+    zoneRedundancy: false
+    ddosProtectionEnabled: 'Disabled'
+    containerRegistryTier: 'Premium'
+    deploy: false
+    configurePrivateDNS: true
+    devBoxPeering: false
+    rgNetworking: 'rg-rsp-networking-spoke-systemtest-uks'
+    rgapplications: 'rg-rsp-applications-spoke-systemtest-uks'
+    rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtest-uks'
+    rgStorage: 'rg-rsp-storage-spoke-systemtest-uks'
+    deployWebAppSlot: true
+    subnets: {
+      infraSubnet: {
+        addressPrefix: '10.3.0.0/18'
+      }
+      webAppSubnet: {
+        addressPrefix: '10.3.128.0/18'
+      }
+      appGatewaySubnet: {
+        addressPrefix: '10.3.64.0/24'
+      }
+      privateEndPointSubnet: {
+        addressPrefix: '10.3.65.0/24'
+      }
+    }
+  }
   // {
   //   subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65' //System Test Automated
   //   ipRange: '10.3.0.0/16'

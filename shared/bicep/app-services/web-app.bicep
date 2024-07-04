@@ -221,7 +221,7 @@ var siteConfigConfigurationMap  = {
   }
 }
 
-resource app 'Microsoft.Web/sites@2022-03-01' = {
+resource app 'Microsoft.Web/sites@2022-09-01' = {
   name: name
   location: location
   kind: kind
