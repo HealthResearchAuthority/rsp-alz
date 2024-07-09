@@ -468,7 +468,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [for i in ra
     sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
     adminLogin: parAdminLogin
     adminPassword: parSqlAdminPhrase
-    databases : ['applicationservice']
+    databases : ['applicationservice','identityservice']
     environment: parSpokeNetworks[i].parEnvironment
     spokePrivateEndpointSubnetName: spoke[i].outputs.spokePrivateEndpointsSubnetName
     spokeVNetId: spoke[i].outputs.spokeVNetId
@@ -492,6 +492,30 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     appConfigURL: supportingServices[i].outputs.appConfigURL
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
+    containerAppName: 'irasservice'
+    //acrName: supportingServices[i].outputs.containerRegistryName
+  }
+  dependsOn: [
+    databaseserver
+  ]
+}]
+
+//TODO
+module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('usermanagementapp-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgapplications)
+  params: {
+    location: location
+    tags: tags
+    containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+    sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
+    containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
+    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    storageRG: parSpokeNetworks[i].rgStorage
+    appConfigURL: supportingServices[i].outputs.appConfigURL
+    appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+    containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
+    containerAppName: 'usermanagementservice'
     //acrName: supportingServices[i].outputs.containerRegistryName
   }
   dependsOn: [
