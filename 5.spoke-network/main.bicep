@@ -435,7 +435,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     containerRegistryTier: parSpokeNetworks[i].containerRegistryTier
     privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
     resourcesNames: sharedServicesNaming[i].outputs.resourcesNames
-    sqlServerName: sqlServerNamePrefix
+    sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
   }
 }]
 
@@ -493,6 +493,7 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'irasservice'
+    containertag: 'loggingversion'
     //acrName: supportingServices[i].outputs.containerRegistryName
   }
   dependsOn: [
@@ -516,6 +517,7 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'usermanagementservice'
+    containertag: 'updatedversion'
     //acrName: supportingServices[i].outputs.containerRegistryName
   }
   dependsOn: [
@@ -552,7 +554,7 @@ module webApp 'modules/08-app-service/deploy.app-service.bicep' = [for i in rang
     location: location
     appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
     webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
-    webAppBaseOs: 'Windows'
+    webAppBaseOs: 'Linux'
     subnetIdForVnetInjection: spoke[i].outputs.spokeWebAppSubnetId
     appConfigmanagedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     deploySlot: parSpokeNetworks[i].deployWebAppSlot

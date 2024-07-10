@@ -29,7 +29,7 @@ var keyvalues = [
   }
   {
     name: 'AppSettings:AuthSettings:JwksUri'
-    value: 'https://localhost:56901/jwks'
+    value: 'https://localhost/jwks'
   }
   {
     name: 'ConnectionStrings:IrasServiceDatabaseConnection'

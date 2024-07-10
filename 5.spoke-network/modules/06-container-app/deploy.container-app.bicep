@@ -25,6 +25,7 @@ param storageRG string
 param appConfigURL string
 param appConfigIdentityClientID string
 param containerRegistryLoginServer string
+param containertag string
 
 // @description('Name of the container registry from which Container App to pull images')
 // param acrName string
@@ -79,7 +80,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       containers: [
         {
           name: containerAppName
-          image: '${containerRegistryLoginServer}/rsp-${containerAppName}:updatedversion'
+          image: '${containerRegistryLoginServer}/rsp-${containerAppName}:${containertag}'
           resources: {
             cpu: json('0.5')
             memory: '1Gi'
