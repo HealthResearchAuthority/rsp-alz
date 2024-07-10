@@ -525,24 +525,24 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
   ]
 }]
 
-module applicationGateway 'modules/07-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-  name: take('applicationGateway-${deployment().name}-deployment', 64)
-  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgNetworking)
-  params: {
-    location: location
-    tags: tags
-    applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
-    applicationGatewayFqdn: applicationGatewayFqdn
-    applicationGatewayPrimaryBackendEndFqdn: (deployInitialRevision) ? irasserviceapp[i].outputs.containerAppFqdn : '' // To fix issue when hello world is not deployed
-    applicationGatewaySubnetId: spoke[i].outputs.spokeApplicationGatewaySubnetId
-    enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
-    keyVaultId: supportingServices[i].outputs.keyVaultId
-    deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
-    ddosProtectionMode: 'Disabled'
-    applicationGatewayLogAnalyticsId: logAnalyticsWorkspaceId
-    networkingResourceNames: networkingnaming[i].outputs.resourcesNames
-  }
-}]
+// module applicationGateway 'modules/07-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+//   name: take('applicationGateway-${deployment().name}-deployment', 64)
+//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgNetworking)
+//   params: {
+//     location: location
+//     tags: tags
+//     applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
+//     applicationGatewayFqdn: applicationGatewayFqdn
+//     applicationGatewayPrimaryBackendEndFqdn: (deployInitialRevision) ? irasserviceapp[i].outputs.containerAppFqdn : '' // To fix issue when hello world is not deployed
+//     applicationGatewaySubnetId: spoke[i].outputs.spokeApplicationGatewaySubnetId
+//     enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
+//     keyVaultId: supportingServices[i].outputs.keyVaultId
+//     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
+//     ddosProtectionMode: 'Disabled'
+//     applicationGatewayLogAnalyticsId: logAnalyticsWorkspaceId
+//     networkingResourceNames: networkingnaming[i].outputs.resourcesNames
+//   }
+// }]
 
 // module webApp 'modules/08-app-service/deploy.app-service.bicep' = [for i in range(0, length(parSpokeNetworks)): {
 //   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgapplications)
