@@ -493,7 +493,7 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'irasservice'
-    containertag: 'updatedversion'
+    containertag: 'loggingversion'
     //acrName: supportingServices[i].outputs.containerRegistryName
   }
   dependsOn: [
