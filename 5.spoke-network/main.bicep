@@ -530,22 +530,22 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
   ]
 }]
 
-// module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgapplications)
-//   name: take('webApp-${deployment().name}-deployment', 64)
-//   params: {
-//     tags: {}
-//     sku: 'B1'
-//     logAnalyticsWsId: logAnalyticsWorkspaceId
-//     location: location
-//     appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
-//     webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
-//     webAppBaseOs: 'Linux'
-//     subnetIdForVnetInjection: spoke[i].outputs.spokeWebAppSubnetId
-//     appConfigmanagedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-//     deploySlot: parSpokeNetworks[i].deployWebAppSlot
-//   }
-// }]
+module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgapplications)
+  name: take('webApp-${deployment().name}-deployment', 64)
+  params: {
+    tags: {}
+    sku: 'B1'
+    logAnalyticsWsId: logAnalyticsWorkspaceId
+    location: location
+    appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
+    webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
+    webAppBaseOs: 'Linux'
+    subnetIdForVnetInjection: spoke[i].outputs.spokeWebAppSubnetId
+    appConfigmanagedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    deploySlot: parSpokeNetworks[i].deployWebAppSlot
+  }
+}]
 
 // module applicationGateway 'modules/07-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
 //   name: take('applicationGateway-${deployment().name}-deployment', 64)
