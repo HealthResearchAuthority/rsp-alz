@@ -502,28 +502,28 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
 }]
 
 //TODO
-// module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-//   name: take('usermanagementapp-${deployment().name}-deployment', 64)
-//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgapplications)
-//   params: {
-//     location: location
-//     tags: tags
-//     containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
-//     sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
-//     containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-//     appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-//     storageRG: parSpokeNetworks[i].rgStorage
-//     appConfigURL: supportingServices[i].outputs.appConfigURL
-//     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
-//     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
-//     containerAppName: 'usermanagementservice'
-//     containertag: 'updatedversion'
-//     //acrName: supportingServices[i].outputs.containerRegistryName
-//   }
-//   dependsOn: [
-//     databaseserver
-//   ]
-// }]
+module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('usermanagementapp-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgapplications)
+  params: {
+    location: location
+    tags: tags
+    containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+    sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
+    containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
+    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    storageRG: parSpokeNetworks[i].rgStorage
+    appConfigURL: supportingServices[i].outputs.appConfigURL
+    appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+    containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
+    containerAppName: 'usermanagementservice'
+    containertag: 'updatedversion'
+    //acrName: supportingServices[i].outputs.containerRegistryName
+  }
+  dependsOn: [
+    databaseserver
+  ]
+}]
 
 // module applicationGateway 'modules/07-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
 //   name: take('applicationGateway-${deployment().name}-deployment', 64)
