@@ -517,7 +517,7 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'usermanagementservice'
-    containertag: 'updatedversion'
+    containertag: 'updatedversion2'
     //acrName: supportingServices[i].outputs.containerRegistryName
   }
   dependsOn: [
