@@ -496,6 +496,7 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     containertag: 'loggingversion'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:ApplicationsServiceUri'
+    sharedservicesRG: parSpokeNetworks[i].rgSharedServices
     //acrName: supportingServices[i].outputs.containerRegistryName
   }
   dependsOn: [
@@ -521,6 +522,7 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     containertag: 'updatedversion2'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:ApplicationsServiceUri'
+    sharedservicesRG: parSpokeNetworks[i].rgSharedServices
     //acrName: supportingServices[i].outputs.containerRegistryName
   }
   dependsOn: [
