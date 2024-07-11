@@ -27,6 +27,9 @@ param appConfigIdentityClientID string
 param containerRegistryLoginServer string
 param containertag string
 
+param configStoreName string
+param webAppURLConfigKey string
+
 // @description('Name of the container registry from which Container App to pull images')
 // param acrName string
 
@@ -152,6 +155,18 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
       }
       volumes: []
     }
+  }
+}
+
+resource configStore 'Microsoft.AppConfiguration/configurationStores@2023-03-01' existing = {
+  name: configStoreName
+}
+
+resource configStoreKeyValue 'Microsoft.AppConfiguration/configurationStores/keyValues@2021-10-01-preview' = {
+  parent: configStore
+  name: webAppURLConfigKey
+  properties: {
+    value: containerApp.properties.configuration.ingress.fqdn
   }
 }
 
