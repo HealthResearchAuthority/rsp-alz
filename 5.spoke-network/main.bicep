@@ -521,7 +521,7 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     containerAppName: 'usermanagementservice'
     containertag: 'updatedversion2'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
-    webAppURLConfigKey: 'AppSettings:ApplicationsServiceUri'
+    webAppURLConfigKey: 'AppSettings:UsersServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
     //acrName: supportingServices[i].outputs.containerRegistryName
   }
