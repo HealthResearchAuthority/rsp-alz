@@ -92,7 +92,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = {
         '${appConfigmanagedIdentityId}': {}
       }
     }
-    slots: !deploySlot ? [
+    slots: deploySlot ? [
       {
         name: slotName
       }
