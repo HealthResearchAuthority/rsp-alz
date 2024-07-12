@@ -31,9 +31,6 @@ param networkApplianceIpAddress string = '10.1.64.4' //Hub firewall IP Address
 @description('Central Log Analytics Workspace ID')
 param logAnalyticsWorkspaceId string = '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-operationsmanagement/providers/Microsoft.OperationalInsights/workspaces/hra-rsp-log-analytics'
 
-@description('Enable or disable the deployment of the Hello World Sample App. If disabled, the Application Gateway will not be deployed.')
-param deployInitialRevision bool
-
 @description('The FQDN of the Application Gateway. Must match the TLS Certificate.')
 param applicationGatewayFqdn string
 
