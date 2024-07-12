@@ -161,7 +161,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
 
 module containerAppURLConfig '../../../shared/bicep/app-configuration/app-config-key-values.bicep' = {
   scope: resourceGroup(sharedservicesRG)
-  name: 'containerAppURLConfig-${webAppURLConfigKey}-${uniqueString(resourceGroup().id)}'
+  name: 'containerAppURLConfig-${guid(resourceGroup().id)}-${uniqueString(resourceGroup().id)}'
   params: {
     configStoreName: configStoreName
     webAppURLConfigKey: webAppURLConfigKey
