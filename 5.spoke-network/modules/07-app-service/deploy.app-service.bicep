@@ -24,6 +24,12 @@ param tags object
 @description('Default is empty. If empty no Private Endpoint will be created for the resoure. Otherwise, the subnet where the private endpoint will be attached to')
 param subnetPrivateEndpointId string = ''
 
+@description('Resource Group where PEP and PEP DNS needs to be deployed')
+param privateEndpointRG string
+
+@description('The resource ID of the VNet to which the private endpoint will be connected.')
+param spokeVNetId string
+
 @description('Kind of server OS of the App Service Plan')
 @allowed([ 'Windows', 'Linux'])
 param webAppBaseOs string
@@ -46,6 +52,11 @@ param deploySlot bool
 // var webAppDnsZoneName = 'privatelink.azurewebsites.net'
 // var appConfigurationDnsZoneName = 'privatelink.azconfig.io'
 var slotName = 'staging'
+
+var spokeVNetIdTokens = split(spokeVNetId, '/')
+var spokeSubscriptionId = spokeVNetIdTokens[2]
+var spokeResourceGroupName = spokeVNetIdTokens[4]
+var spokeVNetName = spokeVNetIdTokens[8]
 
 // resource keyvault 'Microsoft.KeyVault/vaults@2022-11-01' existing = {
 //   name: keyvaultName
@@ -100,10 +111,36 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = {
   }
 }
 
+resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
+  scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
+  name: spokeVNetName
+}
+
+module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = {
+  name:take('containerRegistryNetworkDeployment-${deployment().name}', 64)
+  scope: resourceGroup(privateEndpointRG)
+  params: {
+    location: location
+    azServicePrivateDnsZoneName: 'privatelink.azurewebsites.net'
+    azServiceId: webApp.outputs.resourceId
+    privateEndpointName: take('pep-${webApp.outputs.name}', 64)
+    privateEndpointSubResourceName: webAppName
+    virtualNetworkLinks: [
+      {
+        vnetName: spokeVNetName
+        vnetId: vnetSpoke.id
+        registrationEnabled: false
+      }
+    ]
+    subnetId: subnetPrivateEndpointId
+    //vnetSpokeResourceId: spokeVNetId
+  }
+}
+
 // module webAppPrivateDnsZone '../../../shared/bicep/network/private-dns-zone.bicep' = if ( !empty(subnetPrivateEndpointId)) {
 //   // conditional scope is not working: https://github.com/Azure/bicep/issues/7367
 //   //scope: empty(vnetHubResourceId) ? resourceGroup() : resourceGroup(vnetHubSplitTokens[2], vnetHubSplitTokens[4]) 
-//   scope: resourceGroup(vnetHubSplitTokens[2], vnetHubSplitTokens[4])
+//   scope: resourceGroup(privateEndpointRG)
 //   name: take('${replace(webAppDnsZoneName, '.', '-')}-PrivateDnsZoneDeployment', 64)
 //   params: {
 //     name: webAppDnsZoneName
@@ -112,13 +149,14 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = {
 //   }
 // }
 
-// module peWebApp '../../../shared/bicep/private-endpoint.bicep' = if ( !empty(subnetPrivateEndpointId) && !deployAseV3) {
-//   name:  take('pe-${webAppName}-Deployment', 64)
+// module pepWebApp '../../../shared/bicep/network/private-endpoint.bicep' = if ( !empty(subnetPrivateEndpointId)) {
+//   name:  take('pep-${webAppName}-Deployment', 64)
+//   scope: resourceGroup(privateEndpointRG)
 //   params: {
-//     name: take('pe-${webApp.outputs.name}', 64)
+//     name: take('pep-${webApp.outputs.name}', 64)
 //     location: location
 //     tags: tags
-//     privateDnsZonesId: ( !empty(subnetPrivateEndpointId) && !deployAseV3 ) ? webAppPrivateDnsZone.outputs.privateDnsZonesId : ''
+//     privateDnsZonesId: ( !empty(subnetPrivateEndpointId)) ? webAppPrivateDnsZone.outputs.privateDnsZonesId : ''
 //     privateLinkServiceId: webApp.outputs.resourceId
 //     snetId: subnetPrivateEndpointId
 //     subresource: 'sites'

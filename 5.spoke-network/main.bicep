@@ -541,6 +541,8 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in rang
     subnetIdForVnetInjection: spoke[i].outputs.spokeWebAppSubnetId
     appConfigmanagedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     deploySlot: parSpokeNetworks[i].deployWebAppSlot
+    privateEndpointRG: parSpokeNetworks[i].rgNetworking
+    spokeVNetId: spoke[i].outputs.spokeVNetId
   }
 }]
 
@@ -562,8 +564,6 @@ module applicationGateway 'modules/08-application-gateway/deploy.app-gateway.bic
     networkingResourceNames: networkingnaming[i].outputs.resourcesNames
   }
 }]
-
-
 
 // ------------------
 // OUTPUTS
