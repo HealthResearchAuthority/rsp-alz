@@ -543,6 +543,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in rang
     deploySlot: parSpokeNetworks[i].deployWebAppSlot
     privateEndpointRG: parSpokeNetworks[i].rgNetworking
     spokeVNetId: spoke[i].outputs.spokeVNetId
+    subnetPrivateEndpointSubnetId: spoke[i].outputs.spokePepSubnetId
   }
 }]
 

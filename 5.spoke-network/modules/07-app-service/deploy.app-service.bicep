@@ -24,6 +24,8 @@ param tags object
 @description('Default is empty. If empty no Private Endpoint will be created for the resoure. Otherwise, the subnet where the private endpoint will be attached to')
 param subnetPrivateEndpointId string = ''
 
+param subnetPrivateEndpointSubnetId string
+
 @description('Resource Group where PEP and PEP DNS needs to be deployed')
 param privateEndpointRG string
 
@@ -117,7 +119,7 @@ resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
 }
 
 module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = {
-  name:take('containerRegistryNetworkDeployment-${deployment().name}', 64)
+  name:take('webAppPrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
     location: location
@@ -132,7 +134,7 @@ module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-sp
         registrationEnabled: false
       }
     ]
-    subnetId: subnetPrivateEndpointId
+    subnetId: subnetPrivateEndpointSubnetId
     //vnetSpokeResourceId: spokeVNetId
   }
 }
