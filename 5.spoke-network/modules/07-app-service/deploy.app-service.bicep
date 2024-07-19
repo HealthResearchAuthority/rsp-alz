@@ -126,7 +126,7 @@ module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-sp
     azServicePrivateDnsZoneName: 'privatelink.azurewebsites.net'
     azServiceId: webApp.outputs.resourceId
     privateEndpointName: take('pep-${webApp.outputs.name}', 64)
-    privateEndpointSubResourceName: webAppName
+    privateEndpointSubResourceName: 'sites'
     virtualNetworkLinks: [
       {
         vnetName: spokeVNetName
