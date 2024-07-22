@@ -15,13 +15,8 @@ param databases array = []
 param location string = resourceGroup().location
 
 @description('The name of the environment (e.g. "dev", "test", "prod", "uat", "dr", "qa"). Up to 8 characters long.')
-@maxLength(8)
+@maxLength(12)
 param environment string
-
-@description('The name of the workload that is being deployed. Up to 10 characters long.')
-@minLength(2)
-@maxLength(10)
-param workloadName string
 
 @description('The resource ID of the VNet to which the private endpoint will be connected.')
 param spokeVNetId string
@@ -33,6 +28,9 @@ param spokePrivateEndpointSubnetName string
 param tags object = {}
 
 param sqlServerUAIName string = ''
+
+param networkingResourcesNames object
+param networkingResourceGroup string
 
 // ------------------
 // VARIABLES
@@ -73,17 +71,6 @@ resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
 resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-07-01' existing = {
   parent: vnetSpoke
   name: spokePrivateEndpointSubnetName
-}
-
-@description('User-configured naming rules')
-module naming '../../../shared/bicep/naming/naming.module.bicep' = {
-  name: take('03-sharedNamingDeployment-${deployment().name}', 64)
-  params: {
-    uniqueId: uniqueString(resourceGroup().id)
-    environment: environment
-    workloadName: workloadName
-    location: location
-  }
 }
 
 resource sqlServerUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
@@ -145,11 +132,12 @@ resource database 'Microsoft.Sql/servers/databases@2023-05-01-preview' = [for i 
 
 module sqlServerNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = {
   name: 'sqlServerNetwork-${uniqueString(SQL_Server.id)}'
+  scope: resourceGroup(networkingResourceGroup)
   params: {
     location: location
     azServicePrivateDnsZoneName: privateDnsZoneNames
     azServiceId: SQL_Server.id
-    privateEndpointName: naming.outputs.resourcesNames.azuresqlserverpep
+    privateEndpointName: networkingResourcesNames.azuresqlserverpep
     privateEndpointSubResourceName: sqlServerResourceName
     virtualNetworkLinks: spokeVNetLinks
     subnetId: spokePrivateEndpointSubnet.id

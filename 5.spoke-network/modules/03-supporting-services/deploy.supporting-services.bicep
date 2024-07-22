@@ -4,15 +4,6 @@ targetScope = 'resourceGroup'
 //    PARAMETERS
 // ------------------
 
-@description('The name of the workload that is being deployed. Up to 10 characters long.')
-@minLength(2)
-@maxLength(10)
-param workloadName string
-
-@description('The name of the environment (e.g. "dev", "test", "prod", "uat", "dr", "qa"). Up to 8 characters long.')
-@maxLength(8)
-param environment string
-
 @description('The location where the resources will be created. This needs to be the same region as the spoke.')
 param location string = resourceGroup().location
 
@@ -36,6 +27,9 @@ param containerRegistryTier string = ''
 
 param privateDNSEnabled bool = false
 
+param resourcesNames object
+param sqlServerName string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -46,29 +40,18 @@ var keyVaultPrivateDnsZoneName = 'privatelink.vaultcore.azure.net'
 // RESOURCES
 // ------------------
 
-@description('User-configured naming rules')
-module naming '../../../shared/bicep/naming/naming.module.bicep' = {
-  name: take('03-sharedNamingDeployment-${deployment().name}', 64)
-  params: {
-    uniqueId: uniqueString(resourceGroup().id)
-    environment: environment
-    workloadName: workloadName
-    location: location
-  }
-}
-
 @description('Azure Container Registry, where all workload images should be pulled from.')
 module containerRegistry './modules/container-registry.module.bicep' = {
   name: 'containerRegistry-rsp-${uniqueString(resourceGroup().id)}'
   params: {
-    containerRegistryName: naming.outputs.resourcesNames.containerRegistry
+    containerRegistryName: resourcesNames.containerRegistry
     location: location
     tags: tags
     spokeVNetId: spokeVNetId
     acrTier: containerRegistryTier
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
-    containerRegistryPrivateEndpointName: naming.outputs.resourcesNames.containerRegistryPep
-    containerRegistryUserAssignedIdentityName: naming.outputs.resourcesNames.containerRegistryUserAssignedIdentity
+    containerRegistryPrivateEndpointName: resourcesNames.containerRegistryPep
+    containerRegistryUserAssignedIdentityName: resourcesNames.containerRegistryUserAssignedIdentity
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
     deployZoneRedundantResources: deployZoneRedundantResources
   }
@@ -78,12 +61,12 @@ module containerRegistry './modules/container-registry.module.bicep' = {
 module keyVault './modules/key-vault.bicep' = {
   name: 'keyVault-${uniqueString(resourceGroup().id)}'
   params: {
-    keyVaultName: naming.outputs.resourcesNames.keyVault
+    keyVaultName: resourcesNames.keyVault
     location: location
     tags: tags
     spokeVNetId: spokeVNetId
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
-    keyVaultPrivateEndpointName: naming.outputs.resourcesNames.keyVaultPep
+    keyVaultPrivateEndpointName: resourcesNames.keyVaultPep
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
     privateDNSEnabled: privateDNSEnabled
     privateDnsZoneName: keyVaultPrivateDnsZoneName
@@ -97,8 +80,9 @@ module appConfiguration './modules/app-configuration.bicep' = {
   params: {
     location: location
     tags: tags
-    configStoreName: naming.outputs.resourcesNames.azureappconfigurationstore
-    appConfigurationUserUserAssignedIdentityName: naming.outputs.resourcesNames.azureappconfigurationstoreUserAssignedIdentity
+    configStoreName: resourcesNames.azureappconfigurationstore
+    appConfigurationUserUserAssignedIdentityName: resourcesNames.azureappconfigurationstoreUserAssignedIdentity
+    sqlServerName: sqlServerName
   }
 }
 
@@ -126,3 +110,6 @@ output keyVaultName string = keyVault.outputs.keyVaultName
 
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
  output appConfigurationUserAssignedIdentityId string = appConfiguration.outputs.appConfigurationUserAssignedIdentityId
+
+ output appConfigURL string = appConfiguration.outputs.appConfigURL
+ output appConfigIdentityClientID string = appConfiguration.outputs.appConfigMIClientID

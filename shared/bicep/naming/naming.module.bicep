@@ -2,12 +2,12 @@
 //    PARAMETERS
 // ------------------
 @minLength(2)
-@maxLength(10)
+@maxLength(12)
 @description('The name of the workloard that is being deployed. Up to 10 characters long.')
 param workloadName string
 
 @description('The name of the environment (e.g. "dev", "test", "prod", "uat", "dr", "qa") Up to 8 characters long.')
-@maxLength(8)
+@maxLength(12)
 param environment string
 
 @description('Location for all Resources.')
@@ -48,6 +48,7 @@ var resourceNames = {
   applicationGatewayUserAssignedIdentity: '${naming.resourceTypeAbbreviations.managedIdentity}-${replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.applicationGateway)}-KeyVaultSecretUser'
   applicationGatewayNsg: '${naming.resourceTypeAbbreviations.networkSecurityGroup}-${replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.applicationGateway)}'
   pepNsg: '${naming.resourceTypeAbbreviations.networkSecurityGroup}-pep'
+  webAppNsg: '${naming.resourceTypeAbbreviations.networkSecurityGroup}-${replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.webApp)}'
   applicationInsights: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.applicationInsights)
   azureFirewall: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.azureFirewall)  
   azureFirewallPip: '${naming.resourceTypeAbbreviations.publicIpAddress}-${replace(namingBaseNoWorkloadName, resourceTypeToken, naming.resourceTypeAbbreviations.azureFirewall)}'  
@@ -90,6 +91,8 @@ var resourceNames = {
   azuresqlserverpep: '${naming.resourceTypeAbbreviations.privateEndpoint}-${replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azuresqlserver)}'
   azureappconfigurationstore: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.appConfigurationStore )
   azureappconfigurationstoreUserAssignedIdentity:  '${naming.resourceTypeAbbreviations.managedIdentity}-${toLower( replace ( replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.appConfigurationStore), '-', '' ) )}-DataReader'
+  appServicePlan: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.appServicePlan)
+  webApp: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.webApp)
 }
 
 output resourcesNames object = resourceNames

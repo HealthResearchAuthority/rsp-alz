@@ -3,14 +3,6 @@ targetScope = 'resourceGroup'
 // ------------------
 //    PARAMETERS
 // ------------------
-@description('The name of the workload that is being deployed. Up to 10 characters long.')
-@minLength(2)
-@maxLength(10)
-param workloadName string
-
-@description('The name of the environment (e.g. "dev", "test", "prod", "uat", "dr", "qa"). Up to 8 characters long.')
-@maxLength(8)
-param environment string
 
 @description('The location where the resources will be created. This needs to be the same region as the spoke.')
 param location string = resourceGroup().location
@@ -50,6 +42,9 @@ param hubResourceGroupName string = ''
 
 param privateDNSEnabled bool = false
 
+param resourcesNames object
+param networkRG string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -68,6 +63,7 @@ var telemetryId = '9b4433d6-924a-4c07-b47c-7478619759c7-${location}-acasb'
 
 @description('The existing spoke virtual network.')
 resource spokeVNet 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
+  scope: resourceGroup(networkRG)
   name: spokeVNetName
 }
 
@@ -79,22 +75,11 @@ resource spokeInfraSubnet 'Microsoft.Network/virtualNetworks/subnets@2023-11-01'
 // RESOURCES
 // ------------------
 
-@description('User-configured naming rules')
-module naming '../../../shared/bicep/naming/naming.module.bicep' = {
-  name: take('04-sharedNamingDeployment-${deployment().name}', 64)
-  params: {
-    uniqueId: uniqueString(resourceGroup().id)
-    environment: environment
-    workloadName: workloadName
-    location: location
-  }
-}
-
 @description('Azure Application Insights, the workload\' log & metric sink and APM tool')
 module applicationInsights '../../../shared/bicep/app-insights.bicep' = if (enableApplicationInsights) {
   name: take('applicationInsights-${uniqueString(resourceGroup().id)}', 64)
   params: {
-    name: naming.outputs.resourcesNames.applicationInsights
+    name: resourcesNames.applicationInsights
     location: location
     tags: tags
     workspaceResourceId: logAnalyticsWorkspaceId
@@ -105,7 +90,7 @@ module applicationInsights '../../../shared/bicep/app-insights.bicep' = if (enab
 module containerAppsEnvironment '../../../shared/bicep/aca-environment.bicep' = {
   name: take('containerAppsEnvironment-${uniqueString(resourceGroup().id)}', 64)
   params: {
-    name: naming.outputs.resourcesNames.containerAppsEnvironment
+    name: resourcesNames.containerAppsEnvironment
     location: location
     tags: tags
     diagnosticWorkspaceId: logAnalyticsWorkspaceId

@@ -10,9 +10,6 @@
     },
     "applicationGatewayCertificateKeyName": {
       "value": "agwcert"
-    },
-    "deployInitialRevision": {
-      "value": false
     }
   }
 }

@@ -94,7 +94,6 @@ resource containerRegistryUserAssignedIdentity 'Microsoft.ManagedIdentity/userAs
 
 module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
   name: take('containerRegistryNameDeployment-${deployment().name}', 64)
-  scope: resourceGroup(spokeSubscriptionId,spokeResourceGroupName)
   params: {
     location: location
     tags: tags    

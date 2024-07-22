@@ -52,7 +52,7 @@ jobs:
               --location $(location) \
               --template-file ./5.spoke-network/main.bicep \
               --parameters ./5.spoke-network/main.parameters.jsonc \
-              --parameters deployInitialRevision=true parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase)
+              --parameters parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase)
   - job: deploy
     pool: 
       vmImage: 'ubuntu-latest'
@@ -72,7 +72,7 @@ jobs:
               --location $(location) \
               --template-file ./5.spoke-network/main.bicep \
               --parameters ./5.spoke-network/main.parameters.jsonc \
-              --parameters deployInitialRevision=true parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase))
+              --parameters parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase))
             echo $output | jq .
             spokeResourceGroup=$(echo $output | jq -r '.properties.outputs.spokeResourceGroupName.value')
             hubResourceGroup=$(echo $output | jq -r '.properties.outputs.hubResourceGroupName.value')

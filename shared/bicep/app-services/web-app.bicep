@@ -49,7 +49,7 @@ param storageAccountRequired bool = false
 @description('Optional. Azure Resource Manager ID of the Virtual network and subnet to be joined by Regional VNET Integration. This must be of the form /subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}.')
 param virtualNetworkSubnetId string = ''
 
-@allowed(['windowsNet6', 'windowsNet7', 'windowsAspNet486', 'linuxJava17Se', 'linuxNet7', 'linuxNet6', 'linuxNode18'])
+@allowed(['windowsNet6', 'windowsNet7', 'windowsNet8', 'windowsAspNet486', 'linuxJava17Se', 'linuxNet8', 'linuxNet7', 'linuxNet6', 'linuxNode18'])
 @description('Mandatory. Predefined set of config settings.')
 param siteConfigSelection string 
 
@@ -162,13 +162,6 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
   enabled: true
 }]
 
-var identityType = systemAssignedIdentity ? (!empty(userAssignedIdentities) ? 'SystemAssigned,UserAssigned' : 'SystemAssigned') : (!empty(userAssignedIdentities) ? 'UserAssigned' : 'None')
-
-var identity = identityType != 'None' ? {
-  type: identityType
-  userAssignedIdentities: !empty(userAssignedIdentities) ? userAssignedIdentities : null
-} : null
-
 var webapp_dns_name = '.azurewebsites.net'
 
 // ============ //
@@ -196,6 +189,16 @@ var siteConfigConfigurationMap  = {
     netFrameworkVersion: 'v7.0'
     use32BitWorkerProcess: false    
   }
+  windowsNet8 : {
+    metadata :[
+      {
+        name:'CURRENT_STACK'
+        value:'dotnet'
+      }
+    ]
+    netFrameworkVersion: 'v8.0'
+    use32BitWorkerProcess: false    
+  }
   windowsAspNet486 : {
     metadata :[
       {
@@ -208,6 +211,10 @@ var siteConfigConfigurationMap  = {
   }
   linuxJava17Se: {
     linuxFxVersion: 'JAVA|17-java17'
+    use32BitWorkerProcess: false    
+  }
+  linuxNet8: {
+    linuxFxVersion: 'DOTNETCORE|8.0'
     use32BitWorkerProcess: false    
   }
   linuxNet7: {
@@ -224,12 +231,12 @@ var siteConfigConfigurationMap  = {
   }
 }
 
-resource app 'Microsoft.Web/sites@2022-03-01' = {
+resource app 'Microsoft.Web/sites@2022-09-01' = {
   name: name
   location: location
   kind: kind
   tags: tags
-  identity: identity
+  identity: userAssignedIdentities
   properties: {
     serverFarmId: serverFarmResourceId
     clientAffinityEnabled: clientAffinityEnabled
@@ -253,6 +260,7 @@ resource app 'Microsoft.Web/sites@2022-03-01' = {
     hostNameSslStates: hostNameSslStates
     hyperV: false
     redundancyMode: redundancyMode
+    publicNetworkAccess: 'Disabled'
   }
 }
 
@@ -262,18 +270,6 @@ resource webAppHostBinding 'Microsoft.Web/sites/hostNameBindings@2022-03-01' = i
   properties: {
     siteName: app.name
     hostNameType: 'Verified'
-  }
-}
-
-module app_appsettings 'web-app.appsettings.bicep' = { //if (!empty(appSettingsKeyValuePairs)) {
-  name: 'Site-Config-AppSettings-${uniqueString(deployment().name, location)}'
-  params: {
-    appName: app.name
-    kind: kind
-    storageAccountId: storageAccountId
-    appInsightId: appInsightId
-    setAzureWebJobsDashboard: setAzureWebJobsDashboard
-    appSettingsKeyValuePairs: appSettingsKeyValuePairs
   }
 }
 
