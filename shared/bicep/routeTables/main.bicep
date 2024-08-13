@@ -46,12 +46,13 @@ resource routeTable_lock 'Microsoft.Authorization/locks@2020-05-01' = if (!empty
 module routeTable_roleAssignments '.bicep/nested_roleAssignments.bicep' = [for (roleAssignment, index) in roleAssignments: {
   name: '${uniqueString(deployment().name, location)}-RouteTable-Rbac-${index}'
   params: {
-    description: contains(roleAssignment, 'description') ? roleAssignment.description : ''
+    //description: contains(roleAssignment, 'description') ? roleAssignment.description : ''
+    description: roleAssignment.?description ? roleAssignment.description : ''
     principalIds: roleAssignment.principalIds
-    principalType: contains(roleAssignment, 'principalType') ? roleAssignment.principalType : ''
+    principalType: roleAssignment.?principalType ? roleAssignment.principalType : ''
     roleDefinitionIdOrName: roleAssignment.roleDefinitionIdOrName
-    condition: contains(roleAssignment, 'condition') ? roleAssignment.condition : ''
-    delegatedManagedIdentityResourceId: contains(roleAssignment, 'delegatedManagedIdentityResourceId') ? roleAssignment.delegatedManagedIdentityResourceId : ''
+    condition: roleAssignment.?condition ? roleAssignment.condition : ''
+    delegatedManagedIdentityResourceId: roleAssignment.?delegatedManagedIdentityResourceId ? roleAssignment.delegatedManagedIdentityResourceId : ''
     resourceId: routeTable.id
   }
 }]

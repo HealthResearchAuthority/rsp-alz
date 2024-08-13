@@ -22,9 +22,6 @@ param spokePrivateEndpointSubnetName string
 @description('The name of the private endpoint to be created for Key Vault.')
 param keyVaultPrivateEndpointName string
 
-
-
-
 @description('Optional. Resource ID of the diagnostic storage account. For security reasons, it is recommended to set diagnostic settings to send data to either storage account, log analytics workspace or event hub.')
 param diagnosticStorageAccountId string = ''
 

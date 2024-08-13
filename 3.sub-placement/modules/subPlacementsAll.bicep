@@ -24,9 +24,6 @@ param parLandingZonesNonProdMgdevelopmentSubs array = []
 @sys.description('An array of Subscription IDs to place in the Confidential Corp (Landing Zones) Management Group. Default: Empty Array')
 param parDevBoxMgSubs array = []
 
-@sys.description('Set Parameter to true to Opt-out of deployment telemetry.')
-param parTelemetryOptOut bool = false
-
 param parMgIds object = {}
 
 var varDeploymentNames = {
@@ -39,9 +36,6 @@ var varDeploymentNames = {
   modDevBoxMgSubPlacement: take('modDevBoxMgSubPlacement-${uniqueString(parMgIds.DevBox, string(length(parDevBoxMgSubs)), deployment().name)}', 64)
 }
 
-// Customer Usage Attribution Id
-var varCuaid = 'bb800623-86ff-4ab4-8901-93c2b70967ae'
-
 // Platform Management Groups
 module modPlatformMgSubPlacement 'subscriptionPlacement.bicep' = if (!empty(parPlatformMgSubs)) {
   name: varDeploymentNames.modPlatformMgSubPlacement
@@ -49,7 +43,6 @@ module modPlatformMgSubPlacement 'subscriptionPlacement.bicep' = if (!empty(parP
   params: {
     parTargetManagementGroupId: parMgIds.platform
     parSubscriptionIds: parPlatformMgSubs
-    parTelemetryOptOut: parTelemetryOptOut
     //parTargetManagementGroupName: varMgNames.platform
   }
 }
@@ -60,7 +53,6 @@ module modPlatformManagementMgSubPlacement 'subscriptionPlacement.bicep' = if (!
   params: {
     parTargetManagementGroupId: parMgIds.platformManagement
     parSubscriptionIds: parPlatformManagementMgSubs
-    parTelemetryOptOut: parTelemetryOptOut
     //parTargetManagementGroupName: varMgNames.platformManagement
   }
 }
@@ -71,7 +63,6 @@ module modplatformConnectivityMgSubPlacement 'subscriptionPlacement.bicep' = if 
   params: {
     parTargetManagementGroupId: parMgIds.platformConnectivity
     parSubscriptionIds: parPlatformConnectivityMgSubs
-    parTelemetryOptOut: parTelemetryOptOut
     //parTargetManagementGroupName: varMgNames.platformConnectivity
   }
 }
@@ -82,7 +73,6 @@ module modLandingZonesProdMgSubPlacement 'subscriptionPlacement.bicep' = if (!em
   params: {
     parTargetManagementGroupId: parMgIds.landingZonesProd
     parSubscriptionIds: parLandingZonesProdMgSubs
-    parTelemetryOptOut: parTelemetryOptOut
     //parTargetManagementGroupName: varMgNames.landingZones
   }
 }
@@ -93,7 +83,6 @@ module modLandingZonesNonProdMgSubPlacement 'subscriptionPlacement.bicep' = if (
   params: {
     parTargetManagementGroupId: parMgIds.landingZonesNonProd
     parSubscriptionIds: parLandingZonesNonProdMgSubs
-    parTelemetryOptOut: parTelemetryOptOut
     //parTargetManagementGroupName: varMgNames.landingZonesNonProd
   }
 }
@@ -104,7 +93,6 @@ module modLandingZonesNonProdMgDevelopmentSubPlacement 'subscriptionPlacement.bi
   params: {
     parTargetManagementGroupId: parMgIds.landingZonesNonProdDevelopment
     parSubscriptionIds: parLandingZonesNonProdMgdevelopmentSubs
-    parTelemetryOptOut: parTelemetryOptOut
     //parTargetManagementGroupName: varMgNames.landingZonesNonProd
   }
 }
@@ -116,13 +104,5 @@ module modDevBoxMgSubPlacement 'subscriptionPlacement.bicep' = if (!empty(parDev
   params: {
     parTargetManagementGroupId: parMgIds.DevBox
     parSubscriptionIds: parDevBoxMgSubs
-    parTelemetryOptOut: parTelemetryOptOut
   }
-}
-
-// Optional Deployment for Customer Usage Attribution
-module modCustomerUsageAttribution '../../config/custom-modules/CRML/customerUsageAttribution/cuaIdManagementGroup.bicep' = if (!parTelemetryOptOut) {
-  #disable-next-line no-loc-expr-outside-params //Only to ensure telemetry data is stored in same location as deployment. See https://github.com/Azure/ALZ-Bicep/wiki/FAQ#why-are-some-linter-rules-disabled-via-the-disable-next-line-bicep-function for more information
-  name: 'pid-${varCuaid}-${uniqueString(deployment().location)}'
-  params: {}
 }

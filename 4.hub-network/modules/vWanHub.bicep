@@ -306,16 +306,6 @@ param parPrivateDnsZones array = []
 @sys.description('Tags you would like to be applied to all resources in this module.')
 param parTags object = {}
 
-@sys.description('Set Parameter to true to Opt-out of deployment telemetry')
-param parTelemetryOptOut bool = false
-
-// Customer Usage Attribution Id Telemetry
-var varCuaid = '7f94f23b-7a59-4a5c-9a8d-2a253a566f61'
-
-// ZTN Telemetry
-var varZtnP1CuaId = '3ab23b1e-c5c5-42d4-b163-1402384ba2db'
-var varZtnP1Trigger = (parDdosEnabled && !(contains(map(parVirtualWanHubs, hub => hub.parAzFirewallEnabled), false)) && (parAzFirewallTier == 'Premium')) ? true : false
-
 // Azure Firewalls in Hubs
 var varAzureFirewallInHubs = filter(parVirtualWanHubs, hub => hub.parAzFirewallEnabled == true)
 
@@ -575,17 +565,6 @@ module privateDNSZones '../../shared/bicep/network/private-dns-zone.bicep' =[ fo
     name: privateDNSZoneName
   }
 }]
-
-// Optional Deployments for Customer Usage Attribution
-module modCustomerUsageAttribution '../../config/custom-modules/CRML/customerUsageAttribution/cuaIdResourceGroup.bicep' = if (!parTelemetryOptOut) {
-  name: 'pid-${varCuaid}-${uniqueString(parLocation)}'
-  params: {}
-}
-
-module modCustomerUsageAttributionZtnP1 '../../config/custom-modules/CRML/customerUsageAttribution/cuaIdResourceGroup.bicep' = if (!parTelemetryOptOut && varZtnP1Trigger) {
-  name: 'pid-${varZtnP1CuaId}-${uniqueString(parLocation)}'
-  params: {}
-}
 
 // Output Virtual WAN name and ID
 output outVirtualWanName string = resVwan.name

@@ -86,7 +86,7 @@ resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   name: guid(routeTable.id, principalId, roleDefinitionIdOrName)
   properties: {
     description: description
-    roleDefinitionId: contains(builtInRoleNames, roleDefinitionIdOrName) ? builtInRoleNames[roleDefinitionIdOrName] : roleDefinitionIdOrName
+    roleDefinitionId: builtInRoleNames[?roleDefinitionIdOrName] ? builtInRoleNames[roleDefinitionIdOrName] : roleDefinitionIdOrName
     principalId: principalId
     principalType: !empty(principalType) ? any(principalType) : null
     condition: !empty(condition) ? condition : null

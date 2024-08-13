@@ -165,7 +165,7 @@ module containerAppURLConfig '../../../shared/bicep/app-configuration/app-config
   params: {
     configStoreName: configStoreName
     webAppURLConfigKey: webAppURLConfigKey
-    webAppURLConfigValue: containerApp.properties.configuration.ingress.fqdn
+    webAppURLConfigValue: 'https://${containerApp.properties.configuration.ingress.fqdn}'
   }
 }
 

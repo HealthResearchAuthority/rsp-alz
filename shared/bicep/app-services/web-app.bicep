@@ -261,6 +261,17 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     hyperV: false
     redundancyMode: redundancyMode
     publicNetworkAccess: 'Disabled'
+    // ipSecurityRestrictions: [
+    //   {
+    //     action: 'Allow'
+    //     description: 'Allow access from within the network and from Azure DevOps'
+    //     name: 'Allow AzureDevOps'
+    //     priority: 300
+    //     tag: 'ServiceTag'
+    //     vnetSubnetResourceId: 'string'
+    //     vnetTrafficTag: int
+    //   }
+    // ]
   }
 }
 
@@ -282,33 +293,33 @@ module app_slots 'web-app.slots.bicep' = [for (slot, index) in slots: {
     location: location
     kind: kind
     serverFarmResourceId: serverFarmResourceId
-    httpsOnly: contains(slot, 'httpsOnly') ? slot.httpsOnly : httpsOnly
+    httpsOnly: slot.?httpsOnly ? slot.httpsOnly : httpsOnly
     appServiceEnvironmentId: !empty(appServiceEnvironmentId) ? appServiceEnvironmentId : ''
-    clientAffinityEnabled: contains(slot, 'clientAffinityEnabled') ? slot.clientAffinityEnabled : clientAffinityEnabled
-    systemAssignedIdentity: contains(slot, 'systemAssignedIdentity') ? slot.systemAssignedIdentity : systemAssignedIdentity
-    userAssignedIdentities: contains(slot, 'userAssignedIdentities') ? slot.userAssignedIdentities : userAssignedIdentities
-    keyVaultAccessIdentityResourceId: contains(slot, 'keyVaultAccessIdentityResourceId') ? slot.keyVaultAccessIdentityResourceId : keyVaultAccessIdentityResourceId
-    storageAccountRequired: contains(slot, 'storageAccountRequired') ? slot.storageAccountRequired : storageAccountRequired
-    virtualNetworkSubnetId: contains(slot, 'virtualNetworkSubnetId') ? slot.virtualNetworkSubnetId : virtualNetworkSubnetId
-    siteConfig: contains(slot, 'siteConfig') ? slot.siteConfig : siteConfigConfigurationMap[siteConfigSelection]
-    storageAccountId: contains(slot, 'storageAccountId') ? slot.storageAccountId : storageAccountId
-    appInsightId: contains(slot, 'appInsightId') ? slot.appInsightId : appInsightId
-    setAzureWebJobsDashboard: contains(slot, 'setAzureWebJobsDashboard') ? slot.setAzureWebJobsDashboard : setAzureWebJobsDashboard
+    clientAffinityEnabled: slot.?clientAffinityEnabled ? slot.clientAffinityEnabled : clientAffinityEnabled
+    systemAssignedIdentity: slot.?systemAssignedIdentity ? slot.systemAssignedIdentity : systemAssignedIdentity
+    userAssignedIdentities: slot.?userAssignedIdentities ? slot.userAssignedIdentities : userAssignedIdentities
+    keyVaultAccessIdentityResourceId: slot.?keyVaultAccessIdentityResourceId ? slot.keyVaultAccessIdentityResourceId : keyVaultAccessIdentityResourceId
+    storageAccountRequired: slot.?storageAccountRequired ? slot.storageAccountRequired : storageAccountRequired
+    virtualNetworkSubnetId: slot.?virtualNetworkSubnetId ? slot.virtualNetworkSubnetId : virtualNetworkSubnetId
+    siteConfig: slot.?siteConfig ? slot.siteConfig : siteConfigConfigurationMap[siteConfigSelection]
+    storageAccountId: slot.?storageAccountId ? slot.storageAccountId : storageAccountId
+    appInsightId: slot.?appInsightId ? slot.appInsightId : appInsightId
+    setAzureWebJobsDashboard: slot.?setAzureWebJobsDashboard ? slot.setAzureWebJobsDashboard : setAzureWebJobsDashboard
     diagnosticWorkspaceId: diagnosticWorkspaceId
-    diagnosticLogCategoriesToEnable: contains(slot, 'diagnosticLogCategoriesToEnable') ? slot.diagnosticLogCategoriesToEnable : diagnosticLogCategoriesToEnable
-    diagnosticMetricsToEnable: contains(slot, 'diagnosticMetricsToEnable') ? slot.diagnosticMetricsToEnable : diagnosticMetricsToEnable
-    appSettingsKeyValuePairs: contains(slot, 'appSettingsKeyValuePairs') ? slot.appSettingsKeyValuePairs : appSettingsKeyValuePairs
+    diagnosticLogCategoriesToEnable: slot.?diagnosticLogCategoriesToEnable ? slot.diagnosticLogCategoriesToEnable : diagnosticLogCategoriesToEnable
+    diagnosticMetricsToEnable: slot.?diagnosticMetricsToEnable ? slot.diagnosticMetricsToEnable : diagnosticMetricsToEnable
+    appSettingsKeyValuePairs: slot.appSettingsKeyValuePairs ? slot.appSettingsKeyValuePairs : appSettingsKeyValuePairs
     tags: tags
-    containerSize: contains(slot, 'containerSize') ? slot.containerSize : -1
-    customDomainVerificationId: contains(slot, 'customDomainVerificationId') ? slot.customDomainVerificationId : ''
-    dailyMemoryTimeQuota: contains(slot, 'dailyMemoryTimeQuota') ? slot.dailyMemoryTimeQuota : -1
-    enabled: contains(slot, 'enabled') ? slot.enabled : true
-    hostNameSslStates: contains(slot, 'hostNameSslStates') ? slot.hostNameSslStates : []
-    publicNetworkAccess: contains(slot, 'publicNetworkAccess') ? slot.publicNetworkAccess : ''
-    redundancyMode: contains(slot, 'redundancyMode') ? slot.redundancyMode : 'None'
-    vnetContentShareEnabled: contains(slot, 'vnetContentShareEnabled') ? slot.vnetContentShareEnabled : false
-    vnetImagePullEnabled: contains(slot, 'vnetImagePullEnabled') ? slot.vnetImagePullEnabled : false
-    vnetRouteAllEnabled: contains(slot, 'vnetRouteAllEnabled') ? slot.vnetRouteAllEnabled : false
+    containerSize: slot.?containerSize ? slot.containerSize : -1
+    customDomainVerificationId: slot.?customDomainVerificationId ? slot.customDomainVerificationId : ''
+    dailyMemoryTimeQuota: slot.?dailyMemoryTimeQuota ? slot.dailyMemoryTimeQuota : -1
+    enabled: slot.?enabled ? slot.enabled : true
+    hostNameSslStates: slot.?hostNameSslStates ? slot.hostNameSslStates : []
+    publicNetworkAccess: slot.?publicNetworkAccess ? slot.publicNetworkAccess : ''
+    redundancyMode: slot.?redundancyMode ? slot.redundancyMode : 'None'
+    vnetContentShareEnabled: slot.?vnetContentShareEnabled ? slot.vnetContentShareEnabled : false
+    vnetImagePullEnabled: slot.?vnetImagePullEnabled ? slot.vnetImagePullEnabled : false
+    vnetRouteAllEnabled: slot.?vnetRouteAllEnabled ? slot.vnetRouteAllEnabled : false
   }
 }]
 
