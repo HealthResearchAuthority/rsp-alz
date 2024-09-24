@@ -16,6 +16,18 @@ param tags object = {}
 param appConfigurationUserUserAssignedIdentityName string = ''
 param sqlServerName string
 
+param networkingResourcesNames object
+param networkingResourceGroup string
+
+@description('The resource ID of the VNet to which the private endpoint will be connected.')
+param spokeVNetId string
+
+@description('The name of the subnet in the VNet to which the private endpoint will be connected.')
+param spokePrivateEndpointSubnetName string
+
+@description('JWKS URi for backend services to validate a request')
+param jwksURI string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyvalues = [
@@ -25,11 +37,11 @@ var keyvalues = [
   }
   {
     name: 'AppSettings:AuthSettings:ClientId'
-    value: 'aqHE90z281Yff2vf_OTCdlpNSasa'
+    value: 'Uf6CKXOECh6zhzgtdlfsrnhbzXca'
   }
   {
     name: 'AppSettings:AuthSettings:JwksUri'
-    value: 'https://localhost/jwks'
+    value: '${jwksURI}/jwks'
   }
   {
     name: 'ConnectionStrings:IrasServiceDatabaseConnection'
@@ -40,6 +52,37 @@ var keyvalues = [
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=identityservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
   }
 ]
+
+var privateDnsZoneNames = 'privatelink.azconfig.io'
+var appConfigResourceName = 'configurationStores'
+
+var spokeVNetIdTokens = split(spokeVNetId, '/')
+var spokeSubscriptionId = spokeVNetIdTokens[2]
+var spokeResourceGroupName = spokeVNetIdTokens[4]
+var spokeVNetName = spokeVNetIdTokens[8]
+
+var spokeVNetLinks = [
+  {
+    vnetName: spokeVNetName
+    vnetId: vnetSpoke.id
+    registrationEnabled: false
+  }
+  // {
+  //   vnetName: vnetHub.name
+  //   vnetId: vnetHub.id
+  //   registrationEnabled: false
+  // }
+]
+
+resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
+  scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
+  name: spokeVNetName
+}
+
+resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-07-01' existing = {
+  parent: vnetSpoke
+  name: spokePrivateEndpointSubnetName
+}
 
 resource appConfigurationUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: appConfigurationUserUserAssignedIdentityName
@@ -79,6 +122,20 @@ resource configStoreKeyValue 'Microsoft.AppConfiguration/configurationStores/key
     value: keyValue.value
   }
 }]
+
+module appConfigNetwork '../../../../shared/bicep/network/private-networking-spoke.bicep' = {
+  name: 'appConfigNetwork-${uniqueString(configStore.id)}'
+  scope: resourceGroup(networkingResourceGroup)
+  params: {
+    location: location
+    azServicePrivateDnsZoneName: privateDnsZoneNames
+    azServiceId: configStore.id
+    privateEndpointName: networkingResourcesNames.azureappconfigurationstorepep
+    privateEndpointSubResourceName: appConfigResourceName
+    virtualNetworkLinks: spokeVNetLinks
+    subnetId: spokePrivateEndpointSubnet.id
+  }
+}
 
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
 output appConfigurationUserAssignedIdentityId string = appConfigurationUserAssignedIdentity.id

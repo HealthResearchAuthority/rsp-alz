@@ -91,6 +91,7 @@ var resourceNames = {
   azuresqlserverpep: '${naming.resourceTypeAbbreviations.privateEndpoint}-${replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azuresqlserver)}'
   azureappconfigurationstore: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.appConfigurationStore )
   azureappconfigurationstoreUserAssignedIdentity:  '${naming.resourceTypeAbbreviations.managedIdentity}-${toLower( replace ( replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.appConfigurationStore), '-', '' ) )}-DataReader'
+  azureappconfigurationstorepep: '${naming.resourceTypeAbbreviations.privateEndpoint}-${replace(namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.appConfigurationStore)}'
   appServicePlan: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.appServicePlan)
   webApp: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.webApp)
 }

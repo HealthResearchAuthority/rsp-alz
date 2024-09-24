@@ -433,6 +433,9 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
     resourcesNames: sharedServicesNaming[i].outputs.resourcesNames
     sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
+    networkingResourcesNames: networkingnaming[i].outputs.resourcesNames
+    networkingResourceGroup: parSpokeNetworks[i].rgNetworking
+    jwksURI: 'irasportal-${parSpokeNetworks[i].parEnvironment}.azurewebsites.net'
   }
 }]
 
@@ -465,7 +468,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [for i in ra
     sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
     adminLogin: parAdminLogin
     adminPassword: parSqlAdminPhrase
-    databases : ['applicationservice','identityservice']
+    databases : ['applicationservice','identityservice','questionsetservice']
     environment: parSpokeNetworks[i].parEnvironment
     spokePrivateEndpointSubnetName: spoke[i].outputs.spokePrivateEndpointsSubnetName
     spokeVNetId: spoke[i].outputs.spokeVNetId
@@ -519,6 +522,32 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     containertag: 'updatedversion2'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:UsersServiceUri'
+    sharedservicesRG: parSpokeNetworks[i].rgSharedServices
+    //acrName: supportingServices[i].outputs.containerRegistryName
+  }
+  dependsOn: [
+    databaseserver
+  ]
+}]
+
+module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('questionsetapp-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgapplications)
+  params: {
+    location: location
+    tags: tags
+    containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+    sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
+    containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
+    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    storageRG: parSpokeNetworks[i].rgStorage
+    appConfigURL: supportingServices[i].outputs.appConfigURL
+    appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+    containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
+    containerAppName: 'questionsetservice'
+    containertag: '1955'
+    configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
+    webAppURLConfigKey: 'AppSettings:QuestionSetServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
     //acrName: supportingServices[i].outputs.containerRegistryName
   }

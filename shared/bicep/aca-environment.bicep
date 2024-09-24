@@ -105,7 +105,7 @@ var effectiveWorkloadProfiles = workloadProfiles != [] ? concat(defaultWorkloadP
 // RESOURCES
 // ------------------
 
-resource acaEnvironment 'Microsoft.App/managedEnvironments@2023-05-01' = {
+resource acaEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
   name: name
   location: location
   tags: tags

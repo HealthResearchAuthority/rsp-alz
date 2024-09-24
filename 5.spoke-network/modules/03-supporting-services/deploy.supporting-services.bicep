@@ -29,6 +29,9 @@ param privateDNSEnabled bool = false
 
 param resourcesNames object
 param sqlServerName string
+param networkingResourcesNames object
+param networkingResourceGroup string
+param jwksURI string
 
 // ------------------
 // Varaibles
@@ -83,6 +86,11 @@ module appConfiguration './modules/app-configuration.bicep' = {
     configStoreName: resourcesNames.azureappconfigurationstore
     appConfigurationUserUserAssignedIdentityName: resourcesNames.azureappconfigurationstoreUserAssignedIdentity
     sqlServerName: sqlServerName
+    networkingResourcesNames: networkingResourcesNames
+    networkingResourceGroup: networkingResourceGroup
+    spokeVNetId: spokeVNetId
+    spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
+    jwksURI: jwksURI
   }
 }
 
