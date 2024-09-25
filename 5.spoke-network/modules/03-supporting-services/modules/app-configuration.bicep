@@ -41,7 +41,7 @@ var keyvalues = [
   }
   {
     name: 'AppSettings:AuthSettings:JwksUri'
-    value: '${jwksURI}/jwks'
+    value: 'https://${jwksURI}/jwks'
   }
   {
     name: 'ConnectionStrings:IrasServiceDatabaseConnection'
