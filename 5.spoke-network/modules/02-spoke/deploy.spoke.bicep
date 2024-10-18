@@ -222,37 +222,37 @@ module nsgWebApp '../../../shared/bicep/network/nsg.bicep' = {
   }
 }
 
-@description('The Route Table deployment')
-module egressLockdownUdr '../../../shared/bicep/routeTables/main.bicep' = {
-  name: take('egressLockdownUdr-${uniqueString(spokeNetworkingResourceGroup.id)}', 64)
-  scope: spokeNetworkingResourceGroup
-  params: {
-    name: resourcesNames.routeTable
-    location: location
-    tags: tags
-    routes: [
-      {
-        name: 'defaultEgressLockdown'
-        properties: {
-          addressPrefix: '0.0.0.0/0'
-          nextHopType: 'VirtualAppliance'
-          nextHopIpAddress: networkApplianceIpAddress
-        }
-      }
-    ]
-  }
-}
+// @description('The Route Table deployment')
+// module egressLockdownUdr '../../../shared/bicep/routeTables/main.bicep' = {
+//   name: take('egressLockdownUdr-${uniqueString(spokeNetworkingResourceGroup.id)}', 64)
+//   scope: spokeNetworkingResourceGroup
+//   params: {
+//     name: resourcesNames.routeTable
+//     location: location
+//     tags: tags
+//     routes: [
+//       {
+//         name: 'defaultEgressLockdown'
+//         properties: {
+//           addressPrefix: '0.0.0.0/0'
+//           nextHopType: 'VirtualAppliance'
+//           nextHopIpAddress: networkApplianceIpAddress
+//         }
+//       }
+//     ]
+//   }
+// }
 
-// Module -  Spoke to Azure Virtual WAN Hub peering.
-module modhubVirtualNetworkConnection '../../../shared/bicep/network/hubVirtualNetworkConnection.bicep' = {
-  scope: resourceGroup(parHubSubscriptionId, parHubResourceGroup)
-  name: take('vWanPeering-${deployment().name}', 64)
-  params: {
-    parVirtualWanHubResourceId: parHubResourceId
-    parRemoteVirtualNetworkResourceId: vnetSpoke.outputs.vnetId
-    parEnableInternetSecurity: false
-  }
-}
+// // Module -  Spoke to Azure Virtual WAN Hub peering.
+// module modhubVirtualNetworkConnection '../../../shared/bicep/network/hubVirtualNetworkConnection.bicep' = {
+//   scope: resourceGroup(parHubSubscriptionId, parHubResourceGroup)
+//   name: take('vWanPeering-${deployment().name}', 64)
+//   params: {
+//     parVirtualWanHubResourceId: parHubResourceId
+//     parRemoteVirtualNetworkResourceId: vnetSpoke.outputs.vnetId
+//     parEnableInternetSecurity: false
+//   }
+// }
 
 // module spoketoDevBoxPeering '../../../shared/bicep/network/peering.bicep' = if(parDevBoxVNetPeering) {
 //   scope: resourceGroup(spokeResourceGroupName)
