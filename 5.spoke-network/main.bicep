@@ -186,13 +186,13 @@ param parSpokeNetworks spokesType = [
     devBoxPeering: false
     subnets: {
       infraSubnet: {
-        addressPrefix: '10.1.16.0/22'
+        addressPrefix: '10.1.32.0/20'
       }
       appGatewaySubnet: {
         addressPrefix: '10.1.63.0/24'
       }
       webAppSubnet: {
-        addressPrefix: '10.1.20.0/22'
+        addressPrefix: '10.1.48.0/22'
       }
       privateEndPointSubnet: {
         addressPrefix: '10.1.62.0/24'
