@@ -106,37 +106,37 @@ param deployAzurePolicies bool = true
 
 
 param parSpokeNetworks spokesType = [
-  {
-    subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b' //Development
-    ipRange: '10.2.0.0/16'
-    parEnvironment: 'dev'
-    workloadName: 'container-app'
-    zoneRedundancy: false
-    ddosProtectionEnabled: 'Disabled'
-    containerRegistryTier: 'Premium'
-    deploy: true
-    configurePrivateDNS: true
-    devBoxPeering: true
-    rgNetworking: 'rg-rsp-networking-spoke-dev-uks'
-    rgapplications: 'rg-rsp-applications-spoke-dev-uks'
-    rgSharedServices: 'rg-rsp-sharedservices-spoke-dev-uks'
-    rgStorage: 'rg-rsp-storage-spoke-dev-uks'
-    deployWebAppSlot: false
-    subnets: {
-      infraSubnet: {
-        addressPrefix: '10.2.0.0/18'
-      }
-      webAppSubnet: {
-        addressPrefix: '10.2.128.0/18'
-      }
-      appGatewaySubnet: {
-        addressPrefix: '10.2.64.0/24'
-      }
-      privateEndPointSubnet: {
-        addressPrefix: '10.2.65.0/24'
-      }
-    }
-  }
+  // {
+  //   subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b' //Development
+  //   ipRange: '10.2.0.0/16'
+  //   parEnvironment: 'dev'
+  //   workloadName: 'container-app'
+  //   zoneRedundancy: false
+  //   ddosProtectionEnabled: 'Disabled'
+  //   containerRegistryTier: 'Premium'
+  //   deploy: true
+  //   configurePrivateDNS: true
+  //   devBoxPeering: true
+  //   rgNetworking: 'rg-rsp-networking-spoke-dev-uks'
+  //   rgapplications: 'rg-rsp-applications-spoke-dev-uks'
+  //   rgSharedServices: 'rg-rsp-sharedservices-spoke-dev-uks'
+  //   rgStorage: 'rg-rsp-storage-spoke-dev-uks'
+  //   deployWebAppSlot: false
+  //   subnets: {
+  //     infraSubnet: {
+  //       addressPrefix: '10.2.0.0/18'
+  //     }
+  //     webAppSubnet: {
+  //       addressPrefix: '10.2.128.0/18'
+  //     }
+  //     appGatewaySubnet: {
+  //       addressPrefix: '10.2.64.0/24'
+  //     }
+  //     privateEndPointSubnet: {
+  //       addressPrefix: '10.2.65.0/24'
+  //     }
+  //   }
+  // }
   // {
   //   subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379' //System Test Manual
   //   ipRange: '10.3.0.0/16'
@@ -168,32 +168,37 @@ param parSpokeNetworks spokesType = [
   //     }
   //   }
   // }
-  // {
-  //   subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65' //System Test Automated
-  //   ipRange: '10.3.0.0/16'
-  //   parEnvironment: 'automationtest'
-  //   workloadName: 'container-app'
-  //   zoneRedundancy: false
-  //   ddosProtectionEnabled: 'Disabled'
-  //   containerRegistryTier: 'Premium'
-  //   deploy: false
-  //   configurePrivateDNS: false
-  // rgNetworking: 'rg-rsp-networking-spoke-systemtestauto-uks'
-    // rgapplications: 'rg-rsp-applications-spoke-systemtestauto-uks'
-    // rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtestauto-uks'
-    // rgStorage: 'rg-rsp-storage-spoke-systemtestauto-uks'
-  //   subnets: {
-  //     infraSubnet: {
-  //       addressPrefix: '10.3.0.0/18'
-  //     }
-  //     appGatewaySubnet: {
-  //       addressPrefix: '10.3.64.0/24'
-  //     }
-  //     privateEndPointSubnet: {
-  //       addressPrefix: '10.3.65.0/24'
-  //     }
-  //   }
-  // }
+  {
+    subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65' //System Test Automated
+    ipRange: '10.1.32.0/19'
+    parEnvironment: 'automationtest'
+    workloadName: 'container-app'
+    zoneRedundancy: false
+    ddosProtectionEnabled: 'Disabled'
+    containerRegistryTier: 'Premium'
+    deploy: false
+    configurePrivateDNS: false
+    rgNetworking: 'rg-rsp-networking-spoke-systemtestauto-uks'
+    rgapplications: 'rg-rsp-applications-spoke-systemtestauto-uks'
+    rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtestauto-uks'
+    rgStorage: 'rg-rsp-storage-spoke-systemtestauto-uks'
+    deployWebAppSlot: false
+    devBoxPeering: false
+    subnets: {
+      infraSubnet: {
+        addressPrefix: '10.1.16.0/22'
+      }
+      appGatewaySubnet: {
+        addressPrefix: '10.1.63.0/24'
+      }
+      webAppSubnet: {
+        addressPrefix: '10.1.20.0/22'
+      }
+      privateEndPointSubnet: {
+        addressPrefix: '10.1.62.0/24'
+      }  
+    }
+  }
   // {
   //   subscriptionId: 'c9d1b222-c47a-43fc-814a-33083b8d3375' //System Test Integration
   //   ipRange: '10.4.0.0/16'

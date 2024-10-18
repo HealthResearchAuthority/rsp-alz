@@ -83,8 +83,8 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
     template: {
       containers: [
         {
-          name: containerAppName
-          image: '${containerRegistryLoginServer}/rsp-${containerAppName}:${containertag}'
+          image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+          name: 'simple-hello-world-container'
           resources: {
             cpu: json('0.5')
             memory: '1Gi'
