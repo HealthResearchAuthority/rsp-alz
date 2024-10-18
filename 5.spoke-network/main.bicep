@@ -416,9 +416,9 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
     //networkApplianceIpAddress: networkApplianceIpAddress
     deployAzurePolicies: deployAzurePolicies
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    parHubResourceGroup: varVirtualHubResourceGroup
-    parHubSubscriptionId: varVirtualHubSubscriptionId
-    parHubResourceId: hubVNetId
+    // parHubResourceGroup: varVirtualHubResourceGroup
+    // parHubSubscriptionId: varVirtualHubSubscriptionId
+    // parHubResourceId: hubVNetId
     resourcesNames: networkingnaming[i].outputs.resourcesNames
     spokeNetworkingRGName: parSpokeNetworks[i].rgNetworking
   }
@@ -498,7 +498,7 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'irasservice'
-    containertag: 'loggingversion'
+    //containertag: 'loggingversion'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:ApplicationsServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
@@ -524,7 +524,7 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'usermanagementservice'
-    containertag: 'updatedversion2'
+    //containertag: 'updatedversion2'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:UsersServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
@@ -550,7 +550,7 @@ module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'questionsetservice'
-    containertag: '1955'
+    //containertag: '1955'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:QuestionSetServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices

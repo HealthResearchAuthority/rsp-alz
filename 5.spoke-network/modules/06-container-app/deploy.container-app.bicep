@@ -25,7 +25,6 @@ param storageRG string
 param appConfigURL string
 param appConfigIdentityClientID string
 param containerRegistryLoginServer string
-param containertag string
 
 param configStoreName string
 param webAppURLConfigKey string
