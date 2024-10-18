@@ -13,8 +13,8 @@ param tags object = {}
 //Hub
 param hubVNetId string = '/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth'
 
-@description('Virtual Appliance IP Address. Firewall IP Address')
-param networkApplianceIpAddress string = '10.1.64.4' //Hub firewall IP Address
+// @description('Virtual Appliance IP Address. Firewall IP Address')
+// param networkApplianceIpAddress string = '10.1.64.4' //Hub firewall IP Address
 
 
 //DevBox
@@ -413,7 +413,7 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
     spokePrivateEndpointsSubnetAddressPrefix: parSpokeNetworks[i].subnets.privateEndPointSubnet.addressPrefix
     spokeWebAppSubnetAddressPrefix: parSpokeNetworks[i].subnets.webAppSubnet.addressPrefix
     spokeVNetAddressPrefixes: [parSpokeNetworks[i].ipRange]
-    networkApplianceIpAddress: networkApplianceIpAddress
+    //networkApplianceIpAddress: networkApplianceIpAddress
     deployAzurePolicies: deployAzurePolicies
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     parHubResourceGroup: varVirtualHubResourceGroup

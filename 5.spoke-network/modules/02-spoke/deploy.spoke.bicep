@@ -38,8 +38,8 @@ param spokeWebAppSubnetName string = 'snet-webapp'
 @description('CIDR of the spoke Application Gateway subnet. If the value is empty, this subnet will not be created.')
 param spokeWebAppSubnetAddressPrefix string
 
-@description('The IP address of the network appliance (e.g. firewall) that will be used to route traffic to the internet.')
-param networkApplianceIpAddress string
+// @description('The IP address of the network appliance (e.g. firewall) that will be used to route traffic to the internet.')
+// param networkApplianceIpAddress string
 
 @description('Central Log Analytics Workspace ID')
 param logAnalyticsWorkspaceId string
