@@ -260,7 +260,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     hostNameSslStates: hostNameSslStates
     hyperV: false
     redundancyMode: redundancyMode
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: 'Enabled'
     // ipSecurityRestrictions: [
     //   {
     //     action: 'Allow'

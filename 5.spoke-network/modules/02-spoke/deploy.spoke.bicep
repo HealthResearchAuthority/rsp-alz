@@ -38,8 +38,8 @@ param spokeWebAppSubnetName string = 'snet-webapp'
 @description('CIDR of the spoke Application Gateway subnet. If the value is empty, this subnet will not be created.')
 param spokeWebAppSubnetAddressPrefix string
 
-@description('The IP address of the network appliance (e.g. firewall) that will be used to route traffic to the internet.')
-param networkApplianceIpAddress string
+// @description('The IP address of the network appliance (e.g. firewall) that will be used to route traffic to the internet.')
+// param networkApplianceIpAddress string
 
 @description('Central Log Analytics Workspace ID')
 param logAnalyticsWorkspaceId string
@@ -47,14 +47,14 @@ param logAnalyticsWorkspaceId string
 @description('Optional, default value is true. If true, Azure Policies will be deployed')
 param deployAzurePolicies bool = true
 
-@description('Hub Subscription ID')
-param parHubSubscriptionId string
+// @description('Hub Subscription ID')
+// param parHubSubscriptionId string
 
-@description('Hub Subscription ID')
-param parHubResourceGroup string
+// @description('Hub Subscription ID')
+// param parHubResourceGroup string
 
-@description('Hub Subscription ID')
-param parHubResourceId string
+// @description('Hub Subscription ID')
+// param parHubResourceId string
 
 @description('resource Names')
 param resourcesNames object
@@ -222,37 +222,37 @@ module nsgWebApp '../../../shared/bicep/network/nsg.bicep' = {
   }
 }
 
-@description('The Route Table deployment')
-module egressLockdownUdr '../../../shared/bicep/routeTables/main.bicep' = {
-  name: take('egressLockdownUdr-${uniqueString(spokeNetworkingResourceGroup.id)}', 64)
-  scope: spokeNetworkingResourceGroup
-  params: {
-    name: resourcesNames.routeTable
-    location: location
-    tags: tags
-    routes: [
-      {
-        name: 'defaultEgressLockdown'
-        properties: {
-          addressPrefix: '0.0.0.0/0'
-          nextHopType: 'VirtualAppliance'
-          nextHopIpAddress: networkApplianceIpAddress
-        }
-      }
-    ]
-  }
-}
+// @description('The Route Table deployment')
+// module egressLockdownUdr '../../../shared/bicep/routeTables/main.bicep' = {
+//   name: take('egressLockdownUdr-${uniqueString(spokeNetworkingResourceGroup.id)}', 64)
+//   scope: spokeNetworkingResourceGroup
+//   params: {
+//     name: resourcesNames.routeTable
+//     location: location
+//     tags: tags
+//     routes: [
+//       {
+//         name: 'defaultEgressLockdown'
+//         properties: {
+//           addressPrefix: '0.0.0.0/0'
+//           nextHopType: 'VirtualAppliance'
+//           nextHopIpAddress: networkApplianceIpAddress
+//         }
+//       }
+//     ]
+//   }
+// }
 
-// Module -  Spoke to Azure Virtual WAN Hub peering.
-module modhubVirtualNetworkConnection '../../../shared/bicep/network/hubVirtualNetworkConnection.bicep' = {
-  scope: resourceGroup(parHubSubscriptionId, parHubResourceGroup)
-  name: take('vWanPeering-${deployment().name}', 64)
-  params: {
-    parVirtualWanHubResourceId: parHubResourceId
-    parRemoteVirtualNetworkResourceId: vnetSpoke.outputs.vnetId
-    parEnableInternetSecurity: false
-  }
-}
+// // Module -  Spoke to Azure Virtual WAN Hub peering.
+// module modhubVirtualNetworkConnection '../../../shared/bicep/network/hubVirtualNetworkConnection.bicep' = {
+//   scope: resourceGroup(parHubSubscriptionId, parHubResourceGroup)
+//   name: take('vWanPeering-${deployment().name}', 64)
+//   params: {
+//     parVirtualWanHubResourceId: parHubResourceId
+//     parRemoteVirtualNetworkResourceId: vnetSpoke.outputs.vnetId
+//     parEnableInternetSecurity: false
+//   }
+// }
 
 // module spoketoDevBoxPeering '../../../shared/bicep/network/peering.bicep' = if(parDevBoxVNetPeering) {
 //   scope: resourceGroup(spokeResourceGroupName)
