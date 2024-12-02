@@ -25,6 +25,7 @@ param storageRG string
 param appConfigURL string
 param appConfigIdentityClientID string
 param containerRegistryLoginServer string
+param containertag string
 
 param configStoreName string
 param webAppURLConfigKey string
@@ -82,8 +83,8 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
     template: {
       containers: [
         {
-          image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
-          name: 'simple-hello-world-container'
+          name: containerAppName
+          image: '${containerRegistryLoginServer}/rsp-${containerAppName}:${containertag}'
           resources: {
             cpu: json('0.5')
             memory: '1Gi'

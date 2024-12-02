@@ -51,6 +51,10 @@ var keyvalues = [
     name: 'ConnectionStrings:IdentityDbConnection'
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=identityservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
   }
+  {
+    name: 'ConnectionStrings:QuestionSetServiceDatabaseConnection'
+    value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=QuestionSetService;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+  }
 ]
 
 var privateDnsZoneNames = 'privatelink.azconfig.io'
