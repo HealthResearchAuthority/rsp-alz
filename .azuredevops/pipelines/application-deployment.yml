@@ -1,0 +1,61 @@
+# This workflow will deploy the application resources
+name: application-deployment
+trigger:
+  - main
+pr:
+  - main
+
+jobs:
+  - job: lint
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - checkout: self
+      - bash: az bicep build --file ./5.spoke-network/main.application.bicep
+
+  - job: validate
+    pool:
+      vmImage: 'ubuntu-latest'
+    dependsOn: [lint]
+    steps:
+      - checkout: self
+      - task: AzureCLI@2
+        inputs:
+          azureSubscription: $(azureServiceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az deployment sub validate --name "App-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.application.bicep --parameters ./5.spoke-network/main.parameters.jsonc --parameters parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase)
+
+  - job: preview
+    pool:
+      vmImage: 'ubuntu-latest'
+    dependsOn: [lint, validate]
+    steps:
+      - checkout: self
+      - task: AzureCLI@2
+        inputs:
+          azureSubscription: $(azureServiceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.application.bicep --parameters ./5.spoke-network/main.parameters.jsonc --parameters parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase)
+
+  - job: deploy
+    pool:
+      vmImage: 'ubuntu-latest'
+    dependsOn: [preview]
+    steps:
+      - checkout: self
+      - task: AzureCLI@2
+        name: deploy
+        inputs:
+          azureSubscription: $(azureServiceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          failOnStandardError: true
+          inlineScript: |
+            output=$(az deployment sub create --name "App-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.application.bicep --parameters ./5.spoke-network/main.parameters.jsonc --parameters parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase))
+            echo $output | jq .
+            appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
+            echo "##vso[task.setvariable variable=appResourceGroupName;isoutput=true]$appResourceGroup"

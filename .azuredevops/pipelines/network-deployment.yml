@@ -1,0 +1,69 @@
+# This workflow will deploy the network resources
+name: network-deployment
+trigger:
+  - main
+pr:
+  - main
+
+jobs:
+  - job: lint
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - checkout: self
+      - bash: az bicep build --file ./5.spoke-network/main.network.bicep
+
+  - job: validate
+    pool:
+      vmImage: 'ubuntu-latest'
+    dependsOn: [lint]
+    steps:
+      - checkout: self
+      - task: AzureCLI@2
+        inputs:
+          azureSubscription: $(azureServiceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az deployment sub validate --name "Network-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.network.bicep
+
+  - job: preview
+    pool:
+      vmImage: 'ubuntu-latest'
+    dependsOn: [lint, validate]
+    steps:
+      - checkout: self
+      - task: AzureCLI@2
+        inputs:
+          azureSubscription: $(azureServiceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.network.bicep
+
+  - job: deploy
+    pool:
+      vmImage: 'ubuntu-latest'
+    dependsOn: [preview]
+    steps:
+      - checkout: self
+      - task: AzureCLI@2
+        name: deploy
+        inputs:
+          azureSubscription: $(azureServiceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          failOnStandardError: true
+          inlineScript: |
+            output=$(az deployment sub create --name "Network-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.network.bicep)
+            echo $output | jq .
+            spokeVNetId=$(echo $output | jq -r '.properties.outputs.spokeVNetId.value')
+            spokeVNetName=$(echo $output | jq -r '.properties.outputs.spokeVNetName.value')
+            spokeInfraSubnetId=$(echo $output | jq -r '.properties.outputs.spokeInfraSubnetId.value')
+            spokeInfraSubnetName=$(echo $output | jq -r '.properties.outputs.spokeInfraSubnetName.value')
+            spokePrivateEndpointsSubnetName=$(echo $output | jq -r '.properties.outputs.spokePrivateEndpointsSubnetName.value')
+            echo "##vso[task.setvariable variable=spokeVNetId;isoutput=true]$spokeVNetId"
+            echo "##vso[task.setvariable variable=spokeVNetName;isoutput=true]$spokeVNetName"
+            echo "##vso[task.setvariable variable=spokeInfraSubnetId;isoutput=true]$spokeInfraSubnetId"
+            echo "##vso[task.setvariable variable=spokeInfraSubnetName;isoutput=true]$spokeInfraSubnetName"
+            echo "##vso[task.setvariable variable=spokePrivateEndpointsSubnetName;isoutput=true]$spokePrivateEndpointsSubnetName"
