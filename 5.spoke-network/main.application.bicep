@@ -16,163 +16,22 @@ param logAnalyticsWorkspaceId string = '/subscriptions/8747cd7f-1a06-4fe4-9dbb-2
 // param applicationGatewayFqdn string
 
 // @description('Enable or disable Application Gateway Certificate (PFX).')
-// param enableApplicationGatewayCertificate bool
+// param enableApplicationGatewayCertificate bool 
 
 // @description('The name of the certificate key to use for Application Gateway certificate.')
 // param applicationGatewayCertificateKeyName string
 
+@description('Admin login for SQL Server')
 param parAdminLogin string = ''
+
+@description('SQL Admin Password')
 param parSqlAdminPhrase string
 
+@description('Hub Virtual Network ID')
 param hubVNetId string = '/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth'
 
-type spokesType = ({
-  @description('SubscriptionId for spokeNetworking')
-  subscriptionId: string
-  @description('managementGroup for subscription placement')
-  workloadName: string
-  @description('Name of environment')
-  parEnvironment: string
-  @description('Name of networking resource group')
-  rgNetworking: string
-  @description('Name of Virtual network')
-  vnet: string
-  @description('Name of Shared Services resource group')
-  rgSharedServices: string
-  @description('Name of storage resource group')
-  rgStorage: string
-  @description('Name of applications resource group')
-  rgapplications: string
-  @description('Boolean to indicate deploy Zone redundancy')
-  zoneRedundancy: bool
-  @description('Name of environment. Allowed Valued: "Disabled","Enabled", "VirtualNetworkInherited", "null"')
-  ddosProtectionEnabled: string
-  @description('Name of environment. Allowed Valued: "Basic","Standard", "Premium"')
-  containerRegistryTier: string
-  @description('Boolean variable to indicate deploy this spoke or not')
-  deploy: bool
-  @description('Boolean to indicate deploy private DNS or not')
-  configurePrivateDNS: bool
-  @description('Boolean to indicate to deploy web app slot')
-  deployWebAppSlot: bool
-  @description('Boolean to indicate Spoke Vnet Peering with DevBox Vnet')
-  devBoxPeering: bool
-})[]
-
-param parSpokeNetworks spokesType = [
-  // {
-  //   subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b' //Development
-  //   parEnvironment: 'dev'
-  //   workloadName: 'container-app'
-  //   zoneRedundancy: false
-  //   ddosProtectionEnabled: 'Disabled'
-  //   containerRegistryTier: 'Premium'
-  //   deploy: true
-  //   configurePrivateDNS: true
-  //   devBoxPeering: true
-  //   rgNetworking: 'rg-rsp-networking-spoke-dev-uks'
-  //   vnet: 'vnet-rsp-networking-dev-uks-spoke'
-  //   rgapplications: 'rg-rsp-applications-spoke-dev-uks'
-  //   rgSharedServices: 'rg-rsp-sharedservices-spoke-dev-uks'
-  //   rgStorage: 'rg-rsp-storage-spoke-dev-uks'
-  //   deployWebAppSlot: false
-  // }
-  {
-    subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379' //System Test Manual
-    parEnvironment: 'manualtest'
-    workloadName: 'container-app'
-    zoneRedundancy: false
-    ddosProtectionEnabled: 'Disabled'
-    containerRegistryTier: 'Premium'
-    deploy: false
-    configurePrivateDNS: false
-    devBoxPeering: false
-    rgNetworking: 'rg-rsp-networking-spoke-systemtest-uks'
-    vnet: 'vnet-rsp-networking-manualtest-uks-spoke'
-    rgapplications: 'rg-rsp-applications-spoke-systemtest-uks'
-    rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtest-uks'
-    rgStorage: 'rg-rsp-storage-spoke-systemtest-uks'
-    deployWebAppSlot: false
-  }
-  // {
-  //   subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65' //System Test Automated
-  //   parEnvironment: 'automationtest'
-  //   workloadName: 'container-app'
-  //   zoneRedundancy: false
-  //   ddosProtectionEnabled: 'Disabled'
-  //   containerRegistryTier: 'Premium'
-  //   deploy: false
-  //   configurePrivateDNS: false
-  //   rgNetworking: 'rg-rsp-networking-spoke-systemtestauto-uks'
-  //   vnet: 'vnet-rsp-networking-systemtestauto-uks-spoke'
-  //   rgapplications: 'rg-rsp-applications-spoke-systemtestauto-uks'
-  //   rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtestauto-uks'
-  //   rgStorage: 'rg-rsp-storage-spoke-systemtestauto-uks'
-  //   deployWebAppSlot: false
-  //   devBoxPeering: false
-  // }
-  // {
-  //   subscriptionId: 'c9d1b222-c47a-43fc-814a-33083b8d3375' //System Test Integration
-  //   parEnvironment: 'integrationtest'
-  //   workloadName: 'container-app'
-  //   zoneRedundancy: false
-  //   ddosProtectionEnabled: 'Disabled'
-  //   containerRegistryTier: 'Premium'
-  //   deploy: false
-  //   configurePrivateDNS: false
-  //   rgNetworking: 'rg-rsp-networking-spoke-systemtestint-uks'
-  //   vnet: 'vnet-rsp-networking-systemtestint-uks-spoke'
-    // rgapplications: 'rg-rsp-applications-spoke-systemtestint-uks'
-    // rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtestint-uks'
-    // rgStorage: 'rg-rsp-storage-spoke-systemtestint-uks'
-  // }
-  // {
-  //   subscriptionId: '' //UAT
-  //   parEnvironment: 'uat'
-  //   workloadName: 'container-app'
-  //   zoneRedundancy: true
-  //   ddosProtectionEnabled: 'Enabled'
-  //   containerRegistryTier: 'Premium'
-  //   deploy: false
-  //   configurePrivateDNS: true
-  // rgNetworking: 'rg-rsp-networking-spoke-uat-uks'
-  //   vnet: 'vnet-rsp-networking-systemtestint-uks-spoke'
-    // rgapplications: 'rg-rsp-applications-spoke-uat-uks'
-    // rgSharedServices: 'rg-rsp-sharedservices-spoke-uat-uks'
-    // rgStorage: 'rg-rsp-storage-spoke-uat-uks'
-  // }
-  // {
-  //   subscriptionId: '' //PreProd
-  //   parEnvironment: 'preprod'
-  //   workloadName: 'container-app'
-  //   zoneRedundancy: true
-  //   ddosProtectionEnabled: 'Enabled'
-  //   containerRegistryTier: 'Premium'
-  //   deploy: false
-  //   configurePrivateDNS: true
-  // rgNetworking: 'rg-rsp-networking-spoke-preprod-uks'
-  //   vnet: 'vnet-rsp-networking-systemtestint-uks-spoke'
-    // rgapplications: 'rg-rsp-applications-spoke-preprod-uks'
-    // rgSharedServices: 'rg-rsp-sharedservices-spoke-preprod-uks'
-    // rgStorage: 'rg-rsp-storage-spoke-preprod-uks'
-  // }
-  // {
-  //   subscriptionId: '' //Prod
-  //   parEnvironment: 'prod'
-  //   workloadName: 'container-app'
-  //   zoneRedundancy: true
-  //   ddosProtectionEnabled: 'Enabled'
-  //   containerRegistryTier: 'Premium'
-  //   deploy: false
-  //   configurePrivateDNS: true
-  // rgNetworking: 'rg-rsp-networking-spoke-prod-uks'
-  //   vnet: 'vnet-rsp-networking-systemtestint-uks-spoke'
-    // rgapplications: 'rg-rsp-applications-spoke-prod-uks'
-    // rgSharedServices: 'rg-rsp-sharedservices-spoke-prod-uks'
-    // rgStorage: 'rg-rsp-storage-spoke-prod-uks'
-  //   }
-  // }
-]
+@description('Spoke Networks Configuration')
+param parSpokeNetworks array
 
 // ------------------
 // VARIABLES

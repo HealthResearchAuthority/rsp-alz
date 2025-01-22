@@ -5,6 +5,20 @@ trigger:
 pr:
   - main
 
+parameters:
+  - name: env
+    displayName: Environment
+    type: string
+    default: dev
+    values:
+      - dev
+      - systemtest_manual
+      - systemtest_auto
+      - systemtest_int
+      - uat
+      - pre_prod
+      - production
+
 jobs:
   - job: lint
     pool:
@@ -25,7 +39,8 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
-            az deployment sub validate --name "Network-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.network.bicep
+            az deployment sub validate --name "Network-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.network.bicep  \
+              --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam
 
   - job: preview
     pool:
@@ -39,7 +54,8 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
-            az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.network.bicep
+            az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.network.bicep \
+              --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam
 
   - job: deploy
     pool:
@@ -55,7 +71,9 @@ jobs:
           scriptLocation: inlineScript
           failOnStandardError: true
           inlineScript: |
-            output=$(az deployment sub create --name "Network-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.network.bicep)
+            az config set bicep.use_binary_from_path=false --only-show-errors
+            output=$(az deployment sub create --name "Network-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.network.bicep \
+              --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam)
             echo $output | jq .
             spokeVNetId=$(echo $output | jq -r '.properties.outputs.spokeVNetId.value')
             spokeVNetName=$(echo $output | jq -r '.properties.outputs.spokeVNetName.value')
