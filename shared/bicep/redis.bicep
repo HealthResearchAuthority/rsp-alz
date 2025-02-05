@@ -1,5 +1,5 @@
 @description('Required. The name of the Redis cache resource. Start and end with alphanumeric. Consecutive hyphens not allowed')
-@maxLength(63)
+@maxLength(64)
 @minLength(1)
 param name string
 

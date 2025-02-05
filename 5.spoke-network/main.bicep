@@ -106,37 +106,37 @@ param deployAzurePolicies bool = true
 
 
 param parSpokeNetworks spokesType = [
-  // {
-  //   subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b' //Development
-  //   ipRange: '10.2.0.0/16'
-  //   parEnvironment: 'dev'
-  //   workloadName: 'container-app'
-  //   zoneRedundancy: false
-  //   ddosProtectionEnabled: 'Disabled'
-  //   containerRegistryTier: 'Premium'
-  //   deploy: true
-  //   configurePrivateDNS: true
-  //   devBoxPeering: true
-  //   rgNetworking: 'rg-rsp-networking-spoke-dev-uks'
-  //   rgapplications: 'rg-rsp-applications-spoke-dev-uks'
-  //   rgSharedServices: 'rg-rsp-sharedservices-spoke-dev-uks'
-  //   rgStorage: 'rg-rsp-storage-spoke-dev-uks'
-  //   deployWebAppSlot: false
-  //   subnets: {
-  //     infraSubnet: {
-  //       addressPrefix: '10.2.0.0/18'
-  //     }
-  //     webAppSubnet: {
-  //       addressPrefix: '10.2.128.0/18'
-  //     }
-  //     appGatewaySubnet: {
-  //       addressPrefix: '10.2.64.0/24'
-  //     }
-  //     privateEndPointSubnet: {
-  //       addressPrefix: '10.2.65.0/24'
-  //     }
-  //   }
-  // }
+  {
+    subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b' //Development
+    ipRange: '10.2.0.0/16'
+    parEnvironment: 'dev'
+    workloadName: 'container-app'
+    zoneRedundancy: false
+    ddosProtectionEnabled: 'Disabled'
+    containerRegistryTier: 'Premium'
+    deploy: true
+    configurePrivateDNS: true
+    devBoxPeering: true
+    rgNetworking: 'rg-rsp-networking-spoke-dev-uks'
+    rgapplications: 'rg-rsp-applications-spoke-dev-uks'
+    rgSharedServices: 'rg-rsp-sharedservices-spoke-dev-uks'
+    rgStorage: 'rg-rsp-storage-spoke-dev-uks'
+    deployWebAppSlot: false
+    subnets: {
+      infraSubnet: {
+        addressPrefix: '10.2.0.0/18'
+      }
+      webAppSubnet: {
+        addressPrefix: '10.2.128.0/18'
+      }
+      appGatewaySubnet: {
+        addressPrefix: '10.2.64.0/24'
+      }
+      privateEndPointSubnet: {
+        addressPrefix: '10.2.65.0/24'
+      }
+    }
+  }
   // {
   //   subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379' //System Test Manual
   //   ipRange: '10.3.0.0/16'
@@ -168,37 +168,37 @@ param parSpokeNetworks spokesType = [
   //     }
   //   }
   // }
-  {
-    subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65' //System Test Automated
-    ipRange: '10.1.32.0/19'
-    parEnvironment: 'automationtest'
-    workloadName: 'container-app'
-    zoneRedundancy: false
-    ddosProtectionEnabled: 'Disabled'
-    containerRegistryTier: 'Premium'
-    deploy: false
-    configurePrivateDNS: false
-    rgNetworking: 'rg-rsp-networking-spoke-systemtestauto-uks'
-    rgapplications: 'rg-rsp-applications-spoke-systemtestauto-uks'
-    rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtestauto-uks'
-    rgStorage: 'rg-rsp-storage-spoke-systemtestauto-uks'
-    deployWebAppSlot: false
-    devBoxPeering: false
-    subnets: {
-      infraSubnet: {
-        addressPrefix: '10.1.32.0/20'
-      }
-      appGatewaySubnet: {
-        addressPrefix: '10.1.63.0/24'
-      }
-      webAppSubnet: {
-        addressPrefix: '10.1.48.0/22'
-      }
-      privateEndPointSubnet: {
-        addressPrefix: '10.1.62.0/24'
-      }  
-    }
-  }
+  // {
+  //   subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65' //System Test Automated
+  //   ipRange: '10.1.32.0/19'
+  //   parEnvironment: 'automationtest'
+  //   workloadName: 'container-app'
+  //   zoneRedundancy: false
+  //   ddosProtectionEnabled: 'Disabled'
+  //   containerRegistryTier: 'Premium'
+  //   deploy: false
+  //   configurePrivateDNS: false
+  //   rgNetworking: 'rg-rsp-networking-spoke-systemtestauto-uks'
+  //   rgapplications: 'rg-rsp-applications-spoke-systemtestauto-uks'
+  //   rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtestauto-uks'
+  //   rgStorage: 'rg-rsp-storage-spoke-systemtestauto-uks'
+  //   deployWebAppSlot: false
+  //   devBoxPeering: false
+  //   subnets: {
+  //     infraSubnet: {
+  //       addressPrefix: '10.1.32.0/20'
+  //     }
+  //     appGatewaySubnet: {
+  //       addressPrefix: '10.1.63.0/24'
+  //     }
+  //     webAppSubnet: {
+  //       addressPrefix: '10.1.48.0/22'
+  //     }
+  //     privateEndPointSubnet: {
+  //       addressPrefix: '10.1.62.0/24'
+  //     }  
+  //   }
+  // }
   // {
   //   subscriptionId: 'c9d1b222-c47a-43fc-814a-33083b8d3375' //System Test Integration
   //   ipRange: '10.4.0.0/16'
@@ -473,7 +473,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [for i in ra
     sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
     adminLogin: parAdminLogin
     adminPassword: parSqlAdminPhrase
-    databases : ['applicationservice','identityservice','questionsetservice']
+    databases : ['applicationservice','identityservice','questionsetservice','rtsservice']
     environment: parSpokeNetworks[i].parEnvironment
     spokePrivateEndpointSubnetName: spoke[i].outputs.spokePrivateEndpointsSubnetName
     spokeVNetId: spoke[i].outputs.spokeVNetId
@@ -597,6 +597,57 @@ module applicationGateway 'modules/08-application-gateway/deploy.app-gateway.bic
     ddosProtectionMode: 'Disabled'
     applicationGatewayLogAnalyticsId: logAnalyticsWorkspaceId
     networkingResourceNames: networkingnaming[i].outputs.resourcesNames
+  }
+}]
+// The resources below this needs to be moved to main.application.bicep
+
+// module redisCache '../shared/bicep/redis.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+//   name: take('rediscache-${deployment().name}-deployment', 64)
+//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId,parSpokeNetworks[i].rgStorage)
+//   params: {
+//     name: 'iras-redis-cache'
+//     keyvaultName: supportingServices[i].outputs.keyVaultName
+//     diagnosticWorkspaceId: logAnalyticsWorkspaceId
+//   }
+// }]
+
+module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('rtsserviceapp-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+  params: {
+    location: location
+    tags: tags
+    containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+    sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
+    containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
+    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    storageRG: parSpokeNetworks[i].rgStorage
+    appConfigURL: supportingServices[i].outputs.appConfigURL
+    appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+    containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
+    containerAppName: 'rtsservice'
+    configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
+    webAppURLConfigKey: 'AppSettings:RtsServiceUri'
+    sharedservicesRG: parSpokeNetworks[i].rgSharedServices
+  }
+  dependsOn: [
+    databaseserver
+  ]
+}]
+
+module rtsdatapullfunction '../shared/bicep/function-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('functionapp-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+  params: {
+    functionAppName: 'rts-data-pull-function'
+    location: location
+    storageAccountName: 'irasrtsdatapullsa'
+    appSettings: [
+      {
+        name: 'ExampleSetting'
+        value: 'ExampleValue'
+      }
+    ]
   }
 }]
 
