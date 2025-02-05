@@ -208,29 +208,29 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [for i in ra
   }
 }]
 
-module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-  name: take('iraserviceapp-${deployment().name}-deployment', 64)
-  scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
-  params: {
-    location: location
-    tags: tags
-    containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
-    sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
-    containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-    storageRG: parSpokeNetworks[i].rgStorage
-    appConfigURL: supportingServices[i].outputs.appConfigURL
-    appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
-    containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
-    containerAppName: 'irasservice'
-    configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
-    webAppURLConfigKey: 'AppSettings:ApplicationsServiceUri'
-    sharedservicesRG: parSpokeNetworks[i].rgSharedServices
-  }
-  dependsOn: [
-    databaseserver
-  ]
-}]
+// module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+//   name: take('iraserviceapp-${deployment().name}-deployment', 64)
+//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+//   params: {
+//     location: location
+//     tags: tags
+//     containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+//     sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
+//     containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
+//     appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+//     storageRG: parSpokeNetworks[i].rgStorage
+//     appConfigURL: supportingServices[i].outputs.appConfigURL
+//     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+//     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
+//     containerAppName: 'irasservice'
+//     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
+//     webAppURLConfigKey: 'AppSettings:ApplicationsServiceUri'
+//     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
+//   }
+//   dependsOn: [
+//     databaseserver
+//   ]
+// }]
 
 module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('usermanagementapp-${deployment().name}-deployment', 64)
