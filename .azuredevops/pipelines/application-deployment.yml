@@ -74,9 +74,10 @@ jobs:
           failOnStandardError: true
           inlineScript: |
             az config set bicep.use_binary_from_path=false --only-show-errors
-            output=$(az deployment sub create --name "App-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.application.bicep  \
+            output=$(az stack sub create --name "application-deployment-stack" --location $(location) --template-file ./5.spoke-network/main.application.bicep  \
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
-                           parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase))
+                           parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
+                           --deny-settings-mode none --action-on-unmanage deleteResources --yes)
             echo $output | jq .
             appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
             echo "##vso[task.setvariable variable=appResourceGroupName;isoutput=true]$appResourceGroup"

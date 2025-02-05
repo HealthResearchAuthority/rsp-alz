@@ -72,16 +72,11 @@ jobs:
           failOnStandardError: true
           inlineScript: |
             az config set bicep.use_binary_from_path=false --only-show-errors
-            output=$(az deployment sub create --name "Network-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.network.bicep \
-              --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam)
+            output=$(az stack sub create --name "network-deployment-stack" --location $(location) --template-file ./5.spoke-network/main.network.bicep  \
+              --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam \
+                           --deny-settings-mode none --action-on-unmanage deleteResources --yes)
             echo $output | jq .
-            spokeVNetId=$(echo $output | jq -r '.properties.outputs.spokeVNetId.value')
-            spokeVNetName=$(echo $output | jq -r '.properties.outputs.spokeVNetName.value')
-            spokeInfraSubnetId=$(echo $output | jq -r '.properties.outputs.spokeInfraSubnetId.value')
-            spokeInfraSubnetName=$(echo $output | jq -r '.properties.outputs.spokeInfraSubnetName.value')
-            spokePrivateEndpointsSubnetName=$(echo $output | jq -r '.properties.outputs.spokePrivateEndpointsSubnetName.value')
+            spokeVNetId=$(echo $output | jq -r '.spokeVNetId.value')
+            spokeVNetName=$(echo $output | jq -r '.spokeVNetName.value')
             echo "##vso[task.setvariable variable=spokeVNetId;isoutput=true]$spokeVNetId"
             echo "##vso[task.setvariable variable=spokeVNetName;isoutput=true]$spokeVNetName"
-            echo "##vso[task.setvariable variable=spokeInfraSubnetId;isoutput=true]$spokeInfraSubnetId"
-            echo "##vso[task.setvariable variable=spokeInfraSubnetName;isoutput=true]$spokeInfraSubnetName"
-            echo "##vso[task.setvariable variable=spokePrivateEndpointsSubnetName;isoutput=true]$spokePrivateEndpointsSubnetName"
