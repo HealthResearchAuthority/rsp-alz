@@ -18,6 +18,12 @@ param containerAppName string
 @description('The resource ID of the existing Container Apps environment in which the Container App will be deployed.')
 param containerAppsEnvironmentId string
 
+@description('Container image tag.')
+param containerImageTag string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+
+@description('Custom container name.')
+param containerImageName string = 'simple-hello-world-container'
+
 param sqlServerUserAssignedIdentityName string = ''
 param containerRegistryUserAssignedIdentityId string = ''
 param appConfigurationUserAssignedIdentityId string = ''
@@ -82,8 +88,8 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
     template: {
       containers: [
         {
-          image: 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
-          name: 'simple-hello-world-container'
+          image: containerImageTag
+          name: containerImageName
           resources: {
             cpu: json('0.5')
             memory: '1Gi'

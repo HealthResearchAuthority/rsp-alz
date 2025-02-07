@@ -27,6 +27,18 @@ param parAdminLogin string = ''
 @description('SQL Admin Password')
 param parSqlAdminPhrase string
 
+@description('Iras Service Container image tag.')
+param parIrasContainerImageTag string 
+
+@description('User Service Container image tag.')
+param parUserServiceContainerImageTag string 
+
+@description('QuestionSet Service Container image tag.')
+param parQuestionSetContainerImageTag string 
+
+// @description('RTS Service Container image tag.')
+// param parRtsContainerImageTag string 
+
 @description('Hub Virtual Network ID')
 param hubVNetId string = '/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth'
 
@@ -208,29 +220,31 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [for i in ra
   }
 }]
 
-// module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-//   name: take('iraserviceapp-${deployment().name}-deployment', 64)
-//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
-//   params: {
-//     location: location
-//     tags: tags
-//     containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
-//     sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
-//     containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-//     appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-//     storageRG: parSpokeNetworks[i].rgStorage
-//     appConfigURL: supportingServices[i].outputs.appConfigURL
-//     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
-//     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
-//     containerAppName: 'irasservice'
-//     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
-//     webAppURLConfigKey: 'AppSettings:ApplicationsServiceUri'
-//     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
-//   }
-//   dependsOn: [
-//     databaseserver
-//   ]
-// }]
+module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('iraserviceapp-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+  params: {
+    location: location
+    tags: tags
+    containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+    sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
+    containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
+    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    storageRG: parSpokeNetworks[i].rgStorage
+    appConfigURL: supportingServices[i].outputs.appConfigURL
+    appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+    containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
+    containerAppName: 'irasservice'
+    containerImageTag: parIrasContainerImageTag
+    containerImageName: 'rsp-irasservice'
+    configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
+    webAppURLConfigKey: 'AppSettings:ApplicationsServiceUri'
+    sharedservicesRG: parSpokeNetworks[i].rgSharedServices
+  }
+  dependsOn: [
+    databaseserver
+  ]
+}]
 
 module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('usermanagementapp-${deployment().name}-deployment', 64)
@@ -247,6 +261,8 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'usermanagementservice'
+    containerImageTag: parUserServiceContainerImageTag
+    containerImageName: 'rsp-usersservice'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:UsersServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
@@ -271,6 +287,8 @@ module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'questionsetservice'
+    containerImageTag: parQuestionSetContainerImageTag
+    containerImageName: 'rsp-questionsetservice'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:QuestionSetServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
