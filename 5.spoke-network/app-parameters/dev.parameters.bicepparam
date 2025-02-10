@@ -6,7 +6,7 @@ param parSqlAdminPhrase = ''
 
 param hubVNetId = '/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth'
 
-param parIrasContainerImageTag = 'crrspshared2i2oqdevuks.azurecr.io/rsp-irasservice:latest'
+//param parIrasContainerImageTag = 'crrspshared2i2oqdevuks.azurecr.io/rsp-irasservice:latest'
 
 param parUserServiceContainerImageTag = 'crrspshared2i2oqdevuks.azurecr.io/rsp-usermanagementservice:latest'
 
