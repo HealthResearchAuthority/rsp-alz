@@ -4,7 +4,7 @@ param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
 
-//param parIrasContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-irasservice:latest'
+param parIrasContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-irasservice:latest'
 
 param parUserServiceContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-usermanagementservice:latest'
 
