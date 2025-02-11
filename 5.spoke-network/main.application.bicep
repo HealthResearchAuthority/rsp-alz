@@ -179,6 +179,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     networkingResourcesNames: networkingnaming[i].outputs.resourcesNames
     networkingResourceGroup: parSpokeNetworks[i].rgNetworking
     jwksURI: 'irasportal-${parSpokeNetworks[i].parEnvironment}.azurewebsites.net'
+    IDGENV: parSpokeNetworks[i].outputs.IDGENV
   }
 }]
 

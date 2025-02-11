@@ -28,12 +28,19 @@ param spokePrivateEndpointSubnetName string
 @description('JWKS URi for backend services to validate a request')
 param jwksURI string
 
+@description('Environment Value for IDG Authentication URL')
+param IDGENV string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyvalues = [
   {
     name: 'AppSettings:AuthSettings:Authority'
-    value: 'https://dev.id.nihr.ac.uk:443/oauth2/token'
+    value: 'https://${IDGENV}.id.nihr.ac.uk:443/oauth2/token'
+  }
+  {
+    name: 'AppSettings:AuthSettings:Issuers'
+    value: '[\r\n\thttps://${IDGENV}.id.nihr.ac.uk:443/oauth2/token,\r\n\thttps://${IDGENV}.id.nihr.ac.uk/oauth2/token\\r\n]'
   }
   {
     name: 'AppSettings:AuthSettings:ClientId'

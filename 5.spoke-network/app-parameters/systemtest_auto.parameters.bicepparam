@@ -4,6 +4,12 @@ param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
 
+param parIrasContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-irasservice:latest'
+
+param parUserServiceContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-usermanagementservice:latest'
+
+param parQuestionSetContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-questionsetservice:latest'
+
 param hubVNetId = '/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth'
 
 param parSpokeNetworks = [
@@ -23,5 +29,6 @@ param parSpokeNetworks = [
     rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtestauto-uks'
     rgStorage: 'rg-rsp-storage-spoke-systemtestauto-uks'
     deployWebAppSlot: false
+    IDGENV: 'test'
   }
 ]

@@ -31,5 +31,6 @@ param parSpokeNetworks = [
     rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtest-uks'
     rgStorage: 'rg-rsp-storage-spoke-systemtest-uks'
     deployWebAppSlot: false
+    IDGENV: 'test'
   }
 ]
