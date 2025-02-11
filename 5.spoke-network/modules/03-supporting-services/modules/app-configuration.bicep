@@ -51,6 +51,26 @@ var keyvalues = [
     name: 'ConnectionStrings:IdentityDbConnection'
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=identityservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
   }
+  {
+    name: 'AppSettings:Sentinel$applicationservice'
+    value: '0'
+  }
+  {
+    name: 'AppSettings:Sentinel$portal'
+    value: '0'
+  }
+  {
+    name: 'AppSettings:Sentinel$questionsetservice'
+    value: '0'
+  }
+  {
+    name: 'AppSettings:Sentinel$rtsservice'
+    value: '0'
+  }
+  {
+    name: 'AppSettings:Sentinel$usersservice'
+    value: '0'
+  }
 ]
 
 var privateDnsZoneNames = 'privatelink.azconfig.io'

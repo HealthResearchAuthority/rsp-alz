@@ -261,8 +261,8 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'usermanagementservice'
-    // containerImageTag: parUserServiceContainerImageTag
-    // containerImageName: 'rsp-usersservice'
+    containerImageTag: parUserServiceContainerImageTag
+    containerImageName: 'usermanagementservice'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:UsersServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
@@ -287,8 +287,8 @@ module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'questionsetservice'
-    // containerImageTag: parQuestionSetContainerImageTag
-    // containerImageName: 'rsp-questionsetservice'
+    containerImageTag: parQuestionSetContainerImageTag
+    containerImageName: 'questionsetservice'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:QuestionSetServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
