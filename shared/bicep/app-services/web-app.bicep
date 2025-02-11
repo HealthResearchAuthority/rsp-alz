@@ -49,7 +49,7 @@ param storageAccountRequired bool = false
 @description('Optional. Azure Resource Manager ID of the Virtual network and subnet to be joined by Regional VNET Integration. This must be of the form /subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}.')
 param virtualNetworkSubnetId string = ''
 
-@allowed(['windowsNet6', 'windowsNet7', 'windowsNet8', 'windowsAspNet486', 'linuxJava17Se', 'linuxNet8', 'linuxNet7', 'linuxNet6', 'linuxNode18'])
+@allowed(['windowsNet6', 'windowsNet7', 'windowsNet8', 'windowsNet9', 'windowsAspNet486', 'linuxJava17Se', 'linuxNet9', 'linuxNet8', 'linuxNet7', 'linuxNet6', 'linuxNode18'])
 @description('Mandatory. Predefined set of config settings.')
 param siteConfigSelection string 
 
@@ -199,6 +199,16 @@ var siteConfigConfigurationMap  = {
     netFrameworkVersion: 'v8.0'
     use32BitWorkerProcess: false    
   }
+  windowsNet9 : {
+    metadata :[
+      {
+        name:'CURRENT_STACK'
+        value:'dotnet'
+      }
+    ]
+    netFrameworkVersion: 'v9.0'
+    use32BitWorkerProcess: false    
+  }
   windowsAspNet486 : {
     metadata :[
       {
@@ -211,6 +221,10 @@ var siteConfigConfigurationMap  = {
   }
   linuxJava17Se: {
     linuxFxVersion: 'JAVA|17-java17'
+    use32BitWorkerProcess: false    
+  }
+  linuxNet9: {
+    linuxFxVersion: 'DOTNETCORE|9.0'
     use32BitWorkerProcess: false    
   }
   linuxNet8: {
