@@ -28,16 +28,34 @@ param spokePrivateEndpointSubnetName string
 @description('JWKS URi for backend services to validate a request')
 param jwksURI string
 
+@description('Environment Value for IDG Authentication URL')
+param IDGENV string
+
+@description('Client ID for IDG Authentication')
+param clientID string
+
+@secure()
+@description('Client secret for IDG Authentication')
+param clientSecret string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyvalues = [
   {
     name: 'AppSettings:AuthSettings:Authority'
-    value: 'https://dev.id.nihr.ac.uk:443/oauth2/token'
+    value: 'https://${IDGENV}.id.nihr.ac.uk:443/oauth2/token'
+  }
+  {
+    name: 'AppSettings:AuthSettings:Issuers'
+    value: '[\r\n\thttps://${IDGENV}.id.nihr.ac.uk:443/oauth2/token,\r\n\thttps://${IDGENV}.id.nihr.ac.uk/oauth2/token\n]'
   }
   {
     name: 'AppSettings:AuthSettings:ClientId'
-    value: 'Uf6CKXOECh6zhzgtdlfsrnhbzXca'
+    value: clientID
+  }
+  {
+    name: 'AppSettings:AuthSettings:ClientSecret'
+    value: clientSecret
   }
   {
     name: 'AppSettings:AuthSettings:JwksUri'
@@ -50,6 +68,26 @@ var keyvalues = [
   {
     name: 'ConnectionStrings:IdentityDbConnection'
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=identityservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+  }
+  {
+    name: 'AppSettings:Sentinel$applicationservice'
+    value: '0'
+  }
+  {
+    name: 'AppSettings:Sentinel$portal'
+    value: '0'
+  }
+  {
+    name: 'AppSettings:Sentinel$questionsetservice'
+    value: '0'
+  }
+  {
+    name: 'AppSettings:Sentinel$rtsservice'
+    value: '0'
+  }
+  {
+    name: 'AppSettings:Sentinel$usersservice'
+    value: '0'
   }
 ]
 
@@ -101,6 +139,9 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2023-03-01'
     userAssignedIdentities: {
       '${appConfigurationUserAssignedIdentity.id}': {}
     }
+  }
+  properties: {
+    publicNetworkAccess:'Enabled'
   }
 }
 
