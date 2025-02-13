@@ -36,6 +36,13 @@ param jwksURI string
 @description('Environment Value for IDG Authentication URL')
 param IDGENV string
 
+@description('Client ID for IDG Authentication')
+param clientID string
+
+@secure()
+@description('Client secret for IDG Authentication')
+param clientSecret string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -95,6 +102,8 @@ module appConfiguration './modules/app-configuration.bicep' = {
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     jwksURI: jwksURI
     IDGENV: IDGENV
+    clientID: clientID
+    clientSecret: clientSecret
   }
 }
 

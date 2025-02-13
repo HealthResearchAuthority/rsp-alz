@@ -14,6 +14,10 @@ param parQuestionSetContainerImageTag = 'rsp-questionsetservice:latest'
 
 param parRtsContainerImageTag = 'rsp-rtsservice:latest'
 
+param parClientID = ''
+
+param parClientSecret = ''
+
 param parSpokeNetworks = [
   {
     subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'

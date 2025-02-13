@@ -39,6 +39,13 @@ param parQuestionSetContainerImageTag string
 @description('RTS Service Container image tag.')
 param parRtsContainerImageTag string 
 
+@description('Client Key for IDG Authentication')
+param parClientID string
+
+@secure()
+@description('Client secret for IDG Authentication')
+param parClientSecret string
+
 @description('Hub Virtual Network ID')
 param hubVNetId string = '/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth'
 
@@ -180,6 +187,8 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     networkingResourceGroup: parSpokeNetworks[i].rgNetworking
     jwksURI: 'irasportal-${parSpokeNetworks[i].parEnvironment}.azurewebsites.net'
     IDGENV: parSpokeNetworks[i].IDGENV
+    clientID: parClientID
+    clientSecret: parClientSecret
   }
 }]
 

@@ -31,6 +31,13 @@ param jwksURI string
 @description('Environment Value for IDG Authentication URL')
 param IDGENV string
 
+@description('Client ID for IDG Authentication')
+param clientID string
+
+@secure()
+@description('Client secret for IDG Authentication')
+param clientSecret string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyvalues = [
@@ -44,7 +51,11 @@ var keyvalues = [
   }
   {
     name: 'AppSettings:AuthSettings:ClientId'
-    value: 'Uf6CKXOECh6zhzgtdlfsrnhbzXca'
+    value: clientID
+  }
+  {
+    name: 'AppSettings:AuthSettings:ClientSecret'
+    value: clientSecret
   }
   {
     name: 'AppSettings:AuthSettings:JwksUri'
