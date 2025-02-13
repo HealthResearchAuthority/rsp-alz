@@ -245,7 +245,7 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'irasservice'
-    containerImageTag: '${supportingServices[i].outputs.containerRegistryName}/${parIrasContainerImageTag}'
+    containerImageTag: '${supportingServices[i].outputs.containerRegistryLoginServer}/${parIrasContainerImageTag}'
     containerImageName: 'irasservice'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:ApplicationsServiceUri'
@@ -271,7 +271,7 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'usermanagementservice'
-    containerImageTag: '${supportingServices[i].outputs.containerRegistryName}/${parUserServiceContainerImageTag}'
+    containerImageTag: '${supportingServices[i].outputs.containerRegistryLoginServer}/${parUserServiceContainerImageTag}'
     containerImageName: 'usermanagementservice'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:UsersServiceUri'
@@ -298,7 +298,7 @@ module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'questionsetservice'
-    containerImageTag: '${supportingServices[i].outputs.containerRegistryName}/${parQuestionSetContainerImageTag}'
+    containerImageTag: '${supportingServices[i].outputs.containerRegistryLoginServer}/${parQuestionSetContainerImageTag}'
     containerImageName: 'questionsetservice'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:QuestionSetServiceUri'
@@ -326,7 +326,7 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [fo
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'rtsservice'
-    containerImageTag: '${supportingServices[i].outputs.containerRegistryName}/${parRtsContainerImageTag}'
+    containerImageTag: '${supportingServices[i].outputs.containerRegistryLoginServer}/${parRtsContainerImageTag}'
     containerImageName: 'rtsservice'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:RtsServiceUri'
