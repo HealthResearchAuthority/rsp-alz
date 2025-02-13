@@ -279,6 +279,7 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
   }
   dependsOn: [
     databaseserver
+    irasserviceapp
   ]
 }]
 
@@ -305,6 +306,8 @@ module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [f
   }
   dependsOn: [
     databaseserver
+    irasserviceapp
+    usermanagementapp
   ]
 }]
 
@@ -331,6 +334,9 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [fo
   }
   dependsOn: [
     databaseserver
+    irasserviceapp
+    usermanagementapp
+    questionsetapp
   ]
 }]
 
