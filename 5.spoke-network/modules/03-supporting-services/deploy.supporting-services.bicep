@@ -33,6 +33,9 @@ param networkingResourcesNames object
 param networkingResourceGroup string
 param jwksURI string
 
+@description('Environment Value for IDG Authentication URL')
+param IDGENV string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -91,6 +94,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     spokeVNetId: spokeVNetId
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     jwksURI: jwksURI
+    IDGENV: IDGENV
   }
 }
 
