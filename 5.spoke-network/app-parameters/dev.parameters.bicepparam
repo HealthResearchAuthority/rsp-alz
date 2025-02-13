@@ -14,6 +14,10 @@ param parQuestionSetContainerImageTag = 'crrspshared2i2oqdevuks.azurecr.io/rsp-q
 
 //param parRtsContainerImageTag = 'crrspshared2i2oqdevuks.azurecr.io/rsp-rtsservice:latest'
 
+param parClientID = ''
+
+param parClientSecret = ''
+
 param parSpokeNetworks = [
   {
     subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'

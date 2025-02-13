@@ -10,6 +10,10 @@ param parUserServiceContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.i
 
 param parQuestionSetContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-questionsetservice:latest'
 
+param parClientID = ''
+
+param parClientSecret = ''
+
 param hubVNetId = '/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth'
 
 param parSpokeNetworks = [
