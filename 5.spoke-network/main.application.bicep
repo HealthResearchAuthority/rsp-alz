@@ -220,7 +220,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [for i in ra
     sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
     adminLogin: parAdminLogin
     adminPassword: parSqlAdminPhrase
-    databases : ['applicationservice','identityservice','questionsetservice']
+    databases : ['applicationservice','identityservice','questionsetservice','rtsservice']
     environment: parSpokeNetworks[i].parEnvironment
     spokePrivateEndpointSubnetName: pepSubnet[i].name // spoke[i].outputs.spokePrivateEndpointsSubnetName
     spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId

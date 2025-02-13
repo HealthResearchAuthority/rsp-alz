@@ -140,6 +140,9 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2023-03-01'
       '${appConfigurationUserAssignedIdentity.id}': {}
     }
   }
+  properties: {
+    publicNetworkAccess:'Enabled'
+  }
 }
 
 module appConfigurationDataReaderAssignment '../../../../shared/bicep/role-assignments/role-assignment.bicep' = {
