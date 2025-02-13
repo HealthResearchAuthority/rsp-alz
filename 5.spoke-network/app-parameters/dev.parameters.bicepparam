@@ -6,13 +6,13 @@ param parSqlAdminPhrase = ''
 
 param hubVNetId = '/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth'
 
-param parIrasContainerImageTag = 'crrspshared2i2oqdevuks.azurecr.io/rsp-irasservice:latest'
+param parIrasContainerImageTag = 'rsp-irasservice:latest'
 
-param parUserServiceContainerImageTag = 'crrspshared2i2oqdevuks.azurecr.io/rsp-usermanagementservice:latest'
+param parUserServiceContainerImageTag = 'rsp-usermanagementservice:latest'
 
-param parQuestionSetContainerImageTag = 'crrspshared2i2oqdevuks.azurecr.io/rsp-questionsetservice:latest'
+param parQuestionSetContainerImageTag = 'rsp-questionsetservice:latest'
 
-//param parRtsContainerImageTag = 'crrspshared2i2oqdevuks.azurecr.io/rsp-rtsservice:latest'
+param parRtsContainerImageTag = 'rsp-rtsservice:latest'
 
 param parSpokeNetworks = [
   {

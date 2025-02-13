@@ -36,8 +36,8 @@ param parUserServiceContainerImageTag string
 @description('QuestionSet Service Container image tag.')
 param parQuestionSetContainerImageTag string 
 
-// @description('RTS Service Container image tag.')
-// param parRtsContainerImageTag string 
+@description('RTS Service Container image tag.')
+param parRtsContainerImageTag string 
 
 @description('Hub Virtual Network ID')
 param hubVNetId string = '/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth'
@@ -236,7 +236,7 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'irasservice'
-    containerImageTag: parIrasContainerImageTag
+    containerImageTag: '${supportingServices[i].outputs.containerRegistryName}/${parIrasContainerImageTag}'
     containerImageName: 'irasservice'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:ApplicationsServiceUri'
@@ -262,7 +262,7 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'usermanagementservice'
-    containerImageTag: parUserServiceContainerImageTag
+    containerImageTag: '${supportingServices[i].outputs.containerRegistryName}/${parUserServiceContainerImageTag}'
     containerImageName: 'usermanagementservice'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:UsersServiceUri'
@@ -288,10 +288,36 @@ module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'questionsetservice'
-    containerImageTag: parQuestionSetContainerImageTag
+    containerImageTag: '${supportingServices[i].outputs.containerRegistryName}/${parQuestionSetContainerImageTag}'
     containerImageName: 'questionsetservice'
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:QuestionSetServiceUri'
+    sharedservicesRG: parSpokeNetworks[i].rgSharedServices
+  }
+  dependsOn: [
+    databaseserver
+  ]
+}]
+
+module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  name: take('rtsserviceapp-${deployment().name}-deployment', 64)
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+  params: {
+    location: location
+    tags: tags
+    containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+    sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
+    containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
+    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    storageRG: parSpokeNetworks[i].rgStorage
+    appConfigURL: supportingServices[i].outputs.appConfigURL
+    appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+    containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
+    containerAppName: 'rtsservice'
+    containerImageTag: '${supportingServices[i].outputs.containerRegistryName}/${parRtsContainerImageTag}'
+    containerImageName: 'rtsservice'
+    configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
+    webAppURLConfigKey: 'AppSettings:RtsServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
   }
   dependsOn: [

@@ -4,13 +4,13 @@ param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
 
-param parIrasContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-irasservice:latest'
+param parIrasContainerImageTag = 'rsp-irasservice:latest'
 
-param parUserServiceContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-usermanagementservice:latest'
+param parUserServiceContainerImageTag = 'rsp-usermanagementservice:latest'
 
-param parQuestionSetContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-questionsetservice:latest'
+param parQuestionSetContainerImageTag = 'rsp-questionsetservice:latest'
 
-//param parRtsContainerImageTag = 'crrspsharedrwcwemanualtestuks.azurecr.io/rsp-rtsservice:latest'
+param parRtsContainerImageTag = 'rsp-rtsservice:latest'
 
 param hubVNetId = '/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth'
 
