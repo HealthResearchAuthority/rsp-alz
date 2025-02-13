@@ -40,6 +40,13 @@ param enableApplicationGatewayCertificate bool
 @description('The name of the certificate key to use for Application Gateway certificate.')
 param applicationGatewayCertificateKeyName string
 
+@description('Client Key for IDG Authentication')
+param parClientID string
+
+@secure()
+@description('Client secret for IDG Authentication')
+param parClientSecret string
+
 // @description('Enable usage and telemetry feedback to Microsoft.')
 // param enableTelemetry bool = true
 
@@ -442,6 +449,8 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     networkingResourceGroup: parSpokeNetworks[i].rgNetworking
     jwksURI: 'irasportal-${parSpokeNetworks[i].parEnvironment}.azurewebsites.net'
     IDGENV: ''
+    clientID: parClientID
+    clientSecret: parClientSecret
   }
 }]
 
