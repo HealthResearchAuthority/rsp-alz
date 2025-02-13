@@ -105,4 +105,4 @@ jobs:
           scriptLocation: inlineScript
           failOnStandardError: true
           inlineScript: |
-            az stack sub delete --name "application-deployment-stack" --yes
+            az stack sub delete --name "application-deployment-stack" --action-on-unmanage deleteResources --yes
