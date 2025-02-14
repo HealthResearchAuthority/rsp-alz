@@ -340,25 +340,25 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [fo
   ]
 }]
 
-// module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
-//   name: take('webApp-${deployment().name}-deployment', 64)
-//   params: {
-//     tags: {}
-//     sku: 'B1'
-//     logAnalyticsWsId: logAnalyticsWorkspaceId
-//     location: location
-//     appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
-//     webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
-//     webAppBaseOs: 'Linux'
-//     subnetIdForVnetInjection: webAppSubnet[i].id  // spoke[i].outputs.spokeWebAppSubnetId
-//     appConfigmanagedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-//     deploySlot: parSpokeNetworks[i].deployWebAppSlot
-//     privateEndpointRG: parSpokeNetworks[i].rgNetworking
-//     spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
-//     subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
-//   }
-// }]
+module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+  name: take('webApp-${deployment().name}-deployment', 64)
+  params: {
+    tags: {}
+    sku: 'B1'
+    logAnalyticsWsId: logAnalyticsWorkspaceId
+    location: location
+    appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
+    webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
+    webAppBaseOs: 'Linux'
+    subnetIdForVnetInjection: webAppSubnet[i].id  // spoke[i].outputs.spokeWebAppSubnetId
+    appConfigmanagedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    deploySlot: parSpokeNetworks[i].deployWebAppSlot
+    privateEndpointRG: parSpokeNetworks[i].rgNetworking
+    spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
+    subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
+  }
+}]
 
 // module applicationGateway 'modules/08-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
 //   name: take('applicationGateway-${deployment().name}-deployment', 64)
