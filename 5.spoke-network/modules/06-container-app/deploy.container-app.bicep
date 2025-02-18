@@ -26,7 +26,7 @@ param containerImageName string = 'simple-hello-world-container'
 
 param sqlServerUserAssignedIdentityName string = ''
 param containerRegistryUserAssignedIdentityId string = ''
-param appConfigurationUserAssignedIdentityId string = ''
+//param appConfigurationUserAssignedIdentityId string = ''
 param storageRG string
 param appConfigURL string
 param appConfigIdentityClientID string
@@ -35,6 +35,8 @@ param containerRegistryLoginServer string
 param configStoreName string
 param webAppURLConfigKey string
 param sharedservicesRG string
+
+param userAssignedIdentities array
 
 // @description('Name of the container registry from which Container App to pull images')
 // param acrName string
@@ -56,14 +58,18 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   name: containerAppName
   location: location
   tags: tags
-  identity: { 
+  identity:  {
     type: 'UserAssigned'
-    userAssignedIdentities: {
-        '${sqlServerUserAssignedIdentity.id}': {}
-        '${containerRegistryUserAssignedIdentityId}': {}
-        '${appConfigurationUserAssignedIdentityId}': {}
-    }
+    userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
   }
+  // identity: { 
+  //   type: 'UserAssigned'
+  //   userAssignedIdentities: {
+  //       '${sqlServerUserAssignedIdentity.id}': {}
+  //       '${containerRegistryUserAssignedIdentityId}': {}
+  //       '${appConfigurationUserAssignedIdentityId}': {}
+  //   }
+  // }
   properties: {
     configuration: {
       activeRevisionsMode: 'single'

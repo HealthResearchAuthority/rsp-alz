@@ -60,6 +60,8 @@ param privateDNSEnabled bool = false
 
 param privateDnsZoneName string = ''
 
+param keyVaultUserAssignedIdentityName string = ''
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -151,6 +153,21 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
   }
 }
 
+resource keyVaultmanagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: keyVaultUserAssignedIdentityName
+  location: location
+}
+
+module roleAssignment '../../../../shared/bicep/role-assignments/role-assignment.bicep' = {
+  name: 'role-assignment'
+  params: {
+    name: '${keyVaultName}-role-assignment-reader'
+    principalId: keyVaultmanagedIdentity.properties.principalId
+    resourceId: keyVault.id
+    roleDefinitionId: '21090545-7ca7-4776-b22c-e363652d74d2'
+  }
+}
+
 resource keyVault_diagnosticSettings 'Microsoft.Insights/diagnosticsettings@2021-05-01-preview' = if ((!empty(diagnosticStorageAccountId)) || (!empty(diagnosticWorkspaceId)) || (!empty(diagnosticEventHubAuthorizationRuleId)) || (!empty(diagnosticEventHubName))) {
   name: !empty(diagnosticSettingsName) ? diagnosticSettingsName : '${keyVaultName}-diagnosticSettings'
   properties: {
@@ -188,3 +205,6 @@ output keyVaultId string = keyVault.id
 
 @description('The name of the key vault.')
 output keyVaultName string = keyVault.name
+
+@description('The resource ID of the user assigned managed identity for the Key Vault to be able to read Secrets from it.')
+output keyVaultUserAssignedIdentityId string = keyVaultmanagedIdentity.id

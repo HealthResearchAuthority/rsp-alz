@@ -43,7 +43,7 @@ var maxNameLength = 24
 var storageNameValid = toLower(replace(name, '-', ''))
 var uniqueStorageName = length(storageNameValid) > maxNameLength ? substring(storageNameValid, 0, maxNameLength) : storageNameValid
 
-resource storage 'Microsoft.Storage/storageAccounts@2021-09-01' = {  
+resource storage 'Microsoft.Storage/storageAccounts@2022-05-01' = {  
   name: uniqueStorageName
   location: location  
   kind: kind
@@ -57,6 +57,8 @@ resource storage 'Microsoft.Storage/storageAccounts@2021-09-01' = {
     accessTier: accessTier
     supportsHttpsTrafficOnly: supportsHttpsTrafficOnly
     networkAcls: networkAcls
+    publicNetworkAccess: 'Enabled'
+    minimumTlsVersion: 'TLS1_2'
   }  
 }
 
