@@ -6,10 +6,16 @@ param appServicePlanName string
 
 @description('Required. Name of the web app.')
 @maxLength(60)
-param webAppName string 
+param appName string 
 
-@description('Required. Name of the managed Identity that will be assigned to the web app.')
-param appConfigmanagedIdentityId string
+// @description('Required. Name of the managed Identity that will be assigned to the web app.')
+// param appConfigmanagedIdentityId string
+
+// @description('Required. Name of the managed Identity that will be assigned to the web app.')
+// param keyVaultmanagedIdentityId string = ''
+
+// @description('Required. Name of the managed Identity that will be assigned to the web app.')
+// param sqlServermanagedIdentityId string = ''
 
 @description('Optional S1 is default. Defines the name, tier, size, family and capacity of the App Service Plan. Plans ending to _AZ, are deploying at least three instances in three Availability Zones. EP* is only for functions')
 @allowed([ 'B1','S1', 'S2', 'S3', 'P1V3', 'P2V3', 'P3V3', 'P1V3_AZ', 'P2V3_AZ', 'P3V3_AZ', 'EP1', 'EP2', 'EP3', 'ASE_I1V2_AZ', 'ASE_I2V2_AZ', 'ASE_I3V2_AZ', 'ASE_I1V2', 'ASE_I2V2', 'ASE_I3V2' ])
@@ -42,7 +48,18 @@ param logAnalyticsWsId string
 @description('The subnet ID that is dedicated to Web Server, for Vnet Injection of the web app. If deployAseV3=true then this is the subnet dedicated to the ASE v3')
 param subnetIdForVnetInjection string
 
+@description('Name of the storage account if deploying Function App')
+@maxLength(24)
+param storageAccountName string = ''
+
+@description('Webapp or functionapp')
+@allowed(['functionapp','app'])
+param kind string
+
 param deploySlot bool
+
+param deployAppPrivateEndPoint bool
+param userAssignedIdentities array
 
 // @description('The name of an existing keyvault, that it will be used to store secrets (connection string)' )
 // param keyvaultName string
@@ -65,9 +82,9 @@ var spokeVNetName = spokeVNetIdTokens[8]
 // }
 
 module appInsights '../../../shared/bicep/app-insights.bicep' = {
-  name: 'appInsights-Deployment'
+  name: take('${appName}-appInsights-Deployment', 64)
   params: {
-    name: 'appi-${webAppName}'
+    name: 'appi-${appName}'
     location: location
     tags: tags
     workspaceResourceId: logAnalyticsWsId
@@ -75,7 +92,7 @@ module appInsights '../../../shared/bicep/app-insights.bicep' = {
 }
 
 module appSvcPlan '../../../shared/bicep/app-services/app-service-plan.bicep' = {
-  name: take('appSvcPlan-${appServicePlanName}-Deployment', 64)
+  name: take('appSvcPlan-${appServicePlanName}-Deployment', 64) 
   params: {
     name: appServicePlanName
     location: location
@@ -86,11 +103,11 @@ module appSvcPlan '../../../shared/bicep/app-services/app-service-plan.bicep' = 
   }
 }
 
-module webApp '../../../shared/bicep/app-services/web-app.bicep' = {
-  name: take('${webAppName}-webApp-Deployment', 64)
+module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'app') {
+  name: take('${appName}-webApp-Deployment', 64)
   params: {
     kind: (webAppBaseOs =~ 'linux') ? 'app,linux' : 'app'
-    name:  webAppName
+    name:  appName
     location: location
     serverFarmResourceId: appSvcPlan.outputs.resourceId
     diagnosticWorkspaceId: logAnalyticsWsId   
@@ -101,9 +118,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = {
     systemAssignedIdentity: false
     userAssignedIdentities:  {
       type: 'UserAssigned'
-      userAssignedIdentities: {
-        '${appConfigmanagedIdentityId}': {}
-      }
+      userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
     }
     slots: deploySlot ? [
       {
@@ -113,19 +128,97 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = {
   }
 }
 
+module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'functionapp') {
+  name: take('fnAppStoragePrivateNetwork-${deployment().name}', 64)
+  params: {
+    name: storageAccountName
+    location: location
+    sku: 'Standard_LRS'
+    kind: 'StorageV2'
+    supportsHttpsTrafficOnly: true
+    tags: {}
+  }
+}
+
+module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp') {
+  name:take('rtsfnStorageBlobPrivateNetwork-${deployment().name}', 64)
+  scope: resourceGroup(privateEndpointRG)
+  params: {
+    location: location
+    azServicePrivateDnsZoneName: 'privatelink.blob.${environment().suffixes.storage}'
+    azServiceId: fnstorage.outputs.id
+    privateEndpointName: take('pep-${storageAccountName}-blob', 64)
+    privateEndpointSubResourceName: 'blob'
+    virtualNetworkLinks: [
+      {
+        vnetName: spokeVNetName
+        vnetId: vnetSpoke.id
+        registrationEnabled: false
+      }
+    ]
+    subnetId: subnetPrivateEndpointSubnetId
+    //vnetSpokeResourceId: spokeVNetId
+  }
+}
+
+module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp') {
+  name:take('rtsfnStorageFilePrivateNetwork-${deployment().name}', 64)
+  scope: resourceGroup(privateEndpointRG)
+  params: {
+    location: location
+    azServicePrivateDnsZoneName: 'privatelink.file.${environment().suffixes.storage}'
+    azServiceId: fnstorage.outputs.id
+    privateEndpointName: take('pep-${storageAccountName}-file', 64)
+    privateEndpointSubResourceName: 'file'
+    virtualNetworkLinks: [
+      {
+        vnetName: spokeVNetName
+        vnetId: vnetSpoke.id
+        registrationEnabled: false
+      }
+    ]
+    subnetId: subnetPrivateEndpointSubnetId
+    //vnetSpokeResourceId: spokeVNetId
+  }
+  dependsOn: [
+    storageBlobPrivateNetwork
+  ]
+}
+
+module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind == 'functionapp') {
+  name: take('${appName}-webApp-Deployment', 64)
+  params: {
+    kind: 'functionapp'
+    functionAppName:  appName
+    location: location
+    serverFarmResourceId: appSvcPlan.outputs.resourceId
+    //diagnosticWorkspaceId: logAnalyticsWsId
+    virtualNetworkSubnetId: subnetIdForVnetInjection
+    appInsightId: appInsights.outputs.appInsResourceId
+    userAssignedIdentities:  {
+      type: 'UserAssigned'
+      userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
+    }
+    storageAccountName: storageAccountName
+  }
+  dependsOn: [
+    fnstorage
+  ]
+}
+
 resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
   name: spokeVNetName
 }
 
-module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = {
+module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(deployAppPrivateEndPoint == true) {
   name:take('webAppPrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
     location: location
     azServicePrivateDnsZoneName: 'privatelink.azurewebsites.net'
-    azServiceId: webApp.outputs.resourceId
-    privateEndpointName: take('pep-${webApp.outputs.name}', 64)
+    azServiceId: kind == 'app' ? webApp.outputs.resourceId : fnApp.outputs.functionAppId
+    privateEndpointName: kind == 'app' ? take('pep-${webApp.outputs.name}', 64) : take('pep-${fnApp.outputs.functionAppName}', 64)
     privateEndpointSubResourceName: 'sites'
     virtualNetworkLinks: [
       {
@@ -226,7 +319,7 @@ module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-sp
 // output appConfigStoreName string =  deployAppConfig ? appConfigStore.outputs.name : ''
 // output appConfigStoreId string = deployAppConfig ? appConfigStore.outputs.resourceId : ''
 // output webAppName string = webApp.outputs.name
- output webAppHostName string = webApp.outputs.defaultHostname
+ output appHostName string = (kind == 'app') ? webApp.outputs.defaultHostname: fnApp.outputs.defaultHostName
 // output webAppResourceId string = webApp.outputs.resourceId
 // output webAppLocation string = webApp.outputs.location
 // output webAppSystemAssignedPrincipalId string = webApp.outputs.systemAssignedPrincipalId

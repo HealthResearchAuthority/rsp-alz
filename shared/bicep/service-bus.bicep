@@ -59,8 +59,13 @@ param allowTrustedServicesAccess bool = false
 @description('Specifies the location.')
 param location string = resourceGroup().location
 
+@description('Optional. The ID(s) to assign to the resource.')
+param userAssignedIdentities object = {}
+
 @description('Specifies the resource tags.')
 param tags object
+
+var deadLetterQueueName = 'deadletterQueue'
 
 // Variables
 var diagnosticSettingsName = 'diagnosticSettings'
@@ -98,6 +103,10 @@ resource namespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview' = {
   name: name
   location: location
   tags: tags
+  identity: {
+    type: 'UserAssigned'
+    userAssignedIdentities: userAssignedIdentities
+  }
   sku: {
     name: skuName
     capacity: capacity
@@ -118,6 +127,16 @@ resource namespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview' = {
   }
 }
 
+resource deadLetterFirehoseQueue 'Microsoft.ServiceBus/namespaces/queues@2018-01-01-preview' = {
+  name: deadLetterQueueName
+  parent: namespace
+  properties: {
+    requiresDuplicateDetection: false
+    requiresSession: false
+    enablePartitioning: false
+  }
+}
+
 resource queue 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-preview' = [for queueName in queueNames: {
   parent: namespace
   name: queueName
@@ -129,7 +148,11 @@ resource queue 'Microsoft.ServiceBus/namespaces/queues@2022-10-01-preview' = [fo
     deadLetteringOnMessageExpiration: deadLetteringOnMessageExpiration
     duplicateDetectionHistoryTimeWindow: duplicateDetectionHistoryTimeWindow
     maxDeliveryCount: maxDeliveryCount
+    forwardDeadLetteredMessagesTo: deadLetterQueueName
   }
+  dependsOn: [
+    deadLetterFirehoseQueue
+  ]
 }]
 
 resource topic 'Microsoft.ServiceBus/namespaces/topics@2022-10-01-preview' = [for topicName in topicNames: {

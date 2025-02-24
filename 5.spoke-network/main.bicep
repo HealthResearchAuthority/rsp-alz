@@ -645,7 +645,7 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [fo
   ]
 }]
 
-module rtsdatapullfunction '../shared/bicep/function-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+module rtsdatapullfunction '../shared/bicep/app-services/function-app.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('functionapp-${deployment().name}-deployment', 64)
   scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
   params: {

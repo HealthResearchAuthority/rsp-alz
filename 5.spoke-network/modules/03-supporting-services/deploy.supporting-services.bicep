@@ -83,6 +83,7 @@ module keyVault './modules/key-vault.bicep' = {
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
     privateDNSEnabled: privateDNSEnabled
     privateDnsZoneName: keyVaultPrivateDnsZoneName
+    keyVaultUserAssignedIdentityName: resourcesNames.keyVaultUserAssignedIdentity
   }
 }
 
@@ -104,6 +105,19 @@ module appConfiguration './modules/app-configuration.bicep' = {
     IDGENV: IDGENV
     clientID: clientID
     clientSecret: clientSecret
+  }
+}
+
+module serviceBus './modules/service-bus.module.bicep' = {
+  name: 'serviceBus-${uniqueString(resourceGroup().id)}'
+  params: {
+    serviceBusNamespaceName: resourcesNames.serviceBus
+    serviceBusPrivateEndpointName: resourcesNames.serviceBusPep
+    serviceBusReceiverUserAssignedIdentityName: resourcesNames.serviceBusReceiverUserAssignedIdentity
+    serviceBusSenderUserAssignedIdentityName: resourcesNames.serviceBusSenderUserAssignedIdentity
+    spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
+    spokeVNetId: spokeVNetId
+    diagnosticWorkspaceId: logAnalyticsWorkspaceId
   }
 }
 
@@ -132,5 +146,10 @@ output keyVaultName string = keyVault.outputs.keyVaultName
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
  output appConfigurationUserAssignedIdentityId string = appConfiguration.outputs.appConfigurationUserAssignedIdentityId
 
+@description('The resource ID of the user assigned managed identity for the Key Vault to be able to read Secrets from it.')
+output keyVaultUserAssignedIdentityId string = keyVault.outputs.keyVaultUserAssignedIdentityId
+
  output appConfigURL string = appConfiguration.outputs.appConfigURL
  output appConfigIdentityClientID string = appConfiguration.outputs.appConfigMIClientID
+ output serviceBusReceiverManagedIdentityID string = serviceBus.outputs.serviceBusReceiverManagedIdentityId
+ output serviceBusSenderManagedIdentity string = serviceBus.outputs.serviceBusSenderManagedIdentityId

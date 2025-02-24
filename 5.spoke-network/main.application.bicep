@@ -239,7 +239,7 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
     sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
     containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     storageRG: parSpokeNetworks[i].rgStorage
     appConfigURL: supportingServices[i].outputs.appConfigURL
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
@@ -250,6 +250,12 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:ApplicationsServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
+    userAssignedIdentities: [
+      supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+      supportingServices[i].outputs.serviceBusSenderManagedIdentity
+      databaseserver[i].outputs.outputsqlServerUAIID
+    ]
   }
   dependsOn: [
     databaseserver
@@ -265,7 +271,7 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
     sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
     containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     storageRG: parSpokeNetworks[i].rgStorage
     appConfigURL: supportingServices[i].outputs.appConfigURL
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
@@ -276,6 +282,11 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:UsersServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
+    userAssignedIdentities: [
+      supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+      databaseserver[i].outputs.outputsqlServerUAIID
+    ]
   }
   dependsOn: [
     databaseserver
@@ -292,7 +303,7 @@ module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
     sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
     containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     storageRG: parSpokeNetworks[i].rgStorage
     appConfigURL: supportingServices[i].outputs.appConfigURL
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
@@ -303,6 +314,11 @@ module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:QuestionSetServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
+    userAssignedIdentities: [
+      supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+      databaseserver[i].outputs.outputsqlServerUAIID
+    ]
   }
   dependsOn: [
     databaseserver
@@ -320,7 +336,7 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [fo
     containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
     sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
     containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-    appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     storageRG: parSpokeNetworks[i].rgStorage
     appConfigURL: supportingServices[i].outputs.appConfigURL
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
@@ -331,6 +347,11 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [fo
     configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
     webAppURLConfigKey: 'AppSettings:RtsServiceUri'
     sharedservicesRG: parSpokeNetworks[i].rgSharedServices
+    userAssignedIdentities: [
+      supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
+      databaseserver[i].outputs.outputsqlServerUAIID
+    ]
   }
   dependsOn: [
     databaseserver
@@ -349,15 +370,75 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in rang
     logAnalyticsWsId: logAnalyticsWorkspaceId
     location: location
     appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
-    webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
+    appName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
     webAppBaseOs: 'Linux'
     subnetIdForVnetInjection: webAppSubnet[i].id  // spoke[i].outputs.spokeWebAppSubnetId
-    appConfigmanagedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     deploySlot: parSpokeNetworks[i].deployWebAppSlot
     privateEndpointRG: parSpokeNetworks[i].rgNetworking
     spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
     subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
+    kind: 'app'
+    deployAppPrivateEndPoint: true
+    userAssignedIdentities: [
+      supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+    ]
   }
+}]
+
+module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+  name: take('rtsfnApp-${deployment().name}-deployment', 64)
+  params: {
+    tags: {}
+    sku: 'B1'
+    logAnalyticsWsId: logAnalyticsWorkspaceId
+    location: location
+    appServicePlanName: 'asp-rsp-fnsyncrtsApp-manualtest-uks'
+    appName: 'func-rts-data-sync-${parSpokeNetworks[i].parEnvironment}'
+    webAppBaseOs: 'Windows'
+    subnetIdForVnetInjection: webAppSubnet[i].id  // spoke[i].outputs.spokeWebAppSubnetId
+    deploySlot: parSpokeNetworks[i].deployWebAppSlot
+    privateEndpointRG: parSpokeNetworks[i].rgNetworking
+    spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
+    subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
+    kind: 'functionapp'
+    storageAccountName: 'strtssync${parSpokeNetworks[i].parEnvironment}'
+    deployAppPrivateEndPoint: false
+    userAssignedIdentities: [
+      supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      databaseserver[i].outputs.outputsqlServerUAIID
+      supportingServices[i].outputs.keyVaultUserAssignedIdentityId
+    ]
+  }
+}]
+
+module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in range(0, length(parSpokeNetworks)): {
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+  name: take('fnNotifyApp-${deployment().name}-deployment', 64)
+  params: {
+    tags: {}
+    sku: 'B1'
+    logAnalyticsWsId: logAnalyticsWorkspaceId
+    location: location
+    appServicePlanName: 'asp-rsp-fnNotifyApp-manualtest-uks'
+    appName: 'func-notify-${parSpokeNetworks[i].parEnvironment}'
+    webAppBaseOs: 'Windows'
+    subnetIdForVnetInjection: webAppSubnet[i].id  // spoke[i].outputs.spokeWebAppSubnetId
+    deploySlot: parSpokeNetworks[i].deployWebAppSlot
+    privateEndpointRG: parSpokeNetworks[i].rgNetworking
+    spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
+    subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
+    kind: 'functionapp'
+    storageAccountName: 'stfnnotify${parSpokeNetworks[i].parEnvironment}'
+    deployAppPrivateEndPoint: true
+    userAssignedIdentities: [
+      supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
+    ]
+  }
+  dependsOn:[
+    rtsfnApp
+  ]
 }]
 
 // module applicationGateway 'modules/08-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
@@ -368,7 +449,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in rang
 //     tags: tags
 //     applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
 //     applicationGatewayFqdn: applicationGatewayFqdn
-//     applicationGatewayPrimaryBackendEndFqdn: webApp[i].outputs.webAppHostName
+//     applicationGatewayPrimaryBackendEndFqdn: webApp[i].outputs.appHostName
 //     applicationGatewaySubnetId: agwSubnet[i].id  // spoke[i].outputs.spokeApplicationGatewaySubnetId
 //     enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
 //     keyVaultId: supportingServices[i].outputs.keyVaultId
