@@ -243,6 +243,7 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     storageRG: parSpokeNetworks[i].rgStorage
     appConfigURL: supportingServices[i].outputs.appConfigURL
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+    appInsightsConnectionString: parSpokeNetworks[i].appInsightsConnectionString
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'irasservice'
     containerImageTag: '${supportingServices[i].outputs.containerRegistryLoginServer}/${parIrasContainerImageTag}'
@@ -275,6 +276,7 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
     storageRG: parSpokeNetworks[i].rgStorage
     appConfigURL: supportingServices[i].outputs.appConfigURL
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+    appInsightsConnectionString: parSpokeNetworks[i].appInsightsConnectionString
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'usermanagementservice'
     containerImageTag: '${supportingServices[i].outputs.containerRegistryLoginServer}/${parUserServiceContainerImageTag}'
@@ -307,6 +309,7 @@ module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [f
     storageRG: parSpokeNetworks[i].rgStorage
     appConfigURL: supportingServices[i].outputs.appConfigURL
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+    appInsightsConnectionString: parSpokeNetworks[i].appInsightsConnectionString
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'questionsetservice'
     containerImageTag: '${supportingServices[i].outputs.containerRegistryLoginServer}/${parQuestionSetContainerImageTag}'
@@ -340,6 +343,7 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [fo
     storageRG: parSpokeNetworks[i].rgStorage
     appConfigURL: supportingServices[i].outputs.appConfigURL
     appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
+    appInsightsConnectionString: parSpokeNetworks[i].appInsightsConnectionString
     containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
     containerAppName: 'rtsservice'
     containerImageTag: '${supportingServices[i].outputs.containerRegistryLoginServer}/${parRtsContainerImageTag}'

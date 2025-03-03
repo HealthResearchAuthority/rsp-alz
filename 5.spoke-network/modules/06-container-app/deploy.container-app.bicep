@@ -31,6 +31,7 @@ param storageRG string
 param appConfigURL string
 param appConfigIdentityClientID string
 param containerRegistryLoginServer string
+param appInsightsConnectionString string
 
 param configStoreName string
 param webAppURLConfigKey string
@@ -115,7 +116,11 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
             }
             {
               name: 'AppSettings__AzureAppConfiguration__IdentityClientID'
-              value: appConfigIdentityClientID
+              value: appConfigIdentityClientID 
+            }
+            {
+              name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
+              value: appInsightsConnectionString 
             }
           ]
           probes: [
