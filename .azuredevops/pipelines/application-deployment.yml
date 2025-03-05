@@ -37,7 +37,7 @@ jobs:
       - checkout: self
       - task: AzureCLI@2
         inputs:
-          azureSubscription: $(azureServiceConnection)
+          azureSubscription: $(${{ parameters.env }})
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
@@ -56,7 +56,7 @@ jobs:
       - checkout: self
       - task: AzureCLI@2
         inputs:
-          azureSubscription: $(azureServiceConnection)
+          azureSubscription: $(${{ parameters.env }})
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
@@ -76,7 +76,7 @@ jobs:
       - task: AzureCLI@2
         name: deploy
         inputs:
-          azureSubscription: $(azureServiceConnection)
+          azureSubscription: $(${{ parameters.env }})
           scriptType: bash
           scriptLocation: inlineScript
           failOnStandardError: true
