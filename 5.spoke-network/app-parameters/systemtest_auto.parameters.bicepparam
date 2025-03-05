@@ -30,7 +30,7 @@ param parSpokeNetworks = [
     configurePrivateDNS: false
     devBoxPeering: false
     rgNetworking: 'rg-rsp-networking-spoke-systemtestauto-uks'
-    vnet: 'vnet-rsp-networking-systemtestauto-uks-spoke'
+    vnet: 'vnet-rsp-networking-automationtest-uks-spoke'
     rgapplications: 'rg-rsp-applications-spoke-systemtestauto-uks'
     rgSharedServices: 'rg-rsp-sharedservices-spoke-systemtestauto-uks'
     rgStorage: 'rg-rsp-storage-spoke-systemtestauto-uks'
