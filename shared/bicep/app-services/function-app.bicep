@@ -68,7 +68,7 @@ resource fnAppAppInsights 'microsoft.insights/components@2020-02-02' existing = 
 var defaultSettings = [
   {
     name: 'AzureWebJobsStorage'
-    value: storageAccount.properties.primaryEndpoints.blob
+    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${listKeys(storageAccount.id, '2022-09-01').keys[0].value};EndpointSuffix=core.windows.net'
   }
   {
     name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
