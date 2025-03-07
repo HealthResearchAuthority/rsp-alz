@@ -143,7 +143,7 @@ module sharedServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for 
     uniqueId: uniqueString(sharedServicesRG[i].outputs.outResourceGroupId)
     environment: parSpokeNetworks[i].parEnvironment
     workloadName: 'shared'
-    location: location
+    location: location 
   }
 }]
 
@@ -434,7 +434,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in
     subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
     kind: 'functionapp'
     storageAccountName: 'stfnnotify${parSpokeNetworks[i].parEnvironment}'
-    deployAppPrivateEndPoint: true
+    deployAppPrivateEndPoint: false
     userAssignedIdentities: [
       supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
