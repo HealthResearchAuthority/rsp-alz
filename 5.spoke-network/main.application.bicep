@@ -6,6 +6,9 @@ targetScope = 'subscription'
 @description('The location where the resources will be created.')
 param location string = deployment().location
 
+@description('DevOps Public IP Address')
+param parDevOpsPublicIPAddress string = ''
+
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
@@ -386,6 +389,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in rang
     userAssignedIdentities: [
       supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     ]
+    devOpsPublicIPAddress: parDevOpsPublicIPAddress
   }
 }]
 
@@ -407,12 +411,13 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in ra
     subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
     kind: 'functionapp'
     storageAccountName: 'strtssync${parSpokeNetworks[i].parEnvironment}'
-    deployAppPrivateEndPoint: false
+    deployAppPrivateEndPoint: true
     userAssignedIdentities: [
       supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       databaseserver[i].outputs.outputsqlServerUAIID
       supportingServices[i].outputs.keyVaultUserAssignedIdentityId
     ]
+    devOpsPublicIPAddress: parDevOpsPublicIPAddress
   }
 }]
 
@@ -434,11 +439,12 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in
     subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
     kind: 'functionapp'
     storageAccountName: 'stfnnotify${parSpokeNetworks[i].parEnvironment}'
-    deployAppPrivateEndPoint: false
+    deployAppPrivateEndPoint: true
     userAssignedIdentities: [
       supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
     ]
+    devOpsPublicIPAddress: parDevOpsPublicIPAddress
   }
   dependsOn:[
     rtsfnApp

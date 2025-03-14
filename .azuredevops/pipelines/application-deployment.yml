@@ -20,7 +20,18 @@ parameters:
       - production
 
 jobs:
+  - job: setup
+    pool:
+      vmImage: 'ubuntu-latest'
+    steps:
+      - bash: | 
+          ipaddress=$(curl -s http://ipinfo.io/ip)
+          echo "##vso[task.setvariable variable=ipaddress;isOutput=true;]$ipaddress"
+        name: fetchPublicIP
+      - bash: echo "Azure DevOps Public IP Address is $(devOpsPublicIP)"
+
   - job: lint
+    dependsOn: setup
     pool:
       vmImage: 'ubuntu-latest'
     steps:
@@ -30,9 +41,10 @@ jobs:
   - job: validate
     pool:
       vmImage: 'ubuntu-latest'
-    dependsOn: [lint]
+    dependsOn: [setup, lint]
     variables:
-    - group: ${{ parameters.env }}
+      devOpsPublicIP: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
+      group: ${{ parameters.env }}
     steps:
       - checkout: self
       - task: AzureCLI@2
@@ -44,14 +56,15 @@ jobs:
             az deployment sub validate --name "App-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.application.bicep \
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
-                           parClientID=$(clientID) parClientSecret=$(clientSecret) 
+                           parClientID=$(clientID) parClientSecret=$(clientSecret) parDevOpsPublicIPAddress=$(devOpsPublicIP) 
 
   - job: preview
     pool:
       vmImage: 'ubuntu-latest'
-    dependsOn: [lint, validate]
+    dependsOn: [setup, lint, validate]
     variables:
-    - group: ${{ parameters.env }}
+      devOpsPublicIP: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
+      group: ${{ parameters.env }}
     steps:
       - checkout: self
       - task: AzureCLI@2
@@ -63,16 +76,17 @@ jobs:
             az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.application.bicep \
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
-                           parClientID=$(clientID) parClientSecret=$(clientSecret) 
+                           parClientID=$(clientID) parClientSecret=$(clientSecret) parDevOpsPublicIPAddress=$(devOpsPublicIP) 
 
   - job: deploy
     pool:
       vmImage: 'ubuntu-latest'
-    dependsOn: [preview]
+    dependsOn: [setup, lint, validate]
     variables:
-    - group: ${{ parameters.env }}
+      group: ${{ parameters.env }}
     steps:
       - checkout: self
+      - bash: echo "Azure DevOps Public IP Address is $(devOpsPublicIP)"
       - task: AzureCLI@2
         name: deploy
         inputs:

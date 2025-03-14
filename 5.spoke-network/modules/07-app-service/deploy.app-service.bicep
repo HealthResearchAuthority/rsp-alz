@@ -1,4 +1,7 @@
 
+@description('DevOps Public IP Address')
+param devOpsPublicIPAddress string
+
 @description('Required. Name of the App Service Plan.')
 @minLength(1)
 @maxLength(40)
@@ -137,6 +140,7 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
     kind: 'StorageV2'
     supportsHttpsTrafficOnly: true
     tags: {}
+    devOpsPublicIPAddress: devOpsPublicIPAddress
   }
 }
 
