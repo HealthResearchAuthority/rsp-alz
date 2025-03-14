@@ -94,6 +94,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   kind: kind
   identity: userAssignedIdentities
   properties: {
+    httpsOnly: true
     serverFarmId: serverFarmResourceId
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     siteConfig: {
