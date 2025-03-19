@@ -2,8 +2,6 @@
 name: application-deployment
 trigger:
   - main
-pr:
-  - main
 
 parameters:
   - name: env
