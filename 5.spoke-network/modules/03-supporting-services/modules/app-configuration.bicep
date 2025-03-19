@@ -19,6 +19,7 @@ param sqlServerName string
 param networkingResourcesNames object
 param networkingResourceGroup string
 
+
 @description('The resource ID of the VNet to which the private endpoint will be connected.')
 param spokeVNetId string
 

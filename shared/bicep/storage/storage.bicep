@@ -1,3 +1,6 @@
+@description('DevOps Public IP Address')
+param devOpsPublicIPAddress string = ''
+
 @description('name must be max 24 chars, globally unique, all lowercase letters or numbers with no spaces.')
 param name string
 param location string
@@ -36,8 +39,6 @@ param accessTier string = 'Hot'
 @description('Optional. Allows HTTPS traffic only to storage service if sets to true.')
 param supportsHttpsTrafficOnly bool = true
 
-param networkAcls object = {}
-
 // Variables
 var maxNameLength = 24
 var storageNameValid = toLower(replace(name, '-', ''))
@@ -56,7 +57,16 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   properties: {
     accessTier: accessTier
     supportsHttpsTrafficOnly: supportsHttpsTrafficOnly
-    networkAcls: networkAcls
+    networkAcls: devOpsPublicIPAddress == '' ? {} :  {
+      // Block any IP not explicitly allowed
+      defaultAction: 'Deny'
+      bypass: 'AzureServices'  // Optionally bypass Azure services if needed
+      ipRules: [ {
+        value: devOpsPublicIPAddress
+        action: 'Allow'
+      } ]
+      // virtualNetworkRules: []  // Add if you have any VNET integration requirements
+    }
     publicNetworkAccess: 'Enabled'
     minimumTlsVersion: 'TLS1_2'
   }  

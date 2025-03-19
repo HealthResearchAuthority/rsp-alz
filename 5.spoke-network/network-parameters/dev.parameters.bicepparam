@@ -6,7 +6,7 @@ param parSpokeNetworks = [
     ipRange: '10.2.0.0/16'
     parEnvironment: 'dev'
     zoneRedundancy: false
-    configurePrivateDNS: true
+    //configurePrivateDNS: true
     devBoxPeering: true
     rgNetworking: 'rg-rsp-networking-spoke-dev-uks'
     subnets: {

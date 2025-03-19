@@ -19,10 +19,10 @@ param containerAppName string
 param containerAppsEnvironmentId string
 
 @description('Container image tag.')
-param containerImageTag string = 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+param containerImageTag string = ''
 
 @description('Custom container name.')
-param containerImageName string = 'simple-hello-world-container'
+param containerImageName string = ''
 
 param sqlServerUserAssignedIdentityName string = ''
 param containerRegistryUserAssignedIdentityId string = ''
@@ -63,14 +63,6 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
     type: 'UserAssigned'
     userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
   }
-  // identity: { 
-  //   type: 'UserAssigned'
-  //   userAssignedIdentities: {
-  //       '${sqlServerUserAssignedIdentity.id}': {}
-  //       '${containerRegistryUserAssignedIdentityId}': {}
-  //       '${appConfigurationUserAssignedIdentityId}': {}
-  //   }
-  // }
   properties: {
     configuration: {
       activeRevisionsMode: 'single'
@@ -132,7 +124,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
                 scheme: 'http'
               }
               initialDelaySeconds: 10
-              periodSeconds: 10
+              periodSeconds: 60
               successThreshold: 1
               timeoutSeconds: 1
               type: 'Liveness'
@@ -145,7 +137,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
                 scheme: 'http'
               }
               initialDelaySeconds: 10
-              periodSeconds: 10
+              periodSeconds: 60
               successThreshold: 1
               timeoutSeconds: 1
               type: 'readiness'
@@ -158,7 +150,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
                 scheme: 'http'
               }
               initialDelaySeconds: 10
-              periodSeconds: 10
+              periodSeconds: 60
               successThreshold: 1
               timeoutSeconds: 1
               type: 'startup'

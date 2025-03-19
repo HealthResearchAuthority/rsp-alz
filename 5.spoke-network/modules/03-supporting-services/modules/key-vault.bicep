@@ -10,6 +10,9 @@ param location string = resourceGroup().location
 @description('The name of the Key Vault.')
 param keyVaultName string
 
+@description('Optional. The IP ACL rules.')
+param networkRuleSetIpRules array = []
+
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
@@ -143,6 +146,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
+      ipRules: networkRuleSetIpRules
     }
     enableSoftDelete: true
     softDeleteRetentionInDays: 7

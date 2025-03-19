@@ -6,6 +6,9 @@ targetScope = 'subscription'
 @description('The location where the resources will be created.')
 param location string = deployment().location
 
+@description('DevOps Public IP Address')
+param parDevOpsPublicIPAddress string = ''
+
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
@@ -46,9 +49,6 @@ param parClientID string
 @description('Client secret for IDG Authentication')
 param parClientSecret string
 
-@description('Hub Virtual Network ID')
-param hubVNetId string = '/subscriptions/15642d2a-27a2-4ee8-9eba-788bf7223d95/resourceGroups/rg-hra-connectivity/providers/Microsoft.Network/virtualHubs/vhub-rsp-uksouth'
-
 @description('Spoke Networks Configuration')
 param parSpokeNetworks array
 
@@ -57,10 +57,6 @@ param parSpokeNetworks array
 // ------------------
 
 var sqlServerNamePrefix = 'rspsqlserver'
-var varVirtualHubResourceGroup = (!empty(hubVNetId) && contains(hubVNetId, '/providers/Microsoft.Network/virtualHubs/') ? split(hubVNetId, '/')[4] : '')
-var varVirtualHubSubscriptionId = (!empty(hubVNetId) && contains(hubVNetId, '/providers/Microsoft.Network/virtualHubs/') ? split(hubVNetId, '/')[2] : '')
-//var varHubVirtualNetworkName = (!empty(hubVNetId) && contains(hubVNetId, '/providers/Microsoft.Network/virtualHubs/') ? split(hubVNetId, '/')[8] : '')
-
 
 // ------------------
 // RESOURCES
@@ -180,7 +176,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
     containerRegistryTier: parSpokeNetworks[i].containerRegistryTier
-    privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
+    //privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
     resourcesNames: sharedServicesNaming[i].outputs.resourcesNames
     sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
     networkingResourcesNames: networkingnaming[i].outputs.resourcesNames
@@ -189,6 +185,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
     IDGENV: parSpokeNetworks[i].IDGENV
     clientID: parClientID
     clientSecret: parClientSecret
+    devOpsPublicIPAddress: parDevOpsPublicIPAddress
   }
 }]
 
@@ -203,10 +200,8 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
     enableApplicationInsights: true
     enableTelemetry: false
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    hubResourceGroupName: varVirtualHubResourceGroup
-    hubSubscriptionId: varVirtualHubSubscriptionId
     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
-    privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
+    //privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
     resourcesNames: applicationServicesNaming[i].outputs.resourcesNames
     networkRG: parSpokeNetworks[i].rgNetworking
   }
@@ -382,10 +377,12 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in rang
     spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
     subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
     kind: 'app'
-    deployAppPrivateEndPoint: true
+    deployAppPrivateEndPoint: false
     userAssignedIdentities: [
       supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     ]
+    devOpsPublicIPAddress: parDevOpsPublicIPAddress
+    //isPrivate: false
   }
 }]
 
@@ -407,13 +404,18 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in ra
     subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
     kind: 'functionapp'
     storageAccountName: 'strtssync${parSpokeNetworks[i].parEnvironment}'
-    deployAppPrivateEndPoint: false
+    deployAppPrivateEndPoint: true
     userAssignedIdentities: [
       supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       databaseserver[i].outputs.outputsqlServerUAIID
       supportingServices[i].outputs.keyVaultUserAssignedIdentityId
     ]
+    devOpsPublicIPAddress: parDevOpsPublicIPAddress
+    //isPrivate: true
   }
+  dependsOn: [
+    webApp
+  ]
 }]
 
 module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in range(0, length(parSpokeNetworks)): {
@@ -434,11 +436,13 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in
     subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
     kind: 'functionapp'
     storageAccountName: 'stfnnotify${parSpokeNetworks[i].parEnvironment}'
-    deployAppPrivateEndPoint: false
+    deployAppPrivateEndPoint: true
     userAssignedIdentities: [
       supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
     ]
+    devOpsPublicIPAddress: parDevOpsPublicIPAddress
+    //isPrivate: false
   }
   dependsOn:[
     rtsfnApp
@@ -463,3 +467,5 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in
 //     networkingResourceNames: networkingnaming[i].outputs.resourcesNames
 //   }
 // }]
+
+//output inputdevopsIP string = parDevOpsPublicIPAddress

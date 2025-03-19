@@ -6,7 +6,7 @@ param parSpokeNetworks = [
     ipRange: '10.1.32.0/19'
     parEnvironment: 'automationtest'
     zoneRedundancy: false
-    configurePrivateDNS: false
+    //configurePrivateDNS: false
     devBoxPeering: false
     rgNetworking: 'rg-rsp-networking-spoke-systemtestauto-uks'
     subnets: {

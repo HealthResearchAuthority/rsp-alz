@@ -30,17 +30,8 @@ param logAnalyticsWorkspaceId string
 @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param deployZoneRedundantResources bool = true
 
-//hub
-@description('The ID of the subscription containing the hub virtual network.')
-param hubSubscriptionId string = ''
-
-@description('The name of the resource group containing the hub virtual network.')
-param hubResourceGroupName string = ''
-
 // @description('The name of the hub virtual network.')
 // param hubVNetName string = ''
-
-param privateDNSEnabled bool = false
 
 param resourcesNames object
 param networkRG string
@@ -102,8 +93,8 @@ module containerAppsEnvironment '../../../shared/bicep/aca-environment.bicep' = 
 }
 
 @description('The Private DNS zone containing the ACA load balancer IP')
-module containerAppsEnvironmentPrivateDnsZone '../../../shared/bicep/network/private-dns-zone.bicep' = if(privateDNSEnabled) {
-  scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
+module containerAppsEnvironmentPrivateDnsZone '../../../shared/bicep/network/private-dns-zone.bicep' = {
+  scope: resourceGroup(networkRG)
   name: 'containerAppsEnvironmentPrivateDnsZone-${uniqueString(resourceGroup().id)}'
   params: {
     name: containerAppsEnvironment.outputs.containerAppsEnvironmentDefaultDomain

@@ -10,6 +10,9 @@ param location string = resourceGroup().location
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
+@description('DevOps Public IP Address')
+param devOpsPublicIPAddress string
+
 // Spoke
 @description('The resource ID of the existing spoke virtual network to which the private endpoint will be connected.')
 param spokeVNetId string
@@ -25,7 +28,7 @@ param deployZoneRedundantResources bool = true
 @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param containerRegistryTier string = ''
 
-param privateDNSEnabled bool = false
+param privateDNSEnabled bool = true
 
 param resourcesNames object
 param sqlServerName string
@@ -67,6 +70,12 @@ module containerRegistry './modules/container-registry.module.bicep' = {
     containerRegistryUserAssignedIdentityName: resourcesNames.containerRegistryUserAssignedIdentity
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
     deployZoneRedundantResources: deployZoneRedundantResources
+    networkRuleSetIpRules: [
+      // {
+      //   action: 'Allow'
+      //   value: '${devOpsPublicIPAddress}/32'  // Specific IP or CIDR block to allow
+      // }
+    ]
   }
 }
 
@@ -84,6 +93,12 @@ module keyVault './modules/key-vault.bicep' = {
     privateDNSEnabled: privateDNSEnabled
     privateDnsZoneName: keyVaultPrivateDnsZoneName
     keyVaultUserAssignedIdentityName: resourcesNames.keyVaultUserAssignedIdentity
+    networkRuleSetIpRules: [
+      {
+        action: 'Allow'
+        value: '${devOpsPublicIPAddress}/32'  // Specific IP or CIDR block to allow
+      }
+    ]
   }
 }
 

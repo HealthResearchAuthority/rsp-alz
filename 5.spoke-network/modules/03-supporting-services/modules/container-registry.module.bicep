@@ -10,6 +10,10 @@ param location string = resourceGroup().location
 @description('The name of the container registry.')
 param containerRegistryName string
 
+
+@description('Optional. The IP ACL rules. Note, requires the \'acrSku\' to be \'Premium\'.')
+param networkRuleSetIpRules array = []
+
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
@@ -107,6 +111,7 @@ module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
     userAssignedIdentities: {
       '${containerRegistryUserAssignedIdentity.id}': {}
     }
+    networkRuleSetIpRules: networkRuleSetIpRules
   }
 }
 
