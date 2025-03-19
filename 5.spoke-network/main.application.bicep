@@ -222,6 +222,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [for i in ra
     sqlServerUAIName: storageServicesNaming[i].outputs.resourcesNames.sqlServerUserAssignedIdentity
     networkingResourcesNames: networkingnaming[i].outputs.resourcesNames
     networkingResourceGroup: parSpokeNetworks[i].rgNetworking
+    defenderforSQLStorageAccountName: 'stDefenderforSQL${parSpokeNetworks[i].parEnvironment}'
   }
 }]
 
@@ -382,7 +383,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in rang
       supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     ]
     devOpsPublicIPAddress: parDevOpsPublicIPAddress
-    //isPrivate: false
+    isPrivate: false
   }
 }]
 
@@ -411,7 +412,7 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in ra
       supportingServices[i].outputs.keyVaultUserAssignedIdentityId
     ]
     devOpsPublicIPAddress: parDevOpsPublicIPAddress
-    //isPrivate: true
+    isPrivate: true
   }
   dependsOn: [
     webApp
@@ -442,7 +443,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in
       supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
     ]
     devOpsPublicIPAddress: parDevOpsPublicIPAddress
-    //isPrivate: false
+    isPrivate: true
   }
   dependsOn:[
     rtsfnApp

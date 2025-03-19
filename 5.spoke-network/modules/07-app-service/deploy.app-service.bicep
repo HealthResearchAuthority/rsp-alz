@@ -2,8 +2,8 @@
 @description('DevOps Public IP Address')
 param devOpsPublicIPAddress string
 
-// @description('Determines if we are exposing apps to public')
-// param isPrivate bool
+@description('Determines if we are exposing apps to public')
+param isPrivate bool
 
 @description('Required. Name of the App Service Plan.')
 @minLength(1)
@@ -207,8 +207,8 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
     }
     storageAccountName: storageAccountName
-    // isPrivate: isPrivate
-    // devOpsPublicIPAddress: devOpsPublicIPAddress
+    isPrivate: isPrivate
+    devOpsPublicIPAddress: devOpsPublicIPAddress
   }
   dependsOn: [
     fnstorage

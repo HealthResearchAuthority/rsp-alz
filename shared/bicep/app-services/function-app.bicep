@@ -1,8 +1,8 @@
 @description('Required. Name of your Function App.')
 param functionAppName string
 
-// @description('DevOps Public IP Address')
-// param devOpsPublicIPAddress string = ''
+@description('DevOps Public IP Address')
+param devOpsPublicIPAddress string = ''
 
 @description('Optional. Location for all resources.')
 param location string
@@ -16,8 +16,8 @@ param appSettings array = []
 @description('Required. The resource ID of the app service plan to use for the site.')
 param serverFarmResourceId string
 
-// @description('Determines if we are exposing apps to public')
-// param isPrivate bool = true
+@description('Determines if we are exposing apps to public')
+param isPrivate bool = true
 
 @maxLength(24)
 @description('Conditional. The name of the parent Storage Account. Required if the template is used in a standalone deployment.')
@@ -105,15 +105,15 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     serverFarmId: serverFarmResourceId
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     siteConfig: {
-      // ipSecurityRestrictionsDefaultAction: isPrivate ? 'Deny' : 'Allow'  // Default action is to deny
-      // ipSecurityRestrictions: isPrivate ? [
-      //   {
-      //     action: 'Allow'
-      //     ipAddress: '${devOpsPublicIPAddress}/32'
-      //     name: 'AllowSpecificIP'
-      //     priority: 100
-      //   }
-      // ] : []
+      ipSecurityRestrictionsDefaultAction: isPrivate ? 'Deny' : 'Allow'  // Default action is to deny
+      ipSecurityRestrictions: isPrivate ? [
+        {
+          action: 'Allow'
+          ipAddress: '${devOpsPublicIPAddress}/32'
+          name: 'AllowSpecificIP'
+          priority: 100
+        }
+      ] : []
       netFrameworkVersion: dotnetVersion
       appSettings: concat(defaultSettings, appSettings)
       alwaysOn: true
