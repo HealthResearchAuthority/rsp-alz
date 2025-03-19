@@ -48,7 +48,8 @@ var keyvalues = [
   }
   {
     name: 'AppSettings:AuthSettings:Issuers'
-    value: '[\r\n\thttps://${IDGENV}.id.nihr.ac.uk:443/oauth2/token,\r\n\thttps://${IDGENV}.id.nihr.ac.uk/oauth2/token\n]'
+    value: '["https://${IDGENV}.id.nihr.ac.uk:443/oauth2/token","https://${IDGENV}.id.nihr.ac.uk/oauth2/token"]'
+    contentType: 'application/json'
   }
   {
     name: 'AppSettings:AuthSettings:ClientId'
