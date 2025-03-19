@@ -49,7 +49,6 @@ var keyvalues = [
   {
     name: 'AppSettings:AuthSettings:Issuers'
     value: '["https://${IDGENV}.id.nihr.ac.uk:443/oauth2/token","https://${IDGENV}.id.nihr.ac.uk/oauth2/token"]'
-    content_type: 'application/json'
   }
   {
     name: 'AppSettings:AuthSettings:ClientId'
@@ -163,6 +162,7 @@ resource configStoreKeyValue 'Microsoft.AppConfiguration/configurationStores/key
   name: keyValue.name
   properties: {
     value: keyValue.value
+    contentType: 'application/json'
   }
 }]
 
