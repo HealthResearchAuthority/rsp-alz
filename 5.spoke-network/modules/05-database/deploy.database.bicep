@@ -93,15 +93,26 @@ resource SQL_Server 'Microsoft.Sql/servers@2023-05-01-preview' = {
     administratorLogin: adminLogin
     administratorLoginPassword: adminPassword
     publicNetworkAccess: 'Disabled'
-    administrators: {
-      administratorType:'ActiveDirectory'
-      login: 'nikhil.bharathesh_PA@hra.nhs.uk'
-      sid: '9a3eae88-0bf5-41d8-8791-92ddfe098a0b'
-      tenantId: '8e1f0aca-d87d-4f20-939e-36243d574267'
-      azureADOnlyAuthentication: false
-      principalType: 'User'
-    }
+    // administrators: {
+    //   administratorType:'ActiveDirectory'
+    //   login: 'nikhil.bharathesh_PA@hra.nhs.uk'
+    //   sid: '9a3eae88-0bf5-41d8-8791-92ddfe098a0b'
+    //   tenantId: '8e1f0aca-d87d-4f20-939e-36243d574267'
+    //   azureADOnlyAuthentication: false
+    //   principalType: 'User'
+    // }
     primaryUserAssignedIdentityId: sqlServerUserAssignedIdentity.id
+  }
+}
+
+resource azureADAdmin 'Microsoft.Sql/servers/administrators@2024-05-01-preview' = {
+  name: 'activeDirectory'
+  parent: SQL_Server
+  properties: {
+    login: 'nikhil.bharathesh_PA@hra.nhs.uk'
+    tenantId: '8e1f0aca-d87d-4f20-939e-36243d574267'
+    sid: '9a3eae88-0bf5-41d8-8791-92ddfe098a0b'
+    administratorType: 'ActiveDirectory'
   }
 }
 
