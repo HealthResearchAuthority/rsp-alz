@@ -72,6 +72,14 @@ var keyvalues = [
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=identityservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
   }
   {
+    name: 'ConnectionStrings:QuestionSetServiceDatabaseConnection'
+    value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=questionsetservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+  }
+  {
+    name: 'ConnectionStrings:RTSDatabaseConnection'
+    value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=RtsService;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+  }
+  {
     name: 'AppSettings:Sentinel$applicationservice'
     value: '0'
   }
