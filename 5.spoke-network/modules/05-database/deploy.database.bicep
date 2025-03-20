@@ -95,14 +95,6 @@ resource SQL_Server 'Microsoft.Sql/servers@2024-05-01-preview' = {
     administratorLogin: adminLogin
     administratorLoginPassword: adminPassword
     publicNetworkAccess: 'Disabled'
-    // administrators: {
-    //   administratorType:'ActiveDirectory'
-    //   login: 'nikhil.bharathesh_PA@hra.nhs.uk'
-    //   sid: '9a3eae88-0bf5-41d8-8791-92ddfe098a0b'
-    //   tenantId: '8e1f0aca-d87d-4f20-939e-36243d574267'
-    //   azureADOnlyAuthentication: false
-    //   principalType: 'User'
-    // }
     primaryUserAssignedIdentityId: sqlServerUserAssignedIdentity.id
   }
 }
@@ -161,51 +153,22 @@ resource defenderforsqlstorageforID 'Microsoft.Storage/storageAccounts@2021-06-0
   name: defenderforSQLStorageAccountName
 }
 
-// Assign Storage Blob Data Contributor RBAC role
-// resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-//   name: guid('${defenderforsqlstorageforID.id}-Storage-Blob-Data-Contributor')
-//   scope: defenderforsqlstorageforID
-//   properties: {
-//     roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'ba92f5b4-2d11-453d-a403-e96b0029c9fe')
-//     principalId: SQL_Server.identity.principalId
-//     principalType: 'ServicePrincipal'
-//   }
-// }
-
 module sqlserverstorageadminRoleAssignment '../../../shared/bicep/role-assignments/role-assignment.bicep' = {
-  name: guid('${defenderforsqlstorageforID.id}-Storage-Blob-Data-Contributor')
+  name: take('sqlServerContributorRoleAssignment-STAccount-${deployment().name}', 64)
   params: {
-    name: 'ra-sqlServerContributorRoleAssignment'
+    name: 'ra-sqlServerContributorRoleAssignment-STAccount'
     principalId: sqlServerUserAssignedIdentity.properties.principalId
-    resourceId: defenderforsqlstorageforID.id
+    resourceId: defenderforsqlstorage.outputs.id
     roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
     principalType: 'ServicePrincipal'
   }
 }
-
-// resource defenderForSql 'Microsoft.Sql/servers/sqlVulnerabilityAssessments@2022-05-01-preview' = {
-//   parent: SQL_Server
-//   name: 'default'
-//   properties: {
-//     state: 'Disabled'
-//   }
-// }
-
-// resource advancedThreatProtection 'Microsoft.Sql/servers/advancedThreatProtectionSettings@2024-05-01-preview' = {
-//   name: 'default'  // The name is typically 'default' for ATP settings.
-//   parent: SQL_Server  // Link it to the SQL Server
-//   properties: {
-//     state: 'Enabled'  // Enable Advanced Threat Protection
-//   }
-// }
 
 resource serverSecurityAlertPolicy 'Microsoft.Sql/servers/securityAlertPolicies@2022-11-01-preview' = {
   parent: SQL_Server
   name: 'Default'
   properties: {
     state: 'Enabled'
-    // storageAccountAccessKey:  '${listKeys(defenderforsqlstorageforID.id, '2022-09-01').keys[0].value}'
-    // storageEndpoint: defenderforsqlstorageforID.properties.primaryEndpoints.blob
     retentionDays: 90
     emailAccountAdmins: true
     emailAddresses: [
