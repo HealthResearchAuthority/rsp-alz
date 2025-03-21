@@ -45,6 +45,7 @@ var keyvalues = [
   {
     name: 'AppSettings:AuthSettings:Authority'
     value: 'https://${IDGENV}.id.nihr.ac.uk:443/oauth2/token'
+    contentType: ''
   }
   {
     name: 'AppSettings:AuthSettings:Issuers'
@@ -54,22 +55,27 @@ var keyvalues = [
   {
     name: 'AppSettings:AuthSettings:ClientId'
     value: clientID
+    contentType: ''
   }
   {
     name: 'AppSettings:AuthSettings:ClientSecret'
     value: clientSecret
+    contentType: ''
   }
   {
     name: 'AppSettings:AuthSettings:JwksUri'
     value: 'https://${jwksURI}/jwks'
+    contentType: ''
   }
   {
     name: 'ConnectionStrings:IrasServiceDatabaseConnection'
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=applicationservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+    contentType: ''
   }
   {
     name: 'ConnectionStrings:IdentityDbConnection'
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=identityservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+    contentType: ''
   }
   {
     name: 'ConnectionStrings:QuestionSetServiceDatabaseConnection'
@@ -82,22 +88,27 @@ var keyvalues = [
   {
     name: 'AppSettings:Sentinel$applicationservice'
     value: '0'
+    contentType: ''
   }
   {
     name: 'AppSettings:Sentinel$portal'
     value: '0'
+    contentType: ''
   }
   {
     name: 'AppSettings:Sentinel$questionsetservice'
     value: '0'
+    contentType: ''
   }
   {
     name: 'AppSettings:Sentinel$rtsservice'
     value: '0'
+    contentType: ''
   }
   {
     name: 'AppSettings:Sentinel$usersservice'
     value: '0'
+    contentType: ''
   }
 ]
 
@@ -171,6 +182,7 @@ resource configStoreKeyValue 'Microsoft.AppConfiguration/configurationStores/key
   name: keyValue.name
   properties: {
     value: keyValue.value
+    contentType: keyValue.contentType
   }
 }]
 
