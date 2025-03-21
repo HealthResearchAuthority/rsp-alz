@@ -80,7 +80,7 @@ resource sqlServerUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedId
 }
 
 // SQL Server Resource
-resource SQL_Server 'Microsoft.Sql/servers@2023-05-01-preview' = {
+resource SQL_Server 'Microsoft.Sql/servers@2024-05-01-preview' = {
   name: sqlServerName
   location: location
   identity: {
@@ -93,18 +93,11 @@ resource SQL_Server 'Microsoft.Sql/servers@2023-05-01-preview' = {
     administratorLogin: adminLogin
     administratorLoginPassword: adminPassword
     publicNetworkAccess: 'Disabled'
-    // administrators: {
-    //   administratorType:'ActiveDirectory'
-    //   login: 'nikhil.bharathesh_PA@hra.nhs.uk'
-    //   sid: '9a3eae88-0bf5-41d8-8791-92ddfe098a0b'
-    //   tenantId: '8e1f0aca-d87d-4f20-939e-36243d574267'
-    //   azureADOnlyAuthentication: false
-    //   principalType: 'User'
-    // }
     primaryUserAssignedIdentityId: sqlServerUserAssignedIdentity.id
   }
 }
 
+// Set Azure AD Administrator
 resource azureADAdmin 'Microsoft.Sql/servers/administrators@2024-05-01-preview' = {
   name: 'activeDirectory'
   parent: SQL_Server
@@ -128,7 +121,7 @@ module sqlserveradminRoleAssignment '../../../shared/bicep/role-assignments/role
 }
 
 // Database on SQL Server Resource
-resource database 'Microsoft.Sql/servers/databases@2023-05-01-preview' = [for i in range(0, length(databases)): {
+resource sqldatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [for i in range(0, length(databases)): {
   name: databases[i]
   parent: SQL_Server
   location: location
@@ -140,6 +133,35 @@ resource database 'Microsoft.Sql/servers/databases@2023-05-01-preview' = [for i 
     zoneRedundant: false
   }
 }]
+
+resource advancedThreatProtection 'Microsoft.Sql/servers/advancedThreatProtectionSettings@2024-05-01-preview' = {
+  name: 'default'  // The name is typically 'default' for ATP settings.
+  parent: SQL_Server  // Link it to the SQL Server
+  properties: {
+    state: 'Enabled'  // Enable Advanced Threat Protection
+  }
+}
+
+resource serverSecurityAlertPolicy 'Microsoft.Sql/servers/securityAlertPolicies@2022-11-01-preview' = {
+  parent: SQL_Server
+  name: 'Default'
+  properties: {
+    state: 'Enabled'
+    retentionDays: 90
+    emailAccountAdmins: true
+    emailAddresses: [
+      'nikhil.bharathesh_pa@hra.nhs.uk'
+    ]
+  }
+}
+
+resource sqlVulnerabilityAssessment 'Microsoft.Sql/servers/sqlVulnerabilityAssessments@2022-11-01-preview' = {
+  name: 'default'
+  parent: SQL_Server
+  properties: {
+    state: 'Enabled'
+  }
+}
 
 module sqlServerNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = {
   name: 'sqlServerNetwork-${uniqueString(SQL_Server.id)}'
@@ -162,5 +184,5 @@ output outputsqlServerUAIID string = sqlServerUserAssignedIdentity.id
 output outputsqlServerUAIName string = sqlServerUserAssignedIdentity.name
 
 output database_names array = [for i in range(0, length(databases)): {
-  id: database[i].name
+  id: sqldatabases[i].name
 }]

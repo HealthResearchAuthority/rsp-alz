@@ -382,7 +382,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in rang
       supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
     ]
     devOpsPublicIPAddress: parDevOpsPublicIPAddress
-    //isPrivate: false
+    isPrivate: false
   }
 }]
 
@@ -411,7 +411,7 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in ra
       supportingServices[i].outputs.keyVaultUserAssignedIdentityId
     ]
     devOpsPublicIPAddress: parDevOpsPublicIPAddress
-    //isPrivate: true
+    isPrivate: true
   }
   dependsOn: [
     webApp
@@ -442,7 +442,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in
       supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
     ]
     devOpsPublicIPAddress: parDevOpsPublicIPAddress
-    //isPrivate: false
+    isPrivate: true
   }
   dependsOn:[
     rtsfnApp
