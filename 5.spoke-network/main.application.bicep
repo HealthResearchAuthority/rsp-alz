@@ -222,7 +222,6 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [for i in ra
     sqlServerUAIName: storageServicesNaming[i].outputs.resourcesNames.sqlServerUserAssignedIdentity
     networkingResourcesNames: networkingnaming[i].outputs.resourcesNames
     networkingResourceGroup: parSpokeNetworks[i].rgNetworking
-    defenderforSQLStorageAccountName: 'stDefenderforSQL${parSpokeNetworks[i].parEnvironment}'
   }
 }]
 

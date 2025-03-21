@@ -32,8 +32,6 @@ param sqlServerUAIName string = ''
 param networkingResourcesNames object
 param networkingResourceGroup string
 
-param defenderforSQLStorageAccountName string
-
 // ------------------
 // VARIABLES
 // ------------------
@@ -122,19 +120,6 @@ module sqlserveradminRoleAssignment '../../../shared/bicep/role-assignments/role
   }
 }
 
-//Create a storage account to have the vulnerability assessment scans to be stored
-module defenderforsqlstorage '../../../shared/bicep/storage/storage.bicep' = {
-  name: take('defenderforSQLStorage-${deployment().name}', 64)
-  params: {
-    name: defenderforSQLStorageAccountName
-    location: location
-    sku: 'Standard_LRS'
-    kind: 'StorageV2'
-    supportsHttpsTrafficOnly: true
-    tags: {}
-  }
-}
-
 // Database on SQL Server Resource
 resource sqldatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [for i in range(0, length(databases)): {
   name: databases[i]
@@ -149,18 +134,11 @@ resource sqldatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [fo
   }
 }]
 
-resource defenderforsqlstorageforID 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
-  name: defenderforSQLStorageAccountName
-}
-
-module sqlserverstorageadminRoleAssignment '../../../shared/bicep/role-assignments/role-assignment.bicep' = {
-  name: take('sqlServerContributorRoleAssignment-STAccount-${deployment().name}', 64)
-  params: {
-    name: 'ra-sqlServerContributorRoleAssignment-STAccount'
-    principalId: sqlServerUserAssignedIdentity.properties.principalId
-    resourceId: defenderforsqlstorage.outputs.id
-    roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
-    principalType: 'ServicePrincipal'
+resource advancedThreatProtection 'Microsoft.Sql/servers/advancedThreatProtectionSettings@2024-05-01-preview' = {
+  name: 'default'  // The name is typically 'default' for ATP settings.
+  parent: SQL_Server  // Link it to the SQL Server
+  properties: {
+    state: 'Enabled'  // Enable Advanced Threat Protection
   }
 }
 
@@ -177,15 +155,11 @@ resource serverSecurityAlertPolicy 'Microsoft.Sql/servers/securityAlertPolicies@
   }
 }
 
-resource vulnerabilityAssessment 'Microsoft.Sql/servers/vulnerabilityAssessments@2024-05-01-preview' = {
-  name: 'sqlServervulnerabilityAssessment-${uniqueString(SQL_Server.id)}'
+resource sqlVulnerabilityAssessment 'Microsoft.Sql/servers/sqlVulnerabilityAssessments@2022-11-01-preview' = {
+  name: 'default'
   parent: SQL_Server
   properties: {
-    storageContainerPath: 'https://${last(split(defenderforsqlstorageforID.id, '/'))}.blob.${az.environment().suffixes.storage}/vulnerability-assessment/'
-    storageAccountAccessKey: '${listKeys(defenderforsqlstorageforID.id, '2022-09-01').keys[0].value}'
-    recurringScans: {
-      isEnabled: true
-    }
+    state: 'Enabled'
   }
 }
 
