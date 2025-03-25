@@ -404,7 +404,7 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in ra
     subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
     kind: 'functionapp'
     storageAccountName: 'strtssync${parSpokeNetworks[i].parEnvironment}'
-    deployAppPrivateEndPoint: true
+    deployAppPrivateEndPoint: false
     userAssignedIdentities: [
       supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       databaseserver[i].outputs.outputsqlServerUAIID
@@ -436,7 +436,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [for i in
     subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
     kind: 'functionapp'
     storageAccountName: 'stfnnotify${parSpokeNetworks[i].parEnvironment}'
-    deployAppPrivateEndPoint: true
+    deployAppPrivateEndPoint: false
     userAssignedIdentities: [
       supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
