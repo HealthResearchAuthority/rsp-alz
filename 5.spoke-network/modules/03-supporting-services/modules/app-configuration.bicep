@@ -19,7 +19,6 @@ param sqlServerName string
 param networkingResourcesNames object
 param networkingResourceGroup string
 
-
 @description('The resource ID of the VNet to which the private endpoint will be connected.')
 param spokeVNetId string
 
@@ -39,9 +38,22 @@ param clientID string
 @description('Client secret for IDG Authentication')
 param clientSecret string
 
+@description('Token issuing authority for Gov UK One Login')
+param oneLoginAuthority string
+
+@secure()
+@description('Private RSA key for signing the token')
+param oneLoginPrivateKeyPem string
+
+@description('ClientId for the registered service in Gov UK One Login')
+param oneLoginClientId string
+
+@description('Valid token issuers for Gov UK One Login')
+param oneLoginIssuers array
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
-var keyvalues = [
+var keyValues = [
   {
     name: 'AppSettings:AuthSettings:Authority'
     value: 'https://${IDGENV}.id.nihr.ac.uk:443/oauth2/token'
@@ -112,6 +124,71 @@ var keyvalues = [
     value: '0'
     contentType: null
   }
+  {
+    name: 'AppSettings:OneLogin:Authority$portal'
+    value: oneLoginAuthority
+    contentType: null
+  }
+  {
+    name: 'AppSettings:OneLogin:PrivateKeyPem$portal'
+    value: oneLoginPrivateKeyPem
+    contentType: null
+  }
+  {
+    name: 'AppSettings:OneLogin:ClientId'
+    value: oneLoginClientId
+    contentType: null
+  }
+  {
+    name: 'AppSettings:OneLogin:Issuers'
+    value: oneLoginIssuers
+    contentType: 'application/json'
+  }
+]
+
+var featureFlags = [
+  {
+    id: 'Action.ProceedToSubmit'
+    label: 'portal'
+    description: 'When disabled Proceed To Submit button won\'t appear.'
+    enabled: true
+  }
+  {
+    id: 'Logging.InterceptedLogging'
+    description: 'If enabled, all action methods and services will have start/end logging using Interceptors.'
+    label: null
+    enabled: true
+  }
+  {
+    id: 'Navigation.Admin'
+    description: 'When disabled the Admin menu won\'t appear.'
+    label: 'portal'
+    enabled: true
+  }
+  {
+    id: 'Navigation.MyApplications'
+    description: 'When disabled My Applications men won\'t appear.'
+    label: 'portal'
+    enabled: true
+  }
+  {
+    id: 'Navigation.ReviewApplications'
+    description: 'When disabled the Review Applications menu won\'t appear.'
+    label: 'portal'
+    enabled: true
+  }
+  {
+    id: 'UX.ProgressiveEnhancement'
+    description: 'If this flag is enabled, and javascript is enabled, will provide an enhanced user experience.'
+    label: 'portal'
+    enabled: true
+  }
+  {
+    id: 'Auth.UseOneLogin'
+    description: 'When enabled, Gov UK One Login will be used for authentication'
+    label: null
+    enabled: false
+  }
 ]
 
 var privateDnsZoneNames = 'privatelink.azconfig.io'
@@ -151,7 +228,7 @@ resource appConfigurationUserAssignedIdentity 'Microsoft.ManagedIdentity/userAss
   tags: tags
 }
 
-resource configStore 'Microsoft.AppConfiguration/configurationStores@2023-03-01' = {
+resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01' = {
   name: configStoreName
   location: location
   sku: {
@@ -164,9 +241,43 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2023-03-01'
     }
   }
   properties: {
-    publicNetworkAccess:'Enabled'
+    publicNetworkAccess: 'Enabled'
   }
 }
+
+resource configStoreKeyValue 'Microsoft.AppConfiguration/configurationStores/keyValues@2023-03-01' = [
+  for keyValue in keyValues: {
+    parent: configStore
+    name: keyValue.name
+    properties: {
+      value: string(keyValue.value)
+      contentType: keyValue.contentType
+    }
+  }
+]
+
+// TODO: KeyVault reference will be implemented later
+// resource configStoreWithKeyVaultRef 'Microsoft.AppConfiguration/configurationStores/keyValues@2024-05-01' = [
+//   for keyValue in keyValues: {
+//     parent: configStore
+//     name: keyValue
+//     properties: {
+//       value: string(keyVaultRef)
+//       contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+//     }
+//   }
+// ]
+
+resource configStoreFeatureflag 'Microsoft.AppConfiguration/configurationStores/keyValues@2024-05-01' = [
+  for feature in featureFlags: {
+    parent: configStore
+    name: '.appconfig.featureflag~2F${feature.id}$${feature.label}'
+    properties: {
+      value: string(feature)
+      contentType: 'application/vnd.microsoft.appconfig.ff+json;charset=utf-8'
+    }
+  }
+]
 
 module appConfigurationDataReaderAssignment '../../../../shared/bicep/role-assignments/role-assignment.bicep' = {
   name: take('appConfigurationDataReaderAssignmentDeployment-${deployment().name}', 64)
@@ -178,15 +289,6 @@ module appConfigurationDataReaderAssignment '../../../../shared/bicep/role-assig
     principalType: 'ServicePrincipal'
   }
 }
-
-resource configStoreKeyValue 'Microsoft.AppConfiguration/configurationStores/keyValues@2021-10-01-preview' = [for keyValue in keyvalues: {
-  parent: configStore
-  name: keyValue.name
-  properties: {
-    value: keyValue.value
-    contentType: keyValue.contentType
-  }
-}]
 
 module appConfigNetwork '../../../../shared/bicep/network/private-networking-spoke.bicep' = {
   name: 'appConfigNetwork-${uniqueString(configStore.id)}'

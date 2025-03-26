@@ -46,6 +46,19 @@ param clientID string
 @description('Client secret for IDG Authentication')
 param clientSecret string
 
+@description('Token issuing authority for Gov UK One Login')
+param oneLoginAuthority string
+
+@secure()
+@description('Private RSA key for signing the token')
+param oneLoginPrivateKeyPem string
+
+@description('ClientId for the registered service in Gov UK One Login')
+param oneLoginClientId string
+
+@description('Valid token issuers for Gov UK One Login')
+param oneLoginIssuers array
+
 // ------------------
 // Varaibles
 // ------------------
@@ -96,7 +109,7 @@ module keyVault './modules/key-vault.bicep' = {
     networkRuleSetIpRules: [
       {
         action: 'Allow'
-        value: '${devOpsPublicIPAddress}/32'  // Specific IP or CIDR block to allow
+        value: '${devOpsPublicIPAddress}/32' // Specific IP or CIDR block to allow
       }
     ]
   }
@@ -120,6 +133,10 @@ module appConfiguration './modules/app-configuration.bicep' = {
     IDGENV: IDGENV
     clientID: clientID
     clientSecret: clientSecret
+    oneLoginAuthority: oneLoginAuthority
+    oneLoginPrivateKeyPem: oneLoginPrivateKeyPem
+    oneLoginClientId: oneLoginClientId
+    oneLoginIssuers: oneLoginIssuers
   }
 }
 
@@ -149,8 +166,8 @@ output containerRegistryName string = containerRegistry.outputs.containerRegistr
 @description('The name of the container registry login server.')
 output containerRegistryLoginServer string = containerRegistry.outputs.containerRegistryLoginServer
 
- @description('The resource ID of the user-assigned managed identity for the Azure Container Registry to be able to pull images from it.')
- output containerRegistryUserAssignedIdentityId string = containerRegistry.outputs.containerRegistryUserAssignedIdentityId
+@description('The resource ID of the user-assigned managed identity for the Azure Container Registry to be able to pull images from it.')
+output containerRegistryUserAssignedIdentityId string = containerRegistry.outputs.containerRegistryUserAssignedIdentityId
 
 @description('The resource ID of the Azure Key Vault.')
 output keyVaultId string = keyVault.outputs.keyVaultId
@@ -159,12 +176,12 @@ output keyVaultId string = keyVault.outputs.keyVaultId
 output keyVaultName string = keyVault.outputs.keyVaultName
 
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
- output appConfigurationUserAssignedIdentityId string = appConfiguration.outputs.appConfigurationUserAssignedIdentityId
+output appConfigurationUserAssignedIdentityId string = appConfiguration.outputs.appConfigurationUserAssignedIdentityId
 
 @description('The resource ID of the user assigned managed identity for the Key Vault to be able to read Secrets from it.')
 output keyVaultUserAssignedIdentityId string = keyVault.outputs.keyVaultUserAssignedIdentityId
 
- output appConfigURL string = appConfiguration.outputs.appConfigURL
- output appConfigIdentityClientID string = appConfiguration.outputs.appConfigMIClientID
- output serviceBusReceiverManagedIdentityID string = serviceBus.outputs.serviceBusReceiverManagedIdentityId
- output serviceBusSenderManagedIdentity string = serviceBus.outputs.serviceBusSenderManagedIdentityId
+output appConfigURL string = appConfiguration.outputs.appConfigURL
+output appConfigIdentityClientID string = appConfiguration.outputs.appConfigMIClientID
+output serviceBusReceiverManagedIdentityID string = serviceBus.outputs.serviceBusReceiverManagedIdentityId
+output serviceBusSenderManagedIdentity string = serviceBus.outputs.serviceBusSenderManagedIdentityId
