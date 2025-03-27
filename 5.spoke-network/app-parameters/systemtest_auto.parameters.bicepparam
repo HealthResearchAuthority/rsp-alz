@@ -16,6 +16,14 @@ param parClientID = ''
 
 param parClientSecret = ''
 
+param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
+
+param parOneLoginPrivateKeyPem = ''
+
+param parOneLoginClientId = 'WlsPS-_Zpm64UhTpf5zj9_BnAN4'
+
+param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
+
 param parSpokeNetworks = [
   {
     subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65'
@@ -35,6 +43,5 @@ param parSpokeNetworks = [
     deployWebAppSlot: false
     IDGENV: 'test'
     appInsightsConnectionString: 'InstrumentationKey=225c2ec1-bb7d-4c33-9d5f-cb89c117f2d6;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=3dc21d1c-0655-44cc-8ad3-cb4eab8c8c67'
-
   }
 ]
