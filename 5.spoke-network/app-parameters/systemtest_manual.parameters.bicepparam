@@ -16,6 +16,14 @@ param parClientID = ''
 
 param parClientSecret = ''
 
+param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
+
+param parOneLoginPrivateKeyPem = ''
+
+param parOneLoginClientId = 'bBf29bxbeNGjYFRA_jvrge3hsBI'
+
+param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
+
 param parSpokeNetworks = [
   {
     subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379'
