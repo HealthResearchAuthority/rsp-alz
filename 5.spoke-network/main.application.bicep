@@ -459,14 +459,14 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'functionapp'
       storageAccountName: 'strtssync${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: true
+      deployAppPrivateEndPoint: false
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
         supportingServices[i].outputs.keyVaultUserAssignedIdentityId
       ]
       devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: true
+      isPrivate: false
     }
     dependsOn: [
       webApp
@@ -493,13 +493,13 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'functionapp'
       storageAccountName: 'stfnnotify${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: true
+      deployAppPrivateEndPoint: false
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
       ]
       devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: true
+      isPrivate: false
     }
     dependsOn: [
       rtsfnApp

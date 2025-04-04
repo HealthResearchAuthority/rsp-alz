@@ -28,8 +28,9 @@ param storageAccountName string
   'node'
   'dotnet'
   'java'
+  'dotnet-isolated'
 ])
-param runtime string = 'dotnet' // e.g., 'dotnet', 'node', 'python', etc.
+param runtime string = 'dotnet-isolated' // e.g., 'dotnet', 'node', 'python', etc.
 
 @description('Optional. Runtime Version for Function App.')
 param runtimeVersion string = '~4'
@@ -101,7 +102,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   identity: userAssignedIdentities
   properties: {
     httpsOnly: true
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: isPrivate ? 'Disabled' : 'Enabled'
     serverFarmId: serverFarmResourceId
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     siteConfig: {

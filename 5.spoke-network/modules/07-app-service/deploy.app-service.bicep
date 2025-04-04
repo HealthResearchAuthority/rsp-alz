@@ -141,13 +141,14 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
     location: location
     sku: 'Standard_LRS'
     kind: 'StorageV2'
+    isPrivate: isPrivate
     supportsHttpsTrafficOnly: true
     tags: {}
     devOpsPublicIPAddress: devOpsPublicIPAddress
   }
 }
 
-module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp') {
+module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && isPrivate == true) {
   name:take('rtsfnStorageBlobPrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
