@@ -51,6 +51,10 @@ jobs:
       - group: ${{ parameters.env }}
     steps:
       - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
       - task: AzureCLI@2
         inputs:
           azureSubscription: $(${{ parameters.env }})
@@ -72,6 +76,10 @@ jobs:
       - group: ${{ parameters.env }}
     steps:
       - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
       - task: AzureCLI@2
         inputs:
           azureSubscription: $(${{ parameters.env }})
@@ -95,6 +103,10 @@ jobs:
       - group: ${{ parameters.env }}
     steps:
       - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
       - bash: echo "Azure DevOps Public IP Address is $(devOpsPublicIP)"
       - bash: echo "Azure DevOps Public IP Address from IPIFY is $(devOpsIPIFYPublicIP)"
       - task: AzureCLI@2
@@ -120,7 +132,11 @@ jobs:
   #     vmImage: 'ubuntu-latest'
   #   dependsOn: [lint]
   #   steps:
-  #     - checkout: self
+  #     - checkout: self- bash: |
+        #   az bicep install
+        #   az bicep version
+        # displayName: 'Install Bicep CLI'
+
   #     - task: AzureCLI@2
   #       name: delete
   #       inputs:
