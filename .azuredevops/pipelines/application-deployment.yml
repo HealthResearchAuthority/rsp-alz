@@ -35,6 +35,10 @@ jobs:
       vmImage: 'ubuntu-latest'
     steps:
       - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
       - bash: az bicep build --file ./5.spoke-network/main.application.bicep
 
   - job: validate
@@ -47,12 +51,17 @@ jobs:
       - group: ${{ parameters.env }}
     steps:
       - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
       - task: AzureCLI@2
         inputs:
           azureSubscription: $(${{ parameters.env }})
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
+            az config set bicep.use_binary_from_path=false --only-show-errors
             az deployment sub validate --name "App-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.application.bicep \
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
@@ -68,12 +77,17 @@ jobs:
       - group: ${{ parameters.env }}
     steps:
       - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
       - task: AzureCLI@2
         inputs:
           azureSubscription: $(${{ parameters.env }})
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
+            az config set bicep.use_binary_from_path=false --only-show-errors
             az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.application.bicep \
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
@@ -91,6 +105,10 @@ jobs:
       - group: ${{ parameters.env }}
     steps:
       - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
       - bash: echo "Azure DevOps Public IP Address is $(devOpsPublicIP)"
       - bash: echo "Azure DevOps Public IP Address from IPIFY is $(devOpsIPIFYPublicIP)"
       - task: AzureCLI@2
@@ -116,7 +134,11 @@ jobs:
   #     vmImage: 'ubuntu-latest'
   #   dependsOn: [lint]
   #   steps:
-  #     - checkout: self
+  #     - checkout: self- bash: |
+        #   az bicep install
+        #   az bicep version
+        # displayName: 'Install Bicep CLI'
+
   #     - task: AzureCLI@2
   #       name: delete
   #       inputs:
