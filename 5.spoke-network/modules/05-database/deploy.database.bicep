@@ -182,6 +182,7 @@ module sqlServerNetwork '../../../shared/bicep/network/private-networking-spoke.
 output sqlServer_name string = SQL_Server.name
 output outputsqlServerUAIID string = sqlServerUserAssignedIdentity.id
 output outputsqlServerUAIName string = sqlServerUserAssignedIdentity.name
+output outputsqlServerUAIClientID string = sqlServerUserAssignedIdentity.properties.clientId
 
 output database_names array = [for i in range(0, length(databases)): {
   id: sqldatabases[i].name

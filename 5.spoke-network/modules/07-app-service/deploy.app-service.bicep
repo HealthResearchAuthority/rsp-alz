@@ -62,6 +62,9 @@ param storageAccountName string = ''
 @allowed(['functionapp','app'])
 param kind string
 
+@description('Client ID of the managed identity to be used for the SQL DB connection string. For Function App Only')
+param sqlDBManagedIdentityClientId string = ''
+
 param deploySlot bool
 
 param deployAppPrivateEndPoint bool
@@ -141,13 +144,14 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
     location: location
     sku: 'Standard_LRS'
     kind: 'StorageV2'
+    isPrivate: isPrivate
     supportsHttpsTrafficOnly: true
     tags: {}
     devOpsPublicIPAddress: devOpsPublicIPAddress
   }
 }
 
-module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp') {
+module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && isPrivate == true) {
   name:take('rtsfnStorageBlobPrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
@@ -209,6 +213,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     storageAccountName: storageAccountName
     isPrivate: isPrivate
     devOpsPublicIPAddress: devOpsPublicIPAddress
+    sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
   }
   dependsOn: [
     fnstorage

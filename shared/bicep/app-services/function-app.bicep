@@ -19,6 +19,9 @@ param serverFarmResourceId string
 @description('Determines if we are exposing apps to public')
 param isPrivate bool = true
 
+@description('Client ID of the managed identity to be used for the SQL DB connection string.')
+param sqlDBManagedIdentityClientId string = ''
+
 @maxLength(24)
 @description('Conditional. The name of the parent Storage Account. Required if the template is used in a standalone deployment.')
 param storageAccountName string
@@ -28,8 +31,9 @@ param storageAccountName string
   'node'
   'dotnet'
   'java'
+  'dotnet-isolated'
 ])
-param runtime string = 'dotnet' // e.g., 'dotnet', 'node', 'python', etc.
+param runtime string = 'dotnet-isolated' // e.g., 'dotnet', 'node', 'python', etc.
 
 @description('Optional. Runtime Version for Function App.')
 param runtimeVersion string = '~4'
@@ -92,6 +96,10 @@ var defaultSettings = [
     name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
     value: fnAppAppInsights.properties.InstrumentationKey
   }
+  {
+    name: 'AZURE_CLIENT_ID'
+    value: sqlDBManagedIdentityClientId
+  }
 ]
 
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
@@ -101,7 +109,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   identity: userAssignedIdentities
   properties: {
     httpsOnly: true
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: isPrivate ? 'Disabled' : 'Enabled'
     serverFarmId: serverFarmResourceId
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     siteConfig: {
