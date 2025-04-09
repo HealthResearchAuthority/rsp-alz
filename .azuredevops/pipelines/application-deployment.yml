@@ -35,6 +35,10 @@ jobs:
       vmImage: 'ubuntu-latest'
     steps:
       - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
       - bash: az bicep build --file ./5.spoke-network/main.application.bicep
 
   - job: validate
