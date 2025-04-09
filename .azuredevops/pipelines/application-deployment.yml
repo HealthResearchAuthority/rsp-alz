@@ -61,6 +61,7 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
+            az config set bicep.use_binary_from_path=false --only-show-errors
             az deployment sub validate --name "App-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.application.bicep \
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
@@ -86,6 +87,7 @@ jobs:
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
+            az config set bicep.use_binary_from_path=false --only-show-errors
             az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.application.bicep \
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
