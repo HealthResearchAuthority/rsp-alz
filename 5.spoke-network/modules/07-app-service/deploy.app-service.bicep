@@ -62,6 +62,9 @@ param storageAccountName string = ''
 @allowed(['functionapp','app'])
 param kind string
 
+@description('Client ID of the managed identity to be used for the SQL DB connection string. For Function App Only')
+param sqlDBManagedIdentityClientId string = ''
+
 param deploySlot bool
 
 param deployAppPrivateEndPoint bool
@@ -210,6 +213,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     storageAccountName: storageAccountName
     isPrivate: isPrivate
     devOpsPublicIPAddress: devOpsPublicIPAddress
+    sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
   }
   dependsOn: [
     fnstorage

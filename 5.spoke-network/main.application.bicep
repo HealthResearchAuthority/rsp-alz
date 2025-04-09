@@ -463,8 +463,8 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
-        supportingServices[i].outputs.keyVaultUserAssignedIdentityId
       ]
+      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
       devOpsPublicIPAddress: parDevOpsPublicIPAddress
       isPrivate: false
     }

@@ -19,6 +19,9 @@ param serverFarmResourceId string
 @description('Determines if we are exposing apps to public')
 param isPrivate bool = true
 
+@description('Client ID of the managed identity to be used for the SQL DB connection string.')
+param sqlDBManagedIdentityClientId string = ''
+
 @maxLength(24)
 @description('Conditional. The name of the parent Storage Account. Required if the template is used in a standalone deployment.')
 param storageAccountName string
@@ -92,6 +95,10 @@ var defaultSettings = [
   {
     name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
     value: fnAppAppInsights.properties.InstrumentationKey
+  }
+  {
+    name: 'AZURE_CLIENT_ID'
+    value: sqlDBManagedIdentityClientId
   }
 ]
 
