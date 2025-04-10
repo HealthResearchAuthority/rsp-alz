@@ -96,7 +96,7 @@ var metrics = [for category in metricCategories: {
 }]
 
 var serviceBusEndpoint = '${namespace.id}/AuthorizationRules/RootManageSharedAccessKey'
-var serviceBusConnectionString = listKeys(serviceBusEndpoint, namespace.apiVersion).primaryConnectionString
+//var serviceBusConnectionString = listKeys(serviceBusEndpoint, namespace.apiVersion).primaryConnectionString
 
 // Resources
 resource namespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview' = {
