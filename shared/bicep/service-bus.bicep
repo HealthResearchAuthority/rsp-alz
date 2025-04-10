@@ -180,7 +180,7 @@ resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
 // Outputs
 output id string = namespace.id
 output name string = namespace.name
-output connectionString string = serviceBusConnectionString
+//output connectionString string = serviceBusConnectionString
 output queues array = [for (queueName, i) in queueNames: {
   name: name
   id: queue[i].id
