@@ -1,7 +1,6 @@
 # This workflow will deploy the network resources
 name: network-deployment
-trigger:
-  - main
+trigger: none
 
 
 parameters:
