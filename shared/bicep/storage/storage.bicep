@@ -58,7 +58,7 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   properties: {
     accessTier: accessTier
     supportsHttpsTrafficOnly: supportsHttpsTrafficOnly
-    networkAcls: devOpsPublicIPAddress == '' && isPrivate == false ? {} :  {
+    networkAcls: devOpsPublicIPAddress == '' || isPrivate == false ? {} :  {
       // Block any IP not explicitly allowed
       defaultAction: 'Deny'
       bypass: 'AzureServices'  // Optionally bypass Azure services if needed
