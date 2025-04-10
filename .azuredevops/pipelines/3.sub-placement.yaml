@@ -1,8 +1,7 @@
 # This workflow will deploy the LZA in ADO
 name: 3.sub-placement-lza-deployment
 
-trigger:
-  - main
+trigger: none
 
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel

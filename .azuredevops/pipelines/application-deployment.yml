@@ -1,7 +1,6 @@
 # This workflow will deploy the application resources
 name: application-deployment
-trigger:
-  - main
+trigger: none
 
 parameters:
   - name: env
