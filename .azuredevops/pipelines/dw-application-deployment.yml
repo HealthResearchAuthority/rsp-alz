@@ -19,6 +19,9 @@ jobs:
     pool:
       vmImage: 'ubuntu-latest'
     dependsOn: lint
+    variables:
+      - name: app-variables
+      - group: DW-Application-Variables
     steps:
       - checkout: self
       - bash: |
@@ -27,7 +30,7 @@ jobs:
         displayName: 'Install Bicep CLI'
       - task: AzureCLI@2
         inputs:
-          azureSubscription: $(${{ parameters.env }})
+          azureSubscription: $(azureSubscription)
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
@@ -39,6 +42,9 @@ jobs:
     pool:
       vmImage: 'ubuntu-latest'
     dependsOn: [lint, validate]
+    variables:
+      - name: app-variables
+      - group: DW-Application-Variables
     steps:
       - checkout: self
       - bash: |
@@ -47,7 +53,7 @@ jobs:
         displayName: 'Install Bicep CLI'
       - task: AzureCLI@2
         inputs:
-          azureSubscription: $(${{ parameters.env }})
+          azureSubscription: $(azureSubscription)
           scriptType: bash
           scriptLocation: inlineScript
           inlineScript: |
@@ -60,6 +66,9 @@ jobs:
     pool:
       vmImage: 'ubuntu-latest'
     dependsOn: [lint, validate, preview]
+    variables:
+      - name: app-variables
+      - group: DW-Application-Variables
     steps:
       - checkout: self
       - bash: |
@@ -69,7 +78,7 @@ jobs:
       - task: AzureCLI@2
         name: deploy
         inputs:
-          azureSubscription: $(${{ parameters.env }})
+          azureSubscription: $(azureSubscription)
           scriptType: bash
           scriptLocation: inlineScript
           failOnStandardError: true
