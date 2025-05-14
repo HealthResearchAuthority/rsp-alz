@@ -294,7 +294,7 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
-        supportingServices[i].outputs.serviceBusSenderManagedIdentity
+        //supportingServices[i].outputs.serviceBusSenderManagedIdentity
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
     }
@@ -496,7 +496,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
       deployAppPrivateEndPoint: false
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-        supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
+        // supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
       ]
       devOpsPublicIPAddress: parDevOpsPublicIPAddress
       isPrivate: false

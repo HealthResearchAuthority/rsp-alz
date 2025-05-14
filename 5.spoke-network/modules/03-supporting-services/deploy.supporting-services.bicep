@@ -140,18 +140,18 @@ module appConfiguration './modules/app-configuration.bicep' = {
   }
 }
 
-module serviceBus './modules/service-bus.module.bicep' = {
-  name: 'serviceBus-${uniqueString(resourceGroup().id)}'
-  params: {
-    serviceBusNamespaceName: resourcesNames.serviceBus
-    serviceBusPrivateEndpointName: resourcesNames.serviceBusPep
-    serviceBusReceiverUserAssignedIdentityName: resourcesNames.serviceBusReceiverUserAssignedIdentity
-    serviceBusSenderUserAssignedIdentityName: resourcesNames.serviceBusSenderUserAssignedIdentity
-    spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
-    spokeVNetId: spokeVNetId
-    diagnosticWorkspaceId: logAnalyticsWorkspaceId
-  }
-}
+// module serviceBus './modules/service-bus.module.bicep' = {
+//   name: 'serviceBus-${uniqueString(resourceGroup().id)}'
+//   params: {
+//     serviceBusNamespaceName: resourcesNames.serviceBus
+//     serviceBusPrivateEndpointName: resourcesNames.serviceBusPep
+//     serviceBusReceiverUserAssignedIdentityName: resourcesNames.serviceBusReceiverUserAssignedIdentity
+//     serviceBusSenderUserAssignedIdentityName: resourcesNames.serviceBusSenderUserAssignedIdentity
+//     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
+//     spokeVNetId: spokeVNetId
+//     diagnosticWorkspaceId: logAnalyticsWorkspaceId
+//   }
+// }
 
 // ------------------
 // OUTPUTS
@@ -183,5 +183,5 @@ output keyVaultUserAssignedIdentityId string = keyVault.outputs.keyVaultUserAssi
 
 output appConfigURL string = appConfiguration.outputs.appConfigURL
 output appConfigIdentityClientID string = appConfiguration.outputs.appConfigMIClientID
-output serviceBusReceiverManagedIdentityID string = serviceBus.outputs.serviceBusReceiverManagedIdentityId
-output serviceBusSenderManagedIdentity string = serviceBus.outputs.serviceBusSenderManagedIdentityId
+// output serviceBusReceiverManagedIdentityID string = serviceBus.outputs.serviceBusReceiverManagedIdentityId
+// output serviceBusSenderManagedIdentity string = serviceBus.outputs.serviceBusSenderManagedIdentityId
