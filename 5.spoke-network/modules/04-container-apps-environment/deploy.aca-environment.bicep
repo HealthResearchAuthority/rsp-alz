@@ -33,6 +33,9 @@ param deployZoneRedundantResources bool = true
 // @description('The name of the hub virtual network.')
 // param hubVNetName string = ''
 
+@description('Optional, default value is false. If true, skip creating private DNS zone to avoid conflicts with existing zones. NOTE: Set this to true after the initial deployment since Container Apps creates its own private DNS zone during the first deployment.')
+param skipPrivateDnsZoneCreation bool = false
+
 param resourcesNames object
 param networkRG string
 
@@ -93,7 +96,7 @@ module containerAppsEnvironment '../../../shared/bicep/aca-environment.bicep' = 
 }
 
 @description('The Private DNS zone containing the ACA load balancer IP')
-module containerAppsEnvironmentPrivateDnsZone '../../../shared/bicep/network/private-dns-zone.bicep' = {
+module containerAppsEnvironmentPrivateDnsZone '../../../shared/bicep/network/private-dns-zone.bicep' = if (!skipPrivateDnsZoneCreation) {
   scope: resourceGroup(networkRG)
   name: 'containerAppsEnvironmentPrivateDnsZone-${uniqueString(resourceGroup().id)}'
   params: {

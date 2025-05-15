@@ -243,6 +243,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
       //privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
+      skipPrivateDnsZoneCreation: parSpokeNetworks[i].skipPrivateDnsZoneCreation 
       resourcesNames: applicationServicesNaming[i].outputs.resourcesNames
       networkRG: parSpokeNetworks[i].rgNetworking
     }
