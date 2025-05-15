@@ -62,6 +62,9 @@ param parOneLoginClientId string
 @description('Valid token issuers for Gov UK One Login')
 param parOneLoginIssuers array
 
+@description('How long to keep SQL audit logs in days (default: 15 days)')
+param parSqlAuditRetentionDays int = 15
+
 @description('Spoke Networks Configuration')
 param parSpokeNetworks array
 
@@ -266,7 +269,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       networkingResourcesNames: networkingnaming[i].outputs.resourcesNames
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-      auditRetentionDays: 90
+      auditRetentionDays: parSqlAuditRetentionDays
       enableSqlServerAuditing: true
     }
   }

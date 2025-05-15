@@ -4,6 +4,8 @@ param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
 
+param parSqlAuditRetentionDays = 15
+
 param parSpokeNetworks = [
   {
     subscriptionId: ''
