@@ -182,32 +182,6 @@ resource sqlAuditingSetting 'Microsoft.Sql/servers/auditingSettings@2021-11-01-p
   }
 }
 
-resource sqlServerDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (enableSqlServerAuditing) {
-  name: '${SQL_Server.name}-diagnostics'
-  scope: SQL_Server
-  properties: {
-    workspaceId: logAnalyticsWorkspaceId
-    logs: [
-      {
-        category: 'SQLSecurityAuditEvents'
-        enabled: true
-        retentionPolicy: {
-          days: auditRetentionDays
-          enabled: true
-        }
-      }
-      {
-        category: 'DevOpsOperationsAudit'
-        enabled: true
-        retentionPolicy: {
-          days: auditRetentionDays
-          enabled: true
-        }
-      }
-    ]
-  }
-}
-
 module sqlServerNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = {
   name: 'sqlServerNetwork-${uniqueString(SQL_Server.id)}'
   scope: resourceGroup(networkingResourceGroup)
