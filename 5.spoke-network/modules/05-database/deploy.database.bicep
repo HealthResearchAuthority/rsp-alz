@@ -32,6 +32,15 @@ param sqlServerUAIName string = ''
 param networkingResourcesNames object
 param networkingResourceGroup string
 
+@description('The resource ID of the Log Analytics workspace to which audit logs will be sent.')
+param logAnalyticsWorkspaceId string = '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-operationsmanagement/providers/Microsoft.OperationalInsights/workspaces/hra-rsp-log-analytics'
+
+@description('How long to keep audit logs (default: 30 days)')
+param auditRetentionDays int = 30
+
+@description('Enable or disable SQL Server auditing (default: true)')
+param enableSqlServerAuditing bool = true
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -160,6 +169,42 @@ resource sqlVulnerabilityAssessment 'Microsoft.Sql/servers/sqlVulnerabilityAsses
   parent: SQL_Server
   properties: {
     state: 'Enabled'
+  }
+}
+
+resource sqlAuditingSetting 'Microsoft.Sql/servers/auditingSettings@2021-11-01-preview' = if (enableSqlServerAuditing) {
+  parent: SQL_Server
+  name: 'default'
+  properties: {
+    state: 'Enabled'
+    isAzureMonitorTargetEnabled: true
+    retentionDays: auditRetentionDays
+  }
+}
+
+resource sqlServerDiagnostics 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (enableSqlServerAuditing) {
+  name: '${SQL_Server.name}-diagnostics'
+  scope: SQL_Server
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        category: 'SQLSecurityAuditEvents'
+        enabled: true
+        retentionPolicy: {
+          days: auditRetentionDays
+          enabled: true
+        }
+      }
+      {
+        category: 'DevOpsOperationsAudit'
+        enabled: true
+        retentionPolicy: {
+          days: auditRetentionDays
+          enabled: true
+        }
+      }
+    ]
   }
 }
 

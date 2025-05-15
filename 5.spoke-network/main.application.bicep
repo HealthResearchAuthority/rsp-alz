@@ -265,6 +265,9 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       sqlServerUAIName: storageServicesNaming[i].outputs.resourcesNames.sqlServerUserAssignedIdentity
       networkingResourcesNames: networkingnaming[i].outputs.resourcesNames
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      auditRetentionDays: 90
+      enableSqlServerAuditing: true
     }
   }
 ]
