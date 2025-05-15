@@ -36,7 +36,7 @@ param networkingResourceGroup string
 param logAnalyticsWorkspaceId string = '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-operationsmanagement/providers/Microsoft.OperationalInsights/workspaces/hra-rsp-log-analytics'
 
 @description('How long to keep audit logs (default: 30 days)')
-param auditRetentionDays int = 30
+param auditRetentionDays int = 15
 
 @description('Enable or disable SQL Server auditing (default: true)')
 param enableSqlServerAuditing bool = true
