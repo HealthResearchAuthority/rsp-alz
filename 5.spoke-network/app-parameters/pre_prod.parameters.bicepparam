@@ -15,7 +15,7 @@ param parSpokeNetworks = [
     deploy: false
     configurePrivateDNS: true
     devBoxPeering: false
-    // skipPrivateDnsZoneCreation: false  // Set to true after initial deployment to avoid DNS zone conflicts
+    skipPrivateDnsZoneCreation: false  // Set to true after initial deployment to avoid DNS zone conflicts
     rgNetworking: 'rg-rsp-networking-spoke-preprod-uks'
     vnet: 'vnet-rsp-networking-preprod-uks-spoke'
     rgapplications: 'rg-rsp-applications-spoke-preprod-uks'
