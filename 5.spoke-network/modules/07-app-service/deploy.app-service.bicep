@@ -85,6 +85,19 @@ var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
 var spokeResourceGroupName = spokeVNetIdTokens[4]
 var spokeVNetName = spokeVNetIdTokens[8]
+var networkAcls = isPrivate ? {
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  ipRules: devOpsPublicIPAddress == '' ? [] : [
+    {
+      value: devOpsPublicIPAddress
+      action: 'Allow'
+    }
+  ]
+} : {
+  defaultAction: 'Allow'
+  bypass: 'AzureServices'
+}
 
 // resource keyvault 'Microsoft.KeyVault/vaults@2022-11-01' existing = {
 //   name: keyvaultName
@@ -144,10 +157,9 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
     location: location
     sku: 'Standard_LRS'
     kind: 'StorageV2'
-    isPrivate: isPrivate
     supportsHttpsTrafficOnly: true
     tags: {}
-    devOpsPublicIPAddress: devOpsPublicIPAddress
+    networkAcls: networkAcls 
   }
 }
 
