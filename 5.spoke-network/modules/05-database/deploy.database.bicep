@@ -32,6 +32,12 @@ param sqlServerUAIName string = ''
 param networkingResourcesNames object
 param networkingResourceGroup string
 
+@description('How long to keep audit logs (default: 30 days)')
+param auditRetentionDays int = 15
+
+@description('Enable or disable SQL Server auditing (default: true)')
+param enableSqlServerAuditing bool = true
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -160,6 +166,16 @@ resource sqlVulnerabilityAssessment 'Microsoft.Sql/servers/sqlVulnerabilityAsses
   parent: SQL_Server
   properties: {
     state: 'Enabled'
+  }
+}
+
+resource sqlAuditingSetting 'Microsoft.Sql/servers/auditingSettings@2021-11-01-preview' = if (enableSqlServerAuditing) {
+  parent: SQL_Server
+  name: 'default'
+  properties: {
+    state: 'Enabled'
+    isAzureMonitorTargetEnabled: true
+    retentionDays: auditRetentionDays
   }
 }
 

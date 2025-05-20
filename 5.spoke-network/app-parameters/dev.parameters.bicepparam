@@ -24,6 +24,8 @@ param parOneLoginClientId = 'GJVVaSadH1BG8GXohuWK3U8lUAA'
 
 param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
+param parSqlAuditRetentionDays = 15
+
 param parSpokeNetworks = [
   {
     subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'
