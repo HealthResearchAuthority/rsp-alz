@@ -3,7 +3,7 @@ using '../main.network.bicep'
 param parSpokeNetworks = [
   {
     subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'
-    ipRange: '10.2.0.0/16'
+    ipRange: '10.1.0.0/19' // 8192 IPs: 10.1.0.0 – 10.1.31.255
     parEnvironment: 'dev'
     zoneRedundancy: false
     //configurePrivateDNS: true
@@ -11,16 +11,16 @@ param parSpokeNetworks = [
     rgNetworking: 'rg-rsp-networking-spoke-dev-uks'
     subnets: {
       infraSubnet: {
-        addressPrefix: '10.2.0.0/18'
+        addressPrefix: '10.1.0.0/21' // 2048 IPs
       }
       webAppSubnet: {
-        addressPrefix: '10.2.128.0/18'
+        addressPrefix: '10.1.8.0/22' // 1024 IPs
       }
       appGatewaySubnet: {
-        addressPrefix: '10.2.64.0/24'
+        addressPrefix: '10.1.12.0/27' // 32 IPs
       }
       privateEndPointSubnet: {
-        addressPrefix: '10.2.65.0/24'
+        addressPrefix: '10.1.12.32/27' // 32 IPs
       }
     }
   }
