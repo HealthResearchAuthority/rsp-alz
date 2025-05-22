@@ -131,7 +131,7 @@ jobs:
   - job: delete
     pool:
       vmImage: 'ubuntu-latest'
-    dependsOn: [setup, lint, validate, preview]
+    dependsOn: [setup, lint]
     steps:
       - checkout: self
       - bash: |
