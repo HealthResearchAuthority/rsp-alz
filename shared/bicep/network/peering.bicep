@@ -10,8 +10,13 @@ param remoteRgName string
 @description('The id of the subscription of the remote virtual netowrk')
 param remoteSubscriptionId string
 
+resource localVnet 'Microsoft.Network/virtualNetworks@2022-11-01' existing = {
+  name: localVnetName
+}
+
 resource vnetPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2021-08-01' = {
-  name: '${localVnetName}/peerTo-${remoteVnetName}'
+  parent: localVnet
+  name: '${localVnetName}-peerTo-${remoteVnetName}'
   properties: {
     allowVirtualNetworkAccess: true
     allowGatewayTransit: false

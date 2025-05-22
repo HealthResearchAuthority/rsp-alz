@@ -36,7 +36,7 @@ param parSpokeNetworks = [
     containerRegistryTier: 'Premium'
     deploy: false
     configurePrivateDNS: false
-    devBoxPeering: false
+    devBoxPeering: true
     rgNetworking: 'rg-rsp-networking-spoke-systemtestauto-uks'
     vnet: 'vnet-rsp-networking-automationtest-uks-spoke'
     rgapplications: 'rg-rsp-applications-spoke-systemtestauto-uks'
@@ -44,6 +44,9 @@ param parSpokeNetworks = [
     rgStorage: 'rg-rsp-storage-spoke-systemtestauto-uks'
     deployWebAppSlot: false
     IDGENV: 'test'
+    parDevBoxVNetPeeringSubscriptionID: '9ef9a127-7a6e-452e-b18d-d2e2e89ffa92'
+    parDevBoxVNetPeeringVNetName: 'vnet-dbox-rsp-uksouth'
+    parDevBoxVNetPeeringResourceGroup: 'rg-rsp-devcenter'
     appInsightsConnectionString: 'InstrumentationKey=225c2ec1-bb7d-4c33-9d5f-cb89c117f2d6;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=3dc21d1c-0655-44cc-8ad3-cb4eab8c8c67'
   }
 ]

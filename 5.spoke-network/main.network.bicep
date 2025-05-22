@@ -58,6 +58,10 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     resourcesNames: networkingnaming[i].outputs.resourcesNames
     spokeNetworkingRGName: parSpokeNetworks[i].rgNetworking
+    parDevBoxVNetPeeringResourceGroup: parSpokeNetworks[i].parDevBoxVNetPeeringResourceGroup
+    parDevBoxVNetPeeringSubscriptionID: parSpokeNetworks[i].parDevBoxVNetPeeringSubscriptionID
+    parDevBoxVNetPeeringVNetName: parSpokeNetworks[i].parDevBoxVNetPeeringVNetName
+    parEnableDevBoxVNetPeering: parSpokeNetworks[i].devBoxPeering
   }
 }]
 

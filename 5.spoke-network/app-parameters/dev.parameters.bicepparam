@@ -44,6 +44,9 @@ param parSpokeNetworks = [
     rgStorage: 'rg-rsp-storage-spoke-dev-uks'
     deployWebAppSlot: false
     IDGENV: 'dev'
+    parDevBoxVNetPeeringSubscriptionID: '9ef9a127-7a6e-452e-b18d-d2e2e89ffa92'
+    parDevBoxVNetPeeringVNetName: 'vnet-dbox-rsp-uksouth'
+    parDevBoxVNetPeeringResourceGroup: 'rg-rsp-devcenter'
     appInsightsConnectionString: 'InstrumentationKey=1925d527-9a3a-4439-9bf5-375666529422;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=0dd21ec7-c4a7-40da-8c7e-75f31d979301'
   }
 ]
