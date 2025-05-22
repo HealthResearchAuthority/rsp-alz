@@ -29,7 +29,7 @@ param networkingResourcesNames object
 param networkingResourceGroup string
 
 @description('How long to keep audit logs (default: 30 days)')
-param auditRetentionDays int = 15
+param auditRetentionDays int = 30
 
 @description('Enable or disable SQL Server auditing (default: true)')
 param enableSqlServerAuditing bool = true
@@ -202,10 +202,6 @@ resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
       {
         category: 'SQLSecurityAuditEvents'
         enabled: true
-        retentionPolicy: {
-          days: 30
-          enabled: true
-        }
       }
     ]
   }
