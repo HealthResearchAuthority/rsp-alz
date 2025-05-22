@@ -44,6 +44,6 @@ param parSpokeNetworks = [
     rgStorage: 'rg-rsp-storage-spoke-dev-uks'
     deployWebAppSlot: false
     IDGENV: 'dev'
-    appInsightsConnectionString: 'InstrumentationKey=1925d527-9a3a-4439-9bf5-375666529422;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=0dd21ec7-c4a7-40da-8c7e-75f31d979301'
+    appInsightsConnectionString: 'InstrumentationKey=5d4746f6-cea9-4d2e-ade9-a943edaafadb;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=1d5b29c1-8cfb-4346-a5aa-134095ec7821'
   }
 ]

@@ -131,19 +131,21 @@ jobs:
   # - job: delete
   #   pool:
   #     vmImage: 'ubuntu-latest'
-  #   dependsOn: [lint]
+  #   dependsOn: [setup, lint]
   #   steps:
-  #     - checkout: self- bash: |
-        #   az bicep install
-        #   az bicep version
-        # displayName: 'Install Bicep CLI'
+  #     - checkout: self
+  #     - bash: |
+  #         az bicep install
+  #         az bicep version
+  #       displayName: 'Install Bicep CLI'
 
   #     - task: AzureCLI@2
   #       name: delete
   #       inputs:
-  #         azureSubscription: $(azureServiceConnection)
+  #         azureSubscription: $(${{ parameters.env }})
   #         scriptType: bash
   #         scriptLocation: inlineScript
   #         failOnStandardError: true
   #         inlineScript: |
+  #           az config set bicep.use_binary_from_path=false --only-show-errors
   #           az stack sub delete --name "application-deployment-stack" --action-on-unmanage deleteResources --yes

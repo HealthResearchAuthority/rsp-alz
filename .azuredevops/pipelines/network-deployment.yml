@@ -96,3 +96,24 @@ jobs:
             spokeVNetName=$(echo $output | jq -r '.spokeVNetName.value')
             echo "##vso[task.setvariable variable=spokeVNetId;isoutput=true]$spokeVNetId"
             echo "##vso[task.setvariable variable=spokeVNetName;isoutput=true]$spokeVNetName"
+
+  # - job: delete
+  #   pool:
+  #     vmImage: 'ubuntu-latest'
+  #   dependsOn: [lint]
+  #   steps:
+  #     - checkout: self
+  #     - bash: |
+  #         az bicep install
+  #         az bicep version
+  #       displayName: 'Install Bicep CLI'
+  #     - task: AzureCLI@2
+  #       name: delete
+  #       inputs:
+  #         azureSubscription: $(${{ parameters.env }})
+  #         scriptType: bash
+  #         scriptLocation: inlineScript
+  #         failOnStandardError: true
+  #         inlineScript: |
+  #           az config set bicep.use_binary_from_path=false --only-show-errors
+  #           az stack sub delete --name "network-deployment-stack" --action-on-unmanage deleteResources --yes
