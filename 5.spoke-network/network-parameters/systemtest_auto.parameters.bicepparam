@@ -7,8 +7,11 @@ param parSpokeNetworks = [
     parEnvironment: 'automationtest'
     zoneRedundancy: false
     //configurePrivateDNS: false
-    devBoxPeering: false
+    devBoxPeering: true
     rgNetworking: 'rg-rsp-networking-spoke-systemtestauto-uks'
+    parDevBoxVNetPeeringSubscriptionID: '9ef9a127-7a6e-452e-b18d-d2e2e89ffa92'
+    parDevBoxVNetPeeringVNetName: 'vnet-dbox-rsp-uksouth'
+    parDevBoxVNetPeeringResourceGroup: 'rg-rsp-devcenter'
     subnets: {
       infraSubnet: {
         addressPrefix: '10.1.32.0/20'

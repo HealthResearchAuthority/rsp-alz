@@ -9,6 +9,9 @@ param parSpokeNetworks = [
     //configurePrivateDNS: true
     devBoxPeering: true
     rgNetworking: 'rg-rsp-networking-spoke-dev-uks'
+    parDevBoxVNetPeeringSubscriptionID: '9ef9a127-7a6e-452e-b18d-d2e2e89ffa92'
+    parDevBoxVNetPeeringVNetName: 'vnet-dbox-rsp-uksouth'
+    parDevBoxVNetPeeringResourceGroup: 'rg-rsp-devcenter'
     subnets: {
       infraSubnet: {
         addressPrefix: '10.1.0.0/21' // 2048 IPs
