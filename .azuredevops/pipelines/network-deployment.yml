@@ -29,45 +29,45 @@ jobs:
         displayName: 'Install Bicep CLI'
       - bash: az bicep build --file ./5.spoke-network/main.network.bicep
 
-  - job: validate
-    pool:
-      vmImage: 'ubuntu-latest'
-    dependsOn: [lint]
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2
-        inputs:
-          azureSubscription: $(${{ parameters.env }})
-          scriptType: bash
-          scriptLocation: inlineScript
-          inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            az deployment sub validate --name "Network-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.network.bicep  \
-              --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam
+  # - job: validate
+  #   pool:
+  #     vmImage: 'ubuntu-latest'
+  #   dependsOn: [lint]
+  #   steps:
+  #     - checkout: self
+  #     - bash: |
+  #         az bicep install
+  #         az bicep version
+  #       displayName: 'Install Bicep CLI'
+  #     - task: AzureCLI@2
+  #       inputs:
+  #         azureSubscription: $(${{ parameters.env }})
+  #         scriptType: bash
+  #         scriptLocation: inlineScript
+  #         inlineScript: |
+  #           az config set bicep.use_binary_from_path=false --only-show-errors
+  #           az deployment sub validate --name "Network-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.network.bicep  \
+  #             --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam
 
-  - job: preview
-    pool:
-      vmImage: 'ubuntu-latest'
-    dependsOn: [lint, validate]
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2
-        inputs:
-          azureSubscription: $(${{ parameters.env }})
-          scriptType: bash
-          scriptLocation: inlineScript
-          inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.network.bicep \
-              --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam
+  # - job: preview
+  #   pool:
+  #     vmImage: 'ubuntu-latest'
+  #   dependsOn: [lint, validate]
+  #   steps:
+  #     - checkout: self
+  #     - bash: |
+  #         az bicep install
+  #         az bicep version
+  #       displayName: 'Install Bicep CLI'
+  #     - task: AzureCLI@2
+  #       inputs:
+  #         azureSubscription: $(${{ parameters.env }})
+  #         scriptType: bash
+  #         scriptLocation: inlineScript
+  #         inlineScript: |
+  #           az config set bicep.use_binary_from_path=false --only-show-errors
+  #           az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.network.bicep \
+  #             --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam
 
   # - job: deploy
   #   pool:

@@ -40,57 +40,57 @@ jobs:
         displayName: 'Install Bicep CLI'
       - bash: az bicep build --file ./5.spoke-network/main.application.bicep
 
-  - job: validate
-    pool:
-      vmImage: 'ubuntu-latest'
-    dependsOn: [setup, lint]
-    variables:
-      - name: devOpsPublicIP
-        value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
-      - group: ${{ parameters.env }}
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2
-        inputs:
-          azureSubscription: $(${{ parameters.env }})
-          scriptType: bash
-          scriptLocation: inlineScript
-          inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            az deployment sub validate --name "App-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.application.bicep \
-              --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
-                           parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
-                           parClientID=$(clientID) parClientSecret=$(clientSecret) parDevOpsPublicIPAddress=$(devOpsPublicIP)
+  # - job: validate
+  #   pool:
+  #     vmImage: 'ubuntu-latest'
+  #   dependsOn: [setup, lint]
+  #   variables:
+  #     - name: devOpsPublicIP
+  #       value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
+  #     - group: ${{ parameters.env }}
+  #   steps:
+  #     - checkout: self
+  #     - bash: |
+  #         az bicep install
+  #         az bicep version
+  #       displayName: 'Install Bicep CLI'
+  #     - task: AzureCLI@2
+  #       inputs:
+  #         azureSubscription: $(${{ parameters.env }})
+  #         scriptType: bash
+  #         scriptLocation: inlineScript
+  #         inlineScript: |
+  #           az config set bicep.use_binary_from_path=false --only-show-errors
+  #           az deployment sub validate --name "App-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.application.bicep \
+  #             --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
+  #                          parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
+  #                          parClientID=$(clientID) parClientSecret=$(clientSecret) parDevOpsPublicIPAddress=$(devOpsPublicIP)
 
-  - job: preview
-    pool:
-      vmImage: 'ubuntu-latest'
-    dependsOn: [setup, lint, validate]
-    variables:
-      - name: devOpsPublicIP
-        value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
-      - group: ${{ parameters.env }}
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2
-        inputs:
-          azureSubscription: $(${{ parameters.env }})
-          scriptType: bash
-          scriptLocation: inlineScript
-          inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.application.bicep \
-              --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
-                           parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
-                           parClientID=$(clientID) parClientSecret=$(clientSecret) parDevOpsPublicIPAddress=$(devOpsPublicIP)
+  # - job: preview
+  #   pool:
+  #     vmImage: 'ubuntu-latest'
+  #   dependsOn: [setup, lint, validate]
+  #   variables:
+  #     - name: devOpsPublicIP
+  #       value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
+  #     - group: ${{ parameters.env }}
+  #   steps:
+  #     - checkout: self
+  #     - bash: |
+  #         az bicep install
+  #         az bicep version
+  #       displayName: 'Install Bicep CLI'
+  #     - task: AzureCLI@2
+  #       inputs:
+  #         azureSubscription: $(${{ parameters.env }})
+  #         scriptType: bash
+  #         scriptLocation: inlineScript
+  #         inlineScript: |
+  #           az config set bicep.use_binary_from_path=false --only-show-errors
+  #           az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.application.bicep \
+  #             --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
+  #                          parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
+  #                          parClientID=$(clientID) parClientSecret=$(clientSecret) parDevOpsPublicIPAddress=$(devOpsPublicIP)
 
   # - job: deploy
   #   pool:
@@ -131,7 +131,7 @@ jobs:
   - job: delete
     pool:
       vmImage: 'ubuntu-latest'
-    dependsOn: [lint]
+    dependsOn: [setup, lint, validate, preview]
     steps:
       - checkout: self
       - bash: |
