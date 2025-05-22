@@ -14,10 +14,6 @@ param databases array = []
 @description('The location where the resources will be created.')
 param location string = resourceGroup().location
 
-@description('The name of the environment (e.g. "dev", "test", "prod", "uat", "dr", "qa"). Up to 8 characters long.')
-@maxLength(16)
-param environment string
-
 @description('The resource ID of the VNet to which the private endpoint will be connected.')
 param spokeVNetId string
 
@@ -127,15 +123,21 @@ module sqlserveradminRoleAssignment '../../../shared/bicep/role-assignments/role
 }
 
 // Database on SQL Server Resource
+//ToDo SKU config to come from Environment specific parameters from Main.bicep
 resource sqldatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [for i in range(0, length(databases)): {
   name: databases[i]
   parent: SQL_Server
   location: location
   sku: {
-    name: environment == 'dev' || environment == 'test' ? 'basic': 'standard'
-    tier: environment == 'dev' || environment == 'test' ? 'basic': 'standard'
+    name: 'GP_S_Gen5'
+    tier: 'GeneralPurpose'
+    family: 'Gen5'
+    capacity: 12
+    size: '6GB'
   }
   properties: {
+    createMode: 'Default'
+    minCapacity: 6
     zoneRedundant: false
   }
 }]
