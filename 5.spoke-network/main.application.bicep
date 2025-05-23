@@ -262,7 +262,6 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       adminLogin: parAdminLogin
       adminPassword: parSqlAdminPhrase
       databases: ['applicationservice', 'identityservice', 'questionsetservice', 'rtsservice']
-      environment: parSpokeNetworks[i].parEnvironment
       spokePrivateEndpointSubnetName: pepSubnet[i].name // spoke[i].outputs.spokePrivateEndpointsSubnetName
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       sqlServerUAIName: storageServicesNaming[i].outputs.resourcesNames.sqlServerUserAssignedIdentity
@@ -270,6 +269,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       auditRetentionDays: parSqlAuditRetentionDays
       enableSqlServerAuditing: true
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     }
   }
 ]

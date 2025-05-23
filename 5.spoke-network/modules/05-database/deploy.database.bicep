@@ -14,10 +14,6 @@ param databases array = []
 @description('The location where the resources will be created.')
 param location string = resourceGroup().location
 
-@description('The name of the environment (e.g. "dev", "test", "prod", "uat", "dr", "qa"). Up to 8 characters long.')
-@maxLength(16)
-param environment string
-
 @description('The resource ID of the VNet to which the private endpoint will be connected.')
 param spokeVNetId string
 
@@ -33,10 +29,13 @@ param networkingResourcesNames object
 param networkingResourceGroup string
 
 @description('How long to keep audit logs (default: 30 days)')
-param auditRetentionDays int = 15
+param auditRetentionDays int = 30
 
 @description('Enable or disable SQL Server auditing (default: true)')
 param enableSqlServerAuditing bool = true
+
+@description('The resource id of an existing Azure Log Analytics Workspace.')
+param logAnalyticsWorkspaceId string
 
 // ------------------
 // VARIABLES
@@ -126,16 +125,29 @@ module sqlserveradminRoleAssignment '../../../shared/bicep/role-assignments/role
   }
 }
 
+resource masterDb 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
+  parent: SQL_Server
+  location: location
+  name: 'master'
+  properties: {}
+}
+
 // Database on SQL Server Resource
+//ToDo SKU config to come from Environment specific parameters from Main.bicep
 resource sqldatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [for i in range(0, length(databases)): {
   name: databases[i]
   parent: SQL_Server
   location: location
   sku: {
-    name: environment == 'dev' || environment == 'test' ? 'basic': 'standard'
-    tier: environment == 'dev' || environment == 'test' ? 'basic': 'standard'
+    name: 'GP_S_Gen5'
+    tier: 'GeneralPurpose'
+    family: 'Gen5'
+    capacity: 12
+    size: '6GB'
   }
   properties: {
+    createMode: 'Default'
+    minCapacity: 6
     zoneRedundant: false
   }
 }]
@@ -169,13 +181,29 @@ resource sqlVulnerabilityAssessment 'Microsoft.Sql/servers/sqlVulnerabilityAsses
   }
 }
 
-resource sqlAuditingSetting 'Microsoft.Sql/servers/auditingSettings@2021-11-01-preview' = if (enableSqlServerAuditing) {
+resource sqlAuditingSetting 'Microsoft.Sql/servers/auditingSettings@2024-05-01-preview' = if (enableSqlServerAuditing) {
   parent: SQL_Server
   name: 'default'
   properties: {
     state: 'Enabled'
     isAzureMonitorTargetEnabled: true
     retentionDays: auditRetentionDays
+
+  }
+}
+
+//setting up diagnostic settings applying to "master database" so that it applies to all databases
+resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: 'SQLSecurityAuditLogs'
+  scope: masterDb
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        category: 'SQLSecurityAuditEvents'
+        enabled: true
+      }
+    ]
   }
 }
 
