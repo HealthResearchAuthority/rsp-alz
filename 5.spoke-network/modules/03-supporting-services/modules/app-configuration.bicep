@@ -80,6 +80,11 @@ var keyValues = [
     contentType: null
   }
   {
+    name: 'AppSettings:AuthSettings:AuthCookieTimeout$portal' // Auth cookie timeout in seconds
+    value: 900
+    contentType: null
+  }
+  {
     name: 'ConnectionStrings:IrasServiceDatabaseConnection'
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=applicationservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
     contentType: null
@@ -135,6 +140,11 @@ var keyValues = [
     contentType: null
   }
   {
+    name: 'AppSettings:OneLogin:AuthCookieTimeout$portal' // Auth cookie timeout for Gov UK One Login in seconds
+    value: 900
+    contentType: null
+  }
+  {
     name: 'AppSettings:OneLogin:ClientId'
     value: oneLoginClientId
     contentType: null
@@ -143,6 +153,26 @@ var keyValues = [
     name: 'AppSettings:OneLogin:Issuers'
     value: oneLoginIssuers
     contentType: 'application/json'
+  }
+  {
+    name: 'AppSettings:SessionTimeout$portal' // Session timeout in seconds
+    value: 900
+    contentType: null
+  }
+  {
+    name: 'AppSettings:WarningBeforeSeconds$portal' // Warning before session timeout in seconds
+    value: 120
+    contentType: null
+  }
+  {
+    name: 'AppSettings:DatabaseCommandTimeout$rtsimportfunction' // Warning before session timeout in seconds
+    value: 500
+    contentType: null
+  }
+  {
+    name: 'AppSettings:BulkCopyTimeout$rtsimportfunction' // Warning before session timeout in seconds
+    value: 500
+    contentType: null
   }
 ]
 
