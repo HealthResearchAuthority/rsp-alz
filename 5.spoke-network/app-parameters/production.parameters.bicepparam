@@ -7,7 +7,7 @@ param parSqlAdminPhrase = ''
 param parSqlAuditRetentionDays = 15
 
 param parFileUploadStorageConfig = {
-  containerName: 'document-uploads'
+  containerName: 'documentuploadprod'
   sku: 'Standard_GRS'
   accessTier: 'Hot'
   allowPublicAccess: false
