@@ -26,6 +26,13 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 15
 
+param parFileUploadStorageConfig = {
+  containerName: 'document-uploads'
+  sku: 'Standard_LRS'
+  accessTier: 'Hot'
+  allowPublicAccess: false
+}
+
 param parSpokeNetworks = [
   {
     subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379'
