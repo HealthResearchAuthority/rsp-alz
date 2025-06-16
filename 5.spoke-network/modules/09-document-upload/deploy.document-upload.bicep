@@ -72,7 +72,7 @@ module managedIdentity '../../../shared/bicep/managed-identity.bicep' = {
 module storageAccount '../../../shared/bicep/storage/storage.bicep' = {
   name: 'fileUploadStorageAccount'
   params: {
-    name: 'rspdocupload${environment}'
+    name: 'strspdocupload${environment}'
     location: location
     tags: tags
     kind: 'StorageV2'
@@ -94,7 +94,7 @@ module privateEndpoint '../../../shared/bicep/network/private-networking-spoke.b
   params: {
     azServicePrivateDnsZoneName: 'privatelink.blob.${az.environment().suffixes.storage}'
     azServiceId: storageAccount.outputs.id
-    privateEndpointName: 'pep-rspdocupload${environment}'
+    privateEndpointName: 'pep-strspdocupload${environment}'
     privateEndpointSubResourceName: 'blob'
     virtualNetworkLinks: spokeVNetLinks
     subnetId: spokePrivateEndpointSubnet.id
