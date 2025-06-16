@@ -271,7 +271,6 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       spokePrivateEndpointSubnetName: pepSubnet[i].name
       storageConfig: parFileUploadStorageConfig
       resourcesNames: storageServicesNaming[i].outputs.resourcesNames
-      networkingResourcesNames: networkingnaming[i].outputs.resourcesNames
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
     }

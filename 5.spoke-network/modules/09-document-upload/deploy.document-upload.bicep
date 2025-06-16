@@ -22,8 +22,6 @@ param storageConfig object
 @description('Resource naming configuration from naming module')
 param resourcesNames object
 
-@description('Networking resource names for private endpoint deployment')
-param networkingResourcesNames object
 
 @description('Networking resource group name')
 param networkingResourceGroup string
@@ -74,7 +72,7 @@ module managedIdentity '../../../shared/bicep/managed-identity.bicep' = {
 module storageAccount '../../../shared/bicep/storage/storage.bicep' = {
   name: 'fileUploadStorageAccount'
   params: {
-    name: 'docupload${environment}'
+    name: 'docupload${environment}${uniqueString(resourceGroup().id)}'
     location: location
     tags: tags
     kind: 'StorageV2'
@@ -88,9 +86,6 @@ module storageAccount '../../../shared/bicep/storage/storage.bicep' = {
       virtualNetworkRules: []
     }
   }
-  dependsOn: [
-    managedIdentity
-  ]
 }
 
 module privateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = {
@@ -99,14 +94,11 @@ module privateEndpoint '../../../shared/bicep/network/private-networking-spoke.b
   params: {
     azServicePrivateDnsZoneName: 'privatelink.blob.${az.environment().suffixes.storage}'
     azServiceId: storageAccount.outputs.id
-    privateEndpointName: '${resourcesNames.storageAccountPep}fileupload'
+    privateEndpointName: 'pep-docupload${environment}'
     privateEndpointSubResourceName: 'blob'
     virtualNetworkLinks: spokeVNetLinks
     subnetId: spokePrivateEndpointSubnet.id
   }
-  dependsOn: [
-    storageAccount
-  ]
 }
 
 module blobService '../../../shared/bicep/storage/storage.blobsvc.bicep' = {
@@ -122,9 +114,6 @@ module blobService '../../../shared/bicep/storage/storage.blobsvc.bicep' = {
       }
     ]
   }
-  dependsOn: [
-    storageAccount
-  ]
 }
 
 module roleAssignment '../../../shared/bicep/role-assignments/role-assignment.bicep' = {
@@ -135,10 +124,6 @@ module roleAssignment '../../../shared/bicep/role-assignments/role-assignment.bi
     roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe' // Storage Blob Data Contributor
     resourceId: storageAccount.outputs.id
   }
-  dependsOn: [
-    managedIdentity
-    storageAccount
-  ]
 }
 
 // ------------------
