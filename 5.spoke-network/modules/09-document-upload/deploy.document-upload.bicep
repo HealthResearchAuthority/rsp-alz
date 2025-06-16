@@ -28,6 +28,9 @@ param networkingResourcesNames object
 @description('Networking resource group name')
 param networkingResourceGroup string
 
+@description('Environment name for storage account naming')
+param environment string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -71,7 +74,7 @@ module managedIdentity '../../../shared/bicep/managed-identity.bicep' = {
 module storageAccount '../../../shared/bicep/storage/storage.bicep' = {
   name: 'fileUploadStorageAccount'
   params: {
-    name: '${resourcesNames.storageAccount}fileupload'
+    name: 'docupload${environment}'
     location: location
     tags: tags
     kind: 'StorageV2'
