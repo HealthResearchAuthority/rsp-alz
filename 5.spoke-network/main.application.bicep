@@ -68,6 +68,14 @@ param parSqlAuditRetentionDays int = 15
 @description('Spoke Networks Configuration')
 param parSpokeNetworks array
 
+@description('File upload storage account configuration')
+param parFileUploadStorageConfig object = {
+  containerName: 'document-uploads'
+  sku: 'Standard_LRS'
+  accessTier: 'Hot'
+  allowPublicAccess: false
+}
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -248,6 +256,23 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
       //privateDNSEnabled: parSpokeNetworks[i].configurePrivateDNS
       resourcesNames: applicationServicesNaming[i].outputs.resourcesNames
       networkRG: parSpokeNetworks[i].rgNetworking
+    }
+  }
+]
+
+module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    name: take('documentUpload-${deployment().name}-deployment', 64)
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgStorage)
+    params: {
+      location: location
+      tags: tags
+      spokeVNetId: existingVnet[i].id
+      spokePrivateEndpointSubnetName: pepSubnet[i].name
+      storageConfig: parFileUploadStorageConfig
+      resourcesNames: storageServicesNaming[i].outputs.resourcesNames
+      networkingResourceGroup: parSpokeNetworks[i].rgNetworking
+      environment: parSpokeNetworks[i].parEnvironment
     }
   }
 ]
