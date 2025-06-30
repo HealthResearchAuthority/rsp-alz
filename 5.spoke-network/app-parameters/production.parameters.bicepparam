@@ -6,6 +6,13 @@ param parSqlAdminPhrase = ''
 
 param parSqlAuditRetentionDays = 15
 
+param parFileUploadStorageConfig = {
+  containerName: 'documentuploadprod'
+  sku: 'Standard_GRS'
+  accessTier: 'Hot'
+  allowPublicAccess: false
+}
+
 param parSpokeNetworks = [
   {
     subscriptionId: ''

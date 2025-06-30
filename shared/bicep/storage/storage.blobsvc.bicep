@@ -39,7 +39,7 @@ module blobServices_container 'storage.blobsvc.containers.bicep' = [for (contain
     storageAccountName: storageAccount.name
     blobServicesName: blobServices.name
     name: container.name
-    publicAccess: contains(container, 'publicAccess') ? container.publicAccess : 'None'
+    publicAccess: container.?publicAccess ?? 'None'
   }
 }]
 
