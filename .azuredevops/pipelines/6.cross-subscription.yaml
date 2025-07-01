@@ -1,0 +1,92 @@
+# This workflow will deploy the LZA in ADO
+name: 6.cross-subscription-lza-deployment
+
+trigger: none
+
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # The lint job performs linting on the bicep code
+  - job: lint
+    pool: 
+      vmImage: 'ubuntu-latest'
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under so your job can access it
+      - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
+
+      # Runs the Bicep linter to ensure build is successful
+      - bash: az bicep build --file ./6.cross-subscription/main.bicep
+
+  - job: validate
+    pool: 
+      vmImage: 'ubuntu-latest'
+    dependsOn: [lint]
+    steps:
+      - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
+      - task: AzureCLI@2
+        inputs:
+          azureSubscription: $(azureServiceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az config set bicep.use_binary_from_path=false --only-show-errors
+            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramDevVNetID=$(paramDevVNetID) manageddevopspoolVnetID=$(manageddevopspoolVnetID) 
+
+  - job: preview
+    pool: 
+      vmImage: 'ubuntu-latest'
+    dependsOn: [lint, validate]
+    steps:
+      - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
+      - task: AzureCLI@2 
+        inputs: 
+          azureSubscription: $(azureServiceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          inlineScript: |
+            az config set bicep.use_binary_from_path=false --only-show-errors
+            az deployment mg what-if \
+              --location $(location) \
+              --template-file ./6.cross-subscription/main.bicep \
+              --management-group-id $(management-group-id) \
+              --parameters paramDevVNetID=$(paramDevVNetID) manageddevopspoolVnetID=$(manageddevopspoolVnetID)
+  - job: deploy
+    pool: 
+      vmImage: 'ubuntu-latest'
+    dependsOn: [preview]
+    steps:
+      - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
+      - task: AzureCLI@2 
+        name: deploy
+        inputs: 
+          azureSubscription: $(azureServiceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          failOnStandardError: true
+          inlineScript: |
+            az config set bicep.use_binary_from_path=false --only-show-errors
+            output=$(az deployment mg create \
+              --name "core-services-$(Build.BuildId)" \
+              --location $(location) \
+              --management-group-id $(management-group-id) \
+              --template-file ./6.cross-subscription/main.bicep \
+              --parameters paramDevVNetID=$(paramDevVNetID) manageddevopspoolVnetID=$(manageddevopspoolVnetID))
+            echo $output | jq .
