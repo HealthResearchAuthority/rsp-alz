@@ -10,14 +10,8 @@ param storageAccountId string
 @description('Enable malware scanning for this storage account')
 param enableMalwareScanning bool = true
 
-@description('Enable sensitive data discovery for this storage account')
-param enableSensitiveDataDiscovery bool = true
-
 @description('Monthly scanning cap in GB for this storage account')
 param malwareScanningCapGBPerMonth int = 1000
-
-@description('Event Grid custom topic resource ID for scan results')
-param eventGridCustomTopicId string = ''
 
 @description('Log Analytics workspace resource ID for scan results (optional)')
 param logAnalyticsWorkspaceId string = ''
@@ -79,4 +73,4 @@ output scanningCapGB int = malwareScanningCapGBPerMonth
 output logAnalyticsWorkspaceId string = logAnalyticsWorkspaceId
 
 @description('Log Analytics diagnostic settings name')
-output logAnalyticsConfigName string = !empty(logAnalyticsWorkspaceId) ? '${storageAccountName}-defender-logs' : ''
+output logAnalyticsConfigName string = !empty(logAnalyticsWorkspaceId) ? '${storageAccountName}-monitoring' : ''

@@ -164,9 +164,7 @@ module defenderStorageAccountConfig '../../../shared/bicep/security/defender-sto
   params: {
     storageAccountId: storageAccount.outputs.id
     enableMalwareScanning: enableMalwareScanning
-    enableSensitiveDataDiscovery: true
     malwareScanningCapGBPerMonth: 1000
-    eventGridCustomTopicId: customEventGridTopicId
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
   }
   dependsOn: [
