@@ -7,6 +7,15 @@ targetScope = 'resourceGroup'
 @description('Storage account resource ID')
 param storageAccountId string
 
+@description('Enable malware scanning for this storage account')
+param enableMalwareScanning bool = true
+
+@description('Monthly malware scanning cap in GB for this storage account')
+param malwareScanningCapGBPerMonth int = 1000
+
+@description('Enable sensitive data discovery for this storage account')
+param enableSensitiveDataDiscovery bool = true
+
 @description('Log Analytics workspace resource ID for monitoring (optional)')
 param logAnalyticsWorkspaceId string = ''
 
@@ -21,16 +30,31 @@ var storageAccountName = split(storageAccountId, '/')[8]
 // RESOURCES
 // ------------------
 
-// Note: Defender for Storage configuration is handled by the subscription-level resource
-// This module focuses on Log Analytics integration for storage account monitoring
-
 // Get reference to the storage account for diagnostic settings
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
   name: storageAccountName
 }
 
-// Configure Log Analytics integration for storage account metrics only
-// Note: Defender for Storage handles security logging automatically
+// Configure storage account-level Defender for Storage settings with override
+resource defenderForStorageSettings 'Microsoft.Security/defenderForStorageSettings@2022-12-01-preview' = if (enableMalwareScanning) {
+  scope: storageAccount
+  name: 'current'
+  properties: {
+    isEnabled: true
+    malwareScanning: {
+      onUpload: {
+        isEnabled: enableMalwareScanning
+        capGBPerMonth: malwareScanningCapGBPerMonth
+      }
+    }
+    sensitiveDataDiscovery: {
+      isEnabled: enableSensitiveDataDiscovery
+    }
+    overrideSubscriptionLevelSettings: true
+  }
+}
+
+// Configure Log Analytics integration for storage account metrics
 resource storageAccountLogAnalyticsConfig 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
   scope: storageAccount
   name: '${storageAccountName}-monitoring'
@@ -53,8 +77,17 @@ resource storageAccountLogAnalyticsConfig 'Microsoft.Insights/diagnosticSettings
 // OUTPUTS
 // ------------------
 
-@description('The storage account name configured with monitoring')
+@description('The storage account name configured with Defender')
 output configuredStorageAccountName string = storageAccountName
+
+@description('Indicates whether malware scanning is enabled for this storage account')
+output malwareScanningEnabled bool = enableMalwareScanning
+
+@description('Monthly malware scanning cap configured for this storage account')
+output scanningCapGB int = malwareScanningCapGBPerMonth
+
+@description('Indicates whether sensitive data discovery is enabled for this storage account')
+output sensitiveDataDiscoveryEnabled bool = enableSensitiveDataDiscovery
 
 @description('Log Analytics workspace ID configured for monitoring')
 output logAnalyticsWorkspaceId string = logAnalyticsWorkspaceId

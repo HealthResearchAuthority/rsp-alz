@@ -84,8 +84,6 @@ param parDefenderForStorageConfig object = {
   malwareScanningCapGBPerMonth: 1000
 }
 
-// Note: Event Grid and Malware Function parameters removed - Defender for Storage handles this natively
-
 // ------------------
 // VARIABLES
 // ------------------
@@ -578,7 +576,7 @@ module malwareFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       location: location
       appServicePlanName: 'asp-rsp-fnMalwareApp-${parSpokeNetworks[i].parEnvironment}-uks'
       appName: 'func-malware-${parSpokeNetworks[i].parEnvironment}'
-      webAppBaseOs: 'Linux'
+      webAppBaseOs: 'Windows'
       subnetIdForVnetInjection: webAppSubnet[i].id
       deploySlot: false
       privateEndpointRG: parSpokeNetworks[i].rgNetworking
