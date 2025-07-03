@@ -157,14 +157,16 @@ module defenderStoragePermissions '../../../shared/bicep/role-assignments/defend
   }
 }
 
-module defenderStorageAccountConfig '../../../shared/bicep/security/defender-storage-account-config.bicep' = if (enableMalwareScanning) {
+// Note: Defender for Storage configuration is handled by subscription-level policy
+// Log Analytics integration for scan results
+module defenderStorageAccountConfig '../../../shared/bicep/security/defender-storage-account-config.bicep' = if (enableMalwareScanning && !empty(logAnalyticsWorkspaceId)) {
   name: 'documentUploadDefenderConfig'
   params: {
     storageAccountId: storageAccount.outputs.id
     enableMalwareScanning: enableMalwareScanning
     enableSensitiveDataDiscovery: true
     malwareScanningCapGBPerMonth: 1000
-    eventGridCustomTopicId: customEventGridTopicId // Optional custom topic for scan results
+    eventGridCustomTopicId: customEventGridTopicId
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
   }
   dependsOn: [

@@ -33,25 +33,9 @@ var storageAccountName = split(storageAccountId, '/')[8]
 // RESOURCES
 // ------------------
 
-// Configure Defender for Storage at storage account level with override
-resource storageAccountDefenderConfig 'Microsoft.Security/defenderForStorageSettings@2022-12-01-preview' = {
-  scope: resourceGroup()
-  name: storageAccountName
-  properties: {
-    isEnabled: true
-    malwareScanning: {
-      onUpload: {
-        isEnabled: enableMalwareScanning
-        capGBPerMonth: malwareScanningCapGBPerMonth
-      }
-      scanResultsEventGridTopicResourceId: !empty(eventGridCustomTopicId) ? eventGridCustomTopicId : null
-    }
-    sensitiveDataDiscovery: {
-      isEnabled: enableSensitiveDataDiscovery
-    }
-    overrideSubscriptionLevelSettings: true
-  }
-}
+// Note: Defender for Storage configuration is handled by the subscription-level policy
+// Individual storage account configuration will be applied via the policy assignment
+// This module focuses on Log Analytics integration for scan results
 
 // Get reference to the storage account for diagnostic settings
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
@@ -75,9 +59,7 @@ resource storageAccountLogAnalyticsConfig 'Microsoft.Insights/diagnosticSettings
       }
     ]
   }
-  dependsOn: [
-    storageAccountDefenderConfig
-  ]
+  // dependsOn: Policy-based Defender configuration is handled at subscription level
 }
 
 // ------------------
