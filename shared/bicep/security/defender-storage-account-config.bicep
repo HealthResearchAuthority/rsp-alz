@@ -42,38 +42,13 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing 
   name: storageAccountName
 }
 
-// Configure Log Analytics integration for storage account logs
+// Configure Log Analytics integration for storage account metrics only
+// Note: Defender for Storage handles security logging automatically
 resource storageAccountLogAnalyticsConfig 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
   scope: storageAccount
-  name: '${storageAccountName}-defender-logs'
+  name: '${storageAccountName}-monitoring'
   properties: {
     workspaceId: logAnalyticsWorkspaceId
-    logs: [
-      {
-        category: 'StorageRead'
-        enabled: true
-        retentionPolicy: {
-          enabled: true
-          days: 180
-        }
-      }
-      {
-        category: 'StorageWrite'
-        enabled: true
-        retentionPolicy: {
-          enabled: true
-          days: 180
-        }
-      }
-      {
-        category: 'StorageDelete'
-        enabled: true
-        retentionPolicy: {
-          enabled: true
-          days: 180
-        }
-      }
-    ]
     metrics: [
       {
         category: 'Transaction'
@@ -83,9 +58,16 @@ resource storageAccountLogAnalyticsConfig 'Microsoft.Insights/diagnosticSettings
           days: 180
         }
       }
+      {
+        category: 'Capacity'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 180
+        }
+      }
     ]
   }
-  // dependsOn: Policy-based Defender configuration is handled at subscription level
 }
 
 // ------------------
