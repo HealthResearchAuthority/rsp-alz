@@ -34,7 +34,7 @@ var storageAccountName = split(storageAccountId, '/')[8]
 // ------------------
 
 // Configure Defender for Storage at storage account level with override
-resource storageAccountDefenderConfig 'Microsoft.Security/defenderForStorageSettings@2025-01-01' = {
+resource storageAccountDefenderConfig 'Microsoft.Security/defenderForStorageSettings@2022-12-01-preview' = {
   scope: resourceGroup()
   name: storageAccountName
   properties: {

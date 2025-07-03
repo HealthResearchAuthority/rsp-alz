@@ -33,7 +33,7 @@ var storageAccountName = storageAccountIdTokens[8]
 // RESOURCES
 // ------------------
 
-resource eventGridSystemTopic 'Microsoft.EventGrid/systemTopics@2025-04-01-preview' = {
+resource eventGridSystemTopic 'Microsoft.EventGrid/systemTopics@2022-06-15' = {
   name: systemTopicName
   location: location
   tags: tags

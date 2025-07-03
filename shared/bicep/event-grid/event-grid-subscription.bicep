@@ -69,11 +69,11 @@ var deadLetterConfig = enableDeadLetter && !empty(deadLetterStorageAccountName) 
 // RESOURCES
 // ------------------
 
-resource systemTopic 'Microsoft.EventGrid/systemTopics@2025-04-01-preview' existing = {
+resource systemTopic 'Microsoft.EventGrid/systemTopics@2022-06-15' existing = {
   name: systemTopicName
 }
 
-resource eventGridSubscription 'Microsoft.EventGrid/systemTopics/eventSubscriptions@2025-04-01-preview' = {
+resource eventGridSubscription 'Microsoft.EventGrid/systemTopics/eventSubscriptions@2022-06-15' = {
   parent: systemTopic
   name: subscriptionName
   properties: {

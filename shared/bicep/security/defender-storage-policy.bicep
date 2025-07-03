@@ -28,7 +28,7 @@ var defenderStoragePolicyDefinitionId = '/providers/Microsoft.Authorization/poli
 // RESOURCES
 // ------------------
 
-resource defenderStoragePolicy 'Microsoft.Authorization/policyAssignments@2025-03-01' = if (enableDefenderStoragePolicy) {
+resource defenderStoragePolicy 'Microsoft.Authorization/policyAssignments@2024-04-01' = if (enableDefenderStoragePolicy) {
   name: policyAssignmentName
   properties: {
     displayName: 'Enable Microsoft Defender for Storage'
