@@ -53,18 +53,10 @@ resource storageAccountLogAnalyticsConfig 'Microsoft.Insights/diagnosticSettings
       {
         category: 'Transaction'
         enabled: true
-        retentionPolicy: {
-          enabled: true
-          days: 180
-        }
       }
       {
         category: 'Capacity'
         enabled: true
-        retentionPolicy: {
-          enabled: true
-          days: 180
-        }
       }
     ]
   }
