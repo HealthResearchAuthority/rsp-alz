@@ -76,15 +76,41 @@ param parFileUploadStorageConfig object = {
   allowPublicAccess: false
 }
 
+@description('Microsoft Defender for Storage configuration')
+param parDefenderForStorageConfig object = {
+  enabled: true
+  enablePolicyBased: true
+  enableMalwareScanning: true
+  enableSensitiveDataDiscovery: true
+  enableActivityMonitoring: true
+  malwareScanningCapGBPerMonth: 1000
+  policyAssignmentName: 'defender-for-storage-policy'
+}
+
+// Note: Event Grid and Malware Function parameters removed - Defender for Storage handles this natively
+
 // ------------------
 // VARIABLES
 // ------------------
 
 var sqlServerNamePrefix = 'rspsqlserver'
 
+
 // ------------------
 // RESOURCES
 // ------------------
+
+module defenderStoragePolicy '../shared/bicep/security/defender-storage-policy.bicep' = if (parDefenderForStorageConfig.enabled && parDefenderForStorageConfig.enablePolicyBased) {
+  name: take('defenderStoragePolicy-${deployment().name}', 64)
+  scope: subscription()
+  params: {
+    enableDefenderStoragePolicy: parDefenderForStorageConfig.enabled
+    policyAssignmentName: '${parDefenderForStorageConfig.policyAssignmentName}-${uniqueString(subscription().id)}'
+    malwareScanningConfig: {
+      capGBPerMonthPerStorageAccount: parDefenderForStorageConfig.malwareScanningCapGBPerMonth
+    }
+  }
+}
 
 module sharedServicesRG '../shared/bicep/resourceGroup.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -260,6 +286,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 ]
 
+
 module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('documentUpload-${deployment().name}-deployment', 64)
@@ -273,7 +300,14 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       resourcesNames: storageServicesNaming[i].outputs.resourcesNames
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
+      enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
+      customEventGridTopicId: '' // Optional: Add custom Event Grid topic ID for additional automation
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     }
+    dependsOn: [
+      defenderStoragePolicy
+      storageRG
+    ]
   }
 ]
 
@@ -533,6 +567,40 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
     }
     dependsOn: [
       rtsfnApp
+    ]
+  }
+]
+
+module malwareFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('malwareFnApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: 'B1'
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: 'asp-rsp-fnMalwareApp-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'func-malware-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Linux'
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: false
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stmalware${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: false
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      ]
+      devOpsPublicIPAddress: parDevOpsPublicIPAddress
+      isPrivate: false
+    }
+    dependsOn: [
+      fnNotifyApp
+      documentUpload
+      applicationsRG
     ]
   }
 ]

@@ -29,6 +29,15 @@ param networkingResourceGroup string
 @description('Environment name for storage account naming')
 param environment string
 
+@description('Enable malware scanning integration')
+param enableMalwareScanning bool = true
+
+@description('Custom Event Grid topic resource ID for Defender scan results (optional)')
+param customEventGridTopicId string = ''
+
+@description('Log Analytics workspace ID for security alerts')
+param logAnalyticsWorkspaceId string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -50,12 +59,12 @@ var spokeVNetLinks = [
 // RESOURCES
 // ------------------
 
-resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
+resource vnetSpoke 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
   scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
   name: spokeVNetName
 }
 
-resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-07-01' existing = {
+resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
   parent: vnetSpoke
   name: spokePrivateEndpointSubnetName
 }
@@ -112,9 +121,19 @@ module blobService '../../../shared/bicep/storage/storage.blobsvc.bicep' = {
         name: storageConfig.containerName
         publicAccess: 'None'
       }
+      {
+        name: 'quarantine'
+        publicAccess: 'None'
+      }
+      {
+        name: 'clean'
+        publicAccess: 'None'
+      }
     ]
   }
 }
+
+// Note: Queue service removed - Defender for Storage handles Event Grid natively
 
 module roleAssignment '../../../shared/bicep/role-assignments/role-assignment.bicep' = {
   name: 'fileUploadStorageRoleAssignment'
@@ -124,6 +143,33 @@ module roleAssignment '../../../shared/bicep/role-assignments/role-assignment.bi
     roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe' // Storage Blob Data Contributor
     resourceId: storageAccount.outputs.id
   }
+}
+
+// Note: Event Grid system topic and subscription removed - Defender for Storage creates these automatically
+
+module defenderStoragePermissions '../../../shared/bicep/role-assignments/defender-storage-permissions.bicep' = if (enableMalwareScanning) {
+  name: 'documentUploadDefenderPermissions'
+  params: {
+    storageAccountId: storageAccount.outputs.id
+    eventGridSystemTopicPrincipalId: '' // Defender manages its own Event Grid permissions
+    enableEventGridPermissions: false // Defender handles Event Grid permissions automatically
+    enableDefenderPermissions: enableMalwareScanning
+  }
+}
+
+module defenderStorageAccountConfig '../../../shared/bicep/security/defender-storage-account-config.bicep' = if (enableMalwareScanning) {
+  name: 'documentUploadDefenderConfig'
+  params: {
+    storageAccountId: storageAccount.outputs.id
+    enableMalwareScanning: enableMalwareScanning
+    enableSensitiveDataDiscovery: true
+    malwareScanningCapGBPerMonth: 1000
+    eventGridCustomTopicId: customEventGridTopicId // Optional custom topic for scan results
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+  }
+  dependsOn: [
+    defenderStoragePermissions
+  ]
 }
 
 // ------------------
@@ -147,3 +193,9 @@ output managedIdentityClientId string = managedIdentity.outputs.clientId
 
 @description('The name of the blob container for file uploads.')
 output containerName string = storageConfig.containerName
+
+@description('Indicates whether malware scanning is enabled.')
+output malwareScanningEnabled bool = enableMalwareScanning
+
+@description('Custom Event Grid topic ID used for Defender scan results.')
+output customEventGridTopicId string = customEventGridTopicId
