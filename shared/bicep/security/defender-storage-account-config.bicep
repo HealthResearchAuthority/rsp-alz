@@ -42,7 +42,7 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing 
   name: storageAccountName
 }
 
-// Configure Log Analytics integration for malware scan results
+// Configure Log Analytics integration for storage account logs
 resource storageAccountLogAnalyticsConfig 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(logAnalyticsWorkspaceId)) {
   scope: storageAccount
   name: '${storageAccountName}-defender-logs'
@@ -50,7 +50,33 @@ resource storageAccountLogAnalyticsConfig 'Microsoft.Insights/diagnosticSettings
     workspaceId: logAnalyticsWorkspaceId
     logs: [
       {
-        category: 'StorageMalwareScanningResults'
+        category: 'StorageRead'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 180
+        }
+      }
+      {
+        category: 'StorageWrite'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 180
+        }
+      }
+      {
+        category: 'StorageDelete'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 180
+        }
+      }
+    ]
+    metrics: [
+      {
+        category: 'Transaction'
         enabled: true
         retentionPolicy: {
           enabled: true
