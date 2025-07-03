@@ -565,39 +565,39 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
-module malwareFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
-  for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
-    name: take('malwareFnApp-${deployment().name}-deployment', 64)
-    params: {
-      tags: {}
-      sku: 'B1'
-      logAnalyticsWsId: logAnalyticsWorkspaceId
-      location: location
-      appServicePlanName: 'asp-rsp-fnMalwareApp-${parSpokeNetworks[i].parEnvironment}-uks'
-      appName: 'func-malware-${parSpokeNetworks[i].parEnvironment}'
-      webAppBaseOs: 'Windows'
-      subnetIdForVnetInjection: webAppSubnet[i].id
-      deploySlot: false
-      privateEndpointRG: parSpokeNetworks[i].rgNetworking
-      spokeVNetId: existingVnet[i].id
-      subnetPrivateEndpointSubnetId: pepSubnet[i].id
-      kind: 'functionapp'
-      storageAccountName: 'stmalware${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: false
-      userAssignedIdentities: [
-        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-      ]
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
-    }
-    dependsOn: [
-      fnNotifyApp
-      documentUpload
-      applicationsRG
-    ]
-  }
-]
+// module malwareFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
+//   for i in range(0, length(parSpokeNetworks)): {
+//     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+//     name: take('malwareFnApp-${deployment().name}-deployment', 64)
+//     params: {
+//       tags: {}
+//       sku: 'B1'
+//       logAnalyticsWsId: logAnalyticsWorkspaceId
+//       location: location
+//       appServicePlanName: 'asp-rsp-fnMalwareApp-${parSpokeNetworks[i].parEnvironment}-uks'
+//       appName: 'func-malware-${parSpokeNetworks[i].parEnvironment}'
+//       webAppBaseOs: 'Windows'
+//       subnetIdForVnetInjection: webAppSubnet[i].id
+//       deploySlot: false
+//       privateEndpointRG: parSpokeNetworks[i].rgNetworking
+//       spokeVNetId: existingVnet[i].id
+//       subnetPrivateEndpointSubnetId: pepSubnet[i].id
+//       kind: 'functionapp'
+//       storageAccountName: 'stmalware${parSpokeNetworks[i].parEnvironment}'
+//       deployAppPrivateEndPoint: false
+//       userAssignedIdentities: [
+//         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+//       ]
+//       devOpsPublicIPAddress: parDevOpsPublicIPAddress
+//       isPrivate: false
+//     }
+//     dependsOn: [
+//       fnNotifyApp
+//       documentUpload
+//       applicationsRG
+//     ]
+//   }
+// ]
 
 // module applicationGateway 'modules/08-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
 //   name: take('applicationGateway-${deployment().name}-deployment', 64)
