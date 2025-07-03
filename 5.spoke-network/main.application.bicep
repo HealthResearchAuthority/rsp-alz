@@ -79,12 +79,9 @@ param parFileUploadStorageConfig object = {
 @description('Microsoft Defender for Storage configuration')
 param parDefenderForStorageConfig object = {
   enabled: true
-  enablePolicyBased: true
   enableMalwareScanning: true
   enableSensitiveDataDiscovery: true
-  enableActivityMonitoring: true
   malwareScanningCapGBPerMonth: 1000
-  policyAssignmentName: 'defender-for-storage-policy'
 }
 
 // Note: Event Grid and Malware Function parameters removed - Defender for Storage handles this natively
@@ -100,15 +97,14 @@ var sqlServerNamePrefix = 'rspsqlserver'
 // RESOURCES
 // ------------------
 
-module defenderStoragePolicy '../shared/bicep/security/defender-storage-policy.bicep' = if (parDefenderForStorageConfig.enabled && parDefenderForStorageConfig.enablePolicyBased) {
-  name: take('defenderStoragePolicy-${deployment().name}', 64)
+module defenderStorage '../shared/bicep/security/defender-storage.bicep' = if (parDefenderForStorageConfig.enabled) {
+  name: take('defenderStorage-${deployment().name}', 64)
   scope: subscription()
   params: {
-    enableDefenderStoragePolicy: parDefenderForStorageConfig.enabled
-    policyAssignmentName: '${parDefenderForStorageConfig.policyAssignmentName}-${uniqueString(subscription().id)}'
-    malwareScanningConfig: {
-      capGBPerMonthPerStorageAccount: parDefenderForStorageConfig.malwareScanningCapGBPerMonth
-    }
+    enableDefenderForStorage: parDefenderForStorageConfig.enabled
+    enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
+    enableSensitiveDataDiscovery: parDefenderForStorageConfig.enableSensitiveDataDiscovery
+    malwareScanningCapGBPerMonth: parDefenderForStorageConfig.malwareScanningCapGBPerMonth
   }
 }
 
@@ -305,7 +301,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     }
     dependsOn: [
-      defenderStoragePolicy
+      defenderStorage
       storageRG
     ]
   }

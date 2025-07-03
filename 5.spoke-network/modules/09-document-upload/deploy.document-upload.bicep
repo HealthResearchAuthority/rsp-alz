@@ -157,14 +157,12 @@ module defenderStoragePermissions '../../../shared/bicep/role-assignments/defend
   }
 }
 
-// Note: Defender for Storage configuration is handled by subscription-level policy
-// Log Analytics integration for scan results
+// Note: Defender for Storage configuration is handled by subscription-level resource
+// Log Analytics integration for storage account monitoring
 module defenderStorageAccountConfig '../../../shared/bicep/security/defender-storage-account-config.bicep' = if (enableMalwareScanning && !empty(logAnalyticsWorkspaceId)) {
   name: 'documentUploadDefenderConfig'
   params: {
     storageAccountId: storageAccount.outputs.id
-    enableMalwareScanning: enableMalwareScanning
-    malwareScanningCapGBPerMonth: 1000
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
   }
   dependsOn: [

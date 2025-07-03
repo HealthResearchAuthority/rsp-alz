@@ -7,13 +7,7 @@ targetScope = 'resourceGroup'
 @description('Storage account resource ID')
 param storageAccountId string
 
-@description('Enable malware scanning for this storage account')
-param enableMalwareScanning bool = true
-
-@description('Monthly scanning cap in GB for this storage account')
-param malwareScanningCapGBPerMonth int = 1000
-
-@description('Log Analytics workspace resource ID for scan results (optional)')
+@description('Log Analytics workspace resource ID for monitoring (optional)')
 param logAnalyticsWorkspaceId string = ''
 
 
@@ -27,9 +21,8 @@ var storageAccountName = split(storageAccountId, '/')[8]
 // RESOURCES
 // ------------------
 
-// Note: Defender for Storage configuration is handled by the subscription-level policy
-// Individual storage account configuration will be applied via the policy assignment
-// This module focuses on Log Analytics integration for scan results
+// Note: Defender for Storage configuration is handled by the subscription-level resource
+// This module focuses on Log Analytics integration for storage account monitoring
 
 // Get reference to the storage account for diagnostic settings
 resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' existing = {
@@ -60,16 +53,10 @@ resource storageAccountLogAnalyticsConfig 'Microsoft.Insights/diagnosticSettings
 // OUTPUTS
 // ------------------
 
-@description('The storage account name configured with Defender')
+@description('The storage account name configured with monitoring')
 output configuredStorageAccountName string = storageAccountName
 
-@description('Indicates whether malware scanning is enabled')
-output malwareScanningEnabled bool = enableMalwareScanning
-
-@description('Monthly scanning cap configured')
-output scanningCapGB int = malwareScanningCapGBPerMonth
-
-@description('Log Analytics workspace ID configured for scan results')
+@description('Log Analytics workspace ID configured for monitoring')
 output logAnalyticsWorkspaceId string = logAnalyticsWorkspaceId
 
 @description('Log Analytics diagnostic settings name')
