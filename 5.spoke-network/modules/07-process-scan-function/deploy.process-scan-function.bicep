@@ -64,6 +64,7 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
     devOpsPublicIPAddress: ''
     isPrivate: false
     logAnalyticsWsId: logAnalyticsWorkspaceId
+    createPrivateDnsZones: false
   }
 }
 

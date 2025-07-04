@@ -70,6 +70,9 @@ param deploySlot bool
 param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
 
+@description('Create private DNS zones (set to false if zones already exist)')
+param createPrivateDnsZones bool = true
+
 // @description('The name of an existing keyvault, that it will be used to store secrets (connection string)' )
 // param keyvaultName string
 
@@ -163,7 +166,7 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
   }
 }
 
-module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && isPrivate == true) {
+module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && isPrivate == true && createPrivateDnsZones) {
   name:take('rtsfnStorageBlobPrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
@@ -184,7 +187,7 @@ module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networki
   }
 }
 
-module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp') {
+module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && createPrivateDnsZones) {
   name:take('rtsfnStorageFilePrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
