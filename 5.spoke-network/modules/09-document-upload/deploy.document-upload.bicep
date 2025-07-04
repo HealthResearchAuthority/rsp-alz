@@ -172,6 +172,7 @@ module defenderStorageAccountConfig '../../../shared/bicep/security/defender-sto
     enableSensitiveDataDiscovery: true
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     customEventGridTopicId: enableEventGridIntegration ? customEventGridTopic.outputs.topicId : ''
+    enableBlobIndexTags: false  // Set to false to optimize costs - must be configured post-deployment via Azure Portal
   }
   dependsOn: [
     defenderStoragePermissions

@@ -126,6 +126,7 @@ This approach follows Infrastructure as Code best practices with clean separatio
 
 ### Configuration
 
+#### Enable Event Grid Subscriptions
 To enable Event Grid subscriptions after Function App code deployment:
 
 1. Update the parameter in `5.spoke-network/main.application.bicep`:
@@ -139,6 +140,34 @@ To enable Event Grid subscriptions after Function App code deployment:
      --template-file ./5.spoke-network/main.application.bicep \
      --parameters ./5.spoke-network/app-parameters/dev.parameters.bicepparam
    ```
+
+#### Disable Blob Index Tags (Cost Optimization)
+Blob index tags are enabled by default when malware scanning is enabled. To disable them for cost optimization:
+
+1. **Via Azure Portal:**
+   - Navigate to Storage Account → Security + Networking → Microsoft Defender for Cloud
+   - Click "Settings"
+   - Uncheck "Store scan results as Blob Index Tags"
+   - Click "Save"
+
+2. **Via REST API:**
+   ```bash
+   # Note: Specific blob index tags disable property may vary by API version
+   # Check current Azure documentation for exact property names
+   ```
+
+**Important:** Event Grid integration works independently of blob index tags and will continue to function normally when blob index tags are disabled.
+
+#### Configure Event Grid Topic for Scan Results (Manual Portal Configuration Required)
+While the custom Event Grid topic is created via Bicep templates, the "Send scan results to Event Grid topic" setting must be configured manually:
+
+1. **Via Azure Portal:**
+   - Navigate to Storage Account → Security + Networking → Microsoft Defender for Cloud
+   - Click "Settings"
+   - In the "Event Grid custom topic" section, select your custom Event Grid topic
+   - Click "Save"
+
+**Note:** The Bicep API does not currently support setting the `scanResultsEventGridTopicResourceId` property, so this configuration must be done post-deployment through the Azure Portal.
 
 ## Contributing
 
