@@ -39,6 +39,9 @@ param logAnalyticsWorkspaceId string
 @description('Enable Event Grid integration for scan result processing')
 param enableEventGridIntegration bool = true
 
+@description('Enable Event Grid subscriptions - set to true only after Function App code is deployed with working webhook endpoint')
+param enableEventGridSubscriptions bool = false
+
 @description('Process scan Function App webhook endpoint URL')
 param processScanWebhookEndpoint string = ''
 
@@ -175,7 +178,7 @@ module defenderStorageAccountConfig '../../../shared/bicep/security/defender-sto
   ]
 }
 
-// Custom Event Grid topic for Defender for Storage events (following GitHub tutorial pattern)
+// Custom Event Grid topic for Defender for Storage scan results - always created when Event Grid integration is enabled
 module customEventGridTopic '../../../shared/bicep/event-grid/custom-event-grid-topic.bicep' = if (enableEventGridIntegration) {
   name: 'documentUploadCustomEventGridTopic'
   params: {
@@ -189,9 +192,8 @@ module customEventGridTopic '../../../shared/bicep/event-grid/custom-event-grid-
   }
 }
 
-// Event Grid subscription for custom topic (following GitHub tutorial pattern)
-// Note: With custom topics, scan results are sent via storage account configuration
-module customTopicEventSubscription '../../../shared/bicep/event-grid/custom-topic-subscription.bicep' = if (enableEventGridIntegration && !empty(processScanWebhookEndpoint)) {
+// Event Grid subscription for custom topic - only created when enableEventGridSubscriptions=true (after Function App code deployment)
+module customTopicEventSubscription '../../../shared/bicep/event-grid/custom-topic-subscription.bicep' = if (enableEventGridIntegration && enableEventGridSubscriptions && !empty(processScanWebhookEndpoint)) {
   name: 'customTopicEventSubscription'
   params: {
     subscriptionName: 'defender-scan-processing'
@@ -238,3 +240,12 @@ output customEventGridTopicId string = enableEventGridIntegration ? customEventG
 
 @description('Custom Event Grid topic endpoint URL.')
 output customEventGridTopicEndpoint string = enableEventGridIntegration ? customEventGridTopic.outputs.topicEndpoint : ''
+
+@description('Event Grid subscription resource ID (only when subscriptions are enabled).')
+output eventGridSubscriptionId string = (enableEventGridIntegration && enableEventGridSubscriptions) ? customTopicEventSubscription.outputs.eventSubscriptionId : ''
+
+@description('Event Grid subscription name (only when subscriptions are enabled).')
+output eventGridSubscriptionName string = (enableEventGridIntegration && enableEventGridSubscriptions) ? customTopicEventSubscription.outputs.eventSubscriptionName : ''
+
+@description('Indicates whether Event Grid subscriptions are enabled.')
+output eventGridSubscriptionsEnabled bool = enableEventGridSubscriptions

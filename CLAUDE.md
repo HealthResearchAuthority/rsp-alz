@@ -87,10 +87,12 @@ Services are deployed across 4 resource groups per environment:
 - **Malware Protection**: Defender for Storage with policy-based enablement
 
 ### Defender for Storage Implementation
-- **Subscription Level**: Basic protection (Activity Monitoring) via Azure Policy
-- **Storage Account Level**: Enhanced protection (Malware Scanning) with account-specific overrides
-- **Event Response**: Event Grid + Function Apps for automated file quarantine/approval
+- **Subscription Level**: Basic protection (Activity Monitoring) with malware scanning disabled by default
+- **Storage Account Level**: Enhanced protection (Malware Scanning) enabled selectively with account-specific overrides
+- **Event Response**: Custom Event Grid Topic + Function Apps for automated file quarantine/approval
 - **Logging**: Scan results sent to Log Analytics for compliance
+
+For detailed Defender for Storage deployment instructions, see the main [README.md](README.md#defender-for-storage-implementation).
 
 ## CI/CD Pipeline Structure
 

@@ -319,6 +319,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true
+      enableEventGridSubscriptions: false  // Set to true only after Function App code is deployed and webhook endpoint is ready
       processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint
     }
     dependsOn: [

@@ -97,6 +97,49 @@ To run the pipeline manually to run against a different environment
 3. Select the environment from the drop down
 4. Click Run
 
+## Defender for Storage Implementation
+
+This repository implements Microsoft Defender for Storage with malware scanning and automated response capabilities.
+
+### Architecture Overview
+- **Subscription Level**: Basic protection (Activity Monitoring) with malware scanning disabled by default
+- **Storage Account Level**: Enhanced protection (Malware Scanning) enabled selectively with account-specific overrides
+- **Event Response**: Custom Event Grid Topic + Function Apps for automated file quarantine/approval
+- **Logging**: Scan results sent to Log Analytics for compliance
+
+### Deployment Strategy
+
+Defender for Storage uses a two-step deployment approach to avoid Event Grid webhook validation issues:
+
+**Step 1 - Infrastructure Deployment:**
+- Deploy with `enableEventGridSubscriptions: false` (default)
+- Creates Function App infrastructure, Custom Event Grid Topic, and Storage Account with Defender
+- No Event Grid subscriptions created (avoids webhook validation failure)
+
+**Step 2 - Event Grid Subscriptions:**
+- Deploy Function App code to make webhook endpoint operational
+- Change `enableEventGridSubscriptions: true` in main template
+- Redeploy to create Event Grid subscriptions with successful webhook validation
+- Complete end-to-end malware scanning workflow becomes operational
+
+This approach follows Infrastructure as Code best practices with clean separation between infrastructure and application deployment phases.
+
+### Configuration
+
+To enable Event Grid subscriptions after Function App code deployment:
+
+1. Update the parameter in `5.spoke-network/main.application.bicep`:
+   ```bicep
+   enableEventGridSubscriptions: true  // Change from false to true
+   ```
+
+2. Redeploy the infrastructure:
+   ```sh
+   az deployment sub create --location uksouth \
+     --template-file ./5.spoke-network/main.application.bicep \
+     --parameters ./5.spoke-network/app-parameters/dev.parameters.bicepparam
+   ```
+
 ## Contributing
 
 Contributions are welcome! Please follow these steps:
