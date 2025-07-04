@@ -76,15 +76,34 @@ param parFileUploadStorageConfig object = {
   allowPublicAccess: false
 }
 
+@description('Microsoft Defender for Storage configuration')
+param parDefenderForStorageConfig object = {
+  enabled: true
+  enableMalwareScanning: false
+  enableSensitiveDataDiscovery: true
+  malwareScanningCapGBPerMonth: 1000
+}
+
 // ------------------
 // VARIABLES
 // ------------------
 
 var sqlServerNamePrefix = 'rspsqlserver'
 
+
 // ------------------
 // RESOURCES
 // ------------------
+
+module defenderStorage '../shared/bicep/security/defender-storage.bicep' = if (parDefenderForStorageConfig.enabled) {
+  name: take('defenderStorage-${deployment().name}', 64)
+  scope: subscription()
+  params: {
+    enableDefenderForStorage: parDefenderForStorageConfig.enabled
+    enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
+    enableSensitiveDataDiscovery: parDefenderForStorageConfig.enableSensitiveDataDiscovery
+  }
+}
 
 module sharedServicesRG '../shared/bicep/resourceGroup.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -260,6 +279,30 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 ]
 
+// Process scan Function App (created first to get webhook endpoint for Event Grid)
+module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-function.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('processScanFnApp-${deployment().name}-deployment', 64)
+    params: {
+      functionAppName: 'func-process-scan-${parSpokeNetworks[i].parEnvironment}'
+      location: location
+      tags: tags
+      storageAccountName: 'stprocessscan${parSpokeNetworks[i].parEnvironment}'
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      ]
+    }
+    dependsOn: [
+      applicationsRG
+    ]
+  }
+]
+
 module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('documentUpload-${deployment().name}-deployment', 64)
@@ -273,9 +316,36 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       resourcesNames: storageServicesNaming[i].outputs.resourcesNames
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
+      enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      enableEventGridIntegration: true
+      enableEventGridSubscriptions: false  // Set to true only after Function App code is deployed and webhook endpoint is ready
+      processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint
     }
+    dependsOn: [
+      defenderStorage
+      storageRG
+      processScanFnApp
+    ]
   }
 ]
+
+// Note: Function App permissions will be configured once system assigned identity is available
+// Configure process scan Function App permissions after document upload storage is created
+// module processScanFnAppPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
+//   for i in range(0, length(parSpokeNetworks)): {
+//     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgStorage)
+//     name: take('processScanFnAppPermissions-${deployment().name}-deployment', 64)
+//     params: {
+//       functionAppPrincipalId: processScanFnApp[i].outputs.systemAssignedPrincipalId
+//       documentUploadStorageAccountId: documentUpload[i].outputs.storageAccountId
+//     }
+//     dependsOn: [
+//       processScanFnApp
+//       documentUpload
+//     ]
+//   }
+// ]
 
 module databaseserver 'modules/05-database/deploy.database.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -536,6 +606,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
     ]
   }
 ]
+
 
 // module applicationGateway 'modules/08-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
 //   name: take('applicationGateway-${deployment().name}-deployment', 64)

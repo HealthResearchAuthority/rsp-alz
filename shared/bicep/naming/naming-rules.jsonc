@@ -37,6 +37,7 @@
         "documentIntelligence": "di",
         "eventGridSystemTopic": "egst",
         "eventGridSubscription": "evgs",
+        "functionApp": "func",
         "azuresqlserver": "sql",
         "azuresqldatabase": "sqldb"
     },
