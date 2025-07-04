@@ -280,6 +280,29 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 ]
 
+// Process scan Function App (created first to get webhook endpoint for Event Grid)
+module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-function.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('processScanFnApp-${deployment().name}-deployment', 64)
+    params: {
+      functionAppName: 'func-process-scan-${parSpokeNetworks[i].parEnvironment}'
+      location: location
+      tags: tags
+      storageAccountName: 'stprocessscan${parSpokeNetworks[i].parEnvironment}'
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      ]
+    }
+    dependsOn: [
+      applicationsRG
+    ]
+  }
+]
 
 module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -297,13 +320,33 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
       customEventGridTopicId: '' // Optional: Add custom Event Grid topic ID for additional automation
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      enableEventGridIntegration: true
+      processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint
     }
     dependsOn: [
       defenderStorage
       storageRG
+      processScanFnApp
     ]
   }
 ]
+
+// Note: Function App permissions will be configured once system assigned identity is available
+// Configure process scan Function App permissions after document upload storage is created
+// module processScanFnAppPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
+//   for i in range(0, length(parSpokeNetworks)): {
+//     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgStorage)
+//     name: take('processScanFnAppPermissions-${deployment().name}-deployment', 64)
+//     params: {
+//       functionAppPrincipalId: processScanFnApp[i].outputs.systemAssignedPrincipalId
+//       documentUploadStorageAccountId: documentUpload[i].outputs.storageAccountId
+//     }
+//     dependsOn: [
+//       processScanFnApp
+//       documentUpload
+//     ]
+//   }
+// ]
 
 module databaseserver 'modules/05-database/deploy.database.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -565,39 +608,6 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
-// module malwareFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
-//   for i in range(0, length(parSpokeNetworks)): {
-//     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
-//     name: take('malwareFnApp-${deployment().name}-deployment', 64)
-//     params: {
-//       tags: {}
-//       sku: 'B1'
-//       logAnalyticsWsId: logAnalyticsWorkspaceId
-//       location: location
-//       appServicePlanName: 'asp-rsp-fnMalwareApp-${parSpokeNetworks[i].parEnvironment}-uks'
-//       appName: 'func-malware-${parSpokeNetworks[i].parEnvironment}'
-//       webAppBaseOs: 'Windows'
-//       subnetIdForVnetInjection: webAppSubnet[i].id
-//       deploySlot: false
-//       privateEndpointRG: parSpokeNetworks[i].rgNetworking
-//       spokeVNetId: existingVnet[i].id
-//       subnetPrivateEndpointSubnetId: pepSubnet[i].id
-//       kind: 'functionapp'
-//       storageAccountName: 'stmalware${parSpokeNetworks[i].parEnvironment}'
-//       deployAppPrivateEndPoint: false
-//       userAssignedIdentities: [
-//         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-//       ]
-//       devOpsPublicIPAddress: parDevOpsPublicIPAddress
-//       isPrivate: false
-//     }
-//     dependsOn: [
-//       fnNotifyApp
-//       documentUpload
-//       applicationsRG
-//     ]
-//   }
-// ]
 
 // module applicationGateway 'modules/08-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
 //   name: take('applicationGateway-${deployment().name}-deployment', 64)

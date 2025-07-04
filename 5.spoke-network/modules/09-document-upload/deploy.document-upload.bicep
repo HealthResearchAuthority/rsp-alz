@@ -38,6 +38,12 @@ param customEventGridTopicId string = ''
 @description('Log Analytics workspace ID for security alerts')
 param logAnalyticsWorkspaceId string
 
+@description('Enable Event Grid integration for scan result processing')
+param enableEventGridIntegration bool = true
+
+@description('Process scan Function App webhook endpoint URL')
+param processScanWebhookEndpoint string = ''
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -170,6 +176,58 @@ module defenderStorageAccountConfig '../../../shared/bicep/security/defender-sto
   dependsOn: [
     defenderStoragePermissions
   ]
+}
+
+// Event Grid system topic for Defender for Storage events
+module eventGridSystemTopic '../../../shared/bicep/event-grid/event-grid-system-topic.bicep' = if (enableEventGridIntegration) {
+  name: 'documentUploadEventGridTopic'
+  params: {
+    systemTopicName: 'evgt-${storageAccount.outputs.name}-scan-results'
+    location: location
+    tags: tags
+    storageAccountId: storageAccount.outputs.id
+    topicType: 'Microsoft.Storage.StorageAccounts'
+    enableSystemAssignedIdentity: true
+  }
+  // dependsOn removed: Bicep automatically detects dependency through resource references
+}
+
+// Event Grid subscription for malware scan results
+module scanResultEventSubscription '../../../shared/bicep/event-grid/event-grid-subscription.bicep' = if (enableEventGridIntegration && !empty(processScanWebhookEndpoint)) {
+  name: 'scanResultEventSubscription'
+  params: {
+    subscriptionName: 'scan-result-processing'
+    systemTopicId: eventGridSystemTopic.outputs.systemTopicId
+    destinationType: 'webhook'
+    webhookEndpointUrl: processScanWebhookEndpoint
+    eventTypes: [
+      'Microsoft.Security.MalwareScanningResult'
+    ]
+    containerName: storageConfig.containerName
+    enableAdvancedFiltering: true
+    maxDeliveryAttempts: 3
+    eventTimeToLiveInMinutes: 1440
+  }
+  // dependsOn removed: Bicep automatically detects dependency through systemTopicId parameter
+}
+
+// Event Grid subscription for blob created events (optional - for additional processing)
+module blobCreatedEventSubscription '../../../shared/bicep/event-grid/event-grid-subscription.bicep' = if (enableEventGridIntegration && !empty(processScanWebhookEndpoint)) {
+  name: 'blobCreatedEventSubscription'
+  params: {
+    subscriptionName: 'blob-created-processing'
+    systemTopicId: eventGridSystemTopic.outputs.systemTopicId
+    destinationType: 'webhook'
+    webhookEndpointUrl: processScanWebhookEndpoint
+    eventTypes: [
+      'Microsoft.Storage.BlobCreated'
+    ]
+    containerName: storageConfig.containerName
+    enableAdvancedFiltering: true
+    maxDeliveryAttempts: 3
+    eventTimeToLiveInMinutes: 1440
+  }
+  // dependsOn removed: Bicep automatically detects dependency through systemTopicId parameter
 }
 
 // ------------------

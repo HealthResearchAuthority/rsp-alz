@@ -9,14 +9,21 @@ targetScope = 'resourceGroup'
 param subscriptionName string
 
 
-@description('The name of the Event Grid system topic.')
-param systemTopicName string
+@description('The resource ID of the Event Grid system topic.')
+param systemTopicId string
 
-@description('Storage account name to monitor for blob events.')
-param storageAccountName string
+@description('Destination type for Event Grid subscription')
+@allowed(['webhook', 'storagequeue'])
+param destinationType string = 'webhook'
+
+@description('Storage account name for queue destination (required if destinationType is storagequeue).')
+param storageAccountName string = ''
 
 @description('Container name to monitor for blob events.')
-param containerName string
+param containerName string = ''
+
+@description('Queue name for storage queue destination')
+param queueName string = 'defender-malware-scan-queue'
 
 @description('Event types to subscribe to.')
 param eventTypes array = [
@@ -49,7 +56,7 @@ param enableAdvancedFiltering bool = true
 // VARIABLES
 // ------------------
 
-var subjectFilter = enableAdvancedFiltering ? {
+var subjectFilter = enableAdvancedFiltering && !empty(containerName) ? {
   subjectBeginsWith: '/blobServices/default/containers/${containerName}/'
   subjectEndsWith: ''
   includedEventTypes: eventTypes
@@ -70,14 +77,14 @@ var deadLetterConfig = enableDeadLetter && !empty(deadLetterStorageAccountName) 
 // ------------------
 
 resource systemTopic 'Microsoft.EventGrid/systemTopics@2022-06-15' existing = {
-  name: systemTopicName
+  name: split(systemTopicId, '/')[8]
 }
 
 resource eventGridSubscription 'Microsoft.EventGrid/systemTopics/eventSubscriptions@2022-06-15' = {
   parent: systemTopic
   name: subscriptionName
   properties: {
-    destination: !empty(webhookEndpointUrl) ? {
+    destination: destinationType == 'webhook' ? {
       endpointType: 'WebHook'
       properties: {
         endpointUrl: webhookEndpointUrl
@@ -88,7 +95,7 @@ resource eventGridSubscription 'Microsoft.EventGrid/systemTopics/eventSubscripti
       endpointType: 'StorageQueue'
       properties: {
         resourceId: resourceId('Microsoft.Storage/storageAccounts', storageAccountName)
-        queueName: 'defender-malware-scan-queue'
+        queueName: queueName
       }
     }
     filter: subjectFilter
