@@ -13,8 +13,7 @@ param enableMalwareScanning bool = false
 @description('Enable sensitive data discovery for storage accounts')
 param enableSensitiveDataDiscovery bool = true
 
-@description('Monthly malware scanning cap in GB per storage account')
-param malwareScanningCapGBPerMonth int = 1000
+// Note: Malware scanning caps are configured at storage account level via defenderForStorageSettings
 
 // ------------------
 // RESOURCES
@@ -30,9 +29,6 @@ resource defenderForStorage 'Microsoft.Security/pricings@2023-01-01' = if (enabl
       {
         name: 'OnUploadMalwareScanning'
         isEnabled: enableMalwareScanning ? 'True' : 'False'
-        additionalExtensionProperties: {
-          CapGBPerMonthPerStorageAccount: string(malwareScanningCapGBPerMonth)
-        }
       }
       {
         name: 'SensitiveDataDiscovery'
@@ -55,8 +51,7 @@ output malwareScanningEnabled bool = enableMalwareScanning
 @description('Indicates whether sensitive data discovery is enabled')
 output sensitiveDataDiscoveryEnabled bool = enableSensitiveDataDiscovery
 
-@description('Monthly malware scanning cap in GB per storage account')
-output malwareScanningCapGB int = malwareScanningCapGBPerMonth
+// Note: Malware scanning caps are managed at storage account level
 
 @description('The resource ID of the Defender for Storage configuration')
 output defenderForStorageId string = enableDefenderForStorage ? defenderForStorage.id : ''

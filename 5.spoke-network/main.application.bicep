@@ -102,7 +102,6 @@ module defenderStorage '../shared/bicep/security/defender-storage.bicep' = if (p
     enableDefenderForStorage: parDefenderForStorageConfig.enabled
     enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
     enableSensitiveDataDiscovery: parDefenderForStorageConfig.enableSensitiveDataDiscovery
-    malwareScanningCapGBPerMonth: parDefenderForStorageConfig.malwareScanningCapGBPerMonth
   }
 }
 
