@@ -87,11 +87,11 @@ resource publicIp 'Microsoft.Network/publicIPAddresses@2024-05-01' = {
   name: publicIpName
   location: resourceGroup().location
   sku: {
-    name: 'Basic'
+    name: 'Standard'
     tier: 'Regional'
   }
   properties: {
-    publicIPAllocationMethod: 'Dynamic'
+    publicIPAllocationMethod: 'Static'
   }
 }
 
@@ -144,8 +144,8 @@ resource vpnGateway 'Microsoft.Network/virtualNetworkGateways@2024-05-01' = {
     enableBgpRouteTranslationForNat: false
     disableIPSecReplayProtection: false
     sku: {
-      name: 'Basic'
-      tier: 'Basic'
+      name: 'VpnGw1'
+      tier: 'VpnGw1'
     }
     gatewayType: 'Vpn'
     vpnType: 'RouteBased'

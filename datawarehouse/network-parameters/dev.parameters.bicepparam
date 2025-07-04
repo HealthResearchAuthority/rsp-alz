@@ -10,7 +10,7 @@ param localNetworkGatewayName = 'HRADataWarehouseNetworkGateway'
 
 param manualTestVnetId = '/subscriptions/66482e26-764b-4717-ae2f-fab6b8dd1379/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/virtualNetworks/vnet-manual-test'
 
-param publicIpName = 'HRADataWarehouseVirtualNetwork-PIP'
+param publicIpName = 'HRADataWarehouseVirtualNetwork-PIP-2'
 
 param remoteLocalGatewayId = '/subscriptions/461016b5-8363-472e-81be-eef6aad08353/resourceGroups/VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D/providers/Microsoft.Network/localNetworkGateways/HRADataWarehouseNetworkGateway'
 
