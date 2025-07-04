@@ -188,6 +188,7 @@ module eventGridSystemTopic '../../../shared/bicep/event-grid/event-grid-system-
     storageAccountId: storageAccount.outputs.id
     topicType: 'Microsoft.Storage.StorageAccounts'
     enableSystemAssignedIdentity: true
+    createOrUpdate: false  // Reference existing system topic to avoid duplicate error
   }
   // dependsOn removed: Bicep automatically detects dependency through resource references
 }

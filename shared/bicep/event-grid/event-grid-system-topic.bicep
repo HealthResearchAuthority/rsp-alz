@@ -22,6 +22,9 @@ param topicType string = 'Microsoft.Storage.StorageAccounts'
 @description('Enable system topic identity for authentication.')
 param enableSystemAssignedIdentity bool = true
 
+@description('Create new system topic or reference existing one.')
+param createOrUpdate bool = true
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -33,7 +36,7 @@ var storageAccountName = storageAccountIdTokens[8]
 // RESOURCES
 // ------------------
 
-resource eventGridSystemTopic 'Microsoft.EventGrid/systemTopics@2022-06-15' = {
+resource eventGridSystemTopic 'Microsoft.EventGrid/systemTopics@2022-06-15' = if (createOrUpdate) {
   name: systemTopicName
   location: location
   tags: tags
@@ -46,18 +49,23 @@ resource eventGridSystemTopic 'Microsoft.EventGrid/systemTopics@2022-06-15' = {
   } : null
 }
 
+// Reference existing system topic if not creating new one
+resource existingEventGridSystemTopic 'Microsoft.EventGrid/systemTopics@2022-06-15' existing = if (!createOrUpdate) {
+  name: systemTopicName
+}
+
 // ------------------
 // OUTPUTS
 // ------------------
 
 @description('The resource ID of the Event Grid system topic.')
-output systemTopicId string = eventGridSystemTopic.id
+output systemTopicId string = createOrUpdate ? eventGridSystemTopic.id : existingEventGridSystemTopic.id
 
 @description('The name of the Event Grid system topic.')
-output systemTopicName string = eventGridSystemTopic.name
+output systemTopicName string = createOrUpdate ? eventGridSystemTopic.name : existingEventGridSystemTopic.name
 
 @description('The principal ID of the system topic managed identity.')
-output systemTopicPrincipalId string = enableSystemAssignedIdentity ? eventGridSystemTopic.identity.principalId : ''
+output systemTopicPrincipalId string = enableSystemAssignedIdentity && createOrUpdate ? eventGridSystemTopic.identity.principalId : ''
 
 @description('The storage account name associated with this system topic.')
 output associatedStorageAccountName string = storageAccountName
