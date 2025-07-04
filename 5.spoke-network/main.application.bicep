@@ -79,7 +79,7 @@ param parFileUploadStorageConfig object = {
 @description('Microsoft Defender for Storage configuration')
 param parDefenderForStorageConfig object = {
   enabled: true
-  enableMalwareScanning: true
+  enableMalwareScanning: false
   enableSensitiveDataDiscovery: true
   malwareScanningCapGBPerMonth: 1000
 }
@@ -318,7 +318,6 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
       enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
-      customEventGridTopicId: '' // Optional: Add custom Event Grid topic ID for additional automation
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true
       processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint

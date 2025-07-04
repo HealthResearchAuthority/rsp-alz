@@ -32,8 +32,6 @@ param environment string
 @description('Enable malware scanning integration')
 param enableMalwareScanning bool = true
 
-@description('Custom Event Grid topic resource ID for Defender scan results (optional)')
-param customEventGridTopicId string = ''
 
 @description('Log Analytics workspace ID for security alerts')
 param logAnalyticsWorkspaceId string
@@ -170,54 +168,38 @@ module defenderStorageAccountConfig '../../../shared/bicep/security/defender-sto
     malwareScanningCapGBPerMonth: 1000
     enableSensitiveDataDiscovery: true
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    customEventGridTopicId: enableEventGridIntegration ? customEventGridTopic.outputs.topicId : ''
   }
   dependsOn: [
     defenderStoragePermissions
   ]
 }
 
-// Event Grid system topic for Defender for Storage events
-module eventGridSystemTopic '../../../shared/bicep/event-grid/event-grid-system-topic.bicep' = if (enableEventGridIntegration) {
-  name: 'documentUploadEventGridTopic'
+// Custom Event Grid topic for Defender for Storage events (following GitHub tutorial pattern)
+module customEventGridTopic '../../../shared/bicep/event-grid/custom-event-grid-topic.bicep' = if (enableEventGridIntegration) {
+  name: 'documentUploadCustomEventGridTopic'
   params: {
-    systemTopicName: 'evgt-${storageAccount.outputs.name}-scan-results'
+    topicName: 'evgt-${storageAccount.outputs.name}-custom-scan-results'
     location: location
     tags: tags
-    storageAccountId: storageAccount.outputs.id
-    topicType: 'Microsoft.Storage.StorageAccounts'
     enableSystemAssignedIdentity: true
-    createOrUpdate: true  // Reference existing system topic to avoid duplicate error
+    publicNetworkAccess: 'Enabled'
+    inputSchema: 'EventGridSchema'
+    disableLocalAuth: false
   }
 }
 
-// Event Grid subscription for malware scan results
-module scanResultEventSubscription '../../../shared/bicep/event-grid/event-grid-subscription.bicep' = if (enableEventGridIntegration && !empty(processScanWebhookEndpoint)) {
-  name: 'scanResultEventSubscription'
+// Event Grid subscription for custom topic (following GitHub tutorial pattern)
+// Note: With custom topics, scan results are sent via storage account configuration
+module customTopicEventSubscription '../../../shared/bicep/event-grid/custom-topic-subscription.bicep' = if (enableEventGridIntegration && !empty(processScanWebhookEndpoint)) {
+  name: 'customTopicEventSubscription'
   params: {
-    subscriptionName: 'scan-result-processing'
-    systemTopicId: eventGridSystemTopic.outputs.systemTopicId
+    subscriptionName: 'defender-scan-processing'
+    customTopicId: customEventGridTopic.outputs.topicId
     destinationType: 'webhook'
     webhookEndpointUrl: processScanWebhookEndpoint
     eventTypes: [
       'Microsoft.Security.MalwareScanningResult'
-    ]
-    containerName: storageConfig.containerName
-    enableAdvancedFiltering: true
-    maxDeliveryAttempts: 3
-    eventTimeToLiveInMinutes: 1440
-  }
-}
-
-// Event Grid subscription for blob created events (optional - for additional processing)
-module blobCreatedEventSubscription '../../../shared/bicep/event-grid/event-grid-subscription.bicep' = if (enableEventGridIntegration && !empty(processScanWebhookEndpoint)) {
-  name: 'blobCreatedEventSubscription'
-  params: {
-    subscriptionName: 'blob-created-processing'
-    systemTopicId: eventGridSystemTopic.outputs.systemTopicId
-    destinationType: 'webhook'
-    webhookEndpointUrl: processScanWebhookEndpoint
-    eventTypes: [
-      'Microsoft.Storage.BlobCreated'
     ]
     containerName: storageConfig.containerName
     enableAdvancedFiltering: true
@@ -252,4 +234,7 @@ output containerName string = storageConfig.containerName
 output malwareScanningEnabled bool = enableMalwareScanning
 
 @description('Custom Event Grid topic ID used for Defender scan results.')
-output customEventGridTopicId string = customEventGridTopicId
+output customEventGridTopicId string = enableEventGridIntegration ? customEventGridTopic.outputs.topicId : ''
+
+@description('Custom Event Grid topic endpoint URL.')
+output customEventGridTopicEndpoint string = enableEventGridIntegration ? customEventGridTopic.outputs.topicEndpoint : ''

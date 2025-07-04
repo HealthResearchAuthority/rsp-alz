@@ -19,6 +19,9 @@ param enableSensitiveDataDiscovery bool = true
 @description('Log Analytics workspace resource ID for monitoring (optional)')
 param logAnalyticsWorkspaceId string = ''
 
+@description('Custom Event Grid topic resource ID for scan results (optional)')
+param customEventGridTopicId string = ''
+
 
 // ------------------
 // VARIABLES
@@ -46,6 +49,7 @@ resource defenderForStorageSettings 'Microsoft.Security/defenderForStorageSettin
         isEnabled: enableMalwareScanning
         capGBPerMonth: malwareScanningCapGBPerMonth
       }
+      scanResultsEventGridTopicResourceId: !empty(customEventGridTopicId) ? customEventGridTopicId : null
     }
     sensitiveDataDiscovery: {
       isEnabled: enableSensitiveDataDiscovery

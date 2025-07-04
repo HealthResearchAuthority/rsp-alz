@@ -8,7 +8,7 @@ targetScope = 'subscription'
 param enableDefenderForStorage bool = true
 
 @description('Enable malware scanning for storage accounts')
-param enableMalwareScanning bool = true
+param enableMalwareScanning bool = false
 
 @description('Enable sensitive data discovery for storage accounts')
 param enableSensitiveDataDiscovery bool = true
