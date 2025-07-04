@@ -139,7 +139,6 @@ module blobService '../../../shared/bicep/storage/storage.blobsvc.bicep' = {
   }
 }
 
-// Note: Queue service removed - Defender for Storage handles Event Grid natively
 
 module roleAssignment '../../../shared/bicep/role-assignments/role-assignment.bicep' = {
   name: 'fileUploadStorageRoleAssignment'
@@ -151,7 +150,6 @@ module roleAssignment '../../../shared/bicep/role-assignments/role-assignment.bi
   }
 }
 
-// Note: Event Grid system topic and subscription removed - Defender for Storage creates these automatically
 
 module defenderStoragePermissions '../../../shared/bicep/role-assignments/defender-storage-permissions.bicep' = if (enableMalwareScanning) {
   name: 'documentUploadDefenderPermissions'
@@ -188,9 +186,8 @@ module eventGridSystemTopic '../../../shared/bicep/event-grid/event-grid-system-
     storageAccountId: storageAccount.outputs.id
     topicType: 'Microsoft.Storage.StorageAccounts'
     enableSystemAssignedIdentity: true
-    createOrUpdate: false  // Reference existing system topic to avoid duplicate error
+    createOrUpdate: true  // Reference existing system topic to avoid duplicate error
   }
-  // dependsOn removed: Bicep automatically detects dependency through resource references
 }
 
 // Event Grid subscription for malware scan results
@@ -209,7 +206,6 @@ module scanResultEventSubscription '../../../shared/bicep/event-grid/event-grid-
     maxDeliveryAttempts: 3
     eventTimeToLiveInMinutes: 1440
   }
-  // dependsOn removed: Bicep automatically detects dependency through systemTopicId parameter
 }
 
 // Event Grid subscription for blob created events (optional - for additional processing)
@@ -228,7 +224,6 @@ module blobCreatedEventSubscription '../../../shared/bicep/event-grid/event-grid
     maxDeliveryAttempts: 3
     eventTimeToLiveInMinutes: 1440
   }
-  // dependsOn removed: Bicep automatically detects dependency through systemTopicId parameter
 }
 
 // ------------------
