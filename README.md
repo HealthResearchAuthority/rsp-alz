@@ -53,7 +53,7 @@ shared/
   - `modules/`: Submodules for subscription placement logic.
 
 - **`5.spoke-network/`**: Contains Bicep templates for spoke network deployments.
-  - `main.application.bicep`: Entry point for application-related resources.
+  - `main.application.bicep`: Entry point for application-related resources including web apps, container apps, function apps, and databases.
   - `main.network.bicep`: Entry point for network-related resources.
   - `modules/`: Submodules for network parameters.
 
@@ -168,6 +168,59 @@ While the custom Event Grid topic is created via Bicep templates, the "Send scan
    - Click "Save"
 
 **Note:** The Bicep API does not currently support setting the `scanResultsEventGridTopicResourceId` property, so this configuration must be done post-deployment through the Azure Portal.
+
+## Application Infrastructure
+
+The repository deploys a comprehensive application infrastructure including:
+
+### Web Applications
+- **IRAS Portal**: Main web application (`irasportal-${environment}`)
+- **Container Apps**: Microservices architecture with dedicated container apps for:
+  - IRAS Service (`irasservice`)
+  - User Management Service (`usermanagementservice`)
+  - Question Set Service (`questionsetservice`)
+  - RTS Service (`rtsservice`)
+
+### Function Apps
+- **Process Scan Function**: Handles malware scanning events and file quarantine/approval (`func-process-scan-${environment}`)
+- **RTS Data Sync Function**: Synchronizes RTS data with external systems (`func-rts-data-sync-${environment}`)
+- **Notification Function**: Handles notification processing (`func-notify-${environment}`)
+- **Document API Function**: Provides .NET API endpoints for document processing (`func-document-api-${environment}`)
+
+### Database Infrastructure
+- **SQL Server**: Centralized database server with Azure AD authentication
+- **Databases**: Multiple databases for different services:
+  - `applicationservice`
+  - `identityservice`
+  - `questionsetservice`
+  - `rtsservice`
+
+### Shared Services
+- **Azure App Configuration**: Centralized configuration management
+- **Azure Container Registry**: Container image storage
+- **Key Vault**: Secrets and certificate management
+- **Log Analytics**: Centralized logging and monitoring
+- **Application Insights**: Application performance monitoring
+
+### Network Architecture
+- **VNet Integration**: All services are connected to the spoke virtual network
+- **Private Endpoints**: Database and storage services use private endpoints for secure connectivity
+- **Subnet Segmentation**: Dedicated subnets for different service types:
+  - `snet-webapp`: Web applications and function apps
+  - `snet-pep`: Private endpoints
+  - `snet-infra`: Infrastructure services
+
+### Security Features
+- **Managed Identity**: All services use Azure AD managed identities for authentication
+- **Private Networking**: Database and storage services are accessible only through private endpoints
+- **Microsoft Defender**: Advanced threat protection enabled for storage accounts
+- **Audit Logging**: SQL Server auditing enabled with Log Analytics integration
+
+### Development and Deployment
+- **Infrastructure as Code**: Complete infrastructure defined in Bicep templates
+- **Environment Support**: Multi-environment deployment support (dev, test, prod)
+- **CI/CD Integration**: Azure DevOps pipelines for automated deployment
+- **Modular Design**: Reusable Bicep modules for consistent deployments
 
 ## Contributing
 
