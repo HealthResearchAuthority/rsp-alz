@@ -185,7 +185,7 @@ The repository deploys a comprehensive application infrastructure including:
 - **Process Scan Function**: Handles malware scanning events and file quarantine/approval (`func-process-scan-${environment}`)
 - **RTS Data Sync Function**: Synchronizes RTS data with external systems (`func-rts-data-sync-${environment}`)
 - **Notification Function**: Handles notification processing (`func-notify-${environment}`)
-- **Document API Function**: Provides .NET API endpoints for document processing (`func-document-api-${environment}`)
+- **Document Upload API Function**: Provides .NET API endpoints for document upload processing (`func-document-upload-api-${environment}`)
 
 ### Database Infrastructure
 - **SQL Server**: Centralized database server with Azure AD authentication
