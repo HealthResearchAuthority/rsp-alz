@@ -600,7 +600,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
       appServicePlanName: 'asp-rsp-fnDocApi-${parSpokeNetworks[i].parEnvironment}-uks'
-      appName: 'func-document-api-${parSpokeNetworks[i].parEnvironment}'
+      appName: 'func-documentapi-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Windows'
       subnetIdForVnetInjection: webAppSubnet[i].id
       deploySlot: parSpokeNetworks[i].deployWebAppSlot
