@@ -285,10 +285,10 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('processScanFnApp-${deployment().name}-deployment', 64)
     params: {
-      functionAppName: 'func-process-scan-${parSpokeNetworks[i].parEnvironment}'
+      functionAppName: 'func-process-document-upload-${parSpokeNetworks[i].parEnvironment}'
       location: location
       tags: tags
-      storageAccountName: 'stprocessscan${parSpokeNetworks[i].parEnvironment}'
+      storageAccountName: 'stprocessdocupload${parSpokeNetworks[i].parEnvironment}'
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       subnetIdForVnetInjection: webAppSubnet[i].id
       spokeVNetId: existingVnet[i].id
@@ -600,7 +600,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
       appServicePlanName: 'asp-rsp-fnDocumentApiApp-${parSpokeNetworks[i].parEnvironment}-uks'
-      appName: 'func-document-upload-api-${parSpokeNetworks[i].parEnvironment}'
+      appName: 'func-document-api-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Windows'
       subnetIdForVnetInjection: webAppSubnet[i].id
       deploySlot: parSpokeNetworks[i].deployWebAppSlot
@@ -608,7 +608,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
       kind: 'functionapp'
-      storageAccountName: 'stdocupldapi${parSpokeNetworks[i].parEnvironment}'
+      storageAccountName: 'stdocumentapi${parSpokeNetworks[i].parEnvironment}'
       deployAppPrivateEndPoint: false
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
