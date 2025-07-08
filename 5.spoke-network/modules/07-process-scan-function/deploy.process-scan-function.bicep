@@ -31,6 +31,11 @@ param subnetPrivateEndpointSubnetId string = ''
 @description('User assigned identities for the Function App')
 param userAssignedIdentities array
 
+@description('Required. Name of the App Service Plan.')
+@minLength(1)
+@maxLength(40)
+param appServicePlanName string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -47,7 +52,7 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
     location: location
     tags: tags
     sku: 'B1'
-    appServicePlanName: 'asp-rsp-fn-process-scan-${replace(functionAppName, 'func-process-scan-', '')}-uks'
+    appServicePlanName: appServicePlanName
     webAppBaseOs: 'Windows'
     subnetIdForVnetInjection: subnetIdForVnetInjection
     deploySlot: false

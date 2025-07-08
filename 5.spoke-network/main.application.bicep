@@ -285,10 +285,11 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('processScanFnApp-${deployment().name}-deployment', 64)
     params: {
-      functionAppName: 'func-process-document-upload-${parSpokeNetworks[i].parEnvironment}'
+      functionAppName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
       location: location
       tags: tags
-      storageAccountName: 'stprocessdocupload${parSpokeNetworks[i].parEnvironment}'
+      appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
+      storageAccountName: 'stprocessdocupld${parSpokeNetworks[i].parEnvironment}'
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       subnetIdForVnetInjection: webAppSubnet[i].id
       spokeVNetId: existingVnet[i].id
