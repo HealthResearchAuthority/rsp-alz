@@ -330,23 +330,6 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
   }
 ]
 
-// Note: Function App permissions will be configured once system assigned identity is available
-// Configure process scan Function App permissions after document upload storage is created
-// module processScanFnAppPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
-//   for i in range(0, length(parSpokeNetworks)): {
-//     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgStorage)
-//     name: take('processScanFnAppPermissions-${deployment().name}-deployment', 64)
-//     params: {
-//       functionAppPrincipalId: processScanFnApp[i].outputs.systemAssignedPrincipalId
-//       documentUploadStorageAccountId: documentUpload[i].outputs.storageAccountId
-//     }
-//     dependsOn: [
-//       processScanFnApp
-//       documentUpload
-//     ]
-//   }
-// ]
-
 module databaseserver 'modules/05-database/deploy.database.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('database-${deployment().name}-deployment', 64)

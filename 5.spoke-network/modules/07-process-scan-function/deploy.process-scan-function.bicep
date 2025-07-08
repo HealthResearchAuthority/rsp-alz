@@ -16,9 +16,6 @@ param functionAppName string
 @description('Function App storage account name')
 param storageAccountName string
 
-// Note: documentUploadStorageAccountId parameter removed as permissions will be configured separately
-// Future: This will be used when managed identity permissions are implemented
-
 @description('Log Analytics workspace resource ID')
 param logAnalyticsWorkspaceId string
 
@@ -42,7 +39,7 @@ param userAssignedIdentities array
 // RESOURCES
 // ------------------
 
-// Function App for processing scan results using existing app-service module
+// Function App for processing scan results
 module functionApp '../07-app-service/deploy.app-service.bicep' = {
   name: 'processScanFunctionApp'
   params: {
@@ -68,16 +65,6 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
   }
 }
 
-// Note: Permissions will be configured separately after identity is available
-// Configure system-assigned managed identity permissions for blob operations (only if storage account ID is provided)
-// module permissions '../../../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = if (!empty(documentUploadStorageAccountId)) {
-//   name: 'processScanFunctionPermissions'
-//   params: {
-//     functionAppPrincipalId: functionApp.outputs.systemAssignedPrincipalId
-//     documentUploadStorageAccountId: documentUploadStorageAccountId
-//   }
-// }
-
 // ------------------
 // OUTPUTS
 // ------------------
@@ -93,6 +80,3 @@ output webhookEndpoint string = 'https://${functionApp.outputs.appHostName}/api/
 
 @description('The Function App URL.')
 output functionAppUrl string = 'https://${functionApp.outputs.appHostName}'
-
-// Note: Additional outputs like functionAppId and systemAssignedPrincipalId 
-// need to be added to the app-service module for full functionality
