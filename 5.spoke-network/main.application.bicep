@@ -599,7 +599,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sku: 'B1'
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
-      appServicePlanName: 'asp-rsp-fnDocumentApiApp-${parSpokeNetworks[i].parEnvironment}-uks'
+      appServicePlanName: 'asp-rsp-fnDocApi-${parSpokeNetworks[i].parEnvironment}-uks'
       appName: 'func-document-api-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Windows'
       subnetIdForVnetInjection: webAppSubnet[i].id
@@ -608,7 +608,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
       kind: 'functionapp'
-      storageAccountName: 'stdocumentapi${parSpokeNetworks[i].parEnvironment}'
+      storageAccountName: 'stdocapi${parSpokeNetworks[i].parEnvironment}'
       deployAppPrivateEndPoint: false
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
