@@ -346,7 +346,7 @@ module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-sp
 // output appConfigStoreId string = deployAppConfig ? appConfigStore.outputs.resourceId : ''
 // output webAppName string = webApp.outputs.name
  output appHostName string = (kind == 'app') ? webApp.outputs.defaultHostname: fnApp.outputs.defaultHostName
-// output webAppResourceId string = webApp.outputs.resourceId
+output webAppResourceId string = (kind == 'app') ? webApp.outputs.resourceId : fnApp.outputs.functionAppId
 // output webAppLocation string = webApp.outputs.location
 // output webAppSystemAssignedPrincipalId string = webApp.outputs.systemAssignedPrincipalId
 

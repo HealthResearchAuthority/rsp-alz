@@ -76,6 +76,37 @@ param parFileUploadStorageConfig object = {
   allowPublicAccess: false
 }
 
+@description('Enable Azure Front Door deployment')
+param parEnableFrontDoor bool = true
+
+@description('Front Door WAF policy mode')
+@allowed([
+  'Detection'
+  'Prevention'
+])
+param parFrontDoorWafMode string = 'Prevention'
+
+@description('Enable Front Door rate limiting')
+param parEnableFrontDoorRateLimiting bool = true
+
+@description('Front Door rate limit threshold (requests per minute)')
+param parFrontDoorRateLimitThreshold int = 1000
+
+@description('Enable Front Door caching')
+param parEnableFrontDoorCaching bool = true
+
+@description('Front Door cache duration')
+param parFrontDoorCacheDuration string = 'P1D'
+
+@description('Enable Front Door HTTPS redirect')
+param parEnableFrontDoorHttpsRedirect bool = true
+
+@description('Enable Front Door Private Link to origin')
+param parEnableFrontDoorPrivateLink bool = false
+
+@description('Front Door custom domains configuration')
+param parFrontDoorCustomDomains array = []
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -533,6 +564,34 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
     }
     dependsOn: [
       rtsfnApp
+    ]
+  }
+]
+
+module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): if (parEnableFrontDoor) {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('frontDoor-${deployment().name}-deployment', 64)
+    params: {
+      location: location
+      tags: tags
+      resourcesNames: applicationServicesNaming[i].outputs.resourcesNames
+      originHostName: webApp[i].outputs.appHostName
+      webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
+      enableWaf: true
+      wafMode: parFrontDoorWafMode
+      enableRateLimiting: parEnableFrontDoorRateLimiting
+      rateLimitThreshold: parFrontDoorRateLimitThreshold
+      customDomains: parFrontDoorCustomDomains
+      enableCaching: parEnableFrontDoorCaching
+      cacheDuration: parFrontDoorCacheDuration
+      enableHttpsRedirect: parEnableFrontDoorHttpsRedirect
+      enableManagedTls: true
+      webAppResourceId: webApp[i].outputs.webAppResourceId
+      enablePrivateLink: parEnableFrontDoorPrivateLink
+    }
+    dependsOn: [
+      webApp
     ]
   }
 ]
