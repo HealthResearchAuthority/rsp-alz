@@ -78,9 +78,9 @@ param parFileUploadStorageConfig object = {
 
 @description('Microsoft Defender for Storage configuration')
 param parDefenderForStorageConfig object = {
-  enabled: true
+  enabled: false
   enableMalwareScanning: false
-  enableSensitiveDataDiscovery: true
+  enableSensitiveDataDiscovery: false
   malwareScanningCapGBPerMonth: 1000
 }
 
