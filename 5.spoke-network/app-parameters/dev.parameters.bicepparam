@@ -33,6 +33,16 @@ param parFileUploadStorageConfig = {
   allowPublicAccess: false
 }
 
+param parDefenderForStorageConfig = {
+  enabled: false
+  enableMalwareScanning: false
+  enableSensitiveDataDiscovery: false
+  malwareScanningCapGBPerMonth: 1000
+  enforce: false
+}
+
+param parOverrideSubscriptionLevelSettings = false
+
 param parSpokeNetworks = [
   {
     subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'

@@ -25,6 +25,9 @@ param customEventGridTopicId string = ''
 @description('Enable blob index tags for storing scan results (default: false) - NOTE: This parameter is for documentation purposes only. Blob index tags are controlled via Azure Portal or REST API post-deployment.')
 param enableBlobIndexTags bool = false
 
+@description('Override subscription level settings for this storage account')
+param overrideSubscriptionLevelSettings bool = false
+
 
 // ------------------
 // VARIABLES
@@ -47,10 +50,10 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2024-01-01' existing 
 // 1. Azure Portal: Storage Account > Security + Networking > Microsoft Defender for Cloud > Settings > Uncheck "Store scan results as Blob Index Tags"
 // 2. REST API: Set scanResultsBlob property to null (if supported in future API versions)
 // Event Grid integration works independently of blob index tags setting
-resource defenderForStorageSettings 'Microsoft.Security/defenderForStorageSettings@2024-10-01-preview' = if (enableMalwareScanning) {
+resource defenderForStorageSettings 'Microsoft.Security/defenderForStorageSettings@2024-10-01-preview' = {
   scope: storageAccount
   name: 'current'
-  properties: {
+  properties: enableMalwareScanning ? {
     isEnabled: true
     malwareScanning: {
       onUpload: {
@@ -62,7 +65,10 @@ resource defenderForStorageSettings 'Microsoft.Security/defenderForStorageSettin
     sensitiveDataDiscovery: {
       isEnabled: enableSensitiveDataDiscovery
     }
-    overrideSubscriptionLevelSettings: true
+    overrideSubscriptionLevelSettings: overrideSubscriptionLevelSettings
+  } : {
+    isEnabled: false
+    overrideSubscriptionLevelSettings: overrideSubscriptionLevelSettings
   }
 }
 

@@ -32,6 +32,9 @@ param environment string
 @description('Enable malware scanning integration')
 param enableMalwareScanning bool = true
 
+@description('Override subscription level settings for storage account level defender configuration')
+param overrideSubscriptionLevelSettings bool = false
+
 
 @description('Log Analytics workspace ID for security alerts')
 param logAnalyticsWorkspaceId string
@@ -170,6 +173,7 @@ module defenderStorageAccountConfig '../../../shared/bicep/security/defender-sto
     enableMalwareScanning: enableMalwareScanning
     malwareScanningCapGBPerMonth: 1000
     enableSensitiveDataDiscovery: true
+    overrideSubscriptionLevelSettings: overrideSubscriptionLevelSettings
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     customEventGridTopicId: enableEventGridIntegration ? customEventGridTopic.outputs.topicId : ''
     enableBlobIndexTags: false  // Set to false to optimize costs - must be configured post-deployment via Azure Portal

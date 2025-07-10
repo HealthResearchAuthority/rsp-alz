@@ -82,7 +82,11 @@ param parDefenderForStorageConfig object = {
   enableMalwareScanning: false
   enableSensitiveDataDiscovery: false
   malwareScanningCapGBPerMonth: 1000
+  enforce: false
 }
+
+@description('Override subscription level settings for storage account level defender configuration')
+param parOverrideSubscriptionLevelSettings bool = false
 
 // ------------------
 // VARIABLES
@@ -102,6 +106,8 @@ module defenderStorage '../shared/bicep/security/defender-storage.bicep' = {
     enableDefenderForStorage: parDefenderForStorageConfig.enabled
     enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
     enableSensitiveDataDiscovery: parDefenderForStorageConfig.enableSensitiveDataDiscovery
+    malwareScanningCapGBPerMonth: parDefenderForStorageConfig.malwareScanningCapGBPerMonth
+    enforce: parDefenderForStorageConfig.enforce
   }
 }
 
@@ -318,6 +324,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
       enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
+      overrideSubscriptionLevelSettings: parOverrideSubscriptionLevelSettings
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true
       enableEventGridSubscriptions: false  // Set to true only after Function App code is deployed and webhook endpoint is ready
