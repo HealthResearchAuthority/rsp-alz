@@ -20,9 +20,9 @@ param enableSensitiveDataDiscovery bool = true
 // ------------------
 
 // Enable Microsoft Defender for Storage at subscription level
-resource defenderForStorage 'Microsoft.Security/pricings@2023-01-01' = if (enableDefenderForStorage) {
+resource defenderForStorage 'Microsoft.Security/pricings@2023-01-01' = {
   name: 'StorageAccounts'
-  properties: {
+  properties: enableDefenderForStorage ? {
     pricingTier: 'Standard'
     subPlan: 'DefenderForStorageV2'
     extensions: [
@@ -35,6 +35,8 @@ resource defenderForStorage 'Microsoft.Security/pricings@2023-01-01' = if (enabl
         isEnabled: enableSensitiveDataDiscovery ? 'True' : 'False'
       }
     ]
+  } : {
+    pricingTier: 'Free'
   }
 }
 
@@ -54,4 +56,4 @@ output sensitiveDataDiscoveryEnabled bool = enableSensitiveDataDiscovery
 // Note: Malware scanning caps are managed at storage account level
 
 @description('The resource ID of the Defender for Storage configuration')
-output defenderForStorageId string = enableDefenderForStorage ? defenderForStorage.id : ''
+output defenderForStorageId string = defenderForStorage.id

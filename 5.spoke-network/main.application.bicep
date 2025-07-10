@@ -95,7 +95,7 @@ var sqlServerNamePrefix = 'rspsqlserver'
 // RESOURCES
 // ------------------
 
-module defenderStorage '../shared/bicep/security/defender-storage.bicep' = if (parDefenderForStorageConfig.enabled) {
+module defenderStorage '../shared/bicep/security/defender-storage.bicep' = {
   name: take('defenderStorage-${deployment().name}', 64)
   scope: subscription()
   params: {
