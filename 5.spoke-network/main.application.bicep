@@ -285,10 +285,11 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('processScanFnApp-${deployment().name}-deployment', 64)
     params: {
-      functionAppName: 'func-process-scan-${parSpokeNetworks[i].parEnvironment}'
+      functionAppName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
       location: location
       tags: tags
-      storageAccountName: 'stprocessscan${parSpokeNetworks[i].parEnvironment}'
+      appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
+      storageAccountName: 'stprocessdocupld${parSpokeNetworks[i].parEnvironment}'
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       subnetIdForVnetInjection: webAppSubnet[i].id
       spokeVNetId: existingVnet[i].id
@@ -329,23 +330,6 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
     ]
   }
 ]
-
-// Note: Function App permissions will be configured once system assigned identity is available
-// Configure process scan Function App permissions after document upload storage is created
-// module processScanFnAppPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
-//   for i in range(0, length(parSpokeNetworks)): {
-//     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgStorage)
-//     name: take('processScanFnAppPermissions-${deployment().name}-deployment', 64)
-//     params: {
-//       functionAppPrincipalId: processScanFnApp[i].outputs.systemAssignedPrincipalId
-//       documentUploadStorageAccountId: documentUpload[i].outputs.storageAccountId
-//     }
-//     dependsOn: [
-//       processScanFnApp
-//       documentUpload
-//     ]
-//   }
-// ]
 
 module databaseserver 'modules/05-database/deploy.database.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -617,7 +601,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
       appServicePlanName: 'asp-rsp-fnDocApi-${parSpokeNetworks[i].parEnvironment}-uks'
-      appName: 'func-document-upload-api-${parSpokeNetworks[i].parEnvironment}'
+      appName: 'func-documentapi-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Windows'
       subnetIdForVnetInjection: webAppSubnet[i].id
       deploySlot: parSpokeNetworks[i].deployWebAppSlot
@@ -625,7 +609,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
       kind: 'functionapp'
-      storageAccountName: 'stdocapi$${parSpokeNetworks[i].parEnvironment}${uniqueString(subscription().id)}'
+      storageAccountName: 'stdocapi${parSpokeNetworks[i].parEnvironment}'
       deployAppPrivateEndPoint: false
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
