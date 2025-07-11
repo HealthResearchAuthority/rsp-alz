@@ -308,6 +308,7 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
   }
 ]
 
+// Document upload storage with malware scanning enabled (other storage accounts inherit subscription-level settings)
 module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('documentUpload-${deployment().name}-deployment', 64)
@@ -321,7 +322,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       resourcesNames: storageServicesNaming[i].outputs.resourcesNames
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
-      enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
+      enableMalwareScanning: true
       overrideSubscriptionLevelSettings: parOverrideSubscriptionLevelSettings
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true

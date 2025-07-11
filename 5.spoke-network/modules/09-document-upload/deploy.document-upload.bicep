@@ -33,7 +33,7 @@ param environment string
 param enableMalwareScanning bool = true
 
 @description('Override subscription level settings for storage account level defender configuration')
-param overrideSubscriptionLevelSettings bool = false
+param overrideSubscriptionLevelSettings bool = true
 
 
 @description('Log Analytics workspace ID for security alerts')
