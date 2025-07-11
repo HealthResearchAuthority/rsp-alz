@@ -321,7 +321,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       resourcesNames: storageServicesNaming[i].outputs.resourcesNames
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
-      enableMalwareScanning: true
+      enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
       overrideSubscriptionLevelSettings: parOverrideSubscriptionLevelSettings
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true

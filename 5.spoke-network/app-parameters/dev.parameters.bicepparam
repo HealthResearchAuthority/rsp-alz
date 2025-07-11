@@ -40,7 +40,7 @@ param parDefenderForStorageConfig = {
   enforce: false
 }
 
-param parOverrideSubscriptionLevelSettings = true
+param parOverrideSubscriptionLevelSettings = false
 
 param parSpokeNetworks = [
   {

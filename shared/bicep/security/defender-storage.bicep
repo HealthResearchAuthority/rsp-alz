@@ -36,7 +36,7 @@ resource defenderForStorage 'Microsoft.Security/pricings@2024-01-01' = {
         isEnabled: enableMalwareScanning ? 'True' : 'False'
         additionalExtensionProperties: enableMalwareScanning ? {
           CapGBPerMonthPerStorageAccount: string(malwareScanningCapGBPerMonth)
-        } : {}
+        } : null
       }
       {
         name: 'SensitiveDataDiscovery'
