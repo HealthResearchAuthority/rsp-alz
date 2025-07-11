@@ -37,7 +37,6 @@ param parDefenderForStorageConfig = {
   enabled: true
   enableMalwareScanning: false
   enableSensitiveDataDiscovery: true
-  malwareScanningCapGBPerMonth: 1000
   enforce: false
 }
 

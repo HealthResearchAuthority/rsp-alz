@@ -81,7 +81,6 @@ param parDefenderForStorageConfig object = {
   enabled: false
   enableMalwareScanning: false
   enableSensitiveDataDiscovery: false
-  malwareScanningCapGBPerMonth: 1000
   enforce: false
 }
 
@@ -106,7 +105,6 @@ module defenderStorage '../shared/bicep/security/defender-storage.bicep' = {
     enableDefenderForStorage: parDefenderForStorageConfig.enabled
     enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
     enableSensitiveDataDiscovery: parDefenderForStorageConfig.enableSensitiveDataDiscovery
-    malwareScanningCapGBPerMonth: parDefenderForStorageConfig.malwareScanningCapGBPerMonth
     enforce: parDefenderForStorageConfig.enforce
   }
 }
