@@ -70,7 +70,7 @@ param parSpokeNetworks array
 
 @description('File upload storage account configuration')
 param parFileUploadStorageConfig object = {
-  containerName: 'document-uploads'
+  containerName: 'staging'
   sku: 'Standard_LRS'
   accessTier: 'Hot'
   allowPublicAccess: false
@@ -323,7 +323,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       resourcesNames: storageServicesNaming[i].outputs.resourcesNames
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
-      enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
+      enableMalwareScanning: true
       overrideSubscriptionLevelSettings: parOverrideSubscriptionLevelSettings
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true

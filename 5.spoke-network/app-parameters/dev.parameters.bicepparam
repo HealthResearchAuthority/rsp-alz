@@ -34,14 +34,14 @@ param parFileUploadStorageConfig = {
 }
 
 param parDefenderForStorageConfig = {
-  enabled: false
+  enabled: true
   enableMalwareScanning: false
-  enableSensitiveDataDiscovery: false
+  enableSensitiveDataDiscovery: true
   malwareScanningCapGBPerMonth: 1000
   enforce: false
 }
 
-param parOverrideSubscriptionLevelSettings = false
+param parOverrideSubscriptionLevelSettings = true
 
 param parSpokeNetworks = [
   {
