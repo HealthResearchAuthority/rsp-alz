@@ -74,7 +74,7 @@ param dataEndpointEnabled bool = false
   'Enabled'
   'Disabled'
 ])
-param publicNetworkAccess string = 'Enabled'
+param publicNetworkAccess string = 'Disabled'
 
 @allowed([
   'AzureServices'
