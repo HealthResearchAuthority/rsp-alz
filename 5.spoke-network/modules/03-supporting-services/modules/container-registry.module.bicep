@@ -70,11 +70,6 @@ var spokeVNetLinks = [
     vnetId: vnetSpoke.id
     registrationEnabled: false
   }
-  {
-    vnetName: managementVNet.name
-    vnetId: managementVNet.id
-    registrationEnabled: false
-  }
 ]
 
 // ------------------
