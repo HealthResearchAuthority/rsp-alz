@@ -131,7 +131,7 @@ var appGwAndDefaultSubnets = !empty(spokeApplicationGatewaySubnetAddressPrefix) 
       properties: {
         addressPrefix: spokeApplicationGatewaySubnetAddressPrefix
         networkSecurityGroup: {
-          id: nsgAppGw.outputs.nsgId
+          id: nsgAppGw.?outputs.nsgId
         }
       }
     }
