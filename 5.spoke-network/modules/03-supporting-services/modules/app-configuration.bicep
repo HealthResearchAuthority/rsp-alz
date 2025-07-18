@@ -215,7 +215,7 @@ var featureFlags = [
   }
   {
     id: 'UX.MyResearchPage'
-    description: 'If this flag is enabled, show projects added to new service in my research dashboard',
+    description: 'If this flag is enabled, show projects added to new service in my research dashboard'
     label: 'portal'
     enabled: true
   }
