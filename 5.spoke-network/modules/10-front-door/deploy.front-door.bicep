@@ -63,7 +63,7 @@ var frontDoorProfileName = resourcesNames.frontDoor
 var frontDoorEndpointName = resourcesNames.frontDoorEndpoint
 var originGroupName = resourcesNames.frontDoorOriginGroup
 var routeName = resourcesNames.frontDoorRoute
-var wafPolicyName = resourcesNames.frontDoorWaf
+var wafPolicyName = replace(resourcesNames.frontDoorWaf, '-', '')
 
 var originConfig = {
   name: webAppName
