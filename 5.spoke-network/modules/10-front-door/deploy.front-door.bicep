@@ -93,7 +93,7 @@ module wafPolicy '../../../shared/bicep/front-door/waf-policy.bicep' = if (enabl
   name: take('waf-policy-${deployment().name}', 64)
   params: {
     name: wafPolicyName
-    location: location
+    location: 'global'
     tags: tags
     skuName: 'Premium_AzureFrontDoor'
     policyMode: wafMode
@@ -110,7 +110,7 @@ module frontDoorProfile '../../../shared/bicep/front-door/front-door-profile.bic
   name: take('front-door-profile-${deployment().name}', 64)
   params: {
     name: frontDoorProfileName
-    location: location
+    location: 'global'
     tags: tags
     skuName: 'Premium_AzureFrontDoor'
     identityType: 'SystemAssigned'
@@ -124,7 +124,7 @@ module frontDoorEndpoint '../../../shared/bicep/front-door/front-door-endpoint.b
   params: {
     name: frontDoorEndpointName
     frontDoorProfileName: frontDoorProfile.outputs.name
-    location: location
+    location: 'global'
     tags: tags
     enabled: true
     customDomains: customDomains
