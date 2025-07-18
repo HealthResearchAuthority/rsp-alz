@@ -33,6 +33,13 @@ param parFileUploadStorageConfig = {
   allowPublicAccess: false
 }
 
+param parDefenderForStorageConfig = {
+  enabled: true
+  enableMalwareScanning: false
+  enableSensitiveDataDiscovery: true
+  enforce: false
+}
+
 param parSpokeNetworks = [
   {
     subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379'

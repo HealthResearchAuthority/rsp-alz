@@ -10,13 +10,13 @@ param virtualNetworkLinks array = []
 @description('Optional. Array of A records to be added to the DNS Zone') 
 param aRecords array = []
 
-resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' = {
   name: name
   location: 'global'
   tags: tags
 }
 
-resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = [ for vnet in virtualNetworkLinks: {
+resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2024-06-01' = [ for vnet in virtualNetworkLinks: {
   //name:  '${privateDnsZone.name}/${vnet.vnetName}-link'
   parent: privateDnsZone
   name:  '${vnet.vnetName}-link'
@@ -29,7 +29,7 @@ resource privateDnsZoneLink 'Microsoft.Network/privateDnsZones/virtualNetworkLin
   }
 }]
 
-resource dnsARecord 'Microsoft.Network/privateDnsZones/A@2020-06-01' = [for (aRecord, i) in aRecords: {
+resource dnsARecord 'Microsoft.Network/privateDnsZones/A@2024-06-01' = [for (aRecord, i) in aRecords: {
   parent: privateDnsZone
   name: aRecord.name
   properties: {

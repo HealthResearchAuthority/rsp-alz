@@ -17,6 +17,9 @@ param networkRuleSetIpRules array = []
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
+// @description('The resource ID of the VNet to which the private endpoint will be connected. This should be the management VNet, which hosts managed devops pool and other management services.')
+// param managementVNetId string
+
 @description('The resource ID of the VNet to which the private endpoint will be connected.')
 param spokeVNetId string
 
@@ -38,6 +41,9 @@ param deployZoneRedundantResources bool = true
 @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param acrTier string = ''
 
+
+param networkingResourceGroup string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -45,10 +51,10 @@ param acrTier string = ''
 var privateDnsZoneNames = 'privatelink.azurecr.io'
 var containerRegistryResourceName = 'registry'
 
-//var hubVNetIdTokens = split(hubVNetId, '/')
-// var hubSubscriptionId = hubVNetIdTokens[2]
-// var hubResourceGroupName = hubVNetIdTokens[4]
-// var hubVNetName = hubVNetIdTokens[8]
+// var managementVNetIdTokens = split(managementVNetId, '/')
+// var managementSubscriptionId = managementVNetIdTokens[2]
+// var managementResourceGroupName = managementVNetIdTokens[4]
+// var managementVNetName = managementVNetIdTokens[8]
 
 var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
@@ -64,20 +70,15 @@ var spokeVNetLinks = [
     vnetId: vnetSpoke.id
     registrationEnabled: false
   }
-  // {
-  //   vnetName: vnetHub.name
-  //   vnetId: vnetHub.id
-  //   registrationEnabled: false
-  // }
 ]
 
 // ------------------
 // RESOURCES
 // ------------------
 
-// resource vnetHub  'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
-//   scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
-//   name: hubVNetName
+// resource managementVNet  'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
+//   scope: resourceGroup(managementSubscriptionId, managementResourceGroupName)
+//   name: managementVNetName
 // }
 
 resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
@@ -115,8 +116,9 @@ module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
   }
 }
 
-module containerRegistryNetwork '../../../../shared/bicep/network/private-networking-spoke.bicep' = if(acrTier == 'Premium' && publicAccess == 'Disabled') {
+module containerRegistryNetwork '../../../../shared/bicep/network/private-networking-spoke.bicep' = if(acrTier == 'Premium') {// && publicAccess == 'Disabled') {
   name:take('containerRegistryNetworkDeployment-${deployment().name}', 64)
+  scope: resourceGroup(networkingResourceGroup)
   params: {
     location: location
     azServicePrivateDnsZoneName: privateDnsZoneNames

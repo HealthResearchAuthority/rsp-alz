@@ -94,7 +94,7 @@ var defaultSettings = [
   }
   {
     name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-    value: fnAppAppInsights.properties.InstrumentationKey
+    value: fnAppAppInsights!.properties.InstrumentationKey
   }
   {
     name: 'AZURE_CLIENT_ID'

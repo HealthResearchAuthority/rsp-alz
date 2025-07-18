@@ -10,6 +10,12 @@ param location string =  deployment().location
 @description('The location where the resources will be created.')
 param managementSubscriptionId string =  ''
 
+@description('The address prefix for the virtual network.')
+param vnetprefix string = '10.1.192.0/19'
+
+param devopspoolSubnetPrefix string = '10.1.192.0/22'
+param devopspoolpepSubnetPrefix string = '10.1.196.0/24'
+
 // ------------------
 //    Variables
 // ------------------
@@ -18,6 +24,7 @@ param managementSubscriptionId string =  ''
 var topLevelManagementGroupPrefix = 'mg-rsp'
 var topLevelManagementGroupParentId = 'mg-future-iras'
 var opsManagementResourceGroupName = 'rg-hra-operationsmanagement'
+var manageddevopspoolResourceGroupName = 'rg-hra-manageddevopspool'
 
 //Logging and Sentinel
 var logAnalyticsWorkspaceName = 'hra-rsp-log-analytics'
@@ -65,4 +72,26 @@ module diagnostics 'modules/diagnostics/mgDiagSettingsAll.bicep' = {
   }
 }
 
+@description('Resource group to host managed devops pool related resources')
+module manageddevopspoolrg '../shared/bicep/resourceGroup.bicep' = {
+  name: take('02-manageddevopspoolResourceGroupName-${deployment().name}', 64)
+  scope: subscription(managementSubscriptionId)
+  params: {
+    parLocation: location
+    parResourceGroupName: manageddevopspoolResourceGroupName
+    parTags: {}
+  }
+}
+
+module manageddevopspoolmodule 'modules/manageddevopspool.bicep' = {
+  name: take('05-manageddevopspool-${deployment().name}', 64)
+  scope: resourceGroup(managementSubscriptionId, manageddevopspoolResourceGroupName)
+  params: {
+    devopspoolSubnetPrefix: devopspoolSubnetPrefix
+    vnetName: 'vnet-rsp-networking-devopspool'
+    devopspoolSubnetName: 'snet-devopspool'
+    spokeVNetAddressPrefixes: [vnetprefix]
+    devopspoolpepSubnetPrefix: devopspoolpepSubnetPrefix
+  }
+}
 
