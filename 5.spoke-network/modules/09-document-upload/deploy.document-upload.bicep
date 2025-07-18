@@ -175,7 +175,7 @@ module defenderStorageAccountConfig '../../../shared/bicep/security/defender-sto
     enableSensitiveDataDiscovery: true
     overrideSubscriptionLevelSettings: overrideSubscriptionLevelSettings
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    customEventGridTopicId: enableEventGridIntegration ? customEventGridTopic.outputs.topicId : ''
+    customEventGridTopicId: enableEventGridIntegration ? customEventGridTopic!.outputs.topicId : ''
     enableBlobIndexTags: false  // Set to false to optimize costs - must be configured post-deployment via Azure Portal
   }
   dependsOn: [
@@ -202,7 +202,7 @@ module customTopicEventSubscription '../../../shared/bicep/event-grid/custom-top
   name: 'customTopicEventSubscription'
   params: {
     subscriptionName: 'defender-scan-processing'
-    customTopicId: customEventGridTopic.outputs.topicId
+    customTopicId: customEventGridTopic!.outputs.topicId
     destinationType: 'webhook'
     webhookEndpointUrl: processScanWebhookEndpoint
     eventTypes: [
@@ -241,16 +241,16 @@ output containerName string = storageConfig.containerName
 output malwareScanningEnabled bool = enableMalwareScanning
 
 @description('Custom Event Grid topic ID used for Defender scan results.')
-output customEventGridTopicId string = enableEventGridIntegration ? customEventGridTopic.outputs.topicId : ''
+output customEventGridTopicId string = enableEventGridIntegration ? customEventGridTopic!.outputs.topicId : ''
 
 @description('Custom Event Grid topic endpoint URL.')
-output customEventGridTopicEndpoint string = enableEventGridIntegration ? customEventGridTopic.outputs.topicEndpoint : ''
+output customEventGridTopicEndpoint string = enableEventGridIntegration ? customEventGridTopic!.outputs.topicEndpoint : ''
 
 @description('Event Grid subscription resource ID (only when subscriptions are enabled).')
-output eventGridSubscriptionId string = (enableEventGridIntegration && enableEventGridSubscriptions) ? customTopicEventSubscription.outputs.eventSubscriptionId : ''
+output eventGridSubscriptionId string = (enableEventGridIntegration && enableEventGridSubscriptions) ? customTopicEventSubscription!.outputs.eventSubscriptionId : ''
 
 @description('Event Grid subscription name (only when subscriptions are enabled).')
-output eventGridSubscriptionName string = (enableEventGridIntegration && enableEventGridSubscriptions) ? customTopicEventSubscription.outputs.eventSubscriptionName : ''
+output eventGridSubscriptionName string = (enableEventGridIntegration && enableEventGridSubscriptions) ? customTopicEventSubscription!.outputs.eventSubscriptionName : ''
 
 @description('Indicates whether Event Grid subscriptions are enabled.')
 output eventGridSubscriptionsEnabled bool = enableEventGridSubscriptions
