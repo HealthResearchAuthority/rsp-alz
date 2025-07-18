@@ -214,6 +214,12 @@ var featureFlags = [
     enabled: true
   }
   {
+    id: 'UX.MyResearchPage'
+    description: 'If this flag is enabled, show projects added to new service in my research dashboard'
+    label: 'portal'
+    enabled: true
+  }
+  {
     id: 'Auth.UseOneLogin'
     description: 'When enabled, Gov UK One Login will be used for authentication'
     label: null
