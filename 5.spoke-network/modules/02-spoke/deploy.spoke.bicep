@@ -47,15 +47,6 @@ param logAnalyticsWorkspaceId string
 @description('Optional, default value is true. If true, Azure Policies will be deployed')
 param deployAzurePolicies bool = true
 
-// @description('Hub Subscription ID')
-// param parHubSubscriptionId string
-
-// @description('Hub Subscription ID')
-// param parHubResourceGroup string
-
-// @description('Hub Subscription ID')
-// param parHubResourceId string
-
 @description('resource Names')
 param resourcesNames object
 
@@ -140,7 +131,7 @@ var appGwAndDefaultSubnets = !empty(spokeApplicationGatewaySubnetAddressPrefix) 
       properties: {
         addressPrefix: spokeApplicationGatewaySubnetAddressPrefix
         networkSecurityGroup: {
-          id: nsgAppGw.outputs.nsgId
+          id: nsgAppGw.?outputs.nsgId
         }
       }
     }

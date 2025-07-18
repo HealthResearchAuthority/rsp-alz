@@ -44,6 +44,13 @@ param parEnableFrontDoorHttpsRedirect = true
 param parEnableFrontDoorPrivateLink = false
 param parFrontDoorCustomDomains = []
 
+param parDefenderForStorageConfig = {
+  enabled: true
+  enableMalwareScanning: false
+  enableSensitiveDataDiscovery: true
+  enforce: false
+}
+
 param parSpokeNetworks = [
   {
     subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65'
