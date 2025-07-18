@@ -17,8 +17,8 @@ param networkRuleSetIpRules array = []
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
-@description('The resource ID of the VNet to which the private endpoint will be connected. This should be the management VNet, which hosts managed devops pool and other management services.')
-param managementVNetId string
+// @description('The resource ID of the VNet to which the private endpoint will be connected. This should be the management VNet, which hosts managed devops pool and other management services.')
+// param managementVNetId string
 
 @description('The resource ID of the VNet to which the private endpoint will be connected.')
 param spokeVNetId string
@@ -51,10 +51,10 @@ param networkingResourceGroup string
 var privateDnsZoneNames = 'privatelink.azurecr.io'
 var containerRegistryResourceName = 'registry'
 
-var managementVNetIdTokens = split(managementVNetId, '/')
-var managementSubscriptionId = managementVNetIdTokens[2]
-var managementResourceGroupName = managementVNetIdTokens[4]
-var managementVNetName = managementVNetIdTokens[8]
+// var managementVNetIdTokens = split(managementVNetId, '/')
+// var managementSubscriptionId = managementVNetIdTokens[2]
+// var managementResourceGroupName = managementVNetIdTokens[4]
+// var managementVNetName = managementVNetIdTokens[8]
 
 var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
@@ -76,10 +76,10 @@ var spokeVNetLinks = [
 // RESOURCES
 // ------------------
 
-resource managementVNet  'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
-  scope: resourceGroup(managementSubscriptionId, managementResourceGroupName)
-  name: managementVNetName
-}
+// resource managementVNet  'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
+//   scope: resourceGroup(managementSubscriptionId, managementResourceGroupName)
+//   name: managementVNetName
+// }
 
 resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)

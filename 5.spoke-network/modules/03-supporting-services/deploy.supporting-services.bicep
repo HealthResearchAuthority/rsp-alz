@@ -84,7 +84,7 @@ module containerRegistry './modules/container-registry.module.bicep' = {
     containerRegistryUserAssignedIdentityName: resourcesNames.containerRegistryUserAssignedIdentity
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
     deployZoneRedundantResources: deployZoneRedundantResources
-    managementVNetId: '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-manageddevopspool/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-devopspool'
+    //managementVNetId: '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-manageddevopspool/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-devopspool'
     networkRuleSetIpRules: [
       // {
       //   action: 'Allow'
