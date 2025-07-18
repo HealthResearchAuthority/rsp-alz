@@ -172,7 +172,7 @@ module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networki
   params: {
     location: location
     azServicePrivateDnsZoneName: 'privatelink.blob.${environment().suffixes.storage}'
-    azServiceId: fnstorage.outputs.id
+    azServiceId: fnstorage!.outputs.id
     privateEndpointName: take('pep-${storageAccountName}-blob', 64)
     privateEndpointSubResourceName: 'blob'
     virtualNetworkLinks: [
@@ -193,7 +193,7 @@ module storageFilesPrivateNetwork '../../../shared/bicep/network/private-network
   params: {
     location: location
     azServicePrivateDnsZoneName: 'privatelink.file.${environment().suffixes.storage}'
-    azServiceId: fnstorage.outputs.id
+    azServiceId: fnstorage!.outputs.id
     privateEndpointName: take('pep-${storageAccountName}-file', 64)
     privateEndpointSubResourceName: 'file'
     virtualNetworkLinks: [
@@ -246,8 +246,8 @@ module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-sp
   params: {
     location: location
     azServicePrivateDnsZoneName: 'privatelink.azurewebsites.net'
-    azServiceId: kind == 'app' ? webApp.outputs.resourceId : fnApp.outputs.functionAppId
-    privateEndpointName: kind == 'app' ? take('pep-${webApp.outputs.name}', 64) : take('pep-${fnApp.outputs.functionAppName}', 64)
+    azServiceId: kind == 'app' ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
+    privateEndpointName: kind == 'app' ? take('pep-${webApp!.outputs.name}', 64) : take('pep-${fnApp!.outputs.functionAppName}', 64)
     privateEndpointSubResourceName: 'sites'
     virtualNetworkLinks: [
       {
@@ -348,7 +348,7 @@ module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-sp
 // output appConfigStoreName string =  deployAppConfig ? appConfigStore.outputs.name : ''
 // output appConfigStoreId string = deployAppConfig ? appConfigStore.outputs.resourceId : ''
 // output webAppName string = webApp.outputs.name
- output appHostName string = (kind == 'app') ? webApp.outputs.defaultHostname: fnApp.outputs.defaultHostName
+ output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: fnApp!.outputs.defaultHostName
 // output webAppResourceId string = webApp.outputs.resourceId
 // output webAppLocation string = webApp.outputs.location
 // output webAppSystemAssignedPrincipalId string = webApp.outputs.systemAssignedPrincipalId
