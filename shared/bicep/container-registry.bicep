@@ -74,7 +74,7 @@ param dataEndpointEnabled bool = false
   'Enabled'
   'Disabled'
 ])
-param publicNetworkAccess string = 'Enabled'
+param publicNetworkAccess string = 'Disabled'
 
 @allowed([
   'AzureServices'
@@ -205,8 +205,8 @@ resource registry 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = 
     encryption: !empty(cMKKeyName) ? {
       status: 'enabled'
       keyVaultProperties: {
-        identity: cMKUserAssignedIdentity.properties.clientId
-        keyIdentifier: !empty(cMKKeyVersion) ? '${cMKKeyVaultKey.properties.keyUri}/${cMKKeyVersion}' : cMKKeyVaultKey.properties.keyUriWithVersion
+        identity: cMKUserAssignedIdentity!.properties.clientId
+        keyIdentifier: !empty(cMKKeyVersion) ? '${cMKKeyVaultKey!.properties.keyUri}/${cMKKeyVersion}' : cMKKeyVaultKey!.properties.keyUriWithVersion
       }
     } : null
     policies: {

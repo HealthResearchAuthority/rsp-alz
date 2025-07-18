@@ -1,0 +1,39 @@
+targetScope = 'managementGroup'
+
+// ------------------
+//    PARAMETERS
+// ------------------
+
+@description('The location where the resources will be created.')
+param paramvnetPeeringsVNetIDs string
+
+@description('VNet ID under managed devops pool subscription where the VNet peering will be created.')
+param manageddevopspoolVnetID string
+
+var managementVNetIdTokens = split(manageddevopspoolVnetID, '/')
+var managementSubscriptionId = managementVNetIdTokens[2]
+var managementResourceGroupName = managementVNetIdTokens[4]
+var managementVNetName = managementVNetIdTokens[8]
+
+var peeringVNetIds = split(paramvnetPeeringsVNetIDs, ',')
+
+// Loop through each VNet ID and extract subscriptionId and resourceGroupName
+var vnetInfoArray = [
+  for vnetId in peeringVNetIds: {
+    subscriptionId: split(vnetId, '/')[2]
+    resourceGroupName: split(vnetId, '/')[4]
+    vnetName: split(vnetId, '/')[8]
+  }
+]
+
+@description('Deploy VNet Peering')
+module vnetpeeringmodule 'modules/vnetpeering/vnetpeering.bicep' = {
+  name: take('01-vnetPeering-${deployment().name}', 64)
+  scope: subscription(managementSubscriptionId)
+  params: {
+    vnetPeeringsSpokes: vnetInfoArray
+    managementSubscriptionId: managementSubscriptionId
+    managementResourceGroupName: managementResourceGroupName
+    managementVNetName: managementVNetName
+  }
+}
