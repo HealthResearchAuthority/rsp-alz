@@ -160,7 +160,7 @@ module route '../../../shared/bicep/front-door/route.bicep' = {
     linkToDefaultDomain: true
     httpsRedirect: enableHttpsRedirect
     caching: cachingConfig
-    wafPolicyId: enableWaf ? wafPolicy.outputs.resourceId : ''
+    wafPolicyId: enableWaf ? wafPolicy!.outputs.resourceId : ''
   }
 }
 
@@ -184,7 +184,7 @@ output frontDoorEndpointHostName string = frontDoorEndpoint.outputs.hostName
 output originGroupId string = originGroup.outputs.resourceId
 
 @description('The resource ID of the WAF policy.')
-output wafPolicyId string = enableWaf ? wafPolicy.outputs.resourceId : ''
+output wafPolicyId string = enableWaf ? wafPolicy!.outputs.resourceId : ''
 
 @description('The URL of the Front Door endpoint.')
 output frontDoorUrl string = 'https://${frontDoorEndpoint.outputs.hostName}'
