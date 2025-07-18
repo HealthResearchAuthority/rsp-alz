@@ -81,7 +81,6 @@ var rateLimitRule = enableRateLimiting ? [
       }
     ]
     action: 'Block'
-    transforms: []
   }
 ] : []
 
