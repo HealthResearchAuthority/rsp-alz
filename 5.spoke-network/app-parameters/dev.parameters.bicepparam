@@ -41,7 +41,7 @@ param parFrontDoorRateLimitThreshold = 1000
 param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
-param parEnableFrontDoorPrivateLink = false
+param parEnableFrontDoorPrivateLink = true
 param parFrontDoorCustomDomains = []
 
 param parDefenderForStorageConfig = {
