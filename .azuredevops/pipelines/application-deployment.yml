@@ -19,7 +19,7 @@ parameters:
 jobs:
   - job: setup
     pool:
-      vmImage: 'ubuntu-latest'
+      name: rsp-manageddevopspool
     steps:
       - bash: | 
           ipaddress=$(curl -s http://ipinfo.io/ip)
@@ -31,7 +31,7 @@ jobs:
   - job: lint
     dependsOn: setup
     pool:
-      vmImage: 'ubuntu-latest'
+      name: rsp-manageddevopspool
     steps:
       - checkout: self
       - bash: |
@@ -42,7 +42,7 @@ jobs:
 
   - job: validate
     pool:
-      vmImage: 'ubuntu-latest'
+      name: rsp-manageddevopspool
     dependsOn: [setup, lint]
     variables:
       - name: devOpsPublicIP
@@ -68,7 +68,7 @@ jobs:
 
   - job: preview
     pool:
-      vmImage: 'ubuntu-latest'
+      name: rsp-manageddevopspool
     dependsOn: [setup, lint, validate]
     variables:
       - name: devOpsPublicIP
@@ -94,7 +94,7 @@ jobs:
 
   - job: deploy
     pool:
-      vmImage: 'ubuntu-latest'
+      name: rsp-manageddevopspool
     dependsOn: [setup, lint, validate, preview]
     variables:
       - name: devOpsPublicIP
