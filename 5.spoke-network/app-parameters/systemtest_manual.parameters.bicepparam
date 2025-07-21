@@ -33,6 +33,17 @@ param parFileUploadStorageConfig = {
   allowPublicAccess: false
 }
 
+// Azure Front Door Configuration
+param parEnableFrontDoor = true
+param parFrontDoorWafMode = 'Detection'
+param parEnableFrontDoorRateLimiting = true
+param parFrontDoorRateLimitThreshold = 1000
+param parEnableFrontDoorCaching = false
+param parFrontDoorCacheDuration = 'P1D'
+param parEnableFrontDoorHttpsRedirect = true
+param parEnableFrontDoorPrivateLink = false
+param parFrontDoorCustomDomains = []
+
 param parDefenderForStorageConfig = {
   enabled: true
   enableMalwareScanning: false

@@ -82,6 +82,10 @@ var resourceNames = {
   vmJumpBoxNsg: '${naming.resourceTypeAbbreviations.networkSecurityGroup}-${replace(namingBaseNoWorkloadName, resourceTypeToken, naming.resourceTypeAbbreviations.virtualMachine)}'
   vmJumpBoxNic: '${naming.resourceTypeAbbreviations.networkInterface}-${replace(namingBaseNoWorkloadName, resourceTypeToken, naming.resourceTypeAbbreviations.virtualMachine)}'
   frontDoor: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.frontDoor)
+  frontDoorEndpoint: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.frontDoorEndpoint)
+  frontDoorOriginGroup: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.frontDoorOriginGroup)
+  frontDoorRoute: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.frontDoorRoute)
+  frontDoorWaf: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.frontDoorWaf)
   azureAISearch: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azureAISearch )
   azureAISearchPep: '${naming.resourceTypeAbbreviations.privateEndpoint}-${replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azureAISearch )}'
   documentIntelligence: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.documentIntelligence )
