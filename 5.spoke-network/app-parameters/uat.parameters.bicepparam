@@ -15,7 +15,7 @@ param parFileUploadStorageConfig = {
 
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
-param parFrontDoorWafMode = 'Prevention'
+param parFrontDoorWafMode = 'Detection'
 param parEnableFrontDoorRateLimiting = true
 param parFrontDoorRateLimitThreshold = 1000
 param parEnableFrontDoorCaching = true

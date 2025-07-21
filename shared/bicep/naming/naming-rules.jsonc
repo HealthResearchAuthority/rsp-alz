@@ -12,7 +12,7 @@
         "containerRegistry": "cr",
         "cosmosDbNoSql": "cosno",
         "frontDoor": "afd",
-        "frontDoorEndpoint": "afd-ep",
+        "frontDoorEndpoint": "fd",
         "frontDoorOriginGroup": "og",
         "frontDoorRoute": "rt",
         "frontDoorWaf": "waf",
