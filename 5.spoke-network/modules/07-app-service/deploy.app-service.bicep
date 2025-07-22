@@ -141,6 +141,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
     siteConfigSelection:  (webAppBaseOs =~ 'linux') ? 'linuxNet9' : 'windowsNet9'
     hasPrivateLink: !empty (subnetPrivateEndpointId)
     systemAssignedIdentity: false
+    isPrivate: isPrivate
     userAssignedIdentities:  {
       type: 'UserAssigned'
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
