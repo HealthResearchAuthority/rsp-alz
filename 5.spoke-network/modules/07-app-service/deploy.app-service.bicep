@@ -142,8 +142,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
     siteConfigSelection:  (webAppBaseOs =~ 'linux') ? 'linuxNet9' : 'windowsNet9'
     hasPrivateLink: !empty (subnetPrivateEndpointId)
     systemAssignedIdentity: false
-    isPrivate: isPrivate
-    devOpsSubnetId: '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-manageddevopspool/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-devopspool/subnets/snet-devopspool'
+    subnetPrivateEndpointId: subnetPrivateEndpointId
     userAssignedIdentities:  {
       type: 'UserAssigned'
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))

@@ -43,11 +43,9 @@ param userAssignedIdentities object = {}
 @description('Optional. The resource ID of the assigned identity to be used to access a key vault with.')
 param keyVaultAccessIdentityResourceId string = ''
 
-@description('Determines if we are exposing apps to public')
-param isPrivate bool = false
 
-@description('DevOps Pool subnet for SCM access restrictions')
-param devOpsSubnetId string = ''
+@description('Optional. Resource ID of the subnet to deploy private endpoint in')
+param subnetPrivateEndpointId string = ''
 
 @description('Optional. Checks if Customer provided storage account is required.')
 param storageAccountRequired bool = false
@@ -135,7 +133,7 @@ param enabled bool = true
 param hostNameSslStates array = []
 
 @description('Optional, default is false. If true, then a private endpoint must be assigned to the web app')
-param hasPrivateLink bool
+param hasPrivateLink bool = false
 
 @description('Optional. Site redundancy mode.')
 @allowed([
@@ -220,7 +218,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     hostNameSslStates: hostNameSslStates
     hyperV: false
     redundancyMode: redundancyMode
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: hasPrivateLink ? 'Disabled' : 'Enabled'
   }
 }
 
@@ -233,44 +231,42 @@ resource webAppHostBinding 'Microsoft.Web/sites/hostNameBindings@2022-03-01' = i
   }
 }
 
-resource webAppConfig 'Microsoft.Web/sites/config@2022-09-01' = if (isPrivate) {
-  name: 'web'
-  parent: app
+// Private endpoint for web app
+resource webAppPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-04-01' = if (hasPrivateLink && !empty(subnetPrivateEndpointId)) {
+  name: 'pep-${app.name}'
+  location: location
+  tags: tags
   properties: {
-    ipSecurityRestrictions: [
+    subnet: {
+      id: subnetPrivateEndpointId
+    }
+    privateLinkServiceConnections: [
       {
-        action: 'Allow'
-        description: 'Allow access from Azure Front Door Backend'
-        name: 'AllowFrontDoorBackend'
-        priority: 100
-        tag: 'ServiceTag'
-        ipAddress: 'AzureFrontDoor.Backend'
-      }
-      {
-        action: 'Deny'
-        description: 'Deny all other access'
-        name: 'DenyAll'
-        priority: 2147483647
-        ipAddress: '0.0.0.0/0'
+        name: 'pep-${app.name}-connection'
+        properties: {
+          privateLinkServiceId: app.id
+          groupIds: [
+            'sites'
+          ]
+        }
       }
     ]
-    scmIpSecurityRestrictions: [
+  }
+}
+
+// Private DNS zone group for web app private endpoint
+resource webAppPrivateEndpointDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = if (hasPrivateLink && !empty(subnetPrivateEndpointId)) {
+  parent: webAppPrivateEndpoint
+  name: 'default'
+  properties: {
+    privateDnsZoneConfigs: [
       {
-        action: 'Allow'
-        description: 'Allow SCM access from DevOps pool subnet'
-        name: 'AllowDevOpsPoolSCM'
-        priority: 200
-        vnetSubnetResourceId: !empty(devOpsSubnetId) ? devOpsSubnetId : null
-      }
-      {
-        action: 'Deny'
-        description: 'Deny all other SCM access'
-        name: 'DenySCMAll'
-        priority: 2147483647
-        ipAddress: '0.0.0.0/0'
+        name: 'privatelink-azurewebsites-net'
+        properties: {
+          privateDnsZoneId: resourceId('Microsoft.Network/privateDnsZones', 'privatelink.azurewebsites.net')
+        }
       }
     ]
-    scmIpSecurityRestrictionsUseMain: false
   }
 }
 
