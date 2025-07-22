@@ -5,6 +5,7 @@ param devOpsPublicIPAddress string
 @description('Determines if we are exposing apps to public')
 param isPrivate bool
 
+
 @description('Required. Name of the App Service Plan.')
 @minLength(1)
 @maxLength(40)
@@ -142,6 +143,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
     hasPrivateLink: !empty (subnetPrivateEndpointId)
     systemAssignedIdentity: false
     isPrivate: isPrivate
+    devOpsSubnetId: '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-manageddevopspool/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-devopspool/subnets/snet-devopspool'
     userAssignedIdentities:  {
       type: 'UserAssigned'
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))

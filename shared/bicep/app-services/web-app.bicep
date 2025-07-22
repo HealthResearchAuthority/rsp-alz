@@ -46,6 +46,9 @@ param keyVaultAccessIdentityResourceId string = ''
 @description('Determines if we are exposing apps to public')
 param isPrivate bool = false
 
+@description('DevOps Pool subnet for SCM access restrictions')
+param devOpsSubnetId string = ''
+
 @description('Optional. Checks if Customer provided storage account is required.')
 param storageAccountRequired bool = false
 
@@ -217,18 +220,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     hostNameSslStates: hostNameSslStates
     hyperV: false
     redundancyMode: redundancyMode
-    publicNetworkAccess: isPrivate ? 'Disabled' : 'Enabled'
-    // ipSecurityRestrictions: [
-    //   {
-    //     action: 'Allow'
-    //     description: 'Allow access from within the network and from Azure DevOps'
-    //     name: 'Allow AzureDevOps'
-    //     priority: 300
-    //     tag: 'ServiceTag'
-    //     vnetSubnetResourceId: 'string'
-    //     vnetTrafficTag: int
-    //   }
-    // ]
+    publicNetworkAccess: 'Enabled'
   }
 }
 
@@ -238,6 +230,47 @@ resource webAppHostBinding 'Microsoft.Web/sites/hostNameBindings@2022-03-01' = i
   properties: {
     siteName: app.name
     hostNameType: 'Verified'
+  }
+}
+
+resource webAppConfig 'Microsoft.Web/sites/config@2022-09-01' = if (isPrivate) {
+  name: 'web'
+  parent: app
+  properties: {
+    ipSecurityRestrictions: [
+      {
+        action: 'Allow'
+        description: 'Allow access from Azure Front Door Backend'
+        name: 'AllowFrontDoorBackend'
+        priority: 100
+        tag: 'ServiceTag'
+        ipAddress: 'AzureFrontDoor.Backend'
+      }
+      {
+        action: 'Deny'
+        description: 'Deny all other access'
+        name: 'DenyAll'
+        priority: 2147483647
+        ipAddress: '0.0.0.0/0'
+      }
+    ]
+    scmIpSecurityRestrictions: [
+      {
+        action: 'Allow'
+        description: 'Allow SCM access from DevOps pool subnet'
+        name: 'AllowDevOpsPoolSCM'
+        priority: 200
+        vnetSubnetResourceId: !empty(devOpsSubnetId) ? devOpsSubnetId : null
+      }
+      {
+        action: 'Deny'
+        description: 'Deny all other SCM access'
+        name: 'DenySCMAll'
+        priority: 2147483647
+        ipAddress: '0.0.0.0/0'
+      }
+    ]
+    scmIpSecurityRestrictionsUseMain: false
   }
 }
 

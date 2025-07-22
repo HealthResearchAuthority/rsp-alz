@@ -107,6 +107,7 @@ param parEnableFrontDoorPrivateLink bool = false
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
 
+
 @description('Microsoft Defender for Storage configuration')
 param parDefenderForStorageConfig object = {
   enabled: false
@@ -123,6 +124,7 @@ param parOverrideSubscriptionLevelSettings bool = false
 // ------------------
 
 var sqlServerNamePrefix = 'rspsqlserver'
+
 
 
 // ------------------
