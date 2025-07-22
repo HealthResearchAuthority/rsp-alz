@@ -556,7 +556,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       ]
       devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
+      isPrivate: parEnableFrontDoorPrivateLink
     }
   }
 ]

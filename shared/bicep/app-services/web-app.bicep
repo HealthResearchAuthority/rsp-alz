@@ -43,6 +43,9 @@ param userAssignedIdentities object = {}
 @description('Optional. The resource ID of the assigned identity to be used to access a key vault with.')
 param keyVaultAccessIdentityResourceId string = ''
 
+@description('Determines if we are exposing apps to public')
+param isPrivate bool = false
+
 @description('Optional. Checks if Customer provided storage account is required.')
 param storageAccountRequired bool = false
 
@@ -214,7 +217,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     hostNameSslStates: hostNameSslStates
     hyperV: false
     redundancyMode: redundancyMode
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: isPrivate ? 'Disabled' : 'Enabled'
     // ipSecurityRestrictions: [
     //   {
     //     action: 'Allow'
