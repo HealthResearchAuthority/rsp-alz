@@ -34,8 +34,6 @@ param location string
 @description('Resource tags that we might need to add to all resources (i.e. Environment, Cost center, application name etc)')
 param tags object
 
-@description('Default is empty. If empty no Private Endpoint will be created for the resoure. Otherwise, the subnet where the private endpoint will be attached to')
-param subnetPrivateEndpointId string = ''
 
 param subnetPrivateEndpointSubnetId string
 
@@ -140,9 +138,8 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
     virtualNetworkSubnetId: subnetIdForVnetInjection
     appInsightId: appInsights.outputs.appInsResourceId
     siteConfigSelection:  (webAppBaseOs =~ 'linux') ? 'linuxNet9' : 'windowsNet9'
-    hasPrivateLink: !empty (subnetPrivateEndpointId)
+    hasPrivateLink: deployAppPrivateEndPoint
     systemAssignedIdentity: false
-    subnetPrivateEndpointId: subnetPrivateEndpointId
     userAssignedIdentities:  {
       type: 'UserAssigned'
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))

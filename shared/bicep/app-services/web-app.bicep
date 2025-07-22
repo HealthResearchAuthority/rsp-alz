@@ -44,8 +44,6 @@ param userAssignedIdentities object = {}
 param keyVaultAccessIdentityResourceId string = ''
 
 
-@description('Optional. Resource ID of the subnet to deploy private endpoint in')
-param subnetPrivateEndpointId string = ''
 
 @description('Optional. Checks if Customer provided storage account is required.')
 param storageAccountRequired bool = false
@@ -231,44 +229,6 @@ resource webAppHostBinding 'Microsoft.Web/sites/hostNameBindings@2022-03-01' = i
   }
 }
 
-// Private endpoint for web app
-resource webAppPrivateEndpoint 'Microsoft.Network/privateEndpoints@2023-04-01' = if (hasPrivateLink && !empty(subnetPrivateEndpointId)) {
-  name: 'pep-${app.name}'
-  location: location
-  tags: tags
-  properties: {
-    subnet: {
-      id: subnetPrivateEndpointId
-    }
-    privateLinkServiceConnections: [
-      {
-        name: 'pep-${app.name}-connection'
-        properties: {
-          privateLinkServiceId: app.id
-          groupIds: [
-            'sites'
-          ]
-        }
-      }
-    ]
-  }
-}
-
-// Private DNS zone group for web app private endpoint
-resource webAppPrivateEndpointDnsZoneGroup 'Microsoft.Network/privateEndpoints/privateDnsZoneGroups@2023-04-01' = if (hasPrivateLink && !empty(subnetPrivateEndpointId)) {
-  parent: webAppPrivateEndpoint
-  name: 'default'
-  properties: {
-    privateDnsZoneConfigs: [
-      {
-        name: 'privatelink-azurewebsites-net'
-        properties: {
-          privateDnsZoneId: resourceId('Microsoft.Network/privateDnsZones', 'privatelink.azurewebsites.net')
-        }
-      }
-    ]
-  }
-}
 
 @batchSize(1)
 module app_slots 'web-app.slots.bicep' = [for (slot, index) in slots: {
