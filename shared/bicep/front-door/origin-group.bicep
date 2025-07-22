@@ -71,6 +71,7 @@ resource origin 'Microsoft.Cdn/profiles/originGroups/origins@2023-05-01' = [for 
       }
       privateLinkLocation: originConfig.?privateLinkLocation ?? resourceGroup().location
       requestMessage: originConfig.?privateLinkRequestMessage ?? 'Request access for Front Door'
+      groupId: originConfig.?groupId ?? 'sites'
     } : null
   }
 }]

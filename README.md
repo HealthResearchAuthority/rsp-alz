@@ -124,6 +124,35 @@ Defender for Storage uses a two-step deployment approach to avoid Event Grid web
 
 This approach follows Infrastructure as Code best practices with clean separation between infrastructure and application deployment phases.
 
+## Front Door Configuration
+
+### Private Link Approval Process
+
+When Front Door private link is enabled, the private endpoint connection requires manual approval:
+
+#### Step 1: Navigate to App Service
+1. Go to **Azure Portal** (https://portal.azure.com)
+2. Search for your App Service: `irasportal-{environment}` 
+3. Select your IRAS Portal App Service
+
+#### Step 2: Access Private Endpoint Settings
+1. In the left sidebar, click **Settings** → **Networking**
+2. Look for **"Private endpoint connections"** section
+3. Click **"Configure your private endpoint connections"**
+
+#### Step 3: Approve the Connection
+1. You'll see a **pending connection** from Azure Front Door Premium
+2. Status will show **"Pending"** with a request from Microsoft/Front Door
+3. **Select the pending connection**
+4. Click **"Approve"** button
+5. Optionally add an approval message
+6. Click **"OK"** or **"Save"**
+
+#### Step 4: Wait for Propagation
+1. Status changes to **"Approved"** then **"Connected"**
+2. **Wait 3-5 minutes** for Azure to propagate the connection
+3. Re-deploy if the initial deployment failed due to pending approval
+
 ### Configuration
 
 #### Enable Event Grid Subscriptions

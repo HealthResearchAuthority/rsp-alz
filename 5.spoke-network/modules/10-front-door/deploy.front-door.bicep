@@ -75,6 +75,7 @@ var originConfig = {
   privateLinkResourceId: enablePrivateLink ? webAppResourceId : null
   privateLinkLocation: enablePrivateLink ? location : null
   privateLinkRequestMessage: enablePrivateLink ? 'Request access for Front Door to ${webAppName}' : null
+  groupId: enablePrivateLink ? 'sites' : null
 }
 
 var cachingConfig = {

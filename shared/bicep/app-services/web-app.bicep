@@ -43,6 +43,8 @@ param userAssignedIdentities object = {}
 @description('Optional. The resource ID of the assigned identity to be used to access a key vault with.')
 param keyVaultAccessIdentityResourceId string = ''
 
+
+
 @description('Optional. Checks if Customer provided storage account is required.')
 param storageAccountRequired bool = false
 
@@ -129,7 +131,7 @@ param enabled bool = true
 param hostNameSslStates array = []
 
 @description('Optional, default is false. If true, then a private endpoint must be assigned to the web app')
-param hasPrivateLink bool
+param hasPrivateLink bool = false
 
 @description('Optional. Site redundancy mode.')
 @allowed([
@@ -214,18 +216,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     hostNameSslStates: hostNameSslStates
     hyperV: false
     redundancyMode: redundancyMode
-    publicNetworkAccess: 'Enabled'
-    // ipSecurityRestrictions: [
-    //   {
-    //     action: 'Allow'
-    //     description: 'Allow access from within the network and from Azure DevOps'
-    //     name: 'Allow AzureDevOps'
-    //     priority: 300
-    //     tag: 'ServiceTag'
-    //     vnetSubnetResourceId: 'string'
-    //     vnetTrafficTag: int
-    //   }
-    // ]
+    publicNetworkAccess: hasPrivateLink ? 'Disabled' : 'Enabled'
   }
 }
 
@@ -237,6 +228,7 @@ resource webAppHostBinding 'Microsoft.Web/sites/hostNameBindings@2022-03-01' = i
     hostNameType: 'Verified'
   }
 }
+
 
 @batchSize(1)
 module app_slots 'web-app.slots.bicep' = [for (slot, index) in slots: {
