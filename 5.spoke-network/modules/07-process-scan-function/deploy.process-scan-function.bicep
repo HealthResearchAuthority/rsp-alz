@@ -36,6 +36,11 @@ param userAssignedIdentities array
 @maxLength(40)
 param appServicePlanName string
 
+@description('SQL Database managed identity client ID for database access')
+param sqlDBManagedIdentityClientId string = ''
+
+// Note: Storage permissions are handled separately in main.application.bicep following the original pattern
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -63,12 +68,16 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
     storageAccountName: storageAccountName
     deployAppPrivateEndPoint: false
     userAssignedIdentities: userAssignedIdentities
+    sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     devOpsPublicIPAddress: ''
     isPrivate: false
     logAnalyticsWsId: logAnalyticsWorkspaceId
     createPrivateDnsZones: false
   }
 }
+
+// Note: Storage permissions are deployed separately in main.application.bicep to avoid circular dependency
+// This follows the original working pattern where permissions are handled externally
 
 // ------------------
 // OUTPUTS
@@ -85,3 +94,6 @@ output webhookEndpoint string = 'https://${functionApp.outputs.appHostName}/api/
 
 @description('The Function App URL.')
 output functionAppUrl string = 'https://${functionApp.outputs.appHostName}'
+
+@description('The system-assigned managed identity principal ID of the Function App.')
+output systemAssignedPrincipalId string = functionApp.outputs.systemAssignedPrincipalId

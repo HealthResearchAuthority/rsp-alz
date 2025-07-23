@@ -349,6 +349,7 @@ module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-sp
 // output webAppName string = webApp.outputs.name
 output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: fnApp!.outputs.defaultHostName
 output webAppResourceId string = (kind == 'app') ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
+output systemAssignedPrincipalId string = (kind == 'app') ? webApp!.outputs.systemAssignedPrincipalId : fnApp!.outputs.systemAssignedPrincipalId
 // output webAppLocation string = webApp.outputs.location
 // output webAppSystemAssignedPrincipalId string = webApp.outputs.systemAssignedPrincipalId
 

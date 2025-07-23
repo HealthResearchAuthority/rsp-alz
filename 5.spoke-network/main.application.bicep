@@ -333,10 +333,14 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        databaseserver[i].outputs.outputsqlServerUAIID
       ]
+      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+      // documentStorageAccountIds will be added in a separate deployment phase to avoid circular dependency
     }
     dependsOn: [
       applicationsRG
+      databaseserver
     ]
   }
 ]
@@ -352,7 +356,6 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       spokeVNetId: existingVnet[i].id
       spokePrivateEndpointSubnetName: pepSubnet[i].name
       storageConfig: parFileUploadStorageConfig
-      resourcesNames: storageServicesNaming[i].outputs.resourcesNames
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
       enableMalwareScanning: true
@@ -689,6 +692,22 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
     dependsOn: [
       fnNotifyApp
       databaseserver
+    ]
+  }
+]
+
+// Grant process scan function permissions to all document storage accounts
+module processScanFunctionPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('processScanFunctionPermissions-${deployment().name}-deployment', 64)
+    params: {
+      functionAppPrincipalId: processScanFnApp[i].outputs.systemAssignedPrincipalId
+      storageAccountIds: documentUpload[i].outputs.allStorageAccountIds
+    }
+    dependsOn: [
+      processScanFnApp
+      documentUpload
     ]
   }
 ]
