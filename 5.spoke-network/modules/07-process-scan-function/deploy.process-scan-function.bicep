@@ -36,6 +36,9 @@ param userAssignedIdentities array
 @maxLength(40)
 param appServicePlanName string
 
+@description('Enable private endpoint for function app')
+param deployAppPrivateEndPoint bool = false
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -61,10 +64,8 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
     subnetPrivateEndpointSubnetId: subnetPrivateEndpointSubnetId
     kind: 'functionapp'
     storageAccountName: storageAccountName
-    deployAppPrivateEndPoint: false
+    deployAppPrivateEndPoint: deployAppPrivateEndPoint
     userAssignedIdentities: userAssignedIdentities
-    devOpsPublicIPAddress: ''
-    isPrivate: false
     logAnalyticsWsId: logAnalyticsWorkspaceId
     createPrivateDnsZones: false
   }

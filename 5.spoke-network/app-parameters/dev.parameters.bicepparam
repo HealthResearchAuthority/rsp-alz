@@ -42,6 +42,7 @@ param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
 param parEnableFrontDoorPrivateLink = true
+param parEnableFunctionAppPrivateEndpoints = false
 param parFrontDoorCustomDomains = []
 
 param parDefenderForStorageConfig = {

@@ -1,11 +1,4 @@
 
-@description('DevOps Public IP Address')
-param devOpsPublicIPAddress string
-
-@description('Determines if we are exposing apps to public')
-param isPrivate bool
-
-
 @description('Required. Name of the App Service Plan.')
 @minLength(1)
 @maxLength(40)
@@ -87,15 +80,9 @@ var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
 var spokeResourceGroupName = spokeVNetIdTokens[4]
 var spokeVNetName = spokeVNetIdTokens[8]
-var networkAcls = isPrivate ? {
+var networkAcls = deployAppPrivateEndPoint ? {
   defaultAction: 'Deny'
   bypass: 'AzureServices'
-  ipRules: devOpsPublicIPAddress == '' ? [] : [
-    {
-      value: devOpsPublicIPAddress
-      action: 'Allow'
-    }
-  ]
 } : {
   defaultAction: 'Allow'
   bypass: 'AzureServices'
@@ -165,7 +152,7 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
   }
 }
 
-module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && isPrivate == true && createPrivateDnsZones) {
+module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && deployAppPrivateEndPoint == true && createPrivateDnsZones) {
   name:take('rtsfnStorageBlobPrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
@@ -186,7 +173,7 @@ module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networki
   }
 }
 
-module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && createPrivateDnsZones) {
+module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && deployAppPrivateEndPoint == true && createPrivateDnsZones) {
   name:take('rtsfnStorageFilePrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
@@ -217,7 +204,6 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     functionAppName:  appName
     location: location
     serverFarmResourceId: appSvcPlan.outputs.resourceId
-    //diagnosticWorkspaceId: logAnalyticsWsId
     virtualNetworkSubnetId: subnetIdForVnetInjection
     appInsightId: appInsights.outputs.appInsResourceId
     userAssignedIdentities:  {
@@ -225,8 +211,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
     }
     storageAccountName: storageAccountName
-    isPrivate: isPrivate
-    devOpsPublicIPAddress: devOpsPublicIPAddress
+    hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
   }
   dependsOn: [
