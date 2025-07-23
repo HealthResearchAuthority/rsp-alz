@@ -70,11 +70,54 @@ param parSpokeNetworks array
 
 @description('File upload storage account configuration')
 param parFileUploadStorageConfig object = {
-  containerName: 'document-uploads'
+  containerName: 'staging'
   sku: 'Standard_LRS'
   accessTier: 'Hot'
   allowPublicAccess: false
 }
+
+@description('Enable Azure Front Door deployment')
+param parEnableFrontDoor bool = true
+
+@description('Front Door WAF policy mode')
+@allowed([
+  'Detection'
+  'Prevention'
+])
+param parFrontDoorWafMode string = 'Prevention'
+
+@description('Enable Front Door rate limiting')
+param parEnableFrontDoorRateLimiting bool = true
+
+@description('Front Door rate limit threshold (requests per minute)')
+param parFrontDoorRateLimitThreshold int = 1000
+
+@description('Enable Front Door caching')
+param parEnableFrontDoorCaching bool = true
+
+@description('Front Door cache duration')
+param parFrontDoorCacheDuration string = 'P1D'
+
+@description('Enable Front Door HTTPS redirect')
+param parEnableFrontDoorHttpsRedirect bool = true
+
+@description('Enable Front Door Private Link to origin')
+param parEnableFrontDoorPrivateLink bool = false
+
+@description('Front Door custom domains configuration')
+param parFrontDoorCustomDomains array = []
+
+
+@description('Microsoft Defender for Storage configuration')
+param parDefenderForStorageConfig object = {
+  enabled: false
+  enableMalwareScanning: false
+  enableSensitiveDataDiscovery: false
+  enforce: false
+}
+
+@description('Override subscription level settings for storage account level defender configuration')
+param parOverrideSubscriptionLevelSettings bool = false
 
 // ------------------
 // VARIABLES
@@ -82,9 +125,22 @@ param parFileUploadStorageConfig object = {
 
 var sqlServerNamePrefix = 'rspsqlserver'
 
+
+
 // ------------------
 // RESOURCES
 // ------------------
+
+module defenderStorage '../shared/bicep/security/defender-storage.bicep' = {
+  name: take('defenderStorage-${deployment().name}', 64)
+  scope: subscription()
+  params: {
+    enableDefenderForStorage: parDefenderForStorageConfig.enabled
+    enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
+    enableSensitiveDataDiscovery: parDefenderForStorageConfig.enableSensitiveDataDiscovery
+    enforce: parDefenderForStorageConfig.enforce
+  }
+}
 
 module sharedServicesRG '../shared/bicep/resourceGroup.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -260,6 +316,32 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 ]
 
+// Process scan Function App (created first to get webhook endpoint for Event Grid)
+module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-function.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('processScanFnApp-${deployment().name}-deployment', 64)
+    params: {
+      functionAppName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
+      location: location
+      tags: tags
+      appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
+      storageAccountName: 'stprocessdocupld${parSpokeNetworks[i].parEnvironment}'
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      ]
+    }
+    dependsOn: [
+      applicationsRG
+    ]
+  }
+]
+
+// Document upload storage with malware scanning enabled (other storage accounts inherit subscription-level settings)
 module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('documentUpload-${deployment().name}-deployment', 64)
@@ -273,7 +355,18 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       resourcesNames: storageServicesNaming[i].outputs.resourcesNames
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
+      enableMalwareScanning: true
+      overrideSubscriptionLevelSettings: parOverrideSubscriptionLevelSettings
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      enableEventGridIntegration: true
+      enableEventGridSubscriptions: false  // Set to true only after Function App code is deployed and webhook endpoint is ready
+      processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint
     }
+    dependsOn: [
+      defenderStorage
+      storageRG
+      processScanFnApp
+    ]
   }
 ]
 
@@ -460,12 +553,12 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'app'
-      deployAppPrivateEndPoint: false
+      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       ]
       devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
+      isPrivate: parEnableFrontDoorPrivateLink
     }
   }
 ]
@@ -537,6 +630,68 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
+module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): if (parEnableFrontDoor) {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('frontDoor-${deployment().name}-deployment', 64)
+    params: {
+      location: location
+      tags: tags
+      resourcesNames: applicationServicesNaming[i].outputs.resourcesNames
+      originHostName: webApp[i].outputs.appHostName
+      webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
+      enableWaf: true
+      wafMode: parFrontDoorWafMode
+      enableRateLimiting: parEnableFrontDoorRateLimiting
+      rateLimitThreshold: parFrontDoorRateLimitThreshold
+      customDomains: parFrontDoorCustomDomains
+      enableCaching: parEnableFrontDoorCaching
+      cacheDuration: parFrontDoorCacheDuration
+      enableHttpsRedirect: parEnableFrontDoorHttpsRedirect
+      enableManagedTls: true
+      webAppResourceId: webApp[i].outputs.webAppResourceId
+      enablePrivateLink: parEnableFrontDoorPrivateLink
+    }
+    dependsOn: [
+      webApp
+    ]
+  }
+]
+
+module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('fnDocumentApiApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: 'B1'
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: 'asp-rsp-fnDocApi-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'func-documentapi-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Windows'
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stdocapi${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: false
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        databaseserver[i].outputs.outputsqlServerUAIID
+      ]
+      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+      devOpsPublicIPAddress: parDevOpsPublicIPAddress
+      isPrivate: false
+    }
+    dependsOn: [
+      fnNotifyApp
+      databaseserver
+    ]
+  }
+]
 // module applicationGateway 'modules/08-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
 //   name: take('applicationGateway-${deployment().name}-deployment', 64)
 //   scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgNetworking)

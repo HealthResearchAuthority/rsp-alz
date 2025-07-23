@@ -35,14 +35,14 @@ param appSettingsKeyValuePairs object = {}
 // Variables   //
 // =========== //
 var azureWebJobsValues = !empty(storageAccountId) ? union({
-    AzureWebJobsStorage: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};'
+    AzureWebJobsStorage: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount!.name};AccountKey=${storageAccount!.listKeys().keys[0].value};'
   }, ((setAzureWebJobsDashboard == true) ? {
-    AzureWebJobsDashboard: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${storageAccount.listKeys().keys[0].value};'
+    AzureWebJobsDashboard: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount!.name};AccountKey=${storageAccount!.listKeys().keys[0].value};'
   } : {})) : {}
 
 var appInsightsValues = !empty(appInsightId) ? {
-  APPINSIGHTS_INSTRUMENTATIONKEY: appInsight.properties.InstrumentationKey
-  APPLICATIONINSIGHTS_CONNECTION_STRING: appInsight.properties.ConnectionString
+  APPINSIGHTS_INSTRUMENTATIONKEY: appInsight!.properties.InstrumentationKey
+  APPLICATIONINSIGHTS_CONNECTION_STRING: appInsight!.properties.ConnectionString
   XDT_MicrosoftApplicationInsights_Mode: 'recommended'
   ApplicationInsightsAgent_EXTENSION_VERSION: contains(kind, 'linux') ? '~3' : '~2'
 } : {}

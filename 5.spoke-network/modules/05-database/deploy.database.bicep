@@ -171,6 +171,9 @@ resource serverSecurityAlertPolicy 'Microsoft.Sql/servers/securityAlertPolicies@
       'nikhil.bharathesh_pa@hra.nhs.uk'
     ]
   }
+  dependsOn: [
+    advancedThreatProtection
+  ]
 }
 
 resource sqlVulnerabilityAssessment 'Microsoft.Sql/servers/sqlVulnerabilityAssessments@2022-11-01-preview' = {
@@ -179,6 +182,9 @@ resource sqlVulnerabilityAssessment 'Microsoft.Sql/servers/sqlVulnerabilityAsses
   properties: {
     state: 'Enabled'
   }
+  dependsOn: [
+    serverSecurityAlertPolicy
+  ]
 }
 
 resource sqlAuditingSetting 'Microsoft.Sql/servers/auditingSettings@2024-05-01-preview' = if (enableSqlServerAuditing) {

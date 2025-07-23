@@ -5,6 +5,7 @@ param devOpsPublicIPAddress string
 @description('Determines if we are exposing apps to public')
 param isPrivate bool
 
+
 @description('Required. Name of the App Service Plan.')
 @minLength(1)
 @maxLength(40)
@@ -33,8 +34,6 @@ param location string
 @description('Resource tags that we might need to add to all resources (i.e. Environment, Cost center, application name etc)')
 param tags object
 
-@description('Default is empty. If empty no Private Endpoint will be created for the resoure. Otherwise, the subnet where the private endpoint will be attached to')
-param subnetPrivateEndpointId string = ''
 
 param subnetPrivateEndpointSubnetId string
 
@@ -69,6 +68,9 @@ param deploySlot bool
 
 param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
+
+@description('Create private DNS zones (set to false if zones already exist)')
+param createPrivateDnsZones bool = true
 
 // @description('The name of an existing keyvault, that it will be used to store secrets (connection string)' )
 // param keyvaultName string
@@ -136,7 +138,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
     virtualNetworkSubnetId: subnetIdForVnetInjection
     appInsightId: appInsights.outputs.appInsResourceId
     siteConfigSelection:  (webAppBaseOs =~ 'linux') ? 'linuxNet9' : 'windowsNet9'
-    hasPrivateLink: !empty (subnetPrivateEndpointId)
+    hasPrivateLink: deployAppPrivateEndPoint
     systemAssignedIdentity: false
     userAssignedIdentities:  {
       type: 'UserAssigned'
@@ -163,13 +165,13 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
   }
 }
 
-module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && isPrivate == true) {
+module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && isPrivate == true && createPrivateDnsZones) {
   name:take('rtsfnStorageBlobPrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
     location: location
     azServicePrivateDnsZoneName: 'privatelink.blob.${environment().suffixes.storage}'
-    azServiceId: fnstorage.outputs.id
+    azServiceId: fnstorage!.outputs.id
     privateEndpointName: take('pep-${storageAccountName}-blob', 64)
     privateEndpointSubResourceName: 'blob'
     virtualNetworkLinks: [
@@ -184,13 +186,13 @@ module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networki
   }
 }
 
-module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp') {
+module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && createPrivateDnsZones) {
   name:take('rtsfnStorageFilePrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
     location: location
     azServicePrivateDnsZoneName: 'privatelink.file.${environment().suffixes.storage}'
-    azServiceId: fnstorage.outputs.id
+    azServiceId: fnstorage!.outputs.id
     privateEndpointName: take('pep-${storageAccountName}-file', 64)
     privateEndpointSubResourceName: 'file'
     virtualNetworkLinks: [
@@ -243,8 +245,8 @@ module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-sp
   params: {
     location: location
     azServicePrivateDnsZoneName: 'privatelink.azurewebsites.net'
-    azServiceId: kind == 'app' ? webApp.outputs.resourceId : fnApp.outputs.functionAppId
-    privateEndpointName: kind == 'app' ? take('pep-${webApp.outputs.name}', 64) : take('pep-${fnApp.outputs.functionAppName}', 64)
+    azServiceId: kind == 'app' ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
+    privateEndpointName: kind == 'app' ? take('pep-${webApp!.outputs.name}', 64) : take('pep-${fnApp!.outputs.functionAppName}', 64)
     privateEndpointSubResourceName: 'sites'
     virtualNetworkLinks: [
       {
@@ -345,8 +347,8 @@ module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-sp
 // output appConfigStoreName string =  deployAppConfig ? appConfigStore.outputs.name : ''
 // output appConfigStoreId string = deployAppConfig ? appConfigStore.outputs.resourceId : ''
 // output webAppName string = webApp.outputs.name
- output appHostName string = (kind == 'app') ? webApp.outputs.defaultHostname: fnApp.outputs.defaultHostName
-// output webAppResourceId string = webApp.outputs.resourceId
+output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: fnApp!.outputs.defaultHostName
+output webAppResourceId string = (kind == 'app') ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
 // output webAppLocation string = webApp.outputs.location
 // output webAppSystemAssignedPrincipalId string = webApp.outputs.systemAssignedPrincipalId
 
