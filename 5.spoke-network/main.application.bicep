@@ -731,7 +731,7 @@ module processScanFunctionPermissions '../shared/bicep/role-assignments/process-
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('processScanFunctionPermissions-${deployment().name}-deployment', 64)
     params: {
-      functionAppPrincipalId: processScanFnApp[i].outputs.systemAssignedPrincipalId
+      functionAppPrincipalId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityPrincipalId
       storageAccountIds: documentUpload[i].outputs.allStorageAccountIds
     }
     dependsOn: [
