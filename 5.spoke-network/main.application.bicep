@@ -337,6 +337,7 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       ]
       deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
     }
     dependsOn: [
       applicationsRG

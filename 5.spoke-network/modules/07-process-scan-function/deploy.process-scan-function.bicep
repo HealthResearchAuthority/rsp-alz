@@ -39,6 +39,9 @@ param appServicePlanName string
 @description('Enable private endpoint for function app')
 param deployAppPrivateEndPoint bool = false
 
+@description('Resource Group where PEP and PEP DNS needs to be deployed')
+param privateEndpointRG string = resourceGroup().name
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -59,7 +62,7 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
     webAppBaseOs: 'Windows'
     subnetIdForVnetInjection: subnetIdForVnetInjection
     deploySlot: false
-    privateEndpointRG: resourceGroup().name
+    privateEndpointRG: privateEndpointRG
     spokeVNetId: spokeVNetId
     subnetPrivateEndpointSubnetId: subnetPrivateEndpointSubnetId
     kind: 'functionapp'
