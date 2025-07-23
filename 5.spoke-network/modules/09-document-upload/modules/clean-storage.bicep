@@ -25,6 +25,19 @@ param spokePrivateEndpointSubnetName string
 @description('Networking resource group name')
 param networkingResourceGroup string
 
+@description('Enable blob delete retention policy')
+param enableDeleteRetentionPolicy bool = true
+
+@description('Number of days to retain deleted blobs')
+param retentionPolicyDays int = 365
+
+@description('Network security configuration for storage account')
+param networkSecurityConfig object = {
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+}
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -71,13 +84,13 @@ module storageAccount '../../../../shared/bicep/storage/storage.bicep' = {
     name: 'strspclean${environment}'
     location: location
     tags: tags
-    kind: 'StorageV2'
+    kind: storageConfig.?kind ?? 'StorageV2'
     sku: storageConfig.sku
     accessTier: storageConfig.accessTier
-    supportsHttpsTrafficOnly: true
+    supportsHttpsTrafficOnly: networkSecurityConfig.httpsTrafficOnly
     networkAcls: {
-      defaultAction: 'Deny'
-      bypass: 'AzureServices'
+      defaultAction: networkSecurityConfig.defaultAction
+      bypass: networkSecurityConfig.bypass
       ipRules: []
       virtualNetworkRules: []
     }
@@ -101,11 +114,11 @@ module blobService '../../../../shared/bicep/storage/storage.blobsvc.bicep' = {
   name: 'cleanStorageBlobService'
   params: {
     storageAccountName: storageAccount.outputs.name
-    deleteRetentionPolicy: true
-    deleteRetentionPolicyDays: 365  // Long retention for clean files
+    deleteRetentionPolicy: enableDeleteRetentionPolicy
+    deleteRetentionPolicyDays: retentionPolicyDays
     containers: [
       {
-        name: 'clean'
+        name: storageConfig.containerName
         publicAccess: 'None'
       }
     ]
@@ -142,4 +155,4 @@ output managedIdentityPrincipalId string = managedIdentity.outputs.principalId
 output managedIdentityClientId string = managedIdentity.outputs.clientId
 
 @description('The name of the clean blob container.')
-output containerName string = 'clean'
+output containerName string = storageConfig.containerName

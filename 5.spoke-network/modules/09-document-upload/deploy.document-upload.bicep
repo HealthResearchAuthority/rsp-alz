@@ -16,8 +16,6 @@ param spokeVNetId string
 @description('The name of the subnet in the VNet to which the private endpoint will be connected.')
 param spokePrivateEndpointSubnetName string
 
-@description('File upload storage account configuration')
-param storageConfig object
 
 @description('Networking resource group name')
 param networkingResourceGroup string
@@ -43,6 +41,43 @@ param enableEventGridSubscriptions bool = false
 @description('Process scan Function App webhook endpoint URL')
 param processScanWebhookEndpoint string = ''
 
+@description('Enable blob delete retention policy')
+param enableDeleteRetentionPolicy bool = true
+
+@description('Blob delete retention policy configuration per storage type')
+param retentionPolicyDays object = {
+  staging: 7     // Short retention for staging files
+  clean: 365     // Long retention for production files
+  quarantine: 15 // Forensic retention for quarantine files
+}
+
+@description('Storage account configuration per storage type')
+param storageAccountConfig object = {
+  staging: {
+    sku: 'Standard_LRS'
+    accessTier: 'Hot'
+    containerName: 'staging'
+  }
+  clean: {
+    sku: 'Standard_GRS'  
+    accessTier: 'Hot'
+    containerName: 'clean'
+  }
+  quarantine: {
+    sku: 'Standard_LRS'
+    accessTier: 'Cool' 
+    containerName: 'quarantine'
+  }
+}
+
+@description('Network security configuration for storage accounts')
+param networkSecurityConfig object = {
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+  quarantineBypass: 'None'
+}
+
 // ------------------
 // RESOURCES
 // ------------------
@@ -54,7 +89,7 @@ module stagingStorage 'modules/staging-storage.bicep' = {
     location: location
     tags: tags
     environment: environment
-    storageConfig: storageConfig
+    storageConfig: storageAccountConfig.staging
     spokeVNetId: spokeVNetId
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     networkingResourceGroup: networkingResourceGroup
@@ -64,6 +99,9 @@ module stagingStorage 'modules/staging-storage.bicep' = {
     enableEventGridIntegration: enableEventGridIntegration
     enableEventGridSubscriptions: enableEventGridSubscriptions
     processScanWebhookEndpoint: processScanWebhookEndpoint
+    enableDeleteRetentionPolicy: enableDeleteRetentionPolicy
+    retentionPolicyDays: retentionPolicyDays.staging
+    networkSecurityConfig: networkSecurityConfig
   }
 }
 
@@ -74,14 +112,17 @@ module cleanStorage 'modules/clean-storage.bicep' = {
     location: location
     tags: tags
     environment: environment
-    storageConfig: {
-      sku: 'Standard_GRS'  // Higher availability for production files
-      accessTier: 'Hot'    // Frequent access for clean files
-    }
+    storageConfig: storageAccountConfig.clean
     spokeVNetId: spokeVNetId
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     networkingResourceGroup: networkingResourceGroup
+    enableDeleteRetentionPolicy: enableDeleteRetentionPolicy
+    retentionPolicyDays: retentionPolicyDays.clean
+    networkSecurityConfig: networkSecurityConfig
   }
+  dependsOn: [
+    stagingStorage  // Deploy after staging to avoid DNS zone conflicts
+  ]
 }
 
 // Quarantine Storage Account - For infected/suspicious files
@@ -91,12 +132,18 @@ module quarantineStorage 'modules/quarantine-storage.bicep' = {
     location: location
     tags: tags
     environment: environment
-    // Quarantine storage parameters optimized for security and cost
+    storageConfig: storageAccountConfig.quarantine
     spokeVNetId: spokeVNetId
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     networkingResourceGroup: networkingResourceGroup
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    enableDeleteRetentionPolicy: enableDeleteRetentionPolicy
+    retentionPolicyDays: retentionPolicyDays.quarantine
+    networkSecurityConfig: networkSecurityConfig
   }
+  dependsOn: [
+    cleanStorage  // Deploy after clean storage to avoid DNS zone conflicts
+  ]
 }
 
 // ------------------

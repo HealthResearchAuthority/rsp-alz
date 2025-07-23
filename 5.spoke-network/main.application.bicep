@@ -68,13 +68,6 @@ param parSqlAuditRetentionDays int = 15
 @description('Spoke Networks Configuration')
 param parSpokeNetworks array
 
-@description('File upload storage account configuration')
-param parFileUploadStorageConfig object = {
-  containerName: 'staging'
-  sku: 'Standard_LRS'
-  accessTier: 'Hot'
-  allowPublicAccess: false
-}
 
 @description('Enable Azure Front Door deployment')
 param parEnableFrontDoor bool = true
@@ -118,6 +111,40 @@ param parDefenderForStorageConfig object = {
 
 @description('Override subscription level settings for storage account level defender configuration')
 param parOverrideSubscriptionLevelSettings bool = false
+
+@description('Blob delete retention policy configuration per storage type')
+param parBlobRetentionPolicyDays object = {
+  staging: 7     // Short retention for staging files
+  clean: 365     // Long retention for production files  
+  quarantine: 15 // Forensic retention for quarantine files
+}
+
+@description('Storage account configuration per storage type')
+param parStorageAccountConfig object = {
+  staging: {
+    sku: 'Standard_LRS'
+    accessTier: 'Hot'
+    containerName: 'staging'
+  }
+  clean: {
+    sku: 'Standard_GRS'  
+    accessTier: 'Hot'
+    containerName: 'clean'
+  }
+  quarantine: {
+    sku: 'Standard_LRS'
+    accessTier: 'Cool' 
+    containerName: 'quarantine'
+  }
+}
+
+@description('Network security configuration for storage accounts')
+param parNetworkSecurityConfig object = {
+  defaultAction: 'Deny'        // Network access control
+  bypass: 'AzureServices'      // Allow Azure services by default
+  httpsTrafficOnly: true       // Always enforce HTTPS
+  quarantineBypass: 'None'     // Strictest setting for quarantine storage
+}
 
 // ------------------
 // VARIABLES
@@ -355,7 +382,6 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       tags: tags
       spokeVNetId: existingVnet[i].id
       spokePrivateEndpointSubnetName: pepSubnet[i].name
-      storageConfig: parFileUploadStorageConfig
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
       enableMalwareScanning: true
@@ -364,6 +390,9 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       enableEventGridIntegration: true
       enableEventGridSubscriptions: false  // Set to true only after Function App code is deployed and webhook endpoint is ready
       processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint
+      retentionPolicyDays: parBlobRetentionPolicyDays
+      storageAccountConfig: parStorageAccountConfig
+      networkSecurityConfig: parNetworkSecurityConfig
     }
     dependsOn: [
       defenderStorage

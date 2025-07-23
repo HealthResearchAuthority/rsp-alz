@@ -26,13 +26,6 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 15
 
-param parFileUploadStorageConfig = {
-  containerName: 'documentupload'
-  sku: 'Standard_LRS'
-  accessTier: 'Hot'
-  allowPublicAccess: false
-}
-
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
 param parFrontDoorWafMode = 'Detection'
@@ -52,6 +45,40 @@ param parDefenderForStorageConfig = {
 }
 
 param parOverrideSubscriptionLevelSettings = true
+
+// Blob retention policy configuration for dev environment
+param parBlobRetentionPolicyDays = {
+  staging: 7       // Short retention for staging files
+  clean: 30        // Shorter retention for dev environment  
+  quarantine: 15   // 15 days retention for dev forensic analysis
+}
+
+// Storage account configuration for dev environment
+param parStorageAccountConfig = {
+  staging: {
+    sku: 'Standard_LRS'      // Cost-optimized for dev
+    accessTier: 'Hot'
+    containerName: 'staging'
+  }
+  clean: {
+    sku: 'Standard_LRS'      // Cost-optimized for dev (not GRS)
+    accessTier: 'Hot'
+    containerName: 'clean'
+  }
+  quarantine: {
+    sku: 'Standard_LRS'      // Cost-optimized 
+    accessTier: 'Cool'       // Cool tier for quarantine
+    containerName: 'quarantine'
+  }
+}
+
+// Network security configuration for dev environment
+param parNetworkSecurityConfig = {
+  defaultAction: 'Deny'        // Maintain security even in dev
+  bypass: 'AzureServices'      // Allow Azure services for operational flexibility
+  httpsTrafficOnly: true       // Always enforce HTTPS
+  quarantineBypass: 'None'     // Strictest setting for quarantine storage
+}
 
 param parSpokeNetworks = [
   {

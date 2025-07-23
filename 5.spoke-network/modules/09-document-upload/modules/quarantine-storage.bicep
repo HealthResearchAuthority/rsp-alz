@@ -27,6 +27,27 @@ param networkingResourceGroup string
 @description('Log Analytics workspace ID for enhanced security monitoring')
 param logAnalyticsWorkspaceId string
 
+@description('Enable blob delete retention policy')
+param enableDeleteRetentionPolicy bool = true
+
+@description('Number of days to retain deleted blobs')
+param retentionPolicyDays int = 15
+
+@description('Storage account configuration for quarantine')
+param storageConfig object = {
+  sku: 'Standard_LRS'
+  accessTier: 'Cool'
+  containerName: 'quarantine'
+}
+
+@description('Network security configuration for storage account')
+param networkSecurityConfig object = {
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+  quarantineBypass: 'None'
+}
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -73,13 +94,13 @@ module storageAccount '../../../../shared/bicep/storage/storage.bicep' = {
     name: 'strspquar${environment}'
     location: location
     tags: tags
-    kind: 'StorageV2'
-    sku: 'Standard_LRS'  // Cost-optimized for quarantine
-    accessTier: 'Cool'  // Cool tier for quarantine (Archive not supported for blob storage accounts)
-    supportsHttpsTrafficOnly: true
+    kind: storageConfig.?kind ?? 'StorageV2'
+    sku: storageConfig.sku
+    accessTier: storageConfig.accessTier
+    supportsHttpsTrafficOnly: networkSecurityConfig.httpsTrafficOnly
     networkAcls: {
-      defaultAction: 'Deny'
-      bypass: 'None'  // Strictest network access
+      defaultAction: networkSecurityConfig.defaultAction
+      bypass: networkSecurityConfig.quarantineBypass  // Use strictest bypass setting for quarantine
       ipRules: []
       virtualNetworkRules: []
     }
@@ -103,11 +124,11 @@ module blobService '../../../../shared/bicep/storage/storage.blobsvc.bicep' = {
   name: 'quarantineStorageBlobService'
   params: {
     storageAccountName: storageAccount.outputs.name
-    deleteRetentionPolicy: true
-    deleteRetentionPolicyDays: 2555  // 7 years retention for forensic analysis
+    deleteRetentionPolicy: enableDeleteRetentionPolicy
+    deleteRetentionPolicyDays: retentionPolicyDays
     containers: [
       {
-        name: 'quarantine'
+        name: storageConfig.containerName
         publicAccess: 'None'
       }
     ]
@@ -159,4 +180,4 @@ output managedIdentityPrincipalId string = managedIdentity.outputs.principalId
 output managedIdentityClientId string = managedIdentity.outputs.clientId
 
 @description('The name of the quarantine blob container.')
-output containerName string = 'quarantine'
+output containerName string = storageConfig.containerName

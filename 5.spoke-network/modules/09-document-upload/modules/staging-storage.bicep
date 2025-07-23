@@ -43,6 +43,19 @@ param enableEventGridSubscriptions bool = false
 @description('Process scan Function App webhook endpoint URL')
 param processScanWebhookEndpoint string = ''
 
+@description('Enable blob delete retention policy')
+param enableDeleteRetentionPolicy bool = true
+
+@description('Number of days to retain deleted blobs')
+param retentionPolicyDays int = 7
+
+@description('Network security configuration for storage account')
+param networkSecurityConfig object = {
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+}
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -89,13 +102,13 @@ module storageAccount '../../../../shared/bicep/storage/storage.bicep' = {
     name: 'strspstagng${environment}'
     location: location
     tags: tags
-    kind: 'StorageV2'
+    kind: storageConfig.?kind ?? 'StorageV2'
     sku: storageConfig.sku
     accessTier: storageConfig.accessTier
-    supportsHttpsTrafficOnly: true
+    supportsHttpsTrafficOnly: networkSecurityConfig.httpsTrafficOnly
     networkAcls: {
-      defaultAction: 'Deny'
-      bypass: 'AzureServices'
+      defaultAction: networkSecurityConfig.defaultAction
+      bypass: networkSecurityConfig.bypass
       ipRules: []
       virtualNetworkRules: []
     }
@@ -119,8 +132,8 @@ module blobService '../../../../shared/bicep/storage/storage.blobsvc.bicep' = {
   name: 'stagingStorageBlobService'
   params: {
     storageAccountName: storageAccount.outputs.name
-    deleteRetentionPolicy: true
-    deleteRetentionPolicyDays: 7  // Short retention for staging
+    deleteRetentionPolicy: enableDeleteRetentionPolicy
+    deleteRetentionPolicyDays: retentionPolicyDays
     containers: [
       {
         name: storageConfig.containerName
