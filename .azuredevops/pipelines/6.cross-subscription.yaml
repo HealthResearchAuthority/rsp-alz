@@ -64,29 +64,29 @@ jobs:
               --template-file ./6.cross-subscription/main.bicep \
               --management-group-id $(management-group-id) \
               --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID)
-  - job: deploy
-    pool: 
-      vmImage: 'ubuntu-latest'
-    dependsOn: [preview]
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2 
-        name: deploy
-        inputs: 
-          azureSubscription: $(azureServiceConnection)
-          scriptType: bash
-          scriptLocation: inlineScript
-          failOnStandardError: true
-          inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            output=$(az deployment mg create \
-              --name "core-services-$(Build.BuildId)" \
-              --location $(location) \
-              --management-group-id $(management-group-id) \
-              --template-file ./6.cross-subscription/main.bicep \
-              --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID))
-            echo $output | jq .
+  # - job: deploy
+  #   pool: 
+  #     vmImage: 'ubuntu-latest'
+  #   dependsOn: [preview]
+  #   steps:
+  #     - checkout: self
+  #     - bash: |
+  #         az bicep install
+  #         az bicep version
+  #       displayName: 'Install Bicep CLI'
+  #     - task: AzureCLI@2 
+  #       name: deploy
+  #       inputs: 
+  #         azureSubscription: $(azureServiceConnection)
+  #         scriptType: bash
+  #         scriptLocation: inlineScript
+  #         failOnStandardError: true
+  #         inlineScript: |
+  #           az config set bicep.use_binary_from_path=false --only-show-errors
+  #           output=$(az deployment mg create \
+  #             --name "core-services-$(Build.BuildId)" \
+  #             --location $(location) \
+  #             --management-group-id $(management-group-id) \
+  #             --template-file ./6.cross-subscription/main.bicep \
+  #             --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID))
+  #           echo $output | jq .
