@@ -38,6 +38,15 @@ param networkSecurityConfig object = {
   httpsTrafficOnly: true
 }
 
+@description('Encryption configuration for clean storage account')
+param encryptionConfig object = {
+  enabled: false
+  keyVaultResourceId: ''
+  keyName: ''
+  enableInfrastructureEncryption: false
+  keyRotationEnabled: true
+}
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -78,7 +87,7 @@ module managedIdentity '../../../../shared/bicep/managed-identity.bicep' = {
   }
 }
 
-module storageAccount '../../../../shared/bicep/storage/storage.bicep' = {
+module storageAccount '../../../../shared/bicep/storage/storage-with-encryption.bicep' = {
   name: 'cleanStorageAccount'
   params: {
     name: 'strspclean${environment}'
@@ -94,6 +103,9 @@ module storageAccount '../../../../shared/bicep/storage/storage.bicep' = {
       ipRules: []
       virtualNetworkRules: []
     }
+    encryptionConfig: encryptionConfig
+    createManagedIdentity: encryptionConfig.enabled
+    managedIdentityName: encryptionConfig.enabled ? 'id-clean-storage-${environment}-encryption' : ''
   }
 }
 
@@ -156,3 +168,18 @@ output managedIdentityClientId string = managedIdentity.outputs.clientId
 
 @description('The name of the clean blob container.')
 output containerName string = storageConfig.containerName
+
+@description('The resource ID of the encryption managed identity (if encryption enabled).')
+output encryptionManagedIdentityId string = storageAccount.outputs.managedIdentityId
+
+@description('The principal ID of the encryption managed identity (if encryption enabled).')
+output encryptionManagedIdentityPrincipalId string = storageAccount.outputs.managedIdentityPrincipalId
+
+@description('The client ID of the encryption managed identity (if encryption enabled).')
+output encryptionManagedIdentityClientId string = storageAccount.outputs.managedIdentityClientId
+
+@description('The name of the encryption key (if encryption enabled).')
+output encryptionKeyName string = storageAccount.outputs.keyName
+
+@description('Whether encryption is enabled for this storage account.')
+output encryptionEnabled bool = storageAccount.outputs.encryptionEnabled

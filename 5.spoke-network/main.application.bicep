@@ -146,6 +146,14 @@ param parNetworkSecurityConfig object = {
   quarantineBypass: 'None'     // Strictest setting for quarantine storage
 }
 
+@description('Clean storage encryption configuration')
+param parCleanStorageEncryption object = {
+  enabled: false
+  keyName: ''                        // Auto-generated if empty
+  enableInfrastructureEncryption: false
+  keyRotationEnabled: true           // Automatic key version updates
+}
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -393,6 +401,9 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       retentionPolicyDays: parBlobRetentionPolicyDays
       storageAccountConfig: parStorageAccountConfig
       networkSecurityConfig: parNetworkSecurityConfig
+      cleanStorageEncryption: union(parCleanStorageEncryption, {
+        keyVaultResourceId: parCleanStorageEncryption.enabled ? supportingServices[i].outputs.keyVaultId : ''
+      })
     }
     dependsOn: [
       defenderStorage

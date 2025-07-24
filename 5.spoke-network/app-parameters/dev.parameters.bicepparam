@@ -80,6 +80,14 @@ param parNetworkSecurityConfig = {
   quarantineBypass: 'None'     // Strictest setting for quarantine storage
 }
 
+// Clean storage encryption configuration for dev environment
+param parCleanStorageEncryption = {
+  enabled: true                          // Enable for testing encryption
+  keyName: 'key-clean-storage-dev'      // Environment-specific key name
+  enableInfrastructureEncryption: true  // Double encryption for enhanced security
+  keyRotationEnabled: true              // Automatic key version updates
+}
+
 param parSpokeNetworks = [
   {
     subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'

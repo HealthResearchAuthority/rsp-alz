@@ -78,6 +78,15 @@ param networkSecurityConfig object = {
   quarantineBypass: 'None'
 }
 
+@description('Clean storage encryption configuration')
+param cleanStorageEncryption object = {
+  enabled: false
+  keyVaultResourceId: ''
+  keyName: ''
+  enableInfrastructureEncryption: false
+  keyRotationEnabled: true
+}
+
 // ------------------
 // RESOURCES
 // ------------------
@@ -119,6 +128,7 @@ module cleanStorage 'modules/clean-storage.bicep' = {
     enableDeleteRetentionPolicy: enableDeleteRetentionPolicy
     retentionPolicyDays: retentionPolicyDays.clean
     networkSecurityConfig: networkSecurityConfig
+    encryptionConfig: cleanStorageEncryption
   }
   dependsOn: [
     stagingStorage  // Deploy after staging to avoid DNS zone conflicts
