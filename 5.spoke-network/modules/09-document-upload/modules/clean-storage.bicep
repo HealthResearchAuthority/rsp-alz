@@ -87,6 +87,28 @@ module managedIdentity '../../../../shared/bicep/managed-identity.bicep' = {
   }
 }
 
+// Create encryption managed identity first when encryption is enabled
+module encryptionManagedIdentity '../../../../shared/bicep/managed-identity.bicep' = if (encryptionConfig.enabled) {
+  name: 'cleanStorageEncryptionManagedIdentity'
+  params: {
+    name: 'id-clean-storage-${environment}-encryption'
+    location: location
+    tags: tags
+  }
+}
+
+// Create encryption key and assign permissions when encryption is enabled
+module encryptionKey '../../../../shared/bicep/key-vault/storage-encryption-key.bicep' = if (encryptionConfig.enabled) {
+  name: 'cleanStorageEncryptionKey'
+  scope: resourceGroup(split(encryptionConfig.keyVaultResourceId, '/')[2], split(encryptionConfig.keyVaultResourceId, '/')[4])
+  params: {
+    keyVaultName: split(encryptionConfig.keyVaultResourceId, '/')[8]
+    keyName: encryptionConfig.keyName
+    managedIdentityPrincipalId: encryptionManagedIdentity!.outputs.principalId
+    tags: tags
+  }
+}
+
 module storageAccount '../../../../shared/bicep/storage/storage-with-encryption.bicep' = {
   name: 'cleanStorageAccount'
   params: {
@@ -104,9 +126,13 @@ module storageAccount '../../../../shared/bicep/storage/storage-with-encryption.
       virtualNetworkRules: []
     }
     encryptionConfig: encryptionConfig
-    createManagedIdentity: encryptionConfig.enabled
-    managedIdentityName: encryptionConfig.enabled ? 'id-clean-storage-${environment}-encryption' : ''
+    createManagedIdentity: false  // Use pre-created managed identity
+    managedIdentityName: ''  // Not used when createManagedIdentity is false
+    externalManagedIdentityId: encryptionConfig.enabled ? encryptionManagedIdentity!.outputs.id : ''
   }
+  dependsOn: encryptionConfig.enabled ? [
+    encryptionKey
+  ] : []
 }
 
 module privateEndpoint '../../../../shared/bicep/network/private-networking-spoke.bicep' = {
@@ -136,6 +162,7 @@ module blobService '../../../../shared/bicep/storage/storage.blobsvc.bicep' = {
     ]
   }
 }
+
 
 module roleAssignment '../../../../shared/bicep/role-assignments/role-assignment.bicep' = {
   name: 'cleanStorageRoleAssignment'
@@ -170,13 +197,13 @@ output managedIdentityClientId string = managedIdentity.outputs.clientId
 output containerName string = storageConfig.containerName
 
 @description('The resource ID of the encryption managed identity (if encryption enabled).')
-output encryptionManagedIdentityId string = storageAccount.outputs.managedIdentityId
+output encryptionManagedIdentityId string = encryptionConfig.enabled ? encryptionManagedIdentity!.outputs.id : ''
 
 @description('The principal ID of the encryption managed identity (if encryption enabled).')
-output encryptionManagedIdentityPrincipalId string = storageAccount.outputs.managedIdentityPrincipalId
+output encryptionManagedIdentityPrincipalId string = encryptionConfig.enabled ? encryptionManagedIdentity!.outputs.principalId : ''
 
 @description('The client ID of the encryption managed identity (if encryption enabled).')
-output encryptionManagedIdentityClientId string = storageAccount.outputs.managedIdentityClientId
+output encryptionManagedIdentityClientId string = encryptionConfig.enabled ? encryptionManagedIdentity!.outputs.clientId : ''
 
 @description('The name of the encryption key (if encryption enabled).')
 output encryptionKeyName string = storageAccount.outputs.keyName

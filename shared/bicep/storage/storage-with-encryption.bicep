@@ -54,6 +54,9 @@ param createManagedIdentity bool = true
 @description('Optional. Name for the managed identity. Auto-generated if empty.')
 param managedIdentityName string = ''
 
+@description('Optional. External managed identity resource ID to use when createManagedIdentity is false.')
+param externalManagedIdentityId string = ''
+
 // Variables
 var maxNameLength = 24
 var storageNameValid = toLower(replace(name, '-', ''))
@@ -85,10 +88,12 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
   sku: {
     name: sku
   }
-  identity: encryptionConfig.enabled && createManagedIdentity ? {
+  identity: encryptionConfig.enabled ? {
     type: 'UserAssigned'
-    userAssignedIdentities: {
+    userAssignedIdentities: createManagedIdentity ? {
       '${storageIdentity.id}': {}
+    } : {
+      '${externalManagedIdentityId}': {}
     }
   } : null
   tags: union(tags, {
@@ -101,9 +106,9 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
     publicNetworkAccess: 'Enabled'
     minimumTlsVersion: 'TLS1_2'
     encryption: encryptionConfig.enabled ? {
-      identity: createManagedIdentity ? {
-        userAssignedIdentity: storageIdentity.id
-      } : null
+      identity: {
+        userAssignedIdentity: createManagedIdentity ? storageIdentity.id : externalManagedIdentityId
+      }
       keySource: 'Microsoft.Keyvault'
       services: {
         blob: {
