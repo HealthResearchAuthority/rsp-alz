@@ -62,7 +62,7 @@ var spokeResourceGroupName = spokeVNetIdTokens[4]
 var spokeVNetName = spokeVNetIdTokens[8]
 
 var containerRegistryPullRoleGuid='7f951dda-4ed3-4680-a7ca-43fe172d538d'
-var publicAccess = 'Enabled'
+var publicAccess = 'Disabled'
 
 var spokeVNetLinks = [
   {

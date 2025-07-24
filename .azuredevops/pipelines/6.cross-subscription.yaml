@@ -3,6 +3,8 @@ name: 6.cross-subscription-lza-deployment
 
 trigger: none
 
+variables:
+  - group: 'CrossSubscription'
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -40,7 +42,7 @@ jobs:
           scriptLocation: inlineScript
           inlineScript: |
             az config set bicep.use_binary_from_path=false --only-show-errors
-            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) 
+            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds)
 
   - job: preview
     pool: 
@@ -63,7 +65,7 @@ jobs:
               --location $(location) \
               --template-file ./6.cross-subscription/main.bicep \
               --management-group-id $(management-group-id) \
-              --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID)
+              --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds)
   - job: deploy
     pool: 
       vmImage: 'ubuntu-latest'
@@ -88,5 +90,5 @@ jobs:
               --location $(location) \
               --management-group-id $(management-group-id) \
               --template-file ./6.cross-subscription/main.bicep \
-              --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID))
+              --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds))
             echo $output | jq .
