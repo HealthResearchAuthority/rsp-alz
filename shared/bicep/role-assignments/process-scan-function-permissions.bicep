@@ -25,7 +25,7 @@ var storageQueueDataContributorRoleId = '974c5e8b-45b9-4653-ba55-5f855dd0fb88'
 // This allows the function to read, write, and delete blobs across staging, clean, and quarantine storage
 resource storageBlobDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   for (storageAccountId, index) in storageAccountIds: {
-    name: guid(storageAccountId, functionAppPrincipalId, storageBlobDataContributorRoleId, string(index))
+    name: guid(storageAccountId, functionAppPrincipalId, storageBlobDataContributorRoleId)
     properties: {
       roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataContributorRoleId)
       principalId: functionAppPrincipalId
@@ -39,7 +39,7 @@ resource storageBlobDataContributor 'Microsoft.Authorization/roleAssignments@202
 // This allows the function to read and process queue messages if needed
 resource storageQueueDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   for (storageAccountId, index) in storageAccountIds: {
-    name: guid(storageAccountId, functionAppPrincipalId, storageQueueDataContributorRoleId, string(index))
+    name: guid(storageAccountId, functionAppPrincipalId, storageQueueDataContributorRoleId)
     properties: {
       roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', storageQueueDataContributorRoleId)
       principalId: functionAppPrincipalId
