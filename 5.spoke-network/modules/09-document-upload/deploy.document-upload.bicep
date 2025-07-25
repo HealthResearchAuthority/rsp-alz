@@ -48,7 +48,7 @@ param enableDeleteRetentionPolicy bool = true
 param retentionPolicyDays object = {
   staging: 7     // Short retention for staging files
   clean: 365     // Long retention for production files
-  quarantine: 15 // Forensic retention for quarantine files
+  quarantine: 15 // Short retention for quarantine files
 }
 
 @description('Storage account configuration per storage type')
@@ -160,7 +160,7 @@ module quarantineStorage 'modules/quarantine-storage.bicep' = {
 // OUTPUTS
 // ------------------
 
-// Staging Storage Outputs (for backward compatibility)
+
 @description('The resource ID of the staging storage account (backward compatibility).')
 output storageAccountId string = stagingStorage.outputs.storageAccountId
 
@@ -179,7 +179,7 @@ output managedIdentityClientId string = stagingStorage.outputs.managedIdentityCl
 @description('The name of the blob container for file uploads (backward compatibility).')
 output containerName string = stagingStorage.outputs.containerName
 
-// New Comprehensive Outputs
+
 @description('Staging storage account details for initial file uploads.')
 output stagingStorage object = {
   storageAccountId: stagingStorage.outputs.storageAccountId

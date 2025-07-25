@@ -50,7 +50,7 @@ param parOverrideSubscriptionLevelSettings = true
 param parBlobRetentionPolicyDays = {
   staging: 7       // Short retention for staging files
   clean: 30        // Shorter retention for dev environment  
-  quarantine: 15   // 15 days retention for dev forensic analysis
+  quarantine: 15   // 15 days retention for analysis
 }
 
 // Storage account configuration for dev environment
@@ -74,17 +74,17 @@ param parStorageAccountConfig = {
 
 // Network security configuration for dev environment
 param parNetworkSecurityConfig = {
-  defaultAction: 'Deny'        // Maintain security even in dev
-  bypass: 'AzureServices'      // Allow Azure services for operational flexibility
-  httpsTrafficOnly: true       // Always enforce HTTPS
+  defaultAction: 'Deny'        
+  bypass: 'AzureServices'      
+  httpsTrafficOnly: true       
   quarantineBypass: 'None'     // Strictest setting for quarantine storage
 }
 
 // Clean storage encryption configuration for dev environment
 param parCleanStorageEncryption = {
-  enabled: true                          // Enable for testing encryption
+  enabled: true                          // Enable for encryption
   keyName: 'key-clean-storage-dev'      // Environment-specific key name
-  enableInfrastructureEncryption: true  // Double encryption for enhanced security
+  enableInfrastructureEncryption: true  
   keyRotationEnabled: true              // Automatic key version updates
 }
 

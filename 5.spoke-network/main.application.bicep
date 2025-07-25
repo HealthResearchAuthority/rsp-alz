@@ -116,7 +116,7 @@ param parOverrideSubscriptionLevelSettings bool = false
 param parBlobRetentionPolicyDays object = {
   staging: 7     // Short retention for staging files
   clean: 365     // Long retention for production files  
-  quarantine: 15 // Forensic retention for quarantine files
+  quarantine: 15 // Short retention for quarantine files
 }
 
 @description('Storage account configuration per storage type')
@@ -140,10 +140,10 @@ param parStorageAccountConfig object = {
 
 @description('Network security configuration for storage accounts')
 param parNetworkSecurityConfig object = {
-  defaultAction: 'Deny'        // Network access control
-  bypass: 'AzureServices'      // Allow Azure services by default
-  httpsTrafficOnly: true       // Always enforce HTTPS
-  quarantineBypass: 'None'     // Strictest setting for quarantine storage
+  defaultAction: 'Deny'        
+  bypass: 'AzureServices'      
+  httpsTrafficOnly: true       
+  quarantineBypass: 'None'    
 }
 
 @description('Clean storage encryption configuration')
@@ -151,7 +151,7 @@ param parCleanStorageEncryption object = {
   enabled: false
   keyName: ''                        // Auto-generated if empty
   enableInfrastructureEncryption: false
-  keyRotationEnabled: true           // Automatic key version updates
+  keyRotationEnabled: true          
 }
 
 // ------------------
@@ -351,7 +351,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 ]
 
-// Process scan Function App (created first to get webhook endpoint for Event Grid)
+// Process scan Function App 
 module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-function.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
@@ -371,7 +371,6 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-      // documentStorageAccountIds will be added in a separate deployment phase to avoid circular dependency
     }
     dependsOn: [
       applicationsRG
@@ -736,7 +735,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
-// Grant process scan function permissions to all document storage accounts
+// Grant process scan function permissions to all document storage accounts. Handled seperately as there was circular dependency.
 module processScanFunctionPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
@@ -751,23 +750,3 @@ module processScanFunctionPermissions '../shared/bicep/role-assignments/process-
     ]
   }
 ]
-// module applicationGateway 'modules/08-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-//   name: take('applicationGateway-${deployment().name}-deployment', 64)
-//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgNetworking)
-//   params: {
-//     location: location
-//     tags: tags
-//     applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
-//     applicationGatewayFqdn: applicationGatewayFqdn
-//     applicationGatewayPrimaryBackendEndFqdn: webApp[i].outputs.appHostName
-//     applicationGatewaySubnetId: agwSubnet[i].id  // spoke[i].outputs.spokeApplicationGatewaySubnetId
-//     enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
-//     keyVaultId: supportingServices[i].outputs.keyVaultId
-//     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
-//     ddosProtectionMode: 'Disabled'
-//     applicationGatewayLogAnalyticsId: logAnalyticsWorkspaceId
-//     networkingResourceNames: networkingnaming[i].outputs.resourcesNames
-//   }
-// }]
-
-//output inputdevopsIP string = parDevOpsPublicIPAddress

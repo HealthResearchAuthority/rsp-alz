@@ -39,7 +39,7 @@ param appServicePlanName string
 @description('SQL Database managed identity client ID for database access')
 param sqlDBManagedIdentityClientId string = ''
 
-// Note: Storage permissions are handled separately in main.application.bicep following the original pattern
+// Note: Storage permissions are handled separately in main.application.bicep
 
 // ------------------
 // VARIABLES
@@ -75,9 +75,6 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
     createPrivateDnsZones: false
   }
 }
-
-// Note: Storage permissions are deployed separately in main.application.bicep to avoid circular dependency
-// This follows the original working pattern where permissions are handled externally
 
 // ------------------
 // OUTPUTS
