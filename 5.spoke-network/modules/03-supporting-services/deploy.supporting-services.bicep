@@ -180,6 +180,9 @@ output keyVaultName string = keyVault.outputs.keyVaultName
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
 output appConfigurationUserAssignedIdentityId string = appConfiguration.outputs.appConfigurationUserAssignedIdentityId
 
+@description('The principal ID of the user assigned managed identity for the App Configuration.')
+output appConfigurationUserAssignedIdentityPrincipalId string = appConfiguration.outputs.appConfigurationUserAssignedIdentityPrincipalId
+
 @description('The resource ID of the user assigned managed identity for the Key Vault to be able to read Secrets from it.')
 output keyVaultUserAssignedIdentityId string = keyVault.outputs.keyVaultUserAssignedIdentityId
 

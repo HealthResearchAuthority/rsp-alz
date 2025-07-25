@@ -343,5 +343,8 @@ module appConfigNetwork '../../../../shared/bicep/network/private-networking-spo
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
 output appConfigurationUserAssignedIdentityId string = appConfigurationUserAssignedIdentity.id
 
+@description('The principal ID of the user assigned managed identity for the App Configuration.')
+output appConfigurationUserAssignedIdentityPrincipalId string = appConfigurationUserAssignedIdentity.properties.principalId
+
 output appConfigURL string = configStore.properties.endpoint
 output appConfigMIClientID string = appConfigurationUserAssignedIdentity.properties.clientId
