@@ -21,18 +21,11 @@ var storageQueueDataContributorRoleId = '/providers/Microsoft.Authorization/role
 // RESOURCES
 // ------------------
 
-// Reference existing storage accounts
-resource storageAccounts 'Microsoft.Storage/storageAccounts@2023-05-01' existing = [
-  for storageAccountId in storageAccountIds: {
-    name: split(storageAccountId, '/')[8]
-  }
-]
-
-// Storage Blob Data Contributor role scoped to each storage account
+// Storage Blob Data Contributor role for all storage accounts
+// This allows the function to read, write, and delete blobs across staging, clean, and quarantine storage
 resource storageBlobDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   for (storageAccountId, index) in storageAccountIds: {
     name: guid(storageAccountId, functionAppPrincipalId, storageBlobDataContributorRoleId)
-    scope: storageAccounts[index]
     properties: {
       roleDefinitionId: storageBlobDataContributorRoleId
       principalId: functionAppPrincipalId
@@ -42,11 +35,11 @@ resource storageBlobDataContributor 'Microsoft.Authorization/roleAssignments@202
   }
 ]
 
-// Storage Queue Data Contributor role scoped to each storage account
+// Storage Queue Data Contributor role for all storage accounts
+// This allows the function to read and process queue messages if needed
 resource storageQueueDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   for (storageAccountId, index) in storageAccountIds: {
     name: guid(storageAccountId, functionAppPrincipalId, storageQueueDataContributorRoleId)
-    scope: storageAccounts[index]
     properties: {
       roleDefinitionId: storageQueueDataContributorRoleId
       principalId: functionAppPrincipalId
