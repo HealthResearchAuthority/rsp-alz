@@ -1,5 +1,69 @@
 targetScope = 'subscription'
 // ------------------
+// USER-DEFINED TYPES
+// ------------------
+
+@description('Storage encryption configuration type definition')
+type storageEncryptionConfig = {
+  @description('Enable customer-managed key encryption')
+  enabled: bool
+  
+  @description('Name of the encryption key (auto-generated if empty)')
+  keyName: string
+  
+  @description('Enable infrastructure (double) encryption')
+  enableInfrastructureEncryption: bool
+  
+  @description('Enable automatic key version updates')
+  keyRotationEnabled: bool
+}
+
+@description('Storage account basic configuration type definition')
+type storageAccountConfig = {
+  @description('Storage account SKU')
+  sku: ('Standard_LRS' | 'Standard_GRS' | 'Standard_ZRS' | 'Standard_GZRS' | 'Premium_LRS')
+  
+  @description('Storage account access tier')
+  accessTier: ('Hot' | 'Cool')
+  
+  @description('Container name for this storage type')
+  containerName: string
+}
+
+@description('Storage retention policy configuration type definition')
+type storageRetentionConfig = {
+  @description('Enable delete retention policy for this storage type')
+  enabled: bool
+  
+  @description('Number of days to retain deleted blobs (0 = disabled)')
+  retentionDays: int
+}
+
+@description('Complete storage configuration for a single storage type')
+type storageTypeConfig = {
+  @description('Basic storage account configuration')
+  account: storageAccountConfig
+  
+  @description('Encryption configuration')
+  encryption: storageEncryptionConfig
+  
+  @description('Retention policy configuration')
+  retention: storageRetentionConfig
+}
+
+@description('Complete storage configuration for all storage types')
+type allStorageConfig = {
+  @description('Clean storage configuration')
+  clean: storageTypeConfig
+  
+  @description('Staging storage configuration')
+  staging: storageTypeConfig
+  
+  @description('Quarantine storage configuration')
+  quarantine: storageTypeConfig
+}
+
+// ------------------
 // PARAMETERS
 // ------------------
 
@@ -112,29 +176,58 @@ param parDefenderForStorageConfig object = {
 @description('Override subscription level settings for storage account level defender configuration')
 param parOverrideSubscriptionLevelSettings bool = false
 
-@description('Blob delete retention policy configuration per storage type')
-param parBlobRetentionPolicyDays object = {
-  staging: 7     // Short retention for staging files
-  clean: 365     // Long retention for production files  
-  quarantine: 15 // Short retention for quarantine files
-}
-
-@description('Storage account configuration per storage type')
-param parStorageAccountConfig object = {
-  staging: {
-    sku: 'Standard_LRS'
-    accessTier: 'Hot'
-    containerName: 'staging'
-  }
+@description('Comprehensive storage configuration for all storage account types')
+param parStorageConfig allStorageConfig = {
   clean: {
-    sku: 'Standard_GRS'  
-    accessTier: 'Hot'
-    containerName: 'clean'
+    account: {
+      sku: 'Standard_GRS'
+      accessTier: 'Hot'
+      containerName: 'clean'
+    }
+    encryption: {
+      enabled: false
+      keyName: ''
+      enableInfrastructureEncryption: false
+      keyRotationEnabled: true
+    }
+    retention: {
+      enabled: false  // Disable retention for clean storage
+      retentionDays: 0
+    }
+  }
+  staging: {
+    account: {
+      sku: 'Standard_LRS'
+      accessTier: 'Hot'
+      containerName: 'staging'
+    }
+    encryption: {
+      enabled: false
+      keyName: ''
+      enableInfrastructureEncryption: false
+      keyRotationEnabled: true
+    }
+    retention: {
+      enabled: true
+      retentionDays: 7
+    }
   }
   quarantine: {
-    sku: 'Standard_LRS'
-    accessTier: 'Cool' 
-    containerName: 'quarantine'
+    account: {
+      sku: 'Standard_LRS'
+      accessTier: 'Cool'
+      containerName: 'quarantine'
+    }
+    encryption: {
+      enabled: false
+      keyName: ''
+      enableInfrastructureEncryption: false
+      keyRotationEnabled: true
+    }
+    retention: {
+      enabled: true
+      retentionDays: 15
+    }
   }
 }
 
@@ -146,19 +239,16 @@ param parNetworkSecurityConfig object = {
   quarantineBypass: 'None'    
 }
 
-@description('Clean storage encryption configuration')
-param parCleanStorageEncryption object = {
-  enabled: false
-  keyName: ''                        // Auto-generated if empty
-  enableInfrastructureEncryption: false
-  keyRotationEnabled: true          
-}
-
 // ------------------
 // VARIABLES
 // ------------------
 
 var sqlServerNamePrefix = 'rspsqlserver'
+
+// DRY helper function for storage encryption configuration
+func createStorageEncryptionConfig(config storageEncryptionConfig, keyVaultId string) object => union(config, {
+  keyVaultResourceId: config.enabled ? keyVaultId : ''
+})
 
 
 
@@ -397,12 +487,20 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       enableEventGridIntegration: true
       enableEventGridSubscriptions: false  // Set to true only after Function App code is deployed and webhook endpoint is ready
       processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint
-      retentionPolicyDays: parBlobRetentionPolicyDays
-      storageAccountConfig: parStorageAccountConfig
+      retentionPolicyDays: {
+        staging: parStorageConfig.staging.retention.retentionDays
+        clean: parStorageConfig.clean.retention.retentionDays
+        quarantine: parStorageConfig.quarantine.retention.retentionDays
+      }
+      storageAccountConfig: {
+        staging: parStorageConfig.staging.account
+        clean: parStorageConfig.clean.account
+        quarantine: parStorageConfig.quarantine.account
+      }
       networkSecurityConfig: parNetworkSecurityConfig
-      cleanStorageEncryption: union(parCleanStorageEncryption, {
-        keyVaultResourceId: parCleanStorageEncryption.enabled ? supportingServices[i].outputs.keyVaultId : ''
-      })
+      cleanStorageEncryption: createStorageEncryptionConfig(parStorageConfig.clean.encryption, supportingServices[i].outputs.keyVaultId)
+      stagingStorageEncryption: createStorageEncryptionConfig(parStorageConfig.staging.encryption, supportingServices[i].outputs.keyVaultId)
+      quarantineStorageEncryption: createStorageEncryptionConfig(parStorageConfig.quarantine.encryption, supportingServices[i].outputs.keyVaultId)
     }
     dependsOn: [
       defenderStorage

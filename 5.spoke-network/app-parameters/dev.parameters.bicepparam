@@ -46,29 +46,58 @@ param parDefenderForStorageConfig = {
 
 param parOverrideSubscriptionLevelSettings = true
 
-// Blob retention policy configuration for dev environment
-param parBlobRetentionPolicyDays = {
-  staging: 7       // Short retention for staging files
-  clean: 30        // Shorter retention for dev environment  
-  quarantine: 15   // 15 days retention for analysis
-}
-
-// Storage account configuration for dev environment
-param parStorageAccountConfig = {
-  staging: {
-    sku: 'Standard_LRS'      // Cost-optimized for dev
-    accessTier: 'Hot'
-    containerName: 'staging'
-  }
+// Storage configuration for all storage account types 
+param parStorageConfig = {
   clean: {
-    sku: 'Standard_LRS'      // Cost-optimized for dev (not GRS)
-    accessTier: 'Hot'
-    containerName: 'clean'
+    account: {
+      sku: 'Standard_LRS'      
+      accessTier: 'Hot'
+      containerName: 'clean'
+    }
+    encryption: {
+      enabled: true                          // Enable for encryption
+      keyName: 'key-clean-storage-dev'      // Environment-specific key name
+      enableInfrastructureEncryption: true  
+      keyRotationEnabled: true              // Automatic key version updates
+    }
+    retention: {
+      enabled: false                        // Disable retention for clean storage
+      retentionDays: 0                      // No auto-deletion
+    }
+  }
+  staging: {
+    account: {
+      sku: 'Standard_LRS'      // Cost-optimized for dev
+      accessTier: 'Hot'
+      containerName: 'staging'
+    }
+    encryption: {
+      enabled: true                          // Enable for encryption
+      keyName: 'key-staging-storage-dev'    // Environment-specific key name
+      enableInfrastructureEncryption: true  
+      keyRotationEnabled: true              // Automatic key version updates
+    }
+    retention: {
+      enabled: true                         // Enable retention for staging
+      retentionDays: 7                      // Short retention for staging files
+    }
   }
   quarantine: {
-    sku: 'Standard_LRS'      // Cost-optimized 
-    accessTier: 'Cool'       // Cool tier for quarantine
-    containerName: 'quarantine'
+    account: {
+      sku: 'Standard_LRS'      // Cost-optimized 
+      accessTier: 'Cool'       // Cool tier for quarantine
+      containerName: 'quarantine'
+    }
+    encryption: {
+      enabled: true                          // Enable for encryption
+      keyName: 'key-quarantine-storage-dev' // Environment-specific key name
+      enableInfrastructureEncryption: true  
+      keyRotationEnabled: true              // Automatic key version updates
+    }
+    retention: {
+      enabled: true                         // Enable retention for quarantine
+      retentionDays: 15                     // 15 days retention for analysis
+    }
   }
 }
 
@@ -78,14 +107,6 @@ param parNetworkSecurityConfig = {
   bypass: 'AzureServices'      
   httpsTrafficOnly: true       
   quarantineBypass: 'None'     // Strictest setting for quarantine storage
-}
-
-// Clean storage encryption configuration for dev environment
-param parCleanStorageEncryption = {
-  enabled: true                          // Enable for encryption
-  keyName: 'key-clean-storage-dev'      // Environment-specific key name
-  enableInfrastructureEncryption: true  
-  keyRotationEnabled: true              // Automatic key version updates
 }
 
 param parSpokeNetworks = [

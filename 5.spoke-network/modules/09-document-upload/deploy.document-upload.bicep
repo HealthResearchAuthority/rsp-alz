@@ -41,9 +41,6 @@ param enableEventGridSubscriptions bool = false
 @description('Process scan Function App webhook endpoint URL')
 param processScanWebhookEndpoint string = ''
 
-@description('Enable blob delete retention policy')
-param enableDeleteRetentionPolicy bool = true
-
 @description('Blob delete retention policy configuration per storage type')
 param retentionPolicyDays object = {
   staging: 7     // Short retention for staging files
@@ -121,7 +118,7 @@ module stagingStorage 'modules/document-storage.bicep' = {
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     networkingResourceGroup: networkingResourceGroup
     storageConfig: storageAccountConfig.staging
-    enableDeleteRetentionPolicy: enableDeleteRetentionPolicy
+    enableDeleteRetentionPolicy: retentionPolicyDays.staging > 0
     retentionPolicyDays: retentionPolicyDays.staging
     networkSecurityConfig: networkSecurityConfig
     // Encryption support for staging (NEW FEATURE)
@@ -152,7 +149,7 @@ module cleanStorage 'modules/document-storage.bicep' = {
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     networkingResourceGroup: networkingResourceGroup
     storageConfig: storageAccountConfig.clean
-    enableDeleteRetentionPolicy: enableDeleteRetentionPolicy
+    enableDeleteRetentionPolicy: retentionPolicyDays.clean > 0
     retentionPolicyDays: retentionPolicyDays.clean
     networkSecurityConfig: networkSecurityConfig
     enableEncryption: cleanStorageEncryption.enabled
@@ -175,7 +172,7 @@ module quarantineStorage 'modules/document-storage.bicep' = {
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     networkingResourceGroup: networkingResourceGroup
     storageConfig: storageAccountConfig.quarantine
-    enableDeleteRetentionPolicy: enableDeleteRetentionPolicy
+    enableDeleteRetentionPolicy: retentionPolicyDays.quarantine > 0
     retentionPolicyDays: retentionPolicyDays.quarantine
     networkSecurityConfig: networkSecurityConfig
     // Encryption support for quarantine (NEW FEATURE)

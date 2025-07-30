@@ -154,7 +154,7 @@ module encryptionManagedIdentity '../../../../shared/bicep/managed-identity.bice
 }
 
 // Encryption key setup (when encryption is enabled)
-module encryptionKey '../../../../shared/bicep/key-vault/storage-encryption-key.bicep' = if (enableEncryption) {
+module encryptionKey '../../../../shared/bicep/key-vault/storage-encryption-key.bicep' = if (enableEncryption && !empty(encryptionConfig.keyVaultResourceId)) {
   name: '${storageType}StorageEncryptionKey'
   scope: resourceGroup(split(encryptionConfig.keyVaultResourceId, '/')[2], split(encryptionConfig.keyVaultResourceId, '/')[4])
   params: {
@@ -187,7 +187,7 @@ module storageAccount '../../../../shared/bicep/storage/storage-with-encryption.
     managedIdentityName: ''
     externalManagedIdentityId: enableEncryption ? encryptionManagedIdentity!.outputs.id : ''
   }
-  dependsOn: enableEncryption ? [
+  dependsOn: (enableEncryption && !empty(encryptionConfig.keyVaultResourceId)) ? [
     encryptionKey
   ] : []
 }
@@ -356,10 +356,10 @@ output encryptionManagedIdentityPrincipalId string = enableEncryption ? encrypti
 output encryptionManagedIdentityClientId string = enableEncryption ? encryptionManagedIdentity!.outputs.clientId : ''
 
 @description('The name of the encryption key.')
-output encryptionKeyName string = enableEncryption ? encryptionKey!.outputs.keyName : ''
+output encryptionKeyName string = (enableEncryption && !empty(encryptionConfig.keyVaultResourceId)) ? encryptionKey!.outputs.keyName : ''
 
 @description('The URI of the encryption key.')
-output encryptionKeyUri string = enableEncryption ? encryptionKey!.outputs.keyUri : ''
+output encryptionKeyUri string = (enableEncryption && !empty(encryptionConfig.keyVaultResourceId)) ? encryptionKey!.outputs.keyUri : ''
 
 // Malware scanning outputs (staging only)
 @description('Indicates whether malware scanning is enabled.')
