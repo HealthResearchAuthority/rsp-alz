@@ -212,7 +212,8 @@ module blobService '../../../../shared/bicep/storage/storage.blobsvc.bicep' = {
   params: {
     storageAccountName: storageAccount.outputs.name
     name: 'default'
-    deleteRetentionPolicyDays: enableDeleteRetentionPolicy ? retentionPolicyDays : 0
+    deleteRetentionPolicy: enableDeleteRetentionPolicy
+    deleteRetentionPolicyDays: enableDeleteRetentionPolicy ? retentionPolicyDays : 1
   }
 }
 
