@@ -14,20 +14,27 @@ param storageAccountIds array
 // VARIABLES
 // ------------------
 
-var storageBlobDataContributorRoleId = 'ba92f5b4-2d11-453d-a403-e96b0029c9fe'
-var storageQueueDataContributorRoleId = '974c5e8b-45b9-4653-ba55-5f855dd0fb88'
+var storageBlobDataContributorRoleId = '/providers/Microsoft.Authorization/roleDefinitions/ba92f5b4-2d11-453d-a403-e96b0029c9fe'
+var storageQueueDataContributorRoleId = '/providers/Microsoft.Authorization/roleDefinitions/974c5e8b-45b9-4653-ba55-5f855dd0fb88'
 
 // ------------------
 // RESOURCES
 // ------------------
 
-// Storage Blob Data Contributor role for all storage accounts
-// This allows the function to read, write, and delete blobs across staging, clean, and quarantine storage
+// Reference existing storage accounts
+resource storageAccounts 'Microsoft.Storage/storageAccounts@2023-05-01' existing = [
+  for storageAccountId in storageAccountIds: {
+    name: split(storageAccountId, '/')[8]
+  }
+]
+
+// Storage Blob Data Contributor role scoped to each storage account
 resource storageBlobDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   for (storageAccountId, index) in storageAccountIds: {
     name: guid(storageAccountId, functionAppPrincipalId, storageBlobDataContributorRoleId)
+    scope: storageAccounts[index]
     properties: {
-      roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', storageBlobDataContributorRoleId)
+      roleDefinitionId: storageBlobDataContributorRoleId
       principalId: functionAppPrincipalId
       principalType: 'ServicePrincipal'
       description: 'Allow process-scan Function App to manage blobs in storage account ${split(storageAccountId, '/')[8]}'
@@ -35,13 +42,13 @@ resource storageBlobDataContributor 'Microsoft.Authorization/roleAssignments@202
   }
 ]
 
-// Storage Queue Data Contributor role for all storage accounts
-// This allows the function to read and process queue messages if needed
+// Storage Queue Data Contributor role scoped to each storage account
 resource storageQueueDataContributor 'Microsoft.Authorization/roleAssignments@2022-04-01' = [
   for (storageAccountId, index) in storageAccountIds: {
     name: guid(storageAccountId, functionAppPrincipalId, storageQueueDataContributorRoleId)
+    scope: storageAccounts[index]
     properties: {
-      roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', storageQueueDataContributorRoleId)
+      roleDefinitionId: storageQueueDataContributorRoleId
       principalId: functionAppPrincipalId
       principalType: 'ServicePrincipal'
       description: 'Allow process-scan Function App to manage queue messages in storage account ${split(storageAccountId, '/')[8]}'
