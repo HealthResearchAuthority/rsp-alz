@@ -87,47 +87,75 @@ param cleanStorageEncryption object = {
   keyRotationEnabled: true
 }
 
+@description('Staging storage encryption configuration')
+param stagingStorageEncryption object = {
+  enabled: false
+  keyVaultResourceId: ''
+  keyName: ''
+  enableInfrastructureEncryption: false
+  keyRotationEnabled: true
+}
+
+@description('Quarantine storage encryption configuration')
+param quarantineStorageEncryption object = {
+  enabled: false
+  keyVaultResourceId: ''
+  keyName: ''
+  enableInfrastructureEncryption: false
+  keyRotationEnabled: true
+}
+
 // ------------------
 // RESOURCES
 // ------------------
 
 // Staging Storage Account - Where users initially upload files for malware scanning
-module stagingStorage 'modules/staging-storage.bicep' = {
+module stagingStorage 'modules/document-storage.bicep' = {
   name: 'stagingStorageDeployment'
   params: {
+    storageType: 'staging'
     location: location
     tags: tags
     environment: environment
-    storageConfig: storageAccountConfig.staging
     spokeVNetId: spokeVNetId
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     networkingResourceGroup: networkingResourceGroup
+    storageConfig: storageAccountConfig.staging
+    enableDeleteRetentionPolicy: enableDeleteRetentionPolicy
+    retentionPolicyDays: retentionPolicyDays.staging
+    networkSecurityConfig: networkSecurityConfig
+    // Encryption support for staging (NEW FEATURE)
+    enableEncryption: stagingStorageEncryption.enabled
+    encryptionConfig: stagingStorageEncryption
+    // Malware scanning features (RESTORED)
     enableMalwareScanning: enableMalwareScanning
     overrideSubscriptionLevelSettings: overrideSubscriptionLevelSettings
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     enableEventGridIntegration: enableEventGridIntegration
     enableEventGridSubscriptions: enableEventGridSubscriptions
     processScanWebhookEndpoint: processScanWebhookEndpoint
-    enableDeleteRetentionPolicy: enableDeleteRetentionPolicy
-    retentionPolicyDays: retentionPolicyDays.staging
-    networkSecurityConfig: networkSecurityConfig
+    // Enhanced monitoring
+    enableEnhancedMonitoring: false
+    enableBlobIndexTags: false
   }
 }
 
 // Clean Storage Account - For verified safe files after scanning
-module cleanStorage 'modules/clean-storage.bicep' = {
+module cleanStorage 'modules/document-storage.bicep' = {
   name: 'cleanStorageDeployment'
   params: {
+    storageType: 'clean'
     location: location
     tags: tags
     environment: environment
-    storageConfig: storageAccountConfig.clean
     spokeVNetId: spokeVNetId
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     networkingResourceGroup: networkingResourceGroup
+    storageConfig: storageAccountConfig.clean
     enableDeleteRetentionPolicy: enableDeleteRetentionPolicy
     retentionPolicyDays: retentionPolicyDays.clean
     networkSecurityConfig: networkSecurityConfig
+    enableEncryption: cleanStorageEncryption.enabled
     encryptionConfig: cleanStorageEncryption
   }
   dependsOn: [
@@ -136,20 +164,33 @@ module cleanStorage 'modules/clean-storage.bicep' = {
 }
 
 // Quarantine Storage Account - For infected/suspicious files
-module quarantineStorage 'modules/quarantine-storage.bicep' = {
+module quarantineStorage 'modules/document-storage.bicep' = {
   name: 'quarantineStorageDeployment'
   params: {
+    storageType: 'quarantine'
     location: location
     tags: tags
     environment: environment
-    storageConfig: storageAccountConfig.quarantine
     spokeVNetId: spokeVNetId
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     networkingResourceGroup: networkingResourceGroup
-    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    storageConfig: storageAccountConfig.quarantine
     enableDeleteRetentionPolicy: enableDeleteRetentionPolicy
     retentionPolicyDays: retentionPolicyDays.quarantine
     networkSecurityConfig: networkSecurityConfig
+    // Encryption support for quarantine (NEW FEATURE)
+    enableEncryption: quarantineStorageEncryption.enabled
+    encryptionConfig: quarantineStorageEncryption
+    // Malware scanning (disabled for quarantine)
+    enableMalwareScanning: false
+    overrideSubscriptionLevelSettings: overrideSubscriptionLevelSettings
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    enableEventGridIntegration: false
+    enableEventGridSubscriptions: false
+    processScanWebhookEndpoint: ''
+    // Enhanced monitoring features (RESTORED)
+    enableEnhancedMonitoring: true
+    enableBlobIndexTags: true
   }
   dependsOn: [
     cleanStorage  // Deploy after clean storage to avoid DNS zone conflicts
