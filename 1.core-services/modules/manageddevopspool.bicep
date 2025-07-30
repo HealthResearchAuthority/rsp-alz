@@ -132,14 +132,14 @@ resource manageddevopspool 'Microsoft.DevOpsInfrastructure/pools@2025-01-21' = {
         {
           url: 'https://dev.azure.com/FutureIRAS'
           projects: []
-          parallelism: 2
+          parallelism: 4
           openAccess: false
         }
       ]
       kind: 'AzureDevOps'
     }
     devCenterProjectResourceId: project.id
-    maximumConcurrency: 2
+    maximumConcurrency: 4
     agentProfile: {
       kind: 'Stateless'
     }

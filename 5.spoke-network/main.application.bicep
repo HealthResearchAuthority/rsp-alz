@@ -15,15 +15,6 @@ param tags object = {}
 @description('Central Log Analytics Workspace ID')
 param logAnalyticsWorkspaceId string = '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-operationsmanagement/providers/Microsoft.OperationalInsights/workspaces/hra-rsp-log-analytics'
 
-// @description('The FQDN of the Application Gateway. Must match the TLS Certificate.')
-// param applicationGatewayFqdn string
-
-// @description('Enable or disable Application Gateway Certificate (PFX).')
-// param enableApplicationGatewayCertificate bool 
-
-// @description('The name of the certificate key to use for Application Gateway certificate.')
-// param applicationGatewayCertificateKeyName string
-
 @description('Admin login for SQL Server')
 param parAdminLogin string = ''
 
@@ -379,7 +370,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
       adminLogin: parAdminLogin
       adminPassword: parSqlAdminPhrase
-      databases: ['applicationservice', 'identityservice', 'questionsetservice', 'rtsservice']
+      databases: ['applicationservice', 'identityservice', 'questionsetservice', 'rtsservice', 'cmsdatabase']
       spokePrivateEndpointSubnetName: pepSubnet[i].name // spoke[i].outputs.spokePrivateEndpointsSubnetName
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       sqlServerUAIName: storageServicesNaming[i].outputs.resourcesNames.sqlServerUserAssignedIdentity
@@ -563,6 +554,34 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
+module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('cmsApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: 'B1'
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
+      appName: 'cmsportal-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Linux'
+      subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
+      kind: 'app'
+      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      ]
+      devOpsPublicIPAddress: parDevOpsPublicIPAddress
+      isPrivate: parEnableFrontDoorPrivateLink
+    }
+  }
+]
+
 module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
@@ -692,23 +711,3 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
     ]
   }
 ]
-// module applicationGateway 'modules/08-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-//   name: take('applicationGateway-${deployment().name}-deployment', 64)
-//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgNetworking)
-//   params: {
-//     location: location
-//     tags: tags
-//     applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
-//     applicationGatewayFqdn: applicationGatewayFqdn
-//     applicationGatewayPrimaryBackendEndFqdn: webApp[i].outputs.appHostName
-//     applicationGatewaySubnetId: agwSubnet[i].id  // spoke[i].outputs.spokeApplicationGatewaySubnetId
-//     enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
-//     keyVaultId: supportingServices[i].outputs.keyVaultId
-//     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
-//     ddosProtectionMode: 'Disabled'
-//     applicationGatewayLogAnalyticsId: logAnalyticsWorkspaceId
-//     networkingResourceNames: networkingnaming[i].outputs.resourcesNames
-//   }
-// }]
-
-//output inputdevopsIP string = parDevOpsPublicIPAddress
