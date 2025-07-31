@@ -75,8 +75,6 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
     deployAppPrivateEndPoint: deployAppPrivateEndPoint
     userAssignedIdentities: userAssignedIdentities
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
-    devOpsPublicIPAddress: ''
-    isPrivate: false
     logAnalyticsWsId: logAnalyticsWorkspaceId
     createPrivateDnsZones: false
   }
