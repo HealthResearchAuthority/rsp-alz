@@ -42,6 +42,11 @@ param deployAppPrivateEndPoint bool = false
 @description('Resource Group where PEP and PEP DNS needs to be deployed')
 param privateEndpointRG string = resourceGroup().name
 
+@description('SQL Database managed identity client ID for database access')
+param sqlDBManagedIdentityClientId string = ''
+
+// Note: Storage permissions are handled separately in main.application.bicep
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -69,6 +74,9 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
     storageAccountName: storageAccountName
     deployAppPrivateEndPoint: deployAppPrivateEndPoint
     userAssignedIdentities: userAssignedIdentities
+    sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
+    devOpsPublicIPAddress: ''
+    isPrivate: false
     logAnalyticsWsId: logAnalyticsWorkspaceId
     createPrivateDnsZones: false
   }
@@ -89,3 +97,6 @@ output webhookEndpoint string = 'https://${functionApp.outputs.appHostName}/api/
 
 @description('The Function App URL.')
 output functionAppUrl string = 'https://${functionApp.outputs.appHostName}'
+
+@description('The system-assigned managed identity principal ID of the Function App.')
+output systemAssignedPrincipalId string = functionApp.outputs.systemAssignedPrincipalId

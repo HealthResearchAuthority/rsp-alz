@@ -52,6 +52,73 @@ param parDefenderForStorageConfig = {
   enforce: false
 }
 
+param parOverrideSubscriptionLevelSettings = true
+
+param parSkipExistingRoleAssignments = true
+
+// Storage configuration for all storage account types 
+param parStorageConfig = {
+  clean: {
+    account: {
+      sku: 'Standard_LRS'      
+      accessTier: 'Hot'
+      containerName: 'clean'
+    }
+    encryption: {
+      enabled: true                          
+      keyName: 'key-clean-storage-autotest'      
+      enableInfrastructureEncryption: true  
+      keyRotationEnabled: true              
+    }
+    retention: {
+      enabled: false                        
+      retentionDays: 0                      
+    }
+  }
+  staging: {
+    account: {
+      sku: 'Standard_LRS'      
+      accessTier: 'Hot'
+      containerName: 'staging'
+    }
+    encryption: {
+      enabled: true                          
+      keyName: 'key-staging-storage-autotest'    
+      enableInfrastructureEncryption: true  
+      keyRotationEnabled: true              
+    }
+    retention: {
+      enabled: true                         
+      retentionDays: 7                      
+    }
+  }
+  quarantine: {
+    account: {
+      sku: 'Standard_LRS'      
+      accessTier: 'Cool'       
+      containerName: 'quarantine'
+    }
+    encryption: {
+      enabled: true                          
+      keyName: 'key-quarantine-storage-autotest' 
+      enableInfrastructureEncryption: true  
+      keyRotationEnabled: true              
+    }
+    retention: {
+      enabled: true                         
+      retentionDays: 15                     
+    }
+  }
+}
+
+// Network security configuration for auto test environment
+param parNetworkSecurityConfig = {
+  defaultAction: 'Deny'        
+  bypass: 'AzureServices'      
+  httpsTrafficOnly: true       
+  quarantineBypass: 'None'     
+}
+
 param parSpokeNetworks = [
   {
     subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65'
