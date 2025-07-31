@@ -1,5 +1,69 @@
 targetScope = 'subscription'
 // ------------------
+// USER-DEFINED TYPES
+// ------------------
+
+@description('Storage encryption configuration type definition')
+type storageEncryptionConfig = {
+  @description('Enable customer-managed key encryption')
+  enabled: bool
+  
+  @description('Name of the encryption key (auto-generated if empty)')
+  keyName: string
+  
+  @description('Enable infrastructure (double) encryption')
+  enableInfrastructureEncryption: bool
+  
+  @description('Enable automatic key version updates')
+  keyRotationEnabled: bool
+}
+
+@description('Storage account basic configuration type definition')
+type storageAccountConfig = {
+  @description('Storage account SKU')
+  sku: ('Standard_LRS' | 'Standard_GRS' | 'Standard_ZRS' | 'Standard_GZRS' | 'Premium_LRS')
+  
+  @description('Storage account access tier')
+  accessTier: ('Hot' | 'Cool')
+  
+  @description('Container name for this storage type')
+  containerName: string
+}
+
+@description('Storage retention policy configuration type definition')
+type storageRetentionConfig = {
+  @description('Enable delete retention policy for this storage type')
+  enabled: bool
+  
+  @description('Number of days to retain deleted blobs (0 = disabled)')
+  retentionDays: int
+}
+
+@description('Complete storage configuration for a single storage type')
+type storageTypeConfig = {
+  @description('Basic storage account configuration')
+  account: storageAccountConfig
+  
+  @description('Encryption configuration')
+  encryption: storageEncryptionConfig
+  
+  @description('Retention policy configuration')
+  retention: storageRetentionConfig
+}
+
+@description('Complete storage configuration for all storage types')
+type allStorageConfig = {
+  @description('Clean storage configuration')
+  clean: storageTypeConfig
+  
+  @description('Staging storage configuration')
+  staging: storageTypeConfig
+  
+  @description('Quarantine storage configuration')
+  quarantine: storageTypeConfig
+}
+
+// ------------------
 // PARAMETERS
 // ------------------
 
@@ -68,13 +132,6 @@ param parSqlAuditRetentionDays int = 15
 @description('Spoke Networks Configuration')
 param parSpokeNetworks array
 
-@description('File upload storage account configuration')
-param parFileUploadStorageConfig object = {
-  containerName: 'staging'
-  sku: 'Standard_LRS'
-  accessTier: 'Hot'
-  allowPublicAccess: false
-}
 
 @description('Enable Azure Front Door deployment')
 param parEnableFrontDoor bool = true
@@ -119,11 +176,82 @@ param parDefenderForStorageConfig object = {
 @description('Override subscription level settings for storage account level defender configuration')
 param parOverrideSubscriptionLevelSettings bool = false
 
+@description('Skip creating role assignments if they already exist (for redeployments)')
+param parSkipExistingRoleAssignments bool = false
+
+@description('Comprehensive storage configuration for all storage account types')
+param parStorageConfig allStorageConfig = {
+  clean: {
+    account: {
+      sku: 'Standard_GRS'
+      accessTier: 'Hot'
+      containerName: 'clean'
+    }
+    encryption: {
+      enabled: false
+      keyName: ''
+      enableInfrastructureEncryption: false
+      keyRotationEnabled: true
+    }
+    retention: {
+      enabled: false  // Disable retention for clean storage
+      retentionDays: 0
+    }
+  }
+  staging: {
+    account: {
+      sku: 'Standard_LRS'
+      accessTier: 'Hot'
+      containerName: 'staging'
+    }
+    encryption: {
+      enabled: false
+      keyName: ''
+      enableInfrastructureEncryption: false
+      keyRotationEnabled: true
+    }
+    retention: {
+      enabled: true
+      retentionDays: 7
+    }
+  }
+  quarantine: {
+    account: {
+      sku: 'Standard_LRS'
+      accessTier: 'Cool'
+      containerName: 'quarantine'
+    }
+    encryption: {
+      enabled: false
+      keyName: ''
+      enableInfrastructureEncryption: false
+      keyRotationEnabled: true
+    }
+    retention: {
+      enabled: true
+      retentionDays: 15
+    }
+  }
+}
+
+@description('Network security configuration for storage accounts')
+param parNetworkSecurityConfig object = {
+  defaultAction: 'Deny'        
+  bypass: 'AzureServices'      
+  httpsTrafficOnly: true       
+  quarantineBypass: 'None'    
+}
+
 // ------------------
 // VARIABLES
 // ------------------
 
 var sqlServerNamePrefix = 'rspsqlserver'
+
+// DRY helper function for storage encryption configuration
+func createStorageEncryptionConfig(config storageEncryptionConfig, keyVaultId string) object => union(config, {
+  keyVaultResourceId: config.enabled ? keyVaultId : ''
+})
 
 
 
@@ -316,7 +444,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 ]
 
-// Process scan Function App (created first to get webhook endpoint for Event Grid)
+// Process scan Function App 
 module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-function.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
@@ -333,10 +461,13 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        databaseserver[i].outputs.outputsqlServerUAIID
       ]
+      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
     }
     dependsOn: [
       applicationsRG
+      databaseserver
     ]
   }
 ]
@@ -351,8 +482,6 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       tags: tags
       spokeVNetId: existingVnet[i].id
       spokePrivateEndpointSubnetName: pepSubnet[i].name
-      storageConfig: parFileUploadStorageConfig
-      resourcesNames: storageServicesNaming[i].outputs.resourcesNames
       networkingResourceGroup: parSpokeNetworks[i].rgNetworking
       environment: parSpokeNetworks[i].parEnvironment
       enableMalwareScanning: true
@@ -361,6 +490,20 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       enableEventGridIntegration: true
       enableEventGridSubscriptions: false  // Set to true only after Function App code is deployed and webhook endpoint is ready
       processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint
+      retentionPolicyDays: {
+        staging: parStorageConfig.staging.retention.retentionDays
+        clean: parStorageConfig.clean.retention.retentionDays
+        quarantine: parStorageConfig.quarantine.retention.retentionDays
+      }
+      storageAccountConfig: {
+        staging: parStorageConfig.staging.account
+        clean: parStorageConfig.clean.account
+        quarantine: parStorageConfig.quarantine.account
+      }
+      networkSecurityConfig: parNetworkSecurityConfig
+      cleanStorageEncryption: createStorageEncryptionConfig(parStorageConfig.clean.encryption, supportingServices[i].outputs.keyVaultId)
+      stagingStorageEncryption: createStorageEncryptionConfig(parStorageConfig.staging.encryption, supportingServices[i].outputs.keyVaultId)
+      quarantineStorageEncryption: createStorageEncryptionConfig(parStorageConfig.quarantine.encryption, supportingServices[i].outputs.keyVaultId)
     }
     dependsOn: [
       defenderStorage
@@ -692,23 +835,20 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
     ]
   }
 ]
-// module applicationGateway 'modules/08-application-gateway/deploy.app-gateway.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-//   name: take('applicationGateway-${deployment().name}-deployment', 64)
-//   scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgNetworking)
-//   params: {
-//     location: location
-//     tags: tags
-//     applicationGatewayCertificateKeyName: applicationGatewayCertificateKeyName
-//     applicationGatewayFqdn: applicationGatewayFqdn
-//     applicationGatewayPrimaryBackendEndFqdn: webApp[i].outputs.appHostName
-//     applicationGatewaySubnetId: agwSubnet[i].id  // spoke[i].outputs.spokeApplicationGatewaySubnetId
-//     enableApplicationGatewayCertificate: enableApplicationGatewayCertificate
-//     keyVaultId: supportingServices[i].outputs.keyVaultId
-//     deployZoneRedundantResources: parSpokeNetworks[i].zoneRedundancy
-//     ddosProtectionMode: 'Disabled'
-//     applicationGatewayLogAnalyticsId: logAnalyticsWorkspaceId
-//     networkingResourceNames: networkingnaming[i].outputs.resourcesNames
-//   }
-// }]
 
-//output inputdevopsIP string = parDevOpsPublicIPAddress
+// Grant process scan function permissions to all document storage accounts. Handled seperately as there was circular dependency.
+module processScanFunctionPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('processScanFunctionPermissions-${deployment().name}-deployment', 64)
+    params: {
+      functionAppPrincipalId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityPrincipalId
+      storageAccountIds: documentUpload[i].outputs.allStorageAccountIds
+      skipExistingRoleAssignments: parSkipExistingRoleAssignments
+    }
+    dependsOn: [
+      processScanFnApp
+      documentUpload
+    ]
+  }
+]
