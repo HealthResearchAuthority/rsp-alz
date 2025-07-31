@@ -1,4 +1,6 @@
 
+
+
 @description('Required. Name of the App Service Plan.')
 @minLength(1)
 @maxLength(40)
@@ -61,7 +63,6 @@ param deploySlot bool
 
 param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
-
 
 
 // @description('The name of an existing keyvault, that it will be used to store secrets (connection string)' )
@@ -203,6 +204,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     functionAppName:  appName
     location: location
     serverFarmResourceId: appSvcPlan.outputs.resourceId
+    //diagnosticWorkspaceId: logAnalyticsWsId
     virtualNetworkSubnetId: subnetIdForVnetInjection
     appInsightId: appInsights.outputs.appInsResourceId
     userAssignedIdentities:  {
@@ -241,6 +243,7 @@ module appServicePrivateEndpoint '../../../shared/bicep/network/private-networki
       }
     ]
     subnetId: subnetPrivateEndpointSubnetId
+    //vnetSpokeResourceId: spokeVNetId
   }
 }
 
