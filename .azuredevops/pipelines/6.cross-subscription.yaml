@@ -2,6 +2,7 @@
 name: 6.cross-subscription-lza-deployment
 
 trigger: none
+pr: none
 
 variables:
   - group: 'CrossSubscription'
@@ -91,4 +92,5 @@ jobs:
               --management-group-id $(management-group-id) \
               --template-file ./6.cross-subscription/main.bicep \
               --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds))
+            echo "Full Bicep Deployment Output:"
             echo $output | jq .

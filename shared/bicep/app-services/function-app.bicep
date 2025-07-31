@@ -133,3 +133,4 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
 output functionAppName string = functionApp.name
 output functionAppId string = functionApp.id
 output defaultHostName string = functionApp.properties.defaultHostName
+output systemAssignedPrincipalId string = functionApp.identity.?principalId ?? ''

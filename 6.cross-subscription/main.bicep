@@ -53,3 +53,7 @@ module privateNetworking 'modules/privatenetworking/privatenetworking.bicep' = [
     managementResourceGroupName: managementResourceGroupName
   }
 }]
+
+output serviceIDs array = [for serviceId in pepServiceIDArray: {
+  serviceId: serviceId
+}]
