@@ -26,10 +26,12 @@ var vNetLinksDefault = [
 
 var privateDNSMap = {
   'Microsoft.ContainerRegistry': 'privatelink.azurecr.io'
+  'Microsoft.Web': 'privatelink.azurewebsites.net'
 }
 
 var subResourceNamesMap = {
   'Microsoft.ContainerRegistry': 'registry'
+  'Microsoft.Web': 'sites'
 }
 
 var privateDNSName = privateDNSMap[?sourceResourceType] ?? ''
