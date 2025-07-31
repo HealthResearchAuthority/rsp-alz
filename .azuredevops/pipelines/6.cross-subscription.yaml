@@ -2,6 +2,7 @@
 name: 6.cross-subscription-lza-deployment
 
 trigger: none
+pr: none
 
 variables:
   - group: 'CrossSubscription'
