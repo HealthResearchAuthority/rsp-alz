@@ -85,7 +85,7 @@ param parStorageConfig = {
     }
     retention: {
       enabled: true                         
-      retentionDays: 365                    
+      retentionDays: 90                    
     }
   }
 }
