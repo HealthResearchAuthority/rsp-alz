@@ -176,6 +176,9 @@ param parDefenderForStorageConfig object = {
 @description('Override subscription level settings for storage account level defender configuration')
 param parOverrideSubscriptionLevelSettings bool = false
 
+@description('Skip creating role assignments if they already exist (for redeployments)')
+param parSkipExistingRoleAssignments bool = false
+
 @description('Comprehensive storage configuration for all storage account types')
 param parStorageConfig allStorageConfig = {
   clean: {
@@ -841,6 +844,7 @@ module processScanFunctionPermissions '../shared/bicep/role-assignments/process-
     params: {
       functionAppPrincipalId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityPrincipalId
       storageAccountIds: documentUpload[i].outputs.allStorageAccountIds
+      skipExistingRoleAssignments: parSkipExistingRoleAssignments
     }
     dependsOn: [
       processScanFnApp
