@@ -65,6 +65,21 @@ resource keyVaultRoleAssignment 'Microsoft.Authorization/roleAssignments@2022-04
   }
 }
 
+// Add a deployment script to ensure role assignment propagation
+resource roleAssignmentDelay 'Microsoft.Resources/deploymentScripts@2023-08-01' = {
+  name: 'roleAssignmentDelay-${keyName}'
+  location: resourceGroup().location
+  kind: 'AzurePowerShell'
+  properties: {
+    azPowerShellVersion: '9.0'
+    scriptContent: 'Start-Sleep -Seconds 30'
+    retentionInterval: 'P1D'
+  }
+  dependsOn: [
+    keyVaultRoleAssignment
+  ]
+}
+
 // ------------------
 // OUTPUTS
 // ------------------
