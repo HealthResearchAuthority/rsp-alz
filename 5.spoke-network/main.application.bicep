@@ -245,8 +245,6 @@ param parNetworkSecurityConfig object = {
   quarantineBypass: 'None'    
 }
 
-@description('Private DNS Zone IDs from network deployment for all Azure services by spoke network')
-param parPrivateDnsZoneIds object[] = []
 
 // ------------------
 // VARIABLES
@@ -472,7 +470,6 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
       deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       privateEndpointRG: parSpokeNetworks[i].rgNetworking
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-      privateDnsZoneIdAppServices: !empty(parPrivateDnsZoneIds) ? parPrivateDnsZoneIds[i].appServices : ''
     }
     dependsOn: [
       applicationsRG
@@ -738,7 +735,6 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-      privateDnsZoneIdAppServices: !empty(parPrivateDnsZoneIds) ? parPrivateDnsZoneIds[i].appServices : ''
     }
     dependsOn: [
       webApp
@@ -770,7 +766,6 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         // supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
       ]
-      privateDnsZoneIdAppServices: !empty(parPrivateDnsZoneIds) ? parPrivateDnsZoneIds[i].appServices : ''
     }
     dependsOn: [
       rtsfnApp
@@ -831,7 +826,6 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-      privateDnsZoneIdAppServices: !empty(parPrivateDnsZoneIds) ? parPrivateDnsZoneIds[i].appServices : ''
     }
     dependsOn: [
       fnNotifyApp
