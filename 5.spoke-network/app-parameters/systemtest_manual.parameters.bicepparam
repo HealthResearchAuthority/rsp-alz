@@ -1,5 +1,7 @@
 using '../main.application.bicep'
 
+param logAnalyticsWorkspaceId = ''
+
 param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
