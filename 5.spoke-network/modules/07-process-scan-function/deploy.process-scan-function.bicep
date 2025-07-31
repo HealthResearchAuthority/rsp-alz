@@ -45,6 +45,8 @@ param privateEndpointRG string = resourceGroup().name
 @description('SQL Database managed identity client ID for database access')
 param sqlDBManagedIdentityClientId string = ''
 
+@description('Private DNS Zone ID for App Services from centralized DNS zones')
+param privateDnsZoneIdAppServices string = ''
 
 // Note: Storage permissions are handled separately in main.application.bicep
 
@@ -77,6 +79,7 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
     userAssignedIdentities: userAssignedIdentities
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     logAnalyticsWsId: logAnalyticsWorkspaceId
+    privateDnsZoneIdAppServices: privateDnsZoneIdAppServices
   }
 }
 

@@ -62,6 +62,25 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
   }
 }]
 
+// Centralized Private DNS Zones for all Azure services using custom module
+module centralizedPrivateDnsZones '../shared/bicep/network/centralized-private-dns-zones.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgNetworking)
+    name: take('centralizedPrivateDnsZones-${i}', 64)
+    params: {
+      virtualNetworkInfo: {
+        name: spoke[i].outputs.spokeVNetName
+        id: spoke[i].outputs.spokeVNetId
+      }
+      tags: tags
+      location: 'global'
+    }
+    dependsOn: [
+      spoke
+    ]
+  }
+]
+
 // ------------------
 // OUTPUTS
 // ------------------
@@ -100,3 +119,9 @@ output spokeApplicationGatewaySubnetIds array = [for i in range(0, length(parSpo
 output spokeApplicationGatewaySubnetNames array = [for i in range(0, length(parSpokeNetworks)): {
   Name: spoke[i].outputs.spokeApplicationGatewaySubnetName
 }]
+
+@description('Private DNS Zone resource IDs for all Azure services by spoke network')
+output privateDnsZoneIds array = [for i in range(0, length(parSpokeNetworks)): centralizedPrivateDnsZones[i].outputs.privateDnsZoneIds]
+
+@description('Private DNS Zone names for all Azure services by spoke network')
+output privateDnsZoneNames array = [for i in range(0, length(parSpokeNetworks)): centralizedPrivateDnsZones[i].outputs.privateDnsZoneNames]

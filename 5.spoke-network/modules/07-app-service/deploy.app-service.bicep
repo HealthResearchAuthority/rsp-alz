@@ -62,6 +62,9 @@ param deploySlot bool
 param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
 
+@description('Private DNS Zone ID for App Services from centralized DNS zones')
+param privateDnsZoneIdAppServices string = ''
+
 
 // @description('The name of an existing keyvault, that it will be used to store secrets (connection string)' )
 // param keyvaultName string
@@ -222,23 +225,19 @@ resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   name: spokeVNetName
 }
 
-module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(deployAppPrivateEndPoint == true) {
-  name:take('webAppPrivateNetwork-${deployment().name}', 64)
+// Private endpoint for App Service/Function App using centralized DNS zones
+module appServicePrivateEndpoint '../../../shared/bicep/network/private-endpoint-with-dns-group.bicep' = if(deployAppPrivateEndPoint && !empty(privateDnsZoneIdAppServices)) {
+  name: take('appServicePrivateEndpoint-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
     location: location
-    azServicePrivateDnsZoneName: 'privatelink.azurewebsites.net'
-    azServiceId: kind == 'app' ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
     privateEndpointName: kind == 'app' ? take('pep-${webApp!.outputs.name}', 64) : take('pep-${fnApp!.outputs.functionAppName}', 64)
-    privateEndpointSubResourceName: 'sites'
-    virtualNetworkLinks: [
-      {
-        vnetName: spokeVNetName
-        vnetId: vnetSpoke.id
-        registrationEnabled: false
-      }
-    ]
     subnetId: subnetPrivateEndpointSubnetId
+    privateLinkServiceId: kind == 'app' ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
+    groupId: 'sites'
+    privateDnsZoneId: privateDnsZoneIdAppServices
+    dnsConfigName: 'appservice-config'
+    tags: tags
   }
 }
 
