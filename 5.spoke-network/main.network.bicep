@@ -72,8 +72,8 @@ module centralizedPrivateDnsZones '../shared/bicep/network/centralized-private-d
         name: spoke[i].outputs.spokeVNetName
         id: spoke[i].outputs.spokeVNetId
       }
-      tags: tags
       location: 'global'
+      createVNetLinks: false  // VNet links already exist
     }
     dependsOn: [
       spoke
