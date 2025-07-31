@@ -45,6 +45,9 @@ param privateEndpointRG string = resourceGroup().name
 @description('SQL Database managed identity client ID for database access')
 param sqlDBManagedIdentityClientId string = ''
 
+@description('Create private DNS zones (set to false if zones already exist)')
+param createPrivateDnsZones bool = true
+
 // Note: Storage permissions are handled separately in main.application.bicep
 
 // ------------------
@@ -76,7 +79,7 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
     userAssignedIdentities: userAssignedIdentities
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     logAnalyticsWsId: logAnalyticsWorkspaceId
-    createPrivateDnsZones: false
+    createPrivateDnsZones: createPrivateDnsZones
   }
 }
 

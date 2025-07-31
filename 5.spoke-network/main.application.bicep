@@ -469,6 +469,7 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
       deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       privateEndpointRG: parSpokeNetworks[i].rgNetworking
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+      createPrivateDnsZones: true
     }
     dependsOn: [
       applicationsRG
@@ -734,9 +735,11 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+      createPrivateDnsZones: false
     }
     dependsOn: [
       webApp
+      processScanFnApp
     ]
   }
 ]
@@ -765,6 +768,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         // supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
       ]
+      createPrivateDnsZones: false
     }
     dependsOn: [
       rtsfnApp
@@ -825,6 +829,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+      createPrivateDnsZones: false
     }
     dependsOn: [
       fnNotifyApp
