@@ -74,7 +74,8 @@ jobs:
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
                            parClientID=$(clientID) parClientSecret=$(clientSecret) \
-                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP)
+                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
+                           parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
 
   - job: preview
     pool:
@@ -105,7 +106,8 @@ jobs:
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
                            parClientID=$(clientID) parClientSecret=$(clientSecret) \
-                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP)
+                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
+                           parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
 
   - job: deploy
     pool:
@@ -143,6 +145,7 @@ jobs:
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
                            parClientID=$(clientID) parClientSecret=$(clientSecret) \
                            logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
+                           parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
                            --deny-settings-mode none --action-on-unmanage deleteResources --yes)
             echo $output | jq .
             appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
