@@ -44,7 +44,7 @@ jobs:
           addSpnToEnvironment: true
           failOnStandardError: false
           inlineScript: |
-            az config set bicep.use_binary_from_path=false
+            az config set bicep.use_binary_from_path=false --only-show-errors
             az stack mg validate \
               --name "cross-subscription-deployment-stack" \
               --location $(location) \
@@ -75,7 +75,7 @@ jobs:
           addSpnToEnvironment: true
           failOnStandardError: true
           inlineScript: |
-            az config set bicep.use_binary_from_path=false
+            az config set bicep.use_binary_from_path=false --only-show-errors
             output=$(az stack mg create \
               --name "cross-subscription-deployment-stack" \
               --location $(location) \
