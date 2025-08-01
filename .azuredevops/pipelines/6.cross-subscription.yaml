@@ -45,14 +45,15 @@ jobs:
           failOnStandardError: false
           inlineScript: |
             az config set bicep.use_binary_from_path=false
-            az deployment mg validate \
-              --name "ACA-$(Build.BuildId)" \
+            az stack mg validate \
+              --name "cross-subscription-deployment-stack" \
               --location $(location) \
               --management-group-id $(management-group-id) \
               --template-file ./6.cross-subscription/main.bicep \
               --parameters paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
                            manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
                            paramserviceIds="$(serviceIds)" \
+              --deny-settings-mode none --action-on-unmanage deleteResources \
               --output table
 
   - job: preview
@@ -74,13 +75,15 @@ jobs:
           failOnStandardError: false
           inlineScript: |
             az config set bicep.use_binary_from_path=false
-            az deployment mg what-if \
+            az stack mg what-if \
+              --name "cross-subscription-deployment-stack" \
               --location $(location) \
-              --template-file ./6.cross-subscription/main.bicep \
               --management-group-id $(management-group-id) \
+              --template-file ./6.cross-subscription/main.bicep \
               --parameters paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
                            manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
                            paramserviceIds="$(serviceIds)" \
+              --deny-settings-mode none --action-on-unmanage deleteResources \
               --output table
   - job: deploy
     pool: 
@@ -102,13 +105,14 @@ jobs:
           failOnStandardError: true
           inlineScript: |
             az config set bicep.use_binary_from_path=false
-            output=$(az deployment mg create \
-              --name "core-services-$(Build.BuildId)" \
+            output=$(az stack mg create \
+              --name "cross-subscription-deployment-stack" \
               --location $(location) \
               --management-group-id $(management-group-id) \
               --template-file ./6.cross-subscription/main.bicep \
               --parameters paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
                            manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
-                           paramserviceIds="$(serviceIds)")
+                           paramserviceIds="$(serviceIds)" \
+              --deny-settings-mode none --action-on-unmanage deleteResources --yes)
             echo "Full Bicep Deployment Output:"
             echo $output | jq .
