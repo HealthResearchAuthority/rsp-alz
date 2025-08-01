@@ -41,9 +41,19 @@ jobs:
           azureSubscription: $(azureServiceConnection)
           scriptType: bash
           scriptLocation: inlineScript
+          addSpnToEnvironment: true
+          failOnStandardError: false
           inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds)
+            az config set bicep.use_binary_from_path=false
+            az deployment mg validate \
+              --name "ACA-$(Build.BuildId)" \
+              --location $(location) \
+              --management-group-id $(management-group-id) \
+              --template-file ./6.cross-subscription/main.bicep \
+              --parameters paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
+                           manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
+                           paramserviceIds="$(serviceIds)" \
+              --output table
 
   - job: preview
     pool: 
@@ -60,13 +70,18 @@ jobs:
           azureSubscription: $(azureServiceConnection)
           scriptType: bash
           scriptLocation: inlineScript
+          addSpnToEnvironment: true
+          failOnStandardError: false
           inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
+            az config set bicep.use_binary_from_path=false
             az deployment mg what-if \
               --location $(location) \
               --template-file ./6.cross-subscription/main.bicep \
               --management-group-id $(management-group-id) \
-              --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds)
+              --parameters paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
+                           manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
+                           paramserviceIds="$(serviceIds)" \
+              --output table
   - job: deploy
     pool: 
       vmImage: 'ubuntu-latest'
@@ -83,14 +98,17 @@ jobs:
           azureSubscription: $(azureServiceConnection)
           scriptType: bash
           scriptLocation: inlineScript
+          addSpnToEnvironment: true
           failOnStandardError: true
           inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
+            az config set bicep.use_binary_from_path=false
             output=$(az deployment mg create \
               --name "core-services-$(Build.BuildId)" \
               --location $(location) \
               --management-group-id $(management-group-id) \
               --template-file ./6.cross-subscription/main.bicep \
-              --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds))
+              --parameters paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
+                           manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
+                           paramserviceIds="$(serviceIds)")
             echo "Full Bicep Deployment Output:"
             echo $output | jq .
