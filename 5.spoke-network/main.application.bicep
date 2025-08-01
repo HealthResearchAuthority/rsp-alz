@@ -162,9 +162,11 @@ param parEnableFrontDoorHttpsRedirect bool = true
 @description('Enable Front Door Private Link to origin')
 param parEnableFrontDoorPrivateLink bool = false
 
+@description('Enable Function Apps Private Endpoints')
+param parEnableFunctionAppPrivateEndpoints bool = false
+
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
-
 
 @description('Microsoft Defender for Storage configuration')
 param parDefenderForStorageConfig object = {
@@ -242,6 +244,7 @@ param parNetworkSecurityConfig object = {
   httpsTrafficOnly: true       
   quarantineBypass: 'None'    
 }
+
 
 // ------------------
 // VARIABLES
@@ -464,6 +467,8 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
     }
     dependsOn: [
@@ -701,8 +706,6 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       ]
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: parEnableFrontDoorPrivateLink
     }
   }
 ]
@@ -726,14 +729,12 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'functionapp'
       storageAccountName: 'strtssync${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: false
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
     }
     dependsOn: [
       webApp
@@ -760,13 +761,11 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'functionapp'
       storageAccountName: 'stfnnotify${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: false
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         // supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
       ]
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
     }
     dependsOn: [
       rtsfnApp
@@ -821,14 +820,12 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
       kind: 'functionapp'
       storageAccountName: 'stdocapi${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: false
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
     }
     dependsOn: [
       fnNotifyApp
@@ -836,6 +833,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
     ]
   }
 ]
+
 
 // Grant process scan function permissions to all document storage accounts. Handled seperately as there was circular dependency.
 module processScanFunctionPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [

@@ -36,8 +36,15 @@ param userAssignedIdentities array
 @maxLength(40)
 param appServicePlanName string
 
+@description('Enable private endpoint for function app')
+param deployAppPrivateEndPoint bool = false
+
+@description('Resource Group where PEP and PEP DNS needs to be deployed')
+param privateEndpointRG string = resourceGroup().name
+
 @description('SQL Database managed identity client ID for database access')
 param sqlDBManagedIdentityClientId string = ''
+
 
 // Note: Storage permissions are handled separately in main.application.bicep
 
@@ -61,18 +68,15 @@ module functionApp '../07-app-service/deploy.app-service.bicep' = {
     webAppBaseOs: 'Windows'
     subnetIdForVnetInjection: subnetIdForVnetInjection
     deploySlot: false
-    privateEndpointRG: resourceGroup().name
+    privateEndpointRG: privateEndpointRG
     spokeVNetId: spokeVNetId
     subnetPrivateEndpointSubnetId: subnetPrivateEndpointSubnetId
     kind: 'functionapp'
     storageAccountName: storageAccountName
-    deployAppPrivateEndPoint: false
+    deployAppPrivateEndPoint: deployAppPrivateEndPoint
     userAssignedIdentities: userAssignedIdentities
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
-    devOpsPublicIPAddress: ''
-    isPrivate: false
     logAnalyticsWsId: logAnalyticsWorkspaceId
-    createPrivateDnsZones: false
   }
 }
 
