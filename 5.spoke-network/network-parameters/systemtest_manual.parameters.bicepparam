@@ -1,5 +1,7 @@
 using '../main.network.bicep'
 
+param logAnalyticsWorkspaceId = ''
+
 param parSpokeNetworks = [
   {
     subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379'
