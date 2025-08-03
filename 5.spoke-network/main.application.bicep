@@ -250,6 +250,12 @@ param parStorageAccountName string
 @description('The key for the storage account where the blob connection string will be stored.')
 param parStorageAccountKey string
 
+@description('Allowed hosts for the application to be used when the Web App is behind Front Door')
+param parAllowedHosts string
+
+@description('Indicates whether to use Front Door for the application')
+param parUseFrontDoor bool
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -429,6 +435,8 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       oneLoginIssuers: parOneLoginIssuers
       storageAccountName: parStorageAccountName
       storageAccountKey: parStorageAccountKey
+      allowedHosts: parAllowedHosts
+      useFrontDoor: parUseFrontDoor
     }
   }
 ]

@@ -56,9 +56,20 @@ param storageAccountName string
 @description('The key for the storage account where the blob connection string will be stored.')
 param storageAccountKey string
 
+@description('Allowed hosts for the application to be used when the Web App is behind Front Door')
+param allowedHosts string
+
+@description('Indicates whether to use Front Door for the application')
+param useFrontDoor bool
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
+  {
+    name: 'AppSettings:AllowedHosts$portal' // Allowed hosts for the portal to be used when the Web App is behind Front Door
+    value: allowedHosts
+    contentType: null
+  }
   {
     name: 'AppSettings:AuthSettings:Authority'
     value: 'https://${IDGENV}.id.nihr.ac.uk:443/oauth2/token'
@@ -180,7 +191,7 @@ var keyValues = [
     contentType: null
   }
   {
-    name: 'AppSettings:Azure:DocumentStorage:Blob:ConnectionString'
+    name: 'AppSettings:Azure:DocumentStorage:Blob:ConnectionString$portal'
     value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${storageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
@@ -234,6 +245,12 @@ var featureFlags = [
     description: 'When enabled, Gov UK One Login will be used for authentication'
     label: null
     enabled: false
+  }
+  {
+    id: 'WebApp.UseFrontDoor'
+    description: 'When enabled, it will use the AllowedHosts to Front Door URL.'
+    label: 'portal'
+    enabled: useFrontDoor
   }
 ]
 
