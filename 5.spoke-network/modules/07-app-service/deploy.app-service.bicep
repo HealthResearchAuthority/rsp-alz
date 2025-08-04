@@ -83,6 +83,12 @@ var spokeVNetName = spokeVNetIdTokens[8]
 var networkAcls = deployAppPrivateEndPoint ? {
   defaultAction: 'Deny'
   bypass: 'AzureServices'
+  virtualNetworkRules: [
+    {
+      id: subnetIdForVnetInjection
+      action: 'Allow'
+    }
+  ]
 } : {
   defaultAction: 'Allow'
   bypass: 'AzureServices'
