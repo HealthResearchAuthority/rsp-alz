@@ -30,7 +30,7 @@ param parSqlAuditRetentionDays = 15
 
 
 // Azure Front Door Configuration
-param parEnableFrontDoor = true
+param parEnableFrontDoor = false
 param parFrontDoorWafMode = 'Detection'
 param parEnableFrontDoorRateLimiting = true
 param parFrontDoorRateLimitThreshold = 1000
