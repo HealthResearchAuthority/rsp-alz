@@ -1,5 +1,7 @@
 using '../main.application.bicep'
 
+param logAnalyticsWorkspaceId = ''
+
 param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
@@ -51,6 +53,73 @@ param parDefenderForStorageConfig = {
   enforce: false
 }
 
+param parOverrideSubscriptionLevelSettings = true
+
+param parSkipExistingRoleAssignments = true
+
+// Storage configuration for all storage account types 
+param parStorageConfig = {
+  clean: {
+    account: {
+      sku: 'Standard_LRS'
+      accessTier: 'Hot'
+      containerName: 'clean'
+    }
+    encryption: {
+      enabled: true
+      keyName: 'key-clean-storage-autotest'
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true
+    }
+    retention: {
+      enabled: false
+      retentionDays: 0
+    }
+  }
+  staging: {
+    account: {
+      sku: 'Standard_LRS'
+      accessTier: 'Hot'
+      containerName: 'staging'
+    }
+    encryption: {
+      enabled: true
+      keyName: 'key-staging-storage-autotest'
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true
+    }
+    retention: {
+      enabled: true
+      retentionDays: 7
+    }
+  }
+  quarantine: {
+    account: {
+      sku: 'Standard_LRS'
+      accessTier: 'Cool'
+      containerName: 'quarantine'
+    }
+    encryption: {
+      enabled: true
+      keyName: 'key-quarantine-storage-autotest'
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true
+    }
+    retention: {
+      enabled: true
+      retentionDays: 15
+    }
+  }
+}
+
+// Network security configuration for auto test environment
+param parNetworkSecurityConfig = {
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+  quarantineBypass: 'None'
+}
+
 param parSpokeNetworks = [
   {
     subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65'
@@ -72,3 +141,6 @@ param parSpokeNetworks = [
     appInsightsConnectionString: 'InstrumentationKey=225c2ec1-bb7d-4c33-9d5f-cb89c117f2d6;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=3dc21d1c-0655-44cc-8ad3-cb4eab8c8c67'
   }
 ]
+
+param parStorageAccountName = 'strspstagngdev'
+param parStorageAccountKey = ''

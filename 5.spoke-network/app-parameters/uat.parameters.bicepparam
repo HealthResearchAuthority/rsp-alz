@@ -1,5 +1,7 @@
 using '../main.application.bicep'
 
+param logAnalyticsWorkspaceId = ''
+
 param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
@@ -23,6 +25,80 @@ param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
 param parEnableFrontDoorPrivateLink = false
 param parFrontDoorCustomDomains = []
+
+param parDefenderForStorageConfig = {
+  enabled: true
+  enableMalwareScanning: true
+  enableSensitiveDataDiscovery: true
+  enforce: false
+}
+
+param parOverrideSubscriptionLevelSettings = true
+
+param parSkipExistingRoleAssignments = false
+
+// Storage configuration for all storage account types 
+param parStorageConfig = {
+  clean: {
+    account: {
+      sku: 'Standard_LRS'      
+      accessTier: 'Hot'
+      containerName: 'clean'
+    }
+    encryption: {
+      enabled: true                          
+      keyName: 'key-clean-storage-uat'      
+      enableInfrastructureEncryption: true  
+      keyRotationEnabled: true              
+    }
+    retention: {
+      enabled: false                        
+      retentionDays: 0                      
+    }
+  }
+  staging: {
+    account: {
+      sku: 'Standard_LRS'      
+      accessTier: 'Hot'
+      containerName: 'staging'
+    }
+    encryption: {
+      enabled: true                          
+      keyName: 'key-staging-storage-uat'    
+      enableInfrastructureEncryption: true  
+      keyRotationEnabled: true              
+    }
+    retention: {
+      enabled: true                         
+      retentionDays: 30                     
+    }
+  }
+  quarantine: {
+    account: {
+      sku: 'Standard_LRS'      
+      accessTier: 'Cool'       
+      containerName: 'quarantine'
+    }
+    encryption: {
+      enabled: true                          
+      keyName: 'key-quarantine-storage-uat' 
+      enableInfrastructureEncryption: true  
+      keyRotationEnabled: true              
+    }
+    retention: {
+      enabled: true                         
+      retentionDays: 90                     
+    }
+  }
+}
+
+// Network security configuration for UAT environment
+param parNetworkSecurityConfig = {
+  defaultAction: 'Deny'        
+  bypass: 'AzureServices'      
+  httpsTrafficOnly: true       
+  quarantineBypass: 'None'     
+}
 
 param parSpokeNetworks = [
   {

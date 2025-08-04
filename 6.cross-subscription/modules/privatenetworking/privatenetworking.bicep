@@ -47,7 +47,7 @@ resource managementPEPSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-07-
 
 
 module privateNetworking '../../../shared/bicep/network/private-networking-spoke.bicep' = {
-  name:take('containerRegistryNetworkDeployment-${deployment().name}', 64)
+  name:take('serviceNetworkDeployment-${last(serviceId)}', 64)
   scope: resourceGroup(managementSubscriptionId,managementResourceGroupName)
   params: {
     location: deployment().location

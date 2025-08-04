@@ -1,5 +1,7 @@
 using '../main.application.bicep'
 
+param logAnalyticsWorkspaceId = ''
+
 param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
@@ -26,13 +28,6 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 15
 
-param parFileUploadStorageConfig = {
-  containerName: 'documentupload'
-  sku: 'Standard_LRS'
-  accessTier: 'Hot'
-  allowPublicAccess: false
-}
-
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
 param parFrontDoorWafMode = 'Detection'
@@ -52,6 +47,71 @@ param parDefenderForStorageConfig = {
 }
 
 param parOverrideSubscriptionLevelSettings = true
+
+param parSkipExistingRoleAssignments = true
+
+// Storage configuration for all storage account types 
+param parStorageConfig = {
+  clean: {
+    account: {
+      sku: 'Standard_LRS'
+      accessTier: 'Hot'
+      containerName: 'clean'
+    }
+    encryption: {
+      enabled: true // Enable for encryption
+      keyName: 'key-clean-storage-dev' // Environment-specific key name
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true // Automatic key version updates
+    }
+    retention: {
+      enabled: false // Disable retention for clean storage
+      retentionDays: 0 // No auto-deletion
+    }
+  }
+  staging: {
+    account: {
+      sku: 'Standard_LRS' // Cost-optimized for dev
+      accessTier: 'Hot'
+      containerName: 'staging'
+    }
+    encryption: {
+      enabled: true // Enable for encryption
+      keyName: 'key-staging-storage-dev' // Environment-specific key name
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true // Automatic key version updates
+    }
+    retention: {
+      enabled: true // Enable retention for staging
+      retentionDays: 7 // Short retention for staging files
+    }
+  }
+  quarantine: {
+    account: {
+      sku: 'Standard_LRS' // Cost-optimized 
+      accessTier: 'Cool' // Cool tier for quarantine
+      containerName: 'quarantine'
+    }
+    encryption: {
+      enabled: true // Enable for encryption
+      keyName: 'key-quarantine-storage-dev' // Environment-specific key name
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true // Automatic key version updates
+    }
+    retention: {
+      enabled: true // Enable retention for quarantine
+      retentionDays: 15 // 15 days retention for analysis
+    }
+  }
+}
+
+// Network security configuration for dev environment
+param parNetworkSecurityConfig = {
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+  quarantineBypass: 'None' // Strictest setting for quarantine storage
+}
 
 param parSpokeNetworks = [
   {
@@ -74,3 +134,6 @@ param parSpokeNetworks = [
     appInsightsConnectionString: 'InstrumentationKey=5d4746f6-cea9-4d2e-ade9-a943edaafadb;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=1d5b29c1-8cfb-4346-a5aa-134095ec7821'
   }
 ]
+
+param parStorageAccountName = 'strspstagngdev'
+param parStorageAccountKey = ''

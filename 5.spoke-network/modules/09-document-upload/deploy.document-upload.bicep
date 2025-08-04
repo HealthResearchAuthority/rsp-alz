@@ -16,12 +16,6 @@ param spokeVNetId string
 @description('The name of the subnet in the VNet to which the private endpoint will be connected.')
 param spokePrivateEndpointSubnetName string
 
-@description('File upload storage account configuration')
-param storageConfig object
-
-@description('Resource naming configuration from naming module')
-param resourcesNames object
-
 
 @description('Networking resource group name')
 param networkingResourceGroup string
@@ -35,7 +29,6 @@ param enableMalwareScanning bool = true
 @description('Override subscription level settings for storage account level defender configuration')
 param overrideSubscriptionLevelSettings bool = true
 
-
 @description('Log Analytics workspace ID for security alerts')
 param logAnalyticsWorkspaceId string
 
@@ -48,209 +41,228 @@ param enableEventGridSubscriptions bool = false
 @description('Process scan Function App webhook endpoint URL')
 param processScanWebhookEndpoint string = ''
 
-// ------------------
-// VARIABLES
-// ------------------
+@description('Blob delete retention policy configuration per storage type')
+param retentionPolicyDays object = {
+  staging: 7     // Short retention for staging files
+  clean: 365     // Long retention for production files
+  quarantine: 15 // Short retention for quarantine files
+}
 
-var spokeVNetIdTokens = split(spokeVNetId, '/')
-var spokeSubscriptionId = spokeVNetIdTokens[2]
-var spokeResourceGroupName = spokeVNetIdTokens[4]
-var spokeVNetName = spokeVNetIdTokens[8]
-
-var spokeVNetLinks = [
-  {
-    vnetName: spokeVNetName
-    vnetId: vnetSpoke.id
-    registrationEnabled: false
+@description('Storage account configuration per storage type')
+param storageAccountConfig object = {
+  staging: {
+    sku: 'Standard_LRS'
+    accessTier: 'Hot'
+    containerName: 'staging'
   }
-]
+  clean: {
+    sku: 'Standard_GRS'  
+    accessTier: 'Hot'
+    containerName: 'clean'
+  }
+  quarantine: {
+    sku: 'Standard_LRS'
+    accessTier: 'Cool' 
+    containerName: 'quarantine'
+  }
+}
+
+@description('Network security configuration for storage accounts')
+param networkSecurityConfig object = {
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+  quarantineBypass: 'None'
+}
+
+@description('Clean storage encryption configuration')
+param cleanStorageEncryption object = {
+  enabled: false
+  keyVaultResourceId: ''
+  keyName: ''
+  enableInfrastructureEncryption: false
+  keyRotationEnabled: true
+}
+
+@description('Staging storage encryption configuration')
+param stagingStorageEncryption object = {
+  enabled: false
+  keyVaultResourceId: ''
+  keyName: ''
+  enableInfrastructureEncryption: false
+  keyRotationEnabled: true
+}
+
+@description('Quarantine storage encryption configuration')
+param quarantineStorageEncryption object = {
+  enabled: false
+  keyVaultResourceId: ''
+  keyName: ''
+  enableInfrastructureEncryption: false
+  keyRotationEnabled: true
+}
 
 // ------------------
 // RESOURCES
 // ------------------
 
-resource vnetSpoke 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
-  scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
-  name: spokeVNetName
-}
-
-resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
-  parent: vnetSpoke
-  name: spokePrivateEndpointSubnetName
-}
-
-module managedIdentity '../../../shared/bicep/managed-identity.bicep' = {
-  name: 'fileUploadStorageManagedIdentity'
+// Staging Storage Account - Where users initially upload files for malware scanning
+module stagingStorage 'modules/document-storage.bicep' = {
+  name: 'stagingStorageDeployment'
   params: {
-    name: 'id-${resourcesNames.storageAccount}fileupload-StorageBlobDataContributor'
+    storageType: 'staging'
     location: location
     tags: tags
-  }
-}
-
-module storageAccount '../../../shared/bicep/storage/storage.bicep' = {
-  name: 'fileUploadStorageAccount'
-  params: {
-    name: 'strspdocupload${environment}'
-    location: location
-    tags: tags
-    kind: 'StorageV2'
-    sku: storageConfig.sku
-    accessTier: storageConfig.accessTier
-    supportsHttpsTrafficOnly: true
-    networkAcls: {
-      defaultAction: 'Deny'
-      bypass: 'AzureServices'
-      ipRules: []
-      virtualNetworkRules: []
-    }
-  }
-}
-
-module privateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = {
-  name: 'fileUploadStoragePrivateEndpoint'
-  scope: resourceGroup(spokeSubscriptionId, networkingResourceGroup)
-  params: {
-    azServicePrivateDnsZoneName: 'privatelink.blob.${az.environment().suffixes.storage}'
-    azServiceId: storageAccount.outputs.id
-    privateEndpointName: 'pep-strspdocupload${environment}'
-    privateEndpointSubResourceName: 'blob'
-    virtualNetworkLinks: spokeVNetLinks
-    subnetId: spokePrivateEndpointSubnet.id
-  }
-}
-
-module blobService '../../../shared/bicep/storage/storage.blobsvc.bicep' = {
-  name: 'fileUploadStorageBlobService'
-  params: {
-    storageAccountName: storageAccount.outputs.name
-    deleteRetentionPolicy: true
-    deleteRetentionPolicyDays: 30
-    containers: [
-      {
-        name: storageConfig.containerName
-        publicAccess: 'None'
-      }
-      {
-        name: 'quarantine'
-        publicAccess: 'None'
-      }
-      {
-        name: 'clean'
-        publicAccess: 'None'
-      }
-    ]
-  }
-}
-
-
-module roleAssignment '../../../shared/bicep/role-assignments/role-assignment.bicep' = {
-  name: 'fileUploadStorageRoleAssignment'
-  params: {
-    name: 'ra-fileupload-storage-${uniqueString(managedIdentity.outputs.id, storageAccount.outputs.id)}'
-    principalId: managedIdentity.outputs.principalId
-    roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe' // Storage Blob Data Contributor
-    resourceId: storageAccount.outputs.id
-  }
-}
-
-
-module defenderStoragePermissions '../../../shared/bicep/role-assignments/defender-storage-permissions.bicep' = if (enableMalwareScanning) {
-  name: 'documentUploadDefenderPermissions'
-  params: {
-    storageAccountId: storageAccount.outputs.id
-    eventGridSystemTopicPrincipalId: '' // Defender manages its own Event Grid permissions
-    enableEventGridPermissions: false // Defender handles Event Grid permissions automatically
-    enableDefenderPermissions: enableMalwareScanning
-  }
-}
-
-// Configure storage account-level Defender for Storage settings with override
-module defenderStorageAccountConfig '../../../shared/bicep/security/defender-storage-account-config.bicep' = if (enableMalwareScanning && !empty(logAnalyticsWorkspaceId)) {
-  name: 'documentUploadDefenderConfig'
-  params: {
-    storageAccountId: storageAccount.outputs.id
+    environment: environment
+    spokeVNetId: spokeVNetId
+    spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
+    networkingResourceGroup: networkingResourceGroup
+    storageConfig: storageAccountConfig.staging
+    enableDeleteRetentionPolicy: retentionPolicyDays.staging > 0
+    retentionPolicyDays: retentionPolicyDays.staging
+    networkSecurityConfig: networkSecurityConfig
+    // Encryption support for staging (NEW FEATURE)
+    enableEncryption: stagingStorageEncryption.enabled
+    encryptionConfig: stagingStorageEncryption
+    // Malware scanning features (RESTORED)
     enableMalwareScanning: enableMalwareScanning
-    malwareScanningCapGBPerMonth: 1000
-    enableSensitiveDataDiscovery: true
     overrideSubscriptionLevelSettings: overrideSubscriptionLevelSettings
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    customEventGridTopicId: enableEventGridIntegration ? customEventGridTopic!.outputs.topicId : ''
-    enableBlobIndexTags: false  // Set to false to optimize costs - must be configured post-deployment via Azure Portal
+    enableEventGridIntegration: enableEventGridIntegration
+    enableEventGridSubscriptions: enableEventGridSubscriptions
+    processScanWebhookEndpoint: processScanWebhookEndpoint
+    // Enhanced monitoring
+    enableEnhancedMonitoring: false
+    enableBlobIndexTags: false
+  }
+}
+
+// Clean Storage Account - For verified safe files after scanning
+module cleanStorage 'modules/document-storage.bicep' = {
+  name: 'cleanStorageDeployment'
+  params: {
+    storageType: 'clean'
+    location: location
+    tags: tags
+    environment: environment
+    spokeVNetId: spokeVNetId
+    spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
+    networkingResourceGroup: networkingResourceGroup
+    storageConfig: storageAccountConfig.clean
+    enableDeleteRetentionPolicy: retentionPolicyDays.clean > 0
+    retentionPolicyDays: retentionPolicyDays.clean
+    networkSecurityConfig: networkSecurityConfig
+    enableEncryption: cleanStorageEncryption.enabled
+    encryptionConfig: cleanStorageEncryption
   }
   dependsOn: [
-    defenderStoragePermissions
+    stagingStorage  // Deploy after staging to avoid DNS zone conflicts
   ]
 }
 
-// Custom Event Grid topic for Defender for Storage scan results - always created when Event Grid integration is enabled
-module customEventGridTopic '../../../shared/bicep/event-grid/custom-event-grid-topic.bicep' = if (enableEventGridIntegration) {
-  name: 'documentUploadCustomEventGridTopic'
+// Quarantine Storage Account - For infected/suspicious files
+module quarantineStorage 'modules/document-storage.bicep' = {
+  name: 'quarantineStorageDeployment'
   params: {
-    topicName: 'evgt-${storageAccount.outputs.name}-custom-scan-results'
+    storageType: 'quarantine'
     location: location
     tags: tags
-    enableSystemAssignedIdentity: true
-    publicNetworkAccess: 'Enabled'
-    inputSchema: 'EventGridSchema'
-    disableLocalAuth: false
+    environment: environment
+    spokeVNetId: spokeVNetId
+    spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
+    networkingResourceGroup: networkingResourceGroup
+    storageConfig: storageAccountConfig.quarantine
+    enableDeleteRetentionPolicy: retentionPolicyDays.quarantine > 0
+    retentionPolicyDays: retentionPolicyDays.quarantine
+    networkSecurityConfig: networkSecurityConfig
+    // Encryption support for quarantine (NEW FEATURE)
+    enableEncryption: quarantineStorageEncryption.enabled
+    encryptionConfig: quarantineStorageEncryption
+    // Malware scanning (disabled for quarantine)
+    enableMalwareScanning: false
+    overrideSubscriptionLevelSettings: overrideSubscriptionLevelSettings
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    enableEventGridIntegration: false
+    enableEventGridSubscriptions: false
+    processScanWebhookEndpoint: ''
+    // Enhanced monitoring features (RESTORED)
+    enableEnhancedMonitoring: true
+    enableBlobIndexTags: true
   }
-}
-
-// Event Grid subscription for custom topic - only created when enableEventGridSubscriptions=true (after Function App code deployment)
-module customTopicEventSubscription '../../../shared/bicep/event-grid/custom-topic-subscription.bicep' = if (enableEventGridIntegration && enableEventGridSubscriptions && !empty(processScanWebhookEndpoint)) {
-  name: 'customTopicEventSubscription'
-  params: {
-    subscriptionName: 'defender-scan-processing'
-    customTopicId: customEventGridTopic!.outputs.topicId
-    destinationType: 'webhook'
-    webhookEndpointUrl: processScanWebhookEndpoint
-    eventTypes: [
-      'Microsoft.Security.MalwareScanningResult'
-    ]
-    containerName: storageConfig.containerName
-    enableAdvancedFiltering: true
-    maxDeliveryAttempts: 3
-    eventTimeToLiveInMinutes: 1440
-  }
+  dependsOn: [
+    cleanStorage  // Deploy after clean storage to avoid DNS zone conflicts
+  ]
 }
 
 // ------------------
 // OUTPUTS
 // ------------------
 
-@description('The resource ID of the file upload storage account.')
-output storageAccountId string = storageAccount.outputs.id
 
-@description('The name of the file upload storage account.')
-output storageAccountName string = storageAccount.outputs.name
+@description('The resource ID of the staging storage account (backward compatibility).')
+output storageAccountId string = stagingStorage.outputs.storageAccountId
 
-@description('The resource ID of the managed identity for file upload storage.')
-output managedIdentityId string = managedIdentity.outputs.id
+@description('The name of the staging storage account (backward compatibility).')
+output storageAccountName string = stagingStorage.outputs.storageAccountName
 
-@description('The principal ID of the managed identity for file upload storage.')
-output managedIdentityPrincipalId string = managedIdentity.outputs.principalId
+@description('The resource ID of the managed identity for staging storage (backward compatibility).')
+output managedIdentityId string = stagingStorage.outputs.managedIdentityId
 
-@description('The client ID of the managed identity for file upload storage.')
-output managedIdentityClientId string = managedIdentity.outputs.clientId
+@description('The principal ID of the managed identity for staging storage (backward compatibility).')
+output managedIdentityPrincipalId string = stagingStorage.outputs.managedIdentityPrincipalId
 
-@description('The name of the blob container for file uploads.')
-output containerName string = storageConfig.containerName
+@description('The client ID of the managed identity for staging storage (backward compatibility).')
+output managedIdentityClientId string = stagingStorage.outputs.managedIdentityClientId
+
+@description('The name of the blob container for file uploads (backward compatibility).')
+output containerName string = stagingStorage.outputs.containerName
+
+
+@description('Staging storage account details for initial file uploads.')
+output stagingStorage object = {
+  storageAccountId: stagingStorage.outputs.storageAccountId
+  storageAccountName: stagingStorage.outputs.storageAccountName
+  containerName: stagingStorage.outputs.containerName
+  managedIdentityId: stagingStorage.outputs.managedIdentityId
+  managedIdentityPrincipalId: stagingStorage.outputs.managedIdentityPrincipalId
+  managedIdentityClientId: stagingStorage.outputs.managedIdentityClientId
+}
+
+@description('Clean storage account details for verified safe files.')
+output cleanStorage object = {
+  storageAccountId: cleanStorage.outputs.storageAccountId
+  storageAccountName: cleanStorage.outputs.storageAccountName
+  containerName: cleanStorage.outputs.containerName
+  managedIdentityId: cleanStorage.outputs.managedIdentityId
+  managedIdentityPrincipalId: cleanStorage.outputs.managedIdentityPrincipalId
+  managedIdentityClientId: cleanStorage.outputs.managedIdentityClientId
+}
+
+@description('Quarantine storage account details for infected/suspicious files.')
+output quarantineStorage object = {
+  storageAccountId: quarantineStorage.outputs.storageAccountId
+  storageAccountName: quarantineStorage.outputs.storageAccountName
+  containerName: quarantineStorage.outputs.containerName
+  managedIdentityId: quarantineStorage.outputs.managedIdentityId
+  managedIdentityPrincipalId: quarantineStorage.outputs.managedIdentityPrincipalId
+  managedIdentityClientId: quarantineStorage.outputs.managedIdentityClientId
+}
 
 @description('Indicates whether malware scanning is enabled.')
 output malwareScanningEnabled bool = enableMalwareScanning
 
 @description('Custom Event Grid topic ID used for Defender scan results.')
-output customEventGridTopicId string = enableEventGridIntegration ? customEventGridTopic!.outputs.topicId : ''
+output customEventGridTopicId string = stagingStorage.outputs.customEventGridTopicId
 
 @description('Custom Event Grid topic endpoint URL.')
-output customEventGridTopicEndpoint string = enableEventGridIntegration ? customEventGridTopic!.outputs.topicEndpoint : ''
-
-@description('Event Grid subscription resource ID (only when subscriptions are enabled).')
-output eventGridSubscriptionId string = (enableEventGridIntegration && enableEventGridSubscriptions) ? customTopicEventSubscription!.outputs.eventSubscriptionId : ''
-
-@description('Event Grid subscription name (only when subscriptions are enabled).')
-output eventGridSubscriptionName string = (enableEventGridIntegration && enableEventGridSubscriptions) ? customTopicEventSubscription!.outputs.eventSubscriptionName : ''
+output customEventGridTopicEndpoint string = stagingStorage.outputs.customEventGridTopicEndpoint
 
 @description('Indicates whether Event Grid subscriptions are enabled.')
 output eventGridSubscriptionsEnabled bool = enableEventGridSubscriptions
+
+@description('All storage account IDs for process scan function permissions.')
+output allStorageAccountIds array = [
+  stagingStorage.outputs.storageAccountId
+  cleanStorage.outputs.storageAccountId
+  quarantineStorage.outputs.storageAccountId
+]

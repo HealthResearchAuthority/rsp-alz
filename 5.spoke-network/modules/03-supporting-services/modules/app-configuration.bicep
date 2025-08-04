@@ -51,6 +51,11 @@ param oneLoginClientId string
 @description('Valid token issuers for Gov UK One Login')
 param oneLoginIssuers array
 
+param storageAccountName string
+@secure()
+@description('The key for the storage account where the blob connection string will be stored.')
+param storageAccountKey string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -172,6 +177,11 @@ var keyValues = [
   {
     name: 'AppSettings:BulkCopyTimeout$rtsimportfunction' // Warning before session timeout in seconds
     value: 500
+    contentType: null
+  }
+  {
+    name: 'AppSettings:Azure:DocumentStorage:Blob:ConnectionString'
+    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${storageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
 ]
@@ -342,6 +352,9 @@ module appConfigNetwork '../../../../shared/bicep/network/private-networking-spo
 
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
 output appConfigurationUserAssignedIdentityId string = appConfigurationUserAssignedIdentity.id
+
+@description('The principal ID of the user assigned managed identity for the App Configuration.')
+output appConfigurationUserAssignedIdentityPrincipalId string = appConfigurationUserAssignedIdentity.properties.principalId
 
 output appConfigURL string = configStore.properties.endpoint
 output appConfigMIClientID string = appConfigurationUserAssignedIdentity.properties.clientId

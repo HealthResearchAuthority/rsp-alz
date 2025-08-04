@@ -59,6 +59,11 @@ param oneLoginClientId string
 @description('Valid token issuers for Gov UK One Login')
 param oneLoginIssuers array
 
+param storageAccountName string
+@secure()
+@description('The key for the storage account where the blob connection string will be stored.')
+param storageAccountKey string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -139,6 +144,8 @@ module appConfiguration './modules/app-configuration.bicep' = {
     oneLoginPrivateKeyPem: oneLoginPrivateKeyPem
     oneLoginClientId: oneLoginClientId
     oneLoginIssuers: oneLoginIssuers
+    storageAccountName: storageAccountName
+    storageAccountKey: storageAccountKey
   }
 }
 
@@ -179,6 +186,9 @@ output keyVaultName string = keyVault.outputs.keyVaultName
 
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
 output appConfigurationUserAssignedIdentityId string = appConfiguration.outputs.appConfigurationUserAssignedIdentityId
+
+@description('The principal ID of the user assigned managed identity for the App Configuration.')
+output appConfigurationUserAssignedIdentityPrincipalId string = appConfiguration.outputs.appConfigurationUserAssignedIdentityPrincipalId
 
 @description('The resource ID of the user assigned managed identity for the Key Vault to be able to read Secrets from it.')
 output keyVaultUserAssignedIdentityId string = keyVault.outputs.keyVaultUserAssignedIdentityId
