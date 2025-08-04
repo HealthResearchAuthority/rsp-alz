@@ -71,7 +71,7 @@ resource roleAssignmentDelay 'Microsoft.Resources/deploymentScripts@2023-08-01' 
   location: resourceGroup().location
   kind: 'AzurePowerShell'
   properties: {
-    azPowerShellVersion: '9.0'
+    azPowerShellVersion: '11.0'
     scriptContent: 'Start-Sleep -Seconds 10'
     retentionInterval: 'P1D'
   }
