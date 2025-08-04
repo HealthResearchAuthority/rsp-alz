@@ -7,13 +7,13 @@ targetScope = 'subscription'
 type storageEncryptionConfig = {
   @description('Enable customer-managed key encryption')
   enabled: bool
-  
+
   @description('Name of the encryption key (auto-generated if empty)')
   keyName: string
-  
+
   @description('Enable infrastructure (double) encryption')
   enableInfrastructureEncryption: bool
-  
+
   @description('Enable automatic key version updates')
   keyRotationEnabled: bool
 }
@@ -22,10 +22,10 @@ type storageEncryptionConfig = {
 type storageAccountConfig = {
   @description('Storage account SKU')
   sku: ('Standard_LRS' | 'Standard_GRS' | 'Standard_ZRS' | 'Standard_GZRS' | 'Premium_LRS')
-  
+
   @description('Storage account access tier')
   accessTier: ('Hot' | 'Cool')
-  
+
   @description('Container name for this storage type')
   containerName: string
 }
@@ -34,7 +34,7 @@ type storageAccountConfig = {
 type storageRetentionConfig = {
   @description('Enable delete retention policy for this storage type')
   enabled: bool
-  
+
   @description('Number of days to retain deleted blobs (0 = disabled)')
   retentionDays: int
 }
@@ -43,10 +43,10 @@ type storageRetentionConfig = {
 type storageTypeConfig = {
   @description('Basic storage account configuration')
   account: storageAccountConfig
-  
+
   @description('Encryption configuration')
   encryption: storageEncryptionConfig
-  
+
   @description('Retention policy configuration')
   retention: storageRetentionConfig
 }
@@ -55,10 +55,10 @@ type storageTypeConfig = {
 type allStorageConfig = {
   @description('Clean storage configuration')
   clean: storageTypeConfig
-  
+
   @description('Staging storage configuration')
   staging: storageTypeConfig
-  
+
   @description('Quarantine storage configuration')
   quarantine: storageTypeConfig
 }
@@ -133,7 +133,6 @@ param parSqlAuditRetentionDays int = 15
 @description('Spoke Networks Configuration')
 param parSpokeNetworks array
 
-
 @description('Enable Azure Front Door deployment')
 param parEnableFrontDoor bool = true
 
@@ -197,7 +196,7 @@ param parStorageConfig allStorageConfig = {
       keyRotationEnabled: true
     }
     retention: {
-      enabled: false  // Disable retention for clean storage
+      enabled: false // Disable retention for clean storage
       retentionDays: 0
     }
   }
@@ -239,12 +238,17 @@ param parStorageConfig allStorageConfig = {
 
 @description('Network security configuration for storage accounts')
 param parNetworkSecurityConfig object = {
-  defaultAction: 'Deny'        
-  bypass: 'AzureServices'      
-  httpsTrafficOnly: true       
-  quarantineBypass: 'None'    
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+  quarantineBypass: 'None'
 }
 
+@description('Storage account name for storing blob connection strings')
+param parStorageAccountName string
+@secure()
+@description('The key for the storage account where the blob connection string will be stored.')
+param parStorageAccountKey string
 
 // ------------------
 // VARIABLES
@@ -253,11 +257,10 @@ param parNetworkSecurityConfig object = {
 var sqlServerNamePrefix = 'rspsqlserver'
 
 // DRY helper function for storage encryption configuration
-func createStorageEncryptionConfig(config storageEncryptionConfig, keyVaultId string) object => union(config, {
-  keyVaultResourceId: config.enabled ? keyVaultId : ''
-})
-
-
+func createStorageEncryptionConfig(config storageEncryptionConfig, keyVaultId string) object =>
+  union(config, {
+    keyVaultResourceId: config.enabled ? keyVaultId : ''
+  })
 
 // ------------------
 // RESOURCES
@@ -424,6 +427,8 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       oneLoginPrivateKeyPem: parOneLoginPrivateKeyPem
       oneLoginClientId: parOneLoginClientId
       oneLoginIssuers: parOneLoginIssuers
+      storageAccountName: parStorageAccountName
+      storageAccountKey: parStorageAccountKey
     }
   }
 ]
@@ -494,7 +499,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       overrideSubscriptionLevelSettings: parOverrideSubscriptionLevelSettings
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true
-      enableEventGridSubscriptions: false  // Set to true only after Function App code is deployed and webhook endpoint is ready
+      enableEventGridSubscriptions: false // Set to true only after Function App code is deployed and webhook endpoint is ready
       processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint
       retentionPolicyDays: {
         staging: parStorageConfig.staging.retention.retentionDays
@@ -507,9 +512,18 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
         quarantine: parStorageConfig.quarantine.account
       }
       networkSecurityConfig: parNetworkSecurityConfig
-      cleanStorageEncryption: createStorageEncryptionConfig(parStorageConfig.clean.encryption, supportingServices[i].outputs.keyVaultId)
-      stagingStorageEncryption: createStorageEncryptionConfig(parStorageConfig.staging.encryption, supportingServices[i].outputs.keyVaultId)
-      quarantineStorageEncryption: createStorageEncryptionConfig(parStorageConfig.quarantine.encryption, supportingServices[i].outputs.keyVaultId)
+      cleanStorageEncryption: createStorageEncryptionConfig(
+        parStorageConfig.clean.encryption,
+        supportingServices[i].outputs.keyVaultId
+      )
+      stagingStorageEncryption: createStorageEncryptionConfig(
+        parStorageConfig.staging.encryption,
+        supportingServices[i].outputs.keyVaultId
+      )
+      quarantineStorageEncryption: createStorageEncryptionConfig(
+        parStorageConfig.quarantine.encryption,
+        supportingServices[i].outputs.keyVaultId
+      )
     }
     dependsOn: [
       defenderStorage
