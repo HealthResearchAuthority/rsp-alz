@@ -112,6 +112,14 @@ var defaultSubnets = [
       networkSecurityGroup: {
         id: nsgWebApp.outputs.nsgId
       }
+      serviceEndpoints: [
+        {
+          service: 'Microsoft.Storage'
+          locations: [
+            location
+          ]
+        }
+      ]
       delegations: [
         {
           name: 'envdelegation'
