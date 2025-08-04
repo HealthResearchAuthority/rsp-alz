@@ -28,15 +28,9 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 15
 
-param parFileUploadStorageConfig = {
-  containerName: 'documentuploadautotest'
-  sku: 'Standard_LRS'
-  accessTier: 'Hot'
-  allowPublicAccess: false
-}
 
 // Azure Front Door Configuration
-param parEnableFrontDoor = true
+param parEnableFrontDoor = false
 param parFrontDoorWafMode = 'Detection'
 param parEnableFrontDoorRateLimiting = true
 param parFrontDoorRateLimitThreshold = 1000

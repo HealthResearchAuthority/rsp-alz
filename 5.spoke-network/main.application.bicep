@@ -451,7 +451,7 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
       location: location
       tags: tags
       appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
-      storageAccountName: 'stprocessdocupld${parSpokeNetworks[i].parEnvironment}'
+      storageAccountName: 'stprosupld${parSpokeNetworks[i].parEnvironment}'
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       subnetIdForVnetInjection: webAppSubnet[i].id
       spokeVNetId: existingVnet[i].id
@@ -869,8 +869,6 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
     ]
   }
 ]
-<<<<<<< HEAD
-=======
 
 // Grant process scan function permissions to all document storage accounts. Handled seperately as there was circular dependency.
 module processScanFunctionPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
@@ -888,4 +886,3 @@ module processScanFunctionPermissions '../shared/bicep/role-assignments/process-
     ]
   }
 ]
->>>>>>> main
