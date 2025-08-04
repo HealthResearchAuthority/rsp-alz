@@ -8,12 +8,6 @@ param parSqlAdminPhrase = ''
 
 param parSqlAuditRetentionDays = 15
 
-param parFileUploadStorageConfig = {
-  containerName: 'documentuploadprod'
-  sku: 'Standard_GRS'
-  accessTier: 'Hot'
-  allowPublicAccess: false
-}
 
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
