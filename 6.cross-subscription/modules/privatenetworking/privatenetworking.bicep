@@ -2,8 +2,8 @@ targetScope = 'subscription'
 
 param sourceVNetID string
 
-@description('The ID of the Azure service to be used for the private endpoint.')
-param serviceId string
+@description('The IDs of the Azure services to be used for the private endpoints.')
+param serviceIds array
 
 param managementSubscriptionId string
 param managementResourceGroupName string
@@ -11,9 +11,14 @@ param managementResourceGroupName string
 var sourceVNetTokens = split(sourceVNetID, '/')
 var sourceVNetName = sourceVNetTokens[8]
 
-var serviceTokens = split(serviceId, '/')
-var sourceResourceType = serviceTokens[6]
-var serviceName = serviceTokens[8]
+// Get unique DNS zones needed based on service types
+var containerRegistryServices = filter(serviceIds, serviceId => contains(serviceId, 'Microsoft.ContainerRegistry'))
+var webAppServices = filter(serviceIds, serviceId => contains(serviceId, 'Microsoft.Web'))
+
+var dnsZonesNeeded = concat(
+  length(containerRegistryServices) > 0 ? ['privatelink.azurecr.io'] : [],
+  length(webAppServices) > 0 ? ['privatelink.azurewebsites.net'] : []
+)
 
 //Vnet of Management DevOps Pool 
 var vNetLinksDefault = [
@@ -34,9 +39,6 @@ var subResourceNamesMap = {
   'Microsoft.Web': 'sites'
 }
 
-var privateDNSName = privateDNSMap[?sourceResourceType] ?? ''
-var subResourceName = subResourceNamesMap[?sourceResourceType] ?? ''
-
 resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   scope: resourceGroup(managementSubscriptionId,managementResourceGroupName)
   name: sourceVNetName
@@ -47,17 +49,27 @@ resource managementPEPSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-07-
   name: 'snet-privateendpoints'
 }
 
-
-module privateNetworking '../../../shared/bicep/network/private-networking-spoke.bicep' = {
-  name:take('serviceNetworkDeployment-${last(serviceId)}', 64)
+// Create DNS zones first (one per type)
+module dnsZones '../../../shared/bicep/network/private-dns-zone.bicep' = [for dnsZone in dnsZonesNeeded: {
+  name: 'dnsZone-${replace(dnsZone, '.', '-')}'
   scope: resourceGroup(managementSubscriptionId,managementResourceGroupName)
   params: {
-    location: deployment().location
-    azServicePrivateDnsZoneName: privateDNSName
-    azServiceId: serviceId
-    privateEndpointSubResourceName: subResourceName
+    name: dnsZone
     virtualNetworkLinks: vNetLinksDefault
-    subnetId: managementPEPSubnet.id
-    privateEndpointName: 'pep-${serviceName}-management' //Should be in this format: pep-<resourcename>-management
   }
-}
+}]
+
+// Create private endpoints for each service
+module privateEndpoints '../../../shared/bicep/network/private-endpoint.bicep' = [for serviceId in serviceIds: {
+  name: take('privateEndpoint-${last(split(serviceId, '/'))}', 64)
+  scope: resourceGroup(managementSubscriptionId,managementResourceGroupName)
+  dependsOn: dnsZones
+  params: {
+    name: 'pep-${last(split(serviceId, '/'))}-management'
+    location: deployment().location
+    privateDnsZonesId: resourceId(managementSubscriptionId, managementResourceGroupName, 'Microsoft.Network/privateDnsZones', privateDNSMap[split(serviceId, '/')[6]])
+    privateLinkServiceId: serviceId
+    snetId: managementPEPSubnet.id
+    subresource: subResourceNamesMap[split(serviceId, '/')[6]]
+  }
+}]
