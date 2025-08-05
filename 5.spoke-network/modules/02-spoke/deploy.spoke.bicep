@@ -305,7 +305,7 @@ resource vnetSpokeCreated 'Microsoft.Network/virtualNetworks@2022-07-01' existin
     name: spokeApplicationGatewaySubnetName
   }
 
-  resource spokeWebAppSubnet 'subnets' existing = if (!empty(spokeApplicationGatewaySubnetAddressPrefix)) {
+  resource spokeWebAppSubnet 'subnets' existing = if (!empty(spokeWebAppSubnetAddressPrefix)) {
     name: spokeWebAppSubnetName
   }
 }

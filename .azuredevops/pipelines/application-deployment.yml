@@ -77,42 +77,42 @@ jobs:
                            logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                            parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
 
-  - job: preview
-    pool:
-      name: rsp-manageddevopspool
-    dependsOn: [setup, lint, validate]
-    variables:
-      - name: devOpsPublicIP
-        value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
-      - group: ${{ parameters.env }}
-    steps:
-      - checkout: self
-      - script: |
-          echo "Installing Azure CLI..."
-          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-        displayName: 'Install Azure CLI'
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2
-        inputs:
-          azureSubscription: $(${{ parameters.env }})
-          scriptType: bash
-          scriptLocation: inlineScript
-          inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.application.bicep \
-              --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
-                           parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
-                           parClientID=$(clientID) parClientSecret=$(clientSecret) \
-                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
-                           parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
+  # - job: preview
+  #   pool:
+  #     name: rsp-manageddevopspool
+  #   dependsOn: [setup, lint, validate]
+  #   variables:
+  #     - name: devOpsPublicIP
+  #       value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
+  #     - group: ${{ parameters.env }}
+  #   steps:
+  #     - checkout: self
+  #     - script: |
+  #         echo "Installing Azure CLI..."
+  #         curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+  #       displayName: 'Install Azure CLI'
+  #     - bash: |
+  #         az bicep install
+  #         az bicep version
+  #       displayName: 'Install Bicep CLI'
+  #     - task: AzureCLI@2
+  #       inputs:
+  #         azureSubscription: $(${{ parameters.env }})
+  #         scriptType: bash
+  #         scriptLocation: inlineScript
+  #         inlineScript: |
+  #           az config set bicep.use_binary_from_path=false --only-show-errors
+  #           az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.application.bicep \
+  #             --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
+  #                          parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
+  #                          parClientID=$(clientID) parClientSecret=$(clientSecret) \
+  #                          logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
+  #                          parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
 
   - job: deploy
     pool:
       name: rsp-manageddevopspool
-    dependsOn: [setup, lint, validate, preview]
+    dependsOn: [setup, lint, validate]
     variables:
       - name: devOpsPublicIP
         value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
