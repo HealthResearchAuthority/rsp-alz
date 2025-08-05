@@ -14,7 +14,7 @@ param tags object = {}
 param functionAppName string
 
 @description('Function App storage account name')
-param storageAccountName string
+param storageAccountName string = take('stfnprocessdoc${uniqueString(resourceGroup().id, functionAppName)}', 24)
 
 @description('Log Analytics workspace resource ID')
 param logAnalyticsWorkspaceId string

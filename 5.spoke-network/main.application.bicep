@@ -463,7 +463,6 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
       location: location
       tags: tags
       appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
-      storageAccountName: 'stprosupld${parSpokeNetworks[i].parEnvironment}'
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       subnetIdForVnetInjection: webAppSubnet[i].id
       spokeVNetId: existingVnet[i].id
