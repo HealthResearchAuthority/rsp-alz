@@ -99,6 +99,18 @@ var defaultSettings = [
   }
 ]
 
+// Additional settings for private endpoint scenarios
+var privateEndpointSettings = hasPrivateEndpoint ? [
+  {
+    name: 'WEBSITE_CONTENTOVERVNET'
+    value: '1'
+  }
+  {
+    name: 'WEBSITE_VNET_ROUTE_ALL' 
+    value: '1'
+  }
+] : []
+
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
   location: location
@@ -111,7 +123,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     siteConfig: {
       netFrameworkVersion: dotnetVersion
-      appSettings: concat(defaultSettings, appSettings)
+      appSettings: concat(defaultSettings, privateEndpointSettings, appSettings)
       alwaysOn: true
     }
   }
