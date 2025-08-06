@@ -467,7 +467,7 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       webAppBaseOs: 'Windows'
       logAnalyticsWsId: logAnalyticsWorkspaceId
       subnetIdForVnetInjection: webAppSubnet[i].id
-      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      deploySlot: false
       privateEndpointRG: parSpokeNetworks[i].rgNetworking
       spokeVNetId: existingVnet[i].id
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
@@ -483,7 +483,6 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     dependsOn: [
       applicationsRG
       databaseserver
-      supportingServices
     ]
   }
 ]
