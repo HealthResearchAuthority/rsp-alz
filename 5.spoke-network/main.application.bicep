@@ -483,6 +483,7 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     dependsOn: [
       applicationsRG
       databaseserver
+      webApp  // Wait for webApp to create DNS zone first
     ]
   }
 ]
