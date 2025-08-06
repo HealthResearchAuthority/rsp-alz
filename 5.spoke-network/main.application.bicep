@@ -453,31 +453,37 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 ]
 
-// Process scan Function App 
-module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-function.bicep' = [
+// Process scan Function App - deployed using generic app-service module like other function apps
+module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('processScanFnApp-${deployment().name}-deployment', 64)
     params: {
-      functionAppName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
+      appName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
       location: location
       tags: tags
+      sku: 'B1'
       appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
-      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      webAppBaseOs: 'Windows'
+      logAnalyticsWsId: logAnalyticsWorkspaceId
       subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
       spokeVNetId: existingVnet[i].id
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stprocessdoc${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
-      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
-      privateEndpointRG: parSpokeNetworks[i].rgNetworking
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
     }
     dependsOn: [
       applicationsRG
       databaseserver
+      supportingServices
     ]
   }
 ]
@@ -499,7 +505,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true
       enableEventGridSubscriptions: false // Set to true only after Function App code is deployed and webhook endpoint is ready
-      processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint
+      processScanWebhookEndpoint: 'https://${processScanFnApp[i].outputs.appHostName}/api/ProcessScanResultEventTrigger'
       retentionPolicyDays: {
         staging: parStorageConfig.staging.retention.retentionDays
         clean: parStorageConfig.clean.retention.retentionDays
