@@ -40,7 +40,8 @@ resource managementPEPSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-07-
   name: 'snet-privateendpoints'
 }
 
-// Create private endpoints for each service using the original working approach
+// Create private endpoints for each service using sequential deployment to avoid race conditions
+@batchSize(1)
 module privateNetworking '../../../shared/bicep/network/private-networking-spoke.bicep' = [for serviceId in serviceIds: {
   name: take('serviceNetworkDeployment-${last(split(serviceId, '/'))}', 64)
   scope: resourceGroup(managementSubscriptionId,managementResourceGroupName)
