@@ -757,6 +757,7 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     }
     dependsOn: [
       webApp
+      processScanFnApp
     ]
   }
 ]
@@ -787,6 +788,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
       ]
     }
     dependsOn: [
+      processScanFnApp
       rtsfnApp
     ]
   }
@@ -847,6 +849,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
     }
     dependsOn: [
+      processScanFnApp
       fnNotifyApp
       databaseserver
     ]
