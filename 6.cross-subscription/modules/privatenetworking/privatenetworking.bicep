@@ -18,13 +18,13 @@ var webAppServices = filter(serviceIds, serviceId => contains(serviceId, 'Micros
 var dnsZoneInfo = {
   'privatelink.azurecr.io': {
     needed: length(containerRegistryServices) > 0
-    // Container Registry DNS zones are typically in shared services subscription
+    // Container Registry DNS zones are in networking spoke resource group
     targetSubscriptionId: length(containerRegistryServices) > 0 ? split(containerRegistryServices[0], '/')[2] : ''
-    targetResourceGroup: length(containerRegistryServices) > 0 ? split(containerRegistryServices[0], '/')[4] : ''
+    targetResourceGroup: length(containerRegistryServices) > 0 ? 'rg-rsp-networking-spoke-${split(split(containerRegistryServices[0], '/')[4], '-')[3]}-${split(split(containerRegistryServices[0], '/')[4], '-')[4]}' : ''
   }
   'privatelink.azurewebsites.net': {
     needed: length(webAppServices) > 0
-    // Web App DNS zones are in the dev subscription where the apps are deployed
+    // Web App DNS zones are in networking spoke resource group
     targetSubscriptionId: length(webAppServices) > 0 ? split(webAppServices[0], '/')[2] : ''
     targetResourceGroup: length(webAppServices) > 0 ? 'rg-rsp-networking-spoke-${split(split(webAppServices[0], '/')[4], '-')[3]}-${split(split(webAppServices[0], '/')[4], '-')[4]}' : ''
   }
