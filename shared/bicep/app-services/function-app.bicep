@@ -109,6 +109,10 @@ var privateEndpointSettings = hasPrivateEndpoint ? [
     name: 'WEBSITE_VNET_ROUTE_ALL' 
     value: '1'
   }
+  {
+    name: 'WEBSITE_WEBDEPLOY_USE_SCM'
+    value: 'true'
+  }
 ] : []
 
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
