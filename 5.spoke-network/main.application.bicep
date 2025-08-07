@@ -758,6 +758,7 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     dependsOn: [
       webApp
       processScanFnApp
+      documentUpload
     ]
   }
 ]
@@ -790,6 +791,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
     dependsOn: [
       processScanFnApp
       rtsfnApp
+      documentUpload
     ]
   }
 ]
@@ -852,6 +854,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       processScanFnApp
       fnNotifyApp
       databaseserver
+      documentUpload
     ]
   }
 ]
