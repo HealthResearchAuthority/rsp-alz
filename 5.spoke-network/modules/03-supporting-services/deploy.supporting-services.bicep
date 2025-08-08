@@ -59,6 +59,11 @@ param oneLoginClientId string
 @description('Valid token issuers for Gov UK One Login')
 param oneLoginIssuers array
 
+param storageAccountName string
+@secure()
+@description('The key for the storage account where the blob connection string will be stored.')
+param storageAccountKey string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -78,11 +83,13 @@ module containerRegistry './modules/container-registry.module.bicep' = {
     tags: tags
     spokeVNetId: spokeVNetId
     acrTier: containerRegistryTier
+    networkingResourceGroup: networkingResourceGroup
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     containerRegistryPrivateEndpointName: resourcesNames.containerRegistryPep
     containerRegistryUserAssignedIdentityName: resourcesNames.containerRegistryUserAssignedIdentity
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
     deployZoneRedundantResources: deployZoneRedundantResources
+    //managementVNetId: '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-manageddevopspool/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-devopspool'
     networkRuleSetIpRules: [
       // {
       //   action: 'Allow'
@@ -137,6 +144,8 @@ module appConfiguration './modules/app-configuration.bicep' = {
     oneLoginPrivateKeyPem: oneLoginPrivateKeyPem
     oneLoginClientId: oneLoginClientId
     oneLoginIssuers: oneLoginIssuers
+    storageAccountName: storageAccountName
+    storageAccountKey: storageAccountKey
   }
 }
 
@@ -177,6 +186,9 @@ output keyVaultName string = keyVault.outputs.keyVaultName
 
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
 output appConfigurationUserAssignedIdentityId string = appConfiguration.outputs.appConfigurationUserAssignedIdentityId
+
+@description('The principal ID of the user assigned managed identity for the App Configuration.')
+output appConfigurationUserAssignedIdentityPrincipalId string = appConfiguration.outputs.appConfigurationUserAssignedIdentityPrincipalId
 
 @description('The resource ID of the user assigned managed identity for the Key Vault to be able to read Secrets from it.')
 output keyVaultUserAssignedIdentityId string = keyVault.outputs.keyVaultUserAssignedIdentityId

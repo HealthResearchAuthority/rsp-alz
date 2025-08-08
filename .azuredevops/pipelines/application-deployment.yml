@@ -1,6 +1,7 @@
 # This workflow will deploy the application resources
 name: application-deployment
 trigger: none
+pr: none
 
 parameters:
   - name: env
@@ -19,7 +20,7 @@ parameters:
 jobs:
   - job: setup
     pool:
-      vmImage: 'ubuntu-latest'
+      name: rsp-manageddevopspool
     steps:
       - bash: | 
           ipaddress=$(curl -s http://ipinfo.io/ip)
@@ -31,9 +32,13 @@ jobs:
   - job: lint
     dependsOn: setup
     pool:
-      vmImage: 'ubuntu-latest'
+      name: rsp-manageddevopspool
     steps:
       - checkout: self
+      - script: |
+          echo "Installing Azure CLI..."
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        displayName: 'Install Azure CLI'
       - bash: |
           az bicep install
           az bicep version
@@ -42,7 +47,7 @@ jobs:
 
   - job: validate
     pool:
-      vmImage: 'ubuntu-latest'
+      name: rsp-manageddevopspool
     dependsOn: [setup, lint]
     variables:
       - name: devOpsPublicIP
@@ -50,6 +55,10 @@ jobs:
       - group: ${{ parameters.env }}
     steps:
       - checkout: self
+      - script: |
+          echo "Installing Azure CLI..."
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        displayName: 'Install Azure CLI'
       - bash: |
           az bicep install
           az bicep version
@@ -64,11 +73,13 @@ jobs:
             az deployment sub validate --name "App-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.application.bicep \
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
-                           parClientID=$(clientID) parClientSecret=$(clientSecret) parDevOpsPublicIPAddress=$(devOpsPublicIP)
+                           parClientID=$(clientID) parClientSecret=$(clientSecret) \
+                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
+                           parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
 
   - job: preview
     pool:
-      vmImage: 'ubuntu-latest'
+      name: rsp-manageddevopspool
     dependsOn: [setup, lint, validate]
     variables:
       - name: devOpsPublicIP
@@ -76,6 +87,10 @@ jobs:
       - group: ${{ parameters.env }}
     steps:
       - checkout: self
+      - script: |
+          echo "Installing Azure CLI..."
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        displayName: 'Install Azure CLI'
       - bash: |
           az bicep install
           az bicep version
@@ -90,11 +105,13 @@ jobs:
             az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.application.bicep \
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
-                           parClientID=$(clientID) parClientSecret=$(clientSecret) parDevOpsPublicIPAddress=$(devOpsPublicIP)
+                           parClientID=$(clientID) parClientSecret=$(clientSecret) \
+                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
+                           parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
 
   - job: deploy
     pool:
-      vmImage: 'ubuntu-latest'
+      name: rsp-manageddevopspool
     dependsOn: [setup, lint, validate, preview]
     variables:
       - name: devOpsPublicIP
@@ -104,6 +121,10 @@ jobs:
       - group: ${{ parameters.env }}
     steps:
       - checkout: self
+      - script: |
+          echo "Installing Azure CLI..."
+          curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+        displayName: 'Install Azure CLI'
       - bash: |
           az bicep install
           az bicep version
@@ -122,7 +143,9 @@ jobs:
             output=$(az stack sub create --name "application-deployment-stack" --location $(location) --template-file ./5.spoke-network/main.application.bicep  \
               --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
-                           parClientID=$(clientID) parClientSecret=$(clientSecret) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
+                           parClientID=$(clientID) parClientSecret=$(clientSecret) \
+                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
+                           parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                            --deny-settings-mode none --action-on-unmanage deleteResources --yes)
             echo $output | jq .
             appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')

@@ -94,7 +94,7 @@ var defaultSettings = [
   }
   {
     name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-    value: fnAppAppInsights.properties.InstrumentationKey
+    value: fnAppAppInsights!.properties.InstrumentationKey
   }
   {
     name: 'AZURE_CLIENT_ID'
@@ -133,3 +133,4 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
 output functionAppName string = functionApp.name
 output functionAppId string = functionApp.id
 output defaultHostName string = functionApp.properties.defaultHostName
+output systemAssignedPrincipalId string = functionApp.identity.?principalId ?? ''

@@ -1,6 +1,7 @@
 # This workflow will deploy the network resources
 name: network-deployment
 trigger: none
+pr: none
 
 
 parameters:
@@ -33,6 +34,8 @@ jobs:
     pool:
       vmImage: 'ubuntu-latest'
     dependsOn: [lint]
+    variables:
+      - group: ${{ parameters.env }}
     steps:
       - checkout: self
       - bash: |
@@ -47,12 +50,15 @@ jobs:
           inlineScript: |
             az config set bicep.use_binary_from_path=false --only-show-errors
             az deployment sub validate --name "Network-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.network.bicep  \
-              --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam
+              --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam \
+                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
   - job: preview
     pool:
       vmImage: 'ubuntu-latest'
     dependsOn: [lint, validate]
+    variables:
+      - group: ${{ parameters.env }}
     steps:
       - checkout: self
       - bash: |
@@ -67,12 +73,15 @@ jobs:
           inlineScript: |
             az config set bicep.use_binary_from_path=false --only-show-errors
             az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.network.bicep \
-              --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam
+              --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam \
+                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
   - job: deploy
     pool:
       vmImage: 'ubuntu-latest'
     dependsOn: [preview]
+    variables:
+      - group: ${{ parameters.env }}
     steps:
       - checkout: self
       - bash: |
@@ -90,6 +99,7 @@ jobs:
             az config set bicep.use_binary_from_path=false --only-show-errors
             output=$(az stack sub create --name "network-deployment-stack" --location $(location) --template-file ./5.spoke-network/main.network.bicep  \
               --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam \
+                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                            --deny-settings-mode none --action-on-unmanage deleteResources --yes)
             echo $output | jq .
             spokeVNetId=$(echo $output | jq -r '.spokeVNetId.value')
