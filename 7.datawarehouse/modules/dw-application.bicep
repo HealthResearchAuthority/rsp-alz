@@ -43,112 +43,95 @@ resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
   name: virtualNetworks_HRADataWarehouseVirtualNetwork_name
 }
 
-resource networkSecurityGroups_HRA_Data_DataModelling_nsg_name_resource 'Microsoft.Network/networkSecurityGroups@2024-05-01' = {
-  name: networkSecurityGroups_HRA_Data_DataModelling_nsg_name
-  location: resourceGroup().location
-  properties: {
-    securityRules: []
-  }
-}
-
-resource networkSecurityGroups_AllowAnyCustom8443Inbound 'Microsoft.Network/networkSecurityGroups/securityRules@2024-05-01' = {
-  parent: networkSecurityGroups_HRA_Data_DataModelling_nsg_name_resource
-  name: 'AllowAnyCustom8443Inbound'
-  properties: {
-    description: 'Allows Inbound Connection From iBoss'
-    protocol: '*'
-    sourcePortRange: '*'
-    destinationPortRange: '8443'
-    destinationAddressPrefix: '*'
-    access: 'Allow'
-    priority: 120
-    direction: 'Inbound'
-    sourcePortRanges: []
-    destinationPortRanges: []
-    sourceAddressPrefixes: [
-      '136.228.232.21/32'
-      '136.228.234.3/32'
-      '136.228.244.77/32'
-      '185.251.11.210/32'
-      '185.251.11.92/32'
-      '136.228.234.5/32'
-      '136.228.234.30/32'
-      '136.228.234.48/32'
-      '136.228.234.67/32'
-      '136.228.224.113/32'
-      '136.228.244.17/32'
-      '136.228.244.21/32'
-      '136.228.224.106/32'
-      '136.228.244.128/32'
-      '136.228.244.78/32'
-      '136.228.244.161/32'
-      '136.228.244.45/32'
-      '136.228.234.7/32'
-      '136.228.244.115/32'
+module dataModellingNSG '../../shared/bicep/network/nsg.bicep' = {
+  name: 'nsg-data-modelling-deployment'
+  params: {
+    name: networkSecurityGroups_HRA_Data_DataModelling_nsg_name
+    location: resourceGroup().location
+    tags: {}
+    securityRules: [
+      {
+        name: 'AllowDboxVnetCidrBlock'
+        properties: {
+          protocol: '*'
+          sourcePortRange: '*'
+          destinationPortRange: '8443'
+          sourceAddressPrefix: '*'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 110
+          direction: 'Inbound'
+        }
+      }
+      {
+        name: 'AllowAnyCustom8443Inbound'
+        properties: {
+          description: 'Allows Inbound Connection From iBoss'
+          protocol: '*'
+          sourcePortRange: '*'
+          destinationPortRange: '8443'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 120
+          direction: 'Inbound'
+          sourcePortRanges: []
+          destinationPortRanges: []
+          sourceAddressPrefixes: [
+            '136.228.232.21/32'
+            '136.228.234.3/32'
+            '136.228.244.77/32'
+            '185.251.11.210/32'
+            '185.251.11.92/32'
+            '136.228.234.5/32'
+            '136.228.234.30/32'
+            '136.228.234.48/32'
+            '136.228.234.67/32'
+            '136.228.224.113/32'
+            '136.228.244.17/32'
+            '136.228.244.21/32'
+            '136.228.224.106/32'
+            '136.228.244.128/32'
+            '136.228.244.78/32'
+            '136.228.244.161/32'
+            '136.228.244.45/32'
+            '136.228.234.7/32'
+            '136.228.244.115/32'
+          ]
+        }        
+      }
+      {
+        name: 'AllowCidrBlockCustomAnyInbound'
+        properties: {
+          description: 'This is the ERStudioApp IP address and it\'s needed for login via SSO to work'
+          protocol: '*'
+          sourcePortRange: '*'
+          destinationPortRange: '*'
+          sourceAddressPrefix: '20.0.121.199'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 130
+          direction: 'Inbound'
+        }        
+      }
+      {
+        name: 'AllowPAIps'
+        properties: {
+          protocol: '*'
+          sourcePortRange: '*'
+          destinationPortRange: '8443'
+          destinationAddressPrefix: '*'
+          access: 'Allow'
+          priority: 140
+          direction: 'Inbound'
+          sourceAddressPrefixes: [
+            '217.38.8.142'
+            '194.75.196.200'
+            '80.169.67.56'
+            '194.196.148.229'
+          ]
+        }
+      }
     ]
-    destinationAddressPrefixes: []
-  }
-}
-
-resource networkSecurityGroups_AllowPAIps 'Microsoft.Network/networkSecurityGroups/securityRules@2024-05-01' = {
-  parent: networkSecurityGroups_HRA_Data_DataModelling_nsg_name_resource
-  name: 'AllowPAIps'
-  properties: {
-    protocol: '*'
-    sourcePortRange: '*'
-    destinationPortRange: '8443'
-    destinationAddressPrefix: '*'
-    access: 'Allow'
-    priority: 140
-    direction: 'Inbound'
-    sourcePortRanges: []
-    destinationPortRanges: []
-    sourceAddressPrefixes: [
-      '217.38.8.142'
-      '194.75.196.200'
-      '80.169.67.56'
-      '194.196.148.229'
-    ]
-    destinationAddressPrefixes: []
-  }
-}
-
-resource networkSecurityGroups_AllowCidrBlockCustomAnyInbound 'Microsoft.Network/networkSecurityGroups/securityRules@2024-05-01' = {
-  parent: networkSecurityGroups_HRA_Data_DataModelling_nsg_name_resource
-  name: 'AllowCidrBlockCustomAnyInbound'
-  properties: {
-    description: 'This is the ERStudioApp IP address and it\'s needed for login via SSO to work'
-    protocol: '*'
-    sourcePortRange: '*'
-    destinationPortRange: '*'
-    sourceAddressPrefix: '20.0.121.199'
-    destinationAddressPrefix: '*'
-    access: 'Allow'
-    priority: 130
-    direction: 'Inbound'
-    sourcePortRanges: []
-    destinationPortRanges: []
-    sourceAddressPrefixes: []
-    destinationAddressPrefixes: []
-  }
-}
-
-resource networkSecurityGroups_AllowTagCustom1433Inbound 'Microsoft.Network/networkSecurityGroups/securityRules@2024-05-01' = {
-  parent: networkSecurityGroups_HRA_Data_DataModelling_nsg_name_resource
-  name: 'AllowTagCustom1433Inbound'
-  properties: {
-    protocol: '*'
-    sourcePortRange: '*'
-    destinationPortRange: '1433'
-    sourceAddressPrefix: 'VirtualNetwork'
-    destinationAddressPrefix: '*'
-    access: 'Allow'
-    priority: 100
-    direction: 'Inbound'
-    sourcePortRanges: []
-    destinationPortRanges: []
-    sourceAddressPrefixes: []
-    destinationAddressPrefixes: []
   }
 }
 
@@ -269,7 +252,7 @@ resource networkInterfaces_hra_data_erstudioapp913_z1_name_resource 'Microsoft.N
     enableIPForwarding: false
     disableTcpStateTracking: false
     networkSecurityGroup: {
-      id: networkSecurityGroups_HRA_Data_DataModelling_nsg_name_resource.id
+      id: dataModellingNSG.outputs.nsgId
     }
     nicType: 'Standard'
     auxiliaryMode: 'None'
@@ -312,7 +295,7 @@ resource networkInterfaces_hra_data_erstudiodb711_z1_name_resource 'Microsoft.Ne
     enableIPForwarding: false
     disableTcpStateTracking: false
     networkSecurityGroup: {
-      id: networkSecurityGroups_HRA_Data_DataModelling_nsg_name_resource.id
+      id: dataModellingNSG.outputs.nsgId
     }
     nicType: 'Standard'
     auxiliaryMode: 'None'

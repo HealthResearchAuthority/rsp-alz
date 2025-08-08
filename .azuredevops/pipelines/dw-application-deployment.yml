@@ -1,6 +1,17 @@
-# This workflow will deploy the application resources
-name: dw-application-deployment
+# This workflow will deploy datawarehouse applications
+name: datawarehouse-application-deployment
 trigger: none
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - '7.datawarehouse/main.application.bicep'
+      - '7.datawarehouse/app-parameters/**'
+
+variables:
+  - group: 'datawarehouse'
 
 parameters:
   - name: env
@@ -10,91 +21,148 @@ parameters:
     values:
       - dev
 
-jobs:
-  - job: lint
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - bash: az bicep build --file ./datawarehouse/main.application.bicep
+stages:
+  - stage: PRValidation
+    displayName: 'PR Validation for Datawarehouse Applications'
+    condition: eq(variables['Build.Reason'], 'PullRequest')
 
-  - job: validate
-    pool:
-      vmImage: 'ubuntu-latest'
-    dependsOn: lint
-    variables:
-      - name: app-variables
-      - group: DW-Application-Variables
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2
-        inputs:
-          azureSubscription: $(azureSubscription)
-          scriptType: bash
-          scriptLocation: inlineScript
-          inlineScript: |
-            az deployment sub validate --name "DW-App-$(Build.BuildId)" --location $(location) --template-file ./datawarehouse/main.application.bicep \
-              --parameters ./datawarehouse/app-parameters/{{ parameters.env }}.parameters.bicepparam \
-                           adminUsername=$(adminUsername)
+    jobs:
+      - job: lint
+        displayName: 'Lint Datawarehouse Templates'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - bash: az bicep build --file ./7.datawarehouse/main.application.bicep
+            displayName: 'Lint Bicep Templates'
 
-  - job: preview
-    pool:
-      vmImage: 'ubuntu-latest'
-    dependsOn: [lint, validate]
-    variables:
-      - name: app-variables
-      - group: DW-Application-Variables
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2
-        inputs:
-          azureSubscription: $(azureSubscription)
-          scriptType: bash
-          scriptLocation: inlineScript
-          inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            az deployment sub what-if --location $(location) --template-file ./datawarehouse/main.application.bicep \
-              --parameters ./datawarehouse/app-parameters/{{ parameters.env }}.parameters.bicepparam \
-                           adminUsername=$(adminUsername)
+      - job: validate
+        displayName: 'Validate Datawarehouse Bicep Templates'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: lint
+        condition: succeeded()
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub validate --name "DatawarehouseApplication-Validation-$(Build.BuildId)" \
+                  --location $(location) \
+                  --template-file ./7.datawarehouse/main.application.bicep \
+                  --parameters ./7.datawarehouse/app-parameters/${{ parameters.env }}.parameters.bicepparam \
+                    adminUsername=$(adminUsername) \
+                    logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                    harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                    harpSqlAdminPassword="$(harpSqlAdminPassword)"
 
-  - job: deploy
-    pool:
-      vmImage: 'ubuntu-latest'
-    dependsOn: [lint, validate, preview]
-    variables:
-      - name: app-variables
-      - group: DW-Application-Variables
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2
-        name: deploy
-        inputs:
-          azureSubscription: $(azureSubscription)
-          scriptType: bash
-          scriptLocation: inlineScript
-          failOnStandardError: true
-          inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            output=$(az stack sub create --name "dw-application-deployment-stack" --location $(location) --template-file ./datawarehouse/main.application.bicep \
-              --parameters ./datawarehouse/app-parameters/{{ parameters.env }}.parameters.bicepparam \
-                           adminUsername=$(adminUsername) \
-                           --deny-settings-mode none --action-on-unmanage detach --yes)
-            echo $output | jq .
-            appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
-            echo "##vso[task.setvariable variable=appResourceGroupName;isoutput=true]$appResourceGroup"
+      - job: preview
+        displayName: 'Preview Application Deployment'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [lint, validate]
+        condition: succeeded()
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - task: AzureCLI@2
+            displayName: 'What-If Analysis'
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub what-if \
+                  --location $(location) \
+                  --template-file ./7.datawarehouse/main.application.bicep \
+                  --parameters ./7.datawarehouse/app-parameters/${{ parameters.env }}.parameters.bicepparam \
+                    adminUsername=$(adminUsername) \
+                    logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                    harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                    harpSqlAdminPassword="$(harpSqlAdminPassword)"
+
+  - stage: ManualDeployment
+    displayName: 'Manual Deployment - Datawarehouse Applications'
+    dependsOn: []
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - job: PreDeploymentCheck
+        displayName: 'Pre-Deployment Validation'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - task: AzureCLI@2
+            displayName: 'What-If Analysis'
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub what-if \
+                  --location $(location) \
+                  --template-file ./7.datawarehouse/main.application.bicep \
+                  --parameters ./7.datawarehouse/app-parameters/${{ parameters.env }}.parameters.bicepparam \
+                    adminUsername=$(adminUsername) \
+                    logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                    harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                    harpSqlAdminPassword="$(harpSqlAdminPassword)"
+      - deployment: deployApplication
+        displayName: 'Deploy Datawarehouse Applications'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [PreDeploymentCheck]
+        condition: succeeded()
+        environment: 'datawarehouse-deployment'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - bash: |
+                    az bicep install
+                    az bicep version
+                  displayName: 'Install Bicep CLI'
+                - task: AzureCLI@2
+                  name: deployApplications
+                  displayName: 'Deploy Datawarehouse Applications'
+                  inputs:
+                    azureSubscription: $(azureServiceConnection)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    failOnStandardError: true
+                    inlineScript: |
+                      az config set bicep.use_binary_from_path=false --only-show-errors
+                      output=$(az deployment sub create --name "dw-application-deployment-$(Build.BuildId)" \
+                        --location $(location) \
+                        --template-file ./7.datawarehouse/main.application.bicep \
+                        --parameters ./7.datawarehouse/app-parameters/${{ parameters.env }}.parameters.bicepparam \
+                          adminUsername=$(adminUsername) \
+                          logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                          harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                          harpSqlAdminPassword="$(harpSqlAdminPassword)")
+                      echo $output | jq .
+                      echo "##[section]Datawarehouse Application Deployment Completed Successfully"
+
+                      echo "##vso[task.setvariable variable=functionAppIds;isoutput=true]$(echo $output | jq -r '.properties.outputs.functionAppIds.value')"

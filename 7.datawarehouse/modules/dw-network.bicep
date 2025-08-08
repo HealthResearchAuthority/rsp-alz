@@ -13,14 +13,14 @@ param vpnGatewayName string
 @description('Connection name for VPN')
 param connectionName string
 
-@description('Name of Azure DevOps account')
-param devopsAccountName string
-
 @description('Remote VNet ID for Devbox')
 param devboxVnetId string
 
 @description('Remote VNet ID for Manual Test')
-param manualTestVnetId string
+param devVnetId string
+
+@description('Remote VNet ID for Managed Devops Pool')
+param manageddevopspoolVnetId string
 
 @description('External ID of the remote VPN Gateway')
 param remoteVpnGatewayId string
@@ -44,42 +44,61 @@ param vnetAddressPrefix string = '172.18.0.0/16'
 var dataSubnetPrefix = '172.18.0.0/24'
 var gatewaySubnetPrefix = '172.18.1.0/27'
 var bastionSubnetPrefix = '172.18.2.0/26'
+var privateEndpointSubnetPrefix = '172.18.3.0/26'
+var functionAppSubnetPrefix = '172.18.4.0/26'
 
-resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' = {
-  name: vnetName
-  location: resourceGroup().location
-  properties: {
-    addressSpace: {
-      addressPrefixes: [ vnetAddressPrefix ]
-    }
-    privateEndpointVNetPolicies: 'Disabled'
-  }
-}
-
-resource datawarehouseSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
-  parent: vnet
-  name: 'HRADataWarehouseVirtualNetworkSubnet'
-  properties: {
-    addressPrefix: dataSubnetPrefix
-    privateEndpointNetworkPolicies: 'Disabled'
-  }
-}
-
-resource gatewaySubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
-  parent: vnet
-  name: 'GatewaySubnet'
-  properties: {
-    addressPrefix: gatewaySubnetPrefix
-    privateEndpointNetworkPolicies: 'Disabled'
-  }
-}
-
-resource bastionSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-05-01' = {
-  parent: vnet
-  name: 'AzureBastionSubnet'
-  properties: {
-    addressPrefix: bastionSubnetPrefix
-    privateEndpointNetworkPolicies: 'Disabled'
+module vnet '../../shared/bicep/network/vnet.bicep' = {
+  name: 'vnet-datawarehouse-deployment'
+  params: {
+    name: vnetName
+    location: resourceGroup().location
+    tags: {}
+    vnetAddressPrefixes: [vnetAddressPrefix ]
+    subnets: [
+      {
+        name: 'HRADataWarehouseVirtualNetworkSubnet'
+        properties: {
+          addressPrefix: dataSubnetPrefix
+          privateEndpointNetworkPolicies: 'Disabled'
+        }        
+      }
+      {
+        name: 'GatewaySubnet'
+        properties: {
+          addressPrefix: gatewaySubnetPrefix
+          privateEndpointNetworkPolicies: 'Disabled'
+        }
+      }
+      {
+        name: 'AzureBastionSubnet'
+        properties: {
+          addressPrefix: bastionSubnetPrefix
+          privateEndpointNetworkPolicies: 'Disabled'
+        }
+      }
+      {
+        name: 'snet-privateendpoints'
+        properties: {
+          addressPrefix: privateEndpointSubnetPrefix
+          privateEndpointNetworkPolicies: 'Disabled'
+        }
+      }
+      {
+        name: 'snet-functionapps'
+        properties: {
+          addressPrefix: functionAppSubnetPrefix
+          privateEndpointNetworkPolicies: 'Disabled'
+          delegations: [
+            {
+              name: 'Microsoft.Web.serverFarms'
+              properties: {
+                serviceName: 'Microsoft.Web/serverFarms'
+              }
+            }
+          ]
+        }
+      }
+    ]
   }
 }
 
@@ -120,6 +139,9 @@ resource vpnGateway 'Microsoft.Network/virtualNetworkGateways@2024-05-01' = {
       {
         id: '/subscriptions/9ef9a127-7a6e-452e-b18d-d2e2e89ffa92/resourceGroups/rg-rsp-devcenter/providers/Microsoft.Network/virtualNetworks/vnet-dbox-rsp-uksouth/virtualNetworkPeerings/dw-devbox-link'
       }
+      {
+        id: '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-networking-spoke-dev-uks/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-dev-uks-spoke/virtualNetworkPeerings/dev-dw-link'
+      }
     ]
     virtualNetworkGatewayMigrationStatus: {
       phase: 'None'
@@ -133,14 +155,12 @@ resource vpnGateway 'Microsoft.Network/virtualNetworkGateways@2024-05-01' = {
             id: publicIp.id
           }
           subnet: {
-            id: gatewaySubnet.id
+            id: '/subscriptions/461016b5-8363-472e-81be-eef6aad08353/resourceGroups/VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D/providers/Microsoft.Network/virtualNetworks/HRADataWarehouseVirtualNetwork/subnets/GatewaySubnet'
           }
         }
         type: 'Microsoft.Network/virtualNetworkGateways/ipConfigurations'
       }
     ]
-    natRules: []
-    virtualNetworkGatewayPolicyGroups: []
     enableBgpRouteTranslationForNat: false
     disableIPSecReplayProtection: false
     sku: {
@@ -188,18 +208,22 @@ resource connection 'Microsoft.Network/connections@2024-05-01' = {
     enableBgp: false
     useLocalAzureIpAddress: false
     usePolicyBasedTrafficSelectors: false
-    ipsecPolicies: []
-    trafficSelectorPolicies: []
     expressRouteGatewayBypass: false
     enablePrivateLinkFastPath: false
-    dpdTimeoutSeconds: 0
+    dpdTimeoutSeconds: 45
     connectionMode: 'Default'
-    gatewayCustomBgpIpAddresses: []
   }
 }
 
+resource vnetResource 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
+  name: vnetName
+  dependsOn: [
+    vnet
+  ]
+}
+
 resource devboxPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = {
-  parent: vnet
+  parent: vnetResource
   name: 'devbox-dw-link'
   properties: {
     peeringSyncLevel: 'FullyInSync'
@@ -221,33 +245,56 @@ resource devboxPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings
   }
 }
 
-resource manualTestPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = {
-  parent: vnet
-  name: 'manualtest-dw-link'
+resource devPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = {
+  parent: vnetResource
+  name: 'dev-dw-link'
   properties: {
     peeringSyncLevel: 'FullyInSync'
     remoteVirtualNetwork: {
-      id: manualTestVnetId
+      id: devVnetId
     }
     allowVirtualNetworkAccess: true
     allowForwardedTraffic: true
+    allowGatewayTransit: true
+    useRemoteGateways: false
+    doNotVerifyRemoteGateways: false
+    peerCompleteVnets: true
+    remoteAddressSpace: {
+      addressPrefixes: [ '10.1.0.0/19' ]
+    }
+    remoteVirtualNetworkAddressSpace: {
+      addressPrefixes: [ '10.1.0.0/19' ]
+    }
+  }
+}
+
+resource managedDevopsPoolPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = {
+  parent: vnetResource
+  name: 'peerTo-vnet-rsp-networking-devopspool'
+  properties: {
+    peeringSyncLevel: 'FullyInSync'
+    remoteVirtualNetwork: {
+      id: manageddevopspoolVnetId
+    }
+    allowVirtualNetworkAccess: true
+    allowForwardedTraffic: false
     allowGatewayTransit: false
     useRemoteGateways: false
     doNotVerifyRemoteGateways: false
     peerCompleteVnets: true
     remoteAddressSpace: {
-      addressPrefixes: [ '10.2.0.0/16' ]
+      addressPrefixes: [ '10.1.192.0/19' ]
     }
     remoteVirtualNetworkAddressSpace: {
-      addressPrefixes: [ '10.2.0.0/16' ]
+      addressPrefixes: [ '10.1.192.0/19' ]
     }
   }
 }
 
-resource devopsAccount 'Microsoft.VisualStudio/account@2014-04-01-preview' = {
-  name: devopsAccountName
-  location: resourceGroup().location
-  properties: {
-    AccountURL: 'https://dev.azure.com/${devopsAccountName}/'
-  }
-}
+// resource devopsAccount 'Microsoft.VisualStudio/account@2014-04-01-preview' = {
+//   name: devopsAccountName
+//   location: resourceGroup().location
+//   properties: {
+//     AccountURL: 'https://dev.azure.com/${devopsAccountName}/'
+//   }
+// }

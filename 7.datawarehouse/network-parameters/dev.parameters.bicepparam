@@ -4,11 +4,13 @@ param connectionName = 'VysiionSite'
 
 param devboxVnetId = '/subscriptions/9ef9a127-7a6e-452e-b18d-d2e2e89ffa92/resourceGroups/rg-rsp-devcenter/providers/Microsoft.Network/virtualNetworks/vnet-dbox-rsp-uksouth'
 
-param devopsAccountName = 'HRADataWarehouse'
+// param devopsAccountName = 'HRADataWarehouse'
 
 param localNetworkGatewayName = 'HRADataWarehouseNetworkGateway'
 
-param manualTestVnetId = '/subscriptions/66482e26-764b-4717-ae2f-fab6b8dd1379/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/virtualNetworks/vnet-manual-test'
+param devVnetId = '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-networking-spoke-dev-uks/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-dev-uks-spoke'
+
+param manageddevopspoolVnetId = '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-manageddevopspool/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-devopspool'
 
 param publicIpName = 'HRADataWarehouseVirtualNetwork-PIP-2'
 

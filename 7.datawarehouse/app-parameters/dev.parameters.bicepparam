@@ -25,3 +25,11 @@ param publicIPAddresses_HRADataWarehouseVirtualNetwork_ip_name = 'HRADataWarehou
 param virtualNetworks_HRADataWarehouseVirtualNetwork_name = 'HRADataWarehouseVirtualNetwork'
 
 param bastionDnsName = 'bst-9e2df993-e5ae-4c65-a0ec-d9418579c0ad.bastion.azure.com'
+
+// New Params for HARP Sync Deployment
+param harpSqlAdminLogin = ''
+param harpSqlAdminPassword = ''
+param environment = 'dev'
+param logAnalyticsWorkspaceId = ''
+param enableHarpDeployment = true
+param harpSyncResourceGroupName = 'harpSyncRG'
