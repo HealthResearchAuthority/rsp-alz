@@ -24,7 +24,7 @@ param devopsAccountName string
 param devboxVnetId string
 
 @description('Remote VNet ID for Manual Test')
-param manualTestVnetId string
+param devVnetId string
 
 @description('External ID of the remote VPN Gateway')
 param remoteVpnGatewayId string
@@ -53,7 +53,7 @@ module dw_network './modules/dw-network.bicep' = {
     devboxVnetId: devboxVnetId
     devopsAccountName: devopsAccountName
     localNetworkGatewayName: localNetworkGatewayName
-    manualTestVnetId: manualTestVnetId
+    devVnetId: devVnetId
     remoteLocalGatewayId: remoteLocalGatewayId
     remoteVpnGatewayId: remoteVpnGatewayId
     GatewayIp: GatewayIp

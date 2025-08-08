@@ -20,7 +20,7 @@ param devopsAccountName string
 param devboxVnetId string
 
 @description('Remote VNet ID for Manual Test')
-param manualTestVnetId string
+param devVnetId string
 
 @description('External ID of the remote VPN Gateway')
 param remoteVpnGatewayId string
@@ -119,6 +119,9 @@ resource vpnGateway 'Microsoft.Network/virtualNetworkGateways@2024-05-01' = {
     remoteVirtualNetworkPeerings: [
       {
         id: '/subscriptions/9ef9a127-7a6e-452e-b18d-d2e2e89ffa92/resourceGroups/rg-rsp-devcenter/providers/Microsoft.Network/virtualNetworks/vnet-dbox-rsp-uksouth/virtualNetworkPeerings/dw-devbox-link'
+      }
+      {
+        id: '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-networking-spoke-dev-uks/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-dev-uks-spoke/virtualNetworkPeerings/dev-dw-link'
       }
     ]
     virtualNetworkGatewayMigrationStatus: {
@@ -221,25 +224,25 @@ resource devboxPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings
   }
 }
 
-resource manualTestPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = {
+resource devPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2024-05-01' = {
   parent: vnet
-  name: 'manualtest-dw-link'
+  name: 'dev-dw-link'
   properties: {
     peeringSyncLevel: 'FullyInSync'
     remoteVirtualNetwork: {
-      id: manualTestVnetId
+      id: devVnetId
     }
     allowVirtualNetworkAccess: true
     allowForwardedTraffic: true
-    allowGatewayTransit: false
+    allowGatewayTransit: true
     useRemoteGateways: false
     doNotVerifyRemoteGateways: false
     peerCompleteVnets: true
     remoteAddressSpace: {
-      addressPrefixes: [ '10.2.0.0/16' ]
+      addressPrefixes: [ '10.1.0.0/19' ]
     }
     remoteVirtualNetworkAddressSpace: {
-      addressPrefixes: [ '10.2.0.0/16' ]
+      addressPrefixes: [ '10.1.0.0/19' ]
     }
   }
 }

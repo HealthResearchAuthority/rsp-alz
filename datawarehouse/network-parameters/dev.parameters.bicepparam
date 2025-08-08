@@ -8,7 +8,7 @@ param devopsAccountName = 'HRADataWarehouse'
 
 param localNetworkGatewayName = 'HRADataWarehouseNetworkGateway'
 
-param manualTestVnetId = '/subscriptions/66482e26-764b-4717-ae2f-fab6b8dd1379/resourceGroups/NetworkWatcherRG/providers/Microsoft.Network/virtualNetworks/vnet-manual-test'
+param devVnetId = '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-networking-spoke-dev-uks/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-dev-uks-spoke'
 
 param publicIpName = 'HRADataWarehouseVirtualNetwork-PIP-2'
 
