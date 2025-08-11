@@ -56,10 +56,39 @@ jobs:
               --deny-settings-mode none --action-on-unmanage deleteResources \
               --output table
 
-  - job: deploy
+  - job: preview
     pool: 
       vmImage: 'ubuntu-latest'
     dependsOn: [validate]
+    steps:
+      - checkout: self
+      - bash: |
+          az bicep install
+          az bicep version
+        displayName: 'Install Bicep CLI'
+      - task: AzureCLI@2
+        inputs:
+          azureSubscription: $(azureServiceConnection)
+          scriptType: bash
+          scriptLocation: inlineScript
+          addSpnToEnvironment: true
+          failOnStandardError: false
+          inlineScript: |
+            az config set bicep.use_binary_from_path=false --only-show-errors
+            az stack mg what-if \
+              --name "cross-subscription-deployment-stack" \
+              --location $(location) \
+              --management-group-id $(management-group-id) \
+              --template-file ./6.cross-subscription/main.bicep \
+              --parameters paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
+                           manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
+                           paramserviceIds="$(serviceIds)" \
+              --deny-settings-mode none --action-on-unmanage deleteResources
+
+  - job: deploy
+    pool: 
+      vmImage: 'ubuntu-latest'
+    dependsOn: [preview]
     steps:
       - checkout: self
       - bash: |
