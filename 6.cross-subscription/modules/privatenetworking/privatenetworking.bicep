@@ -27,9 +27,9 @@ var vNetLinksDefault = [
 var privateDNSMap = {
   'Microsoft.ContainerRegistry': 'privatelink.azurecr.io'
   'Microsoft.KeyVault': 'privatelink.vaultcore.azure.net'
-  'Microsoft.Sql': 'privatelink.database.windows.net'
+  'Microsoft.Sql': 'privatelink${environment().suffixes.sqlServerHostname}'
   'Microsoft.AppConfiguration': 'privatelink.azconfig.io'
-  'Microsoft.Storage': 'privatelink.blob.core.windows.net'
+  'Microsoft.Storage': 'privatelink.blob.${environment().suffixes.storage}'
   'Microsoft.Web': 'privatelink.azurewebsites.net'
   'Microsoft.ServiceBus': 'privatelink.servicebus.windows.net'
   'Microsoft.App': 'privatelink.${deployment().location}.azurecontainerapps.io'
