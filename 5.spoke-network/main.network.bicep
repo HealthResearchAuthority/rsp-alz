@@ -62,6 +62,7 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
   }
 }]
 
+
 // ------------------
 // OUTPUTS
 // ------------------
@@ -100,3 +101,4 @@ output spokeApplicationGatewaySubnetIds array = [for i in range(0, length(parSpo
 output spokeApplicationGatewaySubnetNames array = [for i in range(0, length(parSpokeNetworks)): {
   Name: spoke[i].outputs.spokeApplicationGatewaySubnetName
 }]
+

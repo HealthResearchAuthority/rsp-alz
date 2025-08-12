@@ -43,16 +43,16 @@ module vnetpeeringmodule 'modules/vnetpeering/vnetpeering.bicep' = {
   }
 }
 
-module privateNetworking 'modules/privatenetworking/privatenetworking.bicep' = [for (serviceId, i) in pepServiceIDArray: {
-  name: take('privateNetworking-${last(split(serviceId, '/'))}', 64)
+module privateNetworking 'modules/privatenetworking/privatenetworking.bicep' = {
+  name: take('privateNetworking-${deployment().name}', 64)
   scope: subscription(managementSubscriptionId)
   params: {
     sourceVNetID: manageddevopspoolVnetID
-    serviceId: serviceId
+    serviceIds: pepServiceIDArray
     managementSubscriptionId: managementSubscriptionId
     managementResourceGroupName: managementResourceGroupName
   }
-}]
+}
 
 output serviceIDs array = [for serviceId in pepServiceIDArray: {
   serviceId: serviceId

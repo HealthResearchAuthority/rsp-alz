@@ -161,6 +161,9 @@ param parEnableFrontDoorHttpsRedirect bool = true
 @description('Enable Front Door Private Link to origin')
 param parEnableFrontDoorPrivateLink bool = false
 
+@description('Enable Function Apps Private Endpoints')
+param parEnableFunctionAppPrivateEndpoints bool = false
+
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
 
@@ -450,21 +453,27 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 ]
 
-// Process scan Function App 
-module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-function.bicep' = [
+// Process scan Function App
+module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('processScanFnApp-${deployment().name}-deployment', 64)
     params: {
-      functionAppName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
+      appName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
       location: location
       tags: tags
+      sku: 'B1'
       appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
-      storageAccountName: 'stprosupld${parSpokeNetworks[i].parEnvironment}'
-      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      webAppBaseOs: 'Windows'
+      logAnalyticsWsId: logAnalyticsWorkspaceId
       subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: false
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
       spokeVNetId: existingVnet[i].id
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stprocessdoc${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
@@ -474,6 +483,7 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
     dependsOn: [
       applicationsRG
       databaseserver
+      webApp  // Wait for webApp to create DNS zone first
     ]
   }
 ]
@@ -495,7 +505,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true
       enableEventGridSubscriptions: false // Set to true only after Function App code is deployed and webhook endpoint is ready
-      processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint
+      processScanWebhookEndpoint: 'https://${processScanFnApp[i].outputs.appHostName}/api/ProcessScanResultEventTrigger'
       retentionPolicyDays: {
         staging: parStorageConfig.staging.retention.retentionDays
         clean: parStorageConfig.clean.retention.retentionDays
@@ -715,8 +725,6 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       ]
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: parEnableFrontDoorPrivateLink
     }
   }
 ]
@@ -740,17 +748,17 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'functionapp'
       storageAccountName: 'strtssync${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: false
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
     }
     dependsOn: [
       webApp
+      processScanFnApp
+      documentUpload
     ]
   }
 ]
@@ -774,16 +782,16 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'functionapp'
       storageAccountName: 'stfnnotify${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: false
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         // supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
       ]
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
     }
     dependsOn: [
+      processScanFnApp
       rtsfnApp
+      documentUpload
     ]
   }
 ]
@@ -835,21 +843,22 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
       kind: 'functionapp'
       storageAccountName: 'stdocapi${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: false
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
     }
     dependsOn: [
+      processScanFnApp
       fnNotifyApp
       databaseserver
+      documentUpload
     ]
   }
 ]
+
 
 // Grant process scan function permissions to all document storage accounts. Handled seperately as there was circular dependency.
 module processScanFunctionPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
