@@ -32,14 +32,14 @@ param location string = 'uksouth'
 //    VARIABLES
 // ------------------
 
-// Storage account names following the project naming convention
+// Storage account names 
 var storageAccounts = {
   clean: 'strspclean${environment}'
   staging: 'strspstagng${environment}'
   quarantine: 'strspquar${environment}'
 }
 
-// Private endpoint names following the existing pattern
+// Private endpoint names
 var privateEndpointNames = {
   clean: 'pep-devbox-strspclean-${environment}'
   staging: 'pep-devbox-strspstagng-${environment}'
@@ -75,7 +75,7 @@ resource blobPrivateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' exist
   name: 'privatelink.blob.${az.environment().suffixes.storage}'
 }
 
-// Private endpoint for clean storage account using existing private-endpoint module
+// Private endpoint for clean storage account using private-endpoint module
 module cleanStoragePrivateEndpoint '../../../shared/bicep/network/private-endpoint.bicep' = {
   name: take('cleanStoragePE-${environment}', 64)
   scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
@@ -89,7 +89,7 @@ module cleanStoragePrivateEndpoint '../../../shared/bicep/network/private-endpoi
   }
 }
 
-// Private endpoint for staging storage account using existing private-endpoint module
+// Private endpoint for staging storage account using private-endpoint module
 module stagingStoragePrivateEndpoint '../../../shared/bicep/network/private-endpoint.bicep' = {
   name: take('stagingStoragePE-${environment}', 64)
   scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
@@ -103,7 +103,7 @@ module stagingStoragePrivateEndpoint '../../../shared/bicep/network/private-endp
   }
 }
 
-// Private endpoint for quarantine storage account using existing private-endpoint module
+// Private endpoint for quarantine storage account existing private-endpoint module
 module quarantineStoragePrivateEndpoint '../../../shared/bicep/network/private-endpoint.bicep' = {
   name: take('quarantineStoragePE-${environment}', 64)
   scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
