@@ -69,64 +69,52 @@ resource devboxPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@
   name: devboxPrivateEndpointSubnetName
 }
 
-// VNet links for DNS zone
-var vNetLinksForDnsZone = [
-  {
-    vnetName: devboxVNetName
-    vnetId: devboxVNet.id
-    registrationEnabled: false
-  }
-]
+// Reference to existing private DNS zone for blob storage
+resource blobPrivateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' existing = {
+  scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
+  name: 'privatelink.blob.${az.environment().suffixes.storage}'
+}
 
-// Private endpoint for clean storage account using existing private-networking-spoke module
-module cleanStoragePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = {
+// Private endpoint for clean storage account using existing private-endpoint module
+module cleanStoragePrivateEndpoint '../../../shared/bicep/network/private-endpoint.bicep' = {
   name: take('cleanStoragePE-${environment}', 64)
   scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
   params: {
     location: location
-    azServicePrivateDnsZoneName: 'privatelink.blob.${az.environment().suffixes.storage}'
-    azServiceId: storageAccountResourceIds.clean
-    privateEndpointName: privateEndpointNames.clean
-    privateEndpointSubResourceName: 'blob'
-    virtualNetworkLinks: vNetLinksForDnsZone
-    subnetId: devboxPrivateEndpointSubnet.id
+    name: privateEndpointNames.clean
+    snetId: devboxPrivateEndpointSubnet.id
+    privateLinkServiceId: storageAccountResourceIds.clean
+    subresource: 'blob'
+    privateDnsZonesId: blobPrivateDnsZone.id
   }
 }
 
-// Private endpoint for staging storage account using existing private-networking-spoke module
-module stagingStoragePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = {
+// Private endpoint for staging storage account using existing private-endpoint module
+module stagingStoragePrivateEndpoint '../../../shared/bicep/network/private-endpoint.bicep' = {
   name: take('stagingStoragePE-${environment}', 64)
   scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
   params: {
     location: location
-    azServicePrivateDnsZoneName: 'privatelink.blob.${az.environment().suffixes.storage}'
-    azServiceId: storageAccountResourceIds.staging
-    privateEndpointName: privateEndpointNames.staging
-    privateEndpointSubResourceName: 'blob'
-    virtualNetworkLinks: vNetLinksForDnsZone
-    subnetId: devboxPrivateEndpointSubnet.id
+    name: privateEndpointNames.staging
+    snetId: devboxPrivateEndpointSubnet.id
+    privateLinkServiceId: storageAccountResourceIds.staging
+    subresource: 'blob'
+    privateDnsZonesId: blobPrivateDnsZone.id
   }
-  dependsOn: [
-    cleanStoragePrivateEndpoint // Ensure sequential deployment to avoid DNS zone race conditions
-  ]
 }
 
-// Private endpoint for quarantine storage account using existing private-networking-spoke module
-module quarantineStoragePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = {
+// Private endpoint for quarantine storage account using existing private-endpoint module
+module quarantineStoragePrivateEndpoint '../../../shared/bicep/network/private-endpoint.bicep' = {
   name: take('quarantineStoragePE-${environment}', 64)
   scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
   params: {
     location: location
-    azServicePrivateDnsZoneName: 'privatelink.blob.${az.environment().suffixes.storage}'
-    azServiceId: storageAccountResourceIds.quarantine
-    privateEndpointName: privateEndpointNames.quarantine
-    privateEndpointSubResourceName: 'blob'
-    virtualNetworkLinks: vNetLinksForDnsZone
-    subnetId: devboxPrivateEndpointSubnet.id
+    name: privateEndpointNames.quarantine
+    snetId: devboxPrivateEndpointSubnet.id
+    privateLinkServiceId: storageAccountResourceIds.quarantine
+    subresource: 'blob'
+    privateDnsZonesId: blobPrivateDnsZone.id
   }
-  dependsOn: [
-    stagingStoragePrivateEndpoint // Ensure sequential deployment to avoid DNS zone race conditions
-  ]
 }
 
 // ------------------
