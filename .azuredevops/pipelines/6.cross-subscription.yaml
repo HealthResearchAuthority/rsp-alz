@@ -50,7 +50,8 @@ jobs:
               --location $(location) \
               --management-group-id $(management-group-id) \
               --template-file ./6.cross-subscription/main.bicep \
-              --parameters paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
+              --parameters ./6.cross-subscription/dev.parameters.bicepparam \
+                           paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
                            manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
                            paramserviceIds="$(serviceIds)" \
               --deny-settings-mode none --action-on-unmanage deleteResources \
@@ -79,7 +80,8 @@ jobs:
               --location $(location) \
               --management-group-id $(management-group-id) \
               --template-file ./6.cross-subscription/main.bicep \
-              --parameters paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
+              --parameters ./6.cross-subscription/dev.parameters.bicepparam \
+                           paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
                            manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
                            paramserviceIds="$(serviceIds)"
 
@@ -108,7 +110,8 @@ jobs:
               --location $(location) \
               --management-group-id $(management-group-id) \
               --template-file ./6.cross-subscription/main.bicep \
-              --parameters paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
+              --parameters ./6.cross-subscription/dev.parameters.bicepparam \
+                           paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
                            manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
                            paramserviceIds="$(serviceIds)" \
               --deny-settings-mode none --action-on-unmanage deleteResources --yes)
