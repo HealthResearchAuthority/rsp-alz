@@ -67,16 +67,16 @@ module vnetpeeringmodule 'modules/vnetpeering/vnetpeering.bicep' = {
   }
 }
 
-module privateNetworking 'modules/privatenetworking/privatenetworking.bicep' = [for (serviceId, i) in pepServiceIDArray: {
-  name: take('privateNetworking-${last(split(serviceId, '/'))}', 64)
+module privateNetworking 'modules/privatenetworking/privatenetworking.bicep' = {
+  name: take('privateNetworking-${deployment().name}', 64)
   scope: subscription(managementSubscriptionId)
   params: {
     sourceVNetID: manageddevopspoolVnetID
-    serviceId: serviceId
+    serviceIds: pepServiceIDArray
     managementSubscriptionId: managementSubscriptionId
     managementResourceGroupName: managementResourceGroupName
   }
-}]
+}
 
 @description('Deploy DevBox storage private endpoints for dev environment')
 module devboxStorageEndpoints 'modules/devbox-storage-endpoints/devbox-storage-endpoints.bicep' = if (enableDevBoxStorageEndpoints && environment == 'dev') {
