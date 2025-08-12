@@ -69,52 +69,64 @@ resource devboxPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@
   name: devboxPrivateEndpointSubnetName
 }
 
-// Reference to private DNS zone for blob storage
-resource blobPrivateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' existing = {
-  scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
-  name: 'privatelink.blob.core.windows.net'
-}
+// VNet links for DNS zone
+var vNetLinksForDnsZone = [
+  {
+    vnetName: devboxVNetName
+    vnetId: devboxVNet.id
+    registrationEnabled: false
+  }
+]
 
-// Private endpoint for clean storage account
-module cleanStoragePrivateEndpoint '../../../shared/bicep/network/private-endpoint.bicep' = {
+// Private endpoint for clean storage account using existing private-networking-spoke module
+module cleanStoragePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = {
   name: take('cleanStoragePE-${environment}', 64)
   scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
   params: {
-    name: privateEndpointNames.clean
     location: location
-    snetId: devboxPrivateEndpointSubnet.id
-    privateLinkServiceId: storageAccountResourceIds.clean
-    subresource: 'blob'
-    privateDnsZonesId: blobPrivateDnsZone.id
+    azServicePrivateDnsZoneName: 'privatelink.blob.${az.environment().suffixes.storage}'
+    azServiceId: storageAccountResourceIds.clean
+    privateEndpointName: privateEndpointNames.clean
+    privateEndpointSubResourceName: 'blob'
+    virtualNetworkLinks: vNetLinksForDnsZone
+    subnetId: devboxPrivateEndpointSubnet.id
   }
 }
 
-// Private endpoint for staging storage account
-module stagingStoragePrivateEndpoint '../../../shared/bicep/network/private-endpoint.bicep' = {
+// Private endpoint for staging storage account using existing private-networking-spoke module
+module stagingStoragePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = {
   name: take('stagingStoragePE-${environment}', 64)
   scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
   params: {
-    name: privateEndpointNames.staging
     location: location
-    snetId: devboxPrivateEndpointSubnet.id
-    privateLinkServiceId: storageAccountResourceIds.staging
-    subresource: 'blob'
-    privateDnsZonesId: blobPrivateDnsZone.id
+    azServicePrivateDnsZoneName: 'privatelink.blob.${az.environment().suffixes.storage}'
+    azServiceId: storageAccountResourceIds.staging
+    privateEndpointName: privateEndpointNames.staging
+    privateEndpointSubResourceName: 'blob'
+    virtualNetworkLinks: vNetLinksForDnsZone
+    subnetId: devboxPrivateEndpointSubnet.id
   }
+  dependsOn: [
+    cleanStoragePrivateEndpoint // Ensure sequential deployment to avoid DNS zone race conditions
+  ]
 }
 
-// Private endpoint for quarantine storage account
-module quarantineStoragePrivateEndpoint '../../../shared/bicep/network/private-endpoint.bicep' = {
+// Private endpoint for quarantine storage account using existing private-networking-spoke module
+module quarantineStoragePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = {
   name: take('quarantineStoragePE-${environment}', 64)
   scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
   params: {
-    name: privateEndpointNames.quarantine
     location: location
-    snetId: devboxPrivateEndpointSubnet.id
-    privateLinkServiceId: storageAccountResourceIds.quarantine
-    subresource: 'blob'
-    privateDnsZonesId: blobPrivateDnsZone.id
+    azServicePrivateDnsZoneName: 'privatelink.blob.${az.environment().suffixes.storage}'
+    azServiceId: storageAccountResourceIds.quarantine
+    privateEndpointName: privateEndpointNames.quarantine
+    privateEndpointSubResourceName: 'blob'
+    virtualNetworkLinks: vNetLinksForDnsZone
+    subnetId: devboxPrivateEndpointSubnet.id
   }
+  dependsOn: [
+    stagingStoragePrivateEndpoint // Ensure sequential deployment to avoid DNS zone race conditions
+  ]
 }
 
 // ------------------
