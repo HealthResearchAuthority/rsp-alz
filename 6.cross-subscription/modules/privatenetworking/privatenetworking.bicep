@@ -22,12 +22,24 @@ var vNetLinksDefault = [
 
 var privateDNSMap = {
   'Microsoft.ContainerRegistry': 'privatelink.azurecr.io'
+  'Microsoft.KeyVault': 'privatelink.vaultcore.azure.net'
+  'Microsoft.Sql': 'privatelink${environment().suffixes.sqlServerHostname}'
+  'Microsoft.AppConfiguration': 'privatelink.azconfig.io'
+  'Microsoft.Storage': 'privatelink.blob.${environment().suffixes.storage}'
   'Microsoft.Web': 'privatelink.azurewebsites.net'
+  'Microsoft.ServiceBus': 'privatelink.servicebus.windows.net'
+  'Microsoft.App': 'privatelink.${deployment().location}.azurecontainerapps.io'
 }
 
 var subResourceNamesMap = {
   'Microsoft.ContainerRegistry': 'registry'
+  'Microsoft.KeyVault': 'vault'
+  'Microsoft.Sql': 'sqlServer'
+  'Microsoft.AppConfiguration': 'configurationStore'
+  'Microsoft.Storage': 'blob'
   'Microsoft.Web': 'sites'
+  'Microsoft.ServiceBus': 'namespace'
+  'Microsoft.App': 'managedEnvironments'
 }
 
 resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
