@@ -54,6 +54,8 @@ jobs:
                            paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
                            manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
                            paramserviceIds="$(serviceIds)" \
+                           storageSubscriptionId="$(storageSubscriptionId)" \
+                           devboxSubscriptionId="$(devboxSubscriptionId)" \
               --deny-settings-mode none --action-on-unmanage deleteResources \
               --output table
 
@@ -83,7 +85,9 @@ jobs:
               --parameters ./6.cross-subscription/dev.parameters.bicepparam \
                            paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
                            manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
-                           paramserviceIds="$(serviceIds)"
+                           paramserviceIds="$(serviceIds)" \
+                           storageSubscriptionId="$(storageSubscriptionId)" \
+                           devboxSubscriptionId="$(devboxSubscriptionId)"
 
   - job: deploy
     pool: 
@@ -114,6 +118,8 @@ jobs:
                            paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
                            manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
                            paramserviceIds="$(serviceIds)" \
+                           storageSubscriptionId="$(storageSubscriptionId)" \
+                           devboxSubscriptionId="$(devboxSubscriptionId)" \
               --deny-settings-mode none --action-on-unmanage deleteResources --yes)
             echo "Full Bicep Deployment Output:"
             echo $output | jq .

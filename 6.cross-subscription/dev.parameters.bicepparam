@@ -16,9 +16,9 @@ param enableDevBoxStorageEndpoints = true
 param environment = 'dev'
 
 // DevBox storage private endpoints configuration
-param storageSubscriptionId = 'b83b4631-b51b-4961-86a1-295f539c826b'
+param storageSubscriptionId = ''
 param storageResourceGroupName = 'rg-rsp-storage-spoke-dev-uks'
-param devboxSubscriptionId = '9ef9a127-7a6e-452e-b18d-d2e2e89ffa92'
+param devboxSubscriptionId = ''
 param devboxResourceGroupName = 'rg-rsp-devcenter'
 param devboxVNetName = 'vnet-dbox-rsp-uksouth'
 param devboxPrivateEndpointSubnetName = 'sn-devpools'
