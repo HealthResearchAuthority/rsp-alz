@@ -1,9 +1,6 @@
 @description('Required. Name of your Function App.')
 param functionAppName string
 
-@description('DevOps Public IP Address')
-param devOpsPublicIPAddress string = ''
-
 @description('Optional. Location for all resources.')
 param location string
 
@@ -16,8 +13,8 @@ param appSettings array = []
 @description('Required. The resource ID of the app service plan to use for the site.')
 param serverFarmResourceId string
 
-@description('Determines if we are exposing apps to public')
-param isPrivate bool = true
+@description('Optional, default is false. If true, then a private endpoint must be assigned to the function app')
+param hasPrivateEndpoint bool = false
 
 @description('Client ID of the managed identity to be used for the SQL DB connection string.')
 param sqlDBManagedIdentityClientId string = ''
@@ -102,6 +99,22 @@ var defaultSettings = [
   }
 ]
 
+// Additional settings for private endpoint scenarios
+var privateEndpointSettings = hasPrivateEndpoint ? [
+  {
+    name: 'WEBSITE_CONTENTOVERVNET'
+    value: '1'
+  }
+  {
+    name: 'WEBSITE_VNET_ROUTE_ALL' 
+    value: '1'
+  }
+  {
+    name: 'WEBSITE_WEBDEPLOY_USE_SCM'
+    value: 'true'
+  }
+] : []
+
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
   location: location
@@ -109,21 +122,12 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   identity: userAssignedIdentities
   properties: {
     httpsOnly: true
-    publicNetworkAccess: isPrivate ? 'Disabled' : 'Enabled'
+    publicNetworkAccess: hasPrivateEndpoint ? 'Disabled' : 'Enabled'
     serverFarmId: serverFarmResourceId
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     siteConfig: {
-      ipSecurityRestrictionsDefaultAction: isPrivate ? 'Deny' : 'Allow'  // Default action is to deny
-      ipSecurityRestrictions: isPrivate ? [
-        {
-          action: 'Allow'
-          ipAddress: '${devOpsPublicIPAddress}/32'
-          name: 'AllowSpecificIP'
-          priority: 100
-        }
-      ] : []
       netFrameworkVersion: dotnetVersion
-      appSettings: concat(defaultSettings, appSettings)
+      appSettings: concat(defaultSettings, privateEndpointSettings, appSettings)
       alwaysOn: true
     }
   }

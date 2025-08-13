@@ -1,9 +1,4 @@
 
-@description('DevOps Public IP Address')
-param devOpsPublicIPAddress string
-
-@description('Determines if we are exposing apps to public')
-param isPrivate bool
 
 
 @description('Required. Name of the App Service Plan.')
@@ -69,8 +64,6 @@ param deploySlot bool
 param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
 
-@description('Create private DNS zones (set to false if zones already exist)')
-param createPrivateDnsZones bool = true
 
 // @description('The name of an existing keyvault, that it will be used to store secrets (connection string)' )
 // param keyvaultName string
@@ -87,12 +80,12 @@ var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
 var spokeResourceGroupName = spokeVNetIdTokens[4]
 var spokeVNetName = spokeVNetIdTokens[8]
-var networkAcls = isPrivate ? {
+var networkAcls = deployAppPrivateEndPoint ? {
   defaultAction: 'Deny'
   bypass: 'AzureServices'
-  ipRules: devOpsPublicIPAddress == '' ? [] : [
+  virtualNetworkRules: [
     {
-      value: devOpsPublicIPAddress
+      id: subnetIdForVnetInjection
       action: 'Allow'
     }
   ]
@@ -165,7 +158,7 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
   }
 }
 
-module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && isPrivate == true && createPrivateDnsZones) {
+module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && deployAppPrivateEndPoint == true) {
   name:take('rtsfnStorageBlobPrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
@@ -186,7 +179,7 @@ module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networki
   }
 }
 
-module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && createPrivateDnsZones) {
+module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && deployAppPrivateEndPoint == true) {
   name:take('rtsfnStorageFilePrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
@@ -225,8 +218,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
     }
     storageAccountName: storageAccountName
-    isPrivate: isPrivate
-    devOpsPublicIPAddress: devOpsPublicIPAddress
+    hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
   }
   dependsOn: [
@@ -239,8 +231,9 @@ resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   name: spokeVNetName
 }
 
-module webAppPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(deployAppPrivateEndPoint == true) {
-  name:take('webAppPrivateNetwork-${deployment().name}', 64)
+// Private endpoint for App Service/Function App using existing private-networking-spoke module
+module appServicePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = if(deployAppPrivateEndPoint) {
+  name: take('appServicePrivateEndpoint-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
     location: location
