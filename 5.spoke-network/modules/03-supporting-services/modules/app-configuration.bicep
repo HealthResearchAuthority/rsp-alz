@@ -65,6 +65,7 @@ param useFrontDoor bool
 @description('Enable private endpoints for App Configuration')
 param enablePrivateEndpoints bool = false
 
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -307,7 +308,7 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
     }
   }
   properties: {
-    publicNetworkAccess: enablePrivateEndpoints ? 'Disabled' : 'Enabled'
+    publicNetworkAccess: 'Enabled'
   }
 }
 
