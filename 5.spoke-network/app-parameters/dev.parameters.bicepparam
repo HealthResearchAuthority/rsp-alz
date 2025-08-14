@@ -37,6 +37,7 @@ param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
 param parEnableFrontDoorPrivateLink = true
+param parEnableFunctionAppPrivateEndpoints = true
 param parFrontDoorCustomDomains = []
 
 param parDefenderForStorageConfig = {
@@ -137,3 +138,11 @@ param parSpokeNetworks = [
 
 param parStorageAccountName = 'strspstagngdev'
 param parStorageAccountKey = ''
+
+// Allowed hosts for the dev environment to be used when the Web App is behind Front Door
+param parAllowedHosts = 'fd-rsp-applications-dev-uks-cveeakgqdgbqexbz.a03.azurefd.net;irasportal-dev.azurewebsites.net'
+
+// indicates whether to use Front Door for the dev environment
+param parUseFrontDoor = true
+
+//param paramWhitelistIPs = ''

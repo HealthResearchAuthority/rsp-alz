@@ -131,6 +131,7 @@ jobs:
         displayName: 'Install Bicep CLI'
       - bash: echo "Azure DevOps Public IP Address is $(devOpsPublicIP)"
       - bash: echo "Azure DevOps Public IP Address from IPIFY is $(devOpsIPIFYPublicIP)"
+      - bash: echo "Azure DevOps Public IP Address from parWhitelistIPs is $(parWhitelistIPs)"
       - task: AzureCLI@2
         name: deploy
         inputs:

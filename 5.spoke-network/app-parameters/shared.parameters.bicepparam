@@ -4,7 +4,6 @@ param location = 'uksouth'
 
 param tags = {}
 
-// logAnalyticsWorkspaceId is now passed securely via Azure DevOps pipeline variables
 
 param parSqlAuditRetentionDays = 15
 

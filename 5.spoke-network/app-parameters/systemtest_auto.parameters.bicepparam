@@ -28,7 +28,6 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 15
 
-
 // Azure Front Door Configuration
 param parEnableFrontDoor = false
 param parFrontDoorWafMode = 'Detection'
@@ -37,7 +36,8 @@ param parFrontDoorRateLimitThreshold = 1000
 param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
-param parEnableFrontDoorPrivateLink = false
+param parEnableFrontDoorPrivateLink = true
+param parEnableFunctionAppPrivateEndpoints = true
 param parFrontDoorCustomDomains = []
 
 param parDefenderForStorageConfig = {
@@ -136,5 +136,11 @@ param parSpokeNetworks = [
   }
 ]
 
-param parStorageAccountName = 'strspstagngdev'
+param parStorageAccountName = 'strrspstg'
 param parStorageAccountKey = ''
+
+// Allowed hosts for the systemtest_auto environment to be used when the Web App is behind Front Door
+param parAllowedHosts = '*'
+
+// indicates whether to use Front Door for the systemtest_auto environment
+param parUseFrontDoor = false

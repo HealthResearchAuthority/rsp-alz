@@ -41,32 +41,54 @@ jobs:
           azureSubscription: $(azureServiceConnection)
           scriptType: bash
           scriptLocation: inlineScript
+          addSpnToEnvironment: true
+          failOnStandardError: false
           inlineScript: |
             az config set bicep.use_binary_from_path=false --only-show-errors
-            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds)
+            az stack mg validate \
+              --name "cross-subscription-deployment-stack" \
+              --location $(location) \
+              --management-group-id $(management-group-id) \
+              --template-file ./6.cross-subscription/main.bicep \
+              --parameters ./6.cross-subscription/dev.parameters.bicepparam \
+                           paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
+                           manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
+                           paramserviceIds="$(serviceIds)" \
+                           storageSubscriptionId="$(storageSubscriptionId)" \
+                           devboxSubscriptionId="$(devboxSubscriptionId)" \
+              --deny-settings-mode none --action-on-unmanage deleteResources \
+              --output table
 
   - job: preview
     pool: 
       vmImage: 'ubuntu-latest'
-    dependsOn: [lint, validate]
+    dependsOn: [validate]
     steps:
       - checkout: self
       - bash: |
           az bicep install
           az bicep version
         displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2 
-        inputs: 
+      - task: AzureCLI@2
+        inputs:
           azureSubscription: $(azureServiceConnection)
           scriptType: bash
           scriptLocation: inlineScript
+          addSpnToEnvironment: true
+          failOnStandardError: false
           inlineScript: |
             az config set bicep.use_binary_from_path=false --only-show-errors
             az deployment mg what-if \
               --location $(location) \
-              --template-file ./6.cross-subscription/main.bicep \
               --management-group-id $(management-group-id) \
-              --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds)
+              --template-file ./6.cross-subscription/main.bicep \
+              --parameters ./6.cross-subscription/dev.parameters.bicepparam \
+                           paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
+                           manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
+                           paramserviceIds="$(serviceIds)" \
+                           storageSubscriptionId="$(storageSubscriptionId)" \
+                           devboxSubscriptionId="$(devboxSubscriptionId)"
+
   - job: deploy
     pool: 
       vmImage: 'ubuntu-latest'
@@ -83,14 +105,21 @@ jobs:
           azureSubscription: $(azureServiceConnection)
           scriptType: bash
           scriptLocation: inlineScript
+          addSpnToEnvironment: true
           failOnStandardError: true
           inlineScript: |
             az config set bicep.use_binary_from_path=false --only-show-errors
-            output=$(az deployment mg create \
-              --name "core-services-$(Build.BuildId)" \
+            output=$(az stack mg create \
+              --name "cross-subscription-deployment-stack" \
               --location $(location) \
               --management-group-id $(management-group-id) \
               --template-file ./6.cross-subscription/main.bicep \
-              --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds))
+              --parameters ./6.cross-subscription/dev.parameters.bicepparam \
+                           paramvnetPeeringsVNetIDs="$(paramvnetPeeringsVNetIDs)" \
+                           manageddevopspoolVnetID="$(manageddevopspoolVnetID)" \
+                           paramserviceIds="$(serviceIds)" \
+                           storageSubscriptionId="$(storageSubscriptionId)" \
+                           devboxSubscriptionId="$(devboxSubscriptionId)" \
+              --deny-settings-mode none --action-on-unmanage deleteResources --yes)
             echo "Full Bicep Deployment Output:"
             echo $output | jq .

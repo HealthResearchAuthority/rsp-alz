@@ -7,6 +7,9 @@
 @description('Required. Name of the site.')
 param name string
 
+// @description('Optional. The IP ACL rules. Note, requires the \'acrSku\' to be \'Premium\'.')
+// param networkRuleSetIpRules array = []
+
 @description('Optional. Location for all Resources.')
 param location string
 
@@ -53,7 +56,7 @@ param virtualNetworkSubnetId string = ''
 
 @allowed(['windowsNet6', 'windowsNet7', 'windowsNet8', 'windowsNet9', 'windowsAspNet486', 'linuxJava17Se', 'linuxNet9', 'linuxNet8', 'linuxNet7', 'linuxNet6', 'linuxNode18'])
 @description('Mandatory. Predefined set of config settings.')
-param siteConfigSelection string 
+param operatingSystem string 
 
 @description('Optional. Required if app of kind functionapp. Resource ID of the storage account to manage triggers and logging function executions.')
 param storageAccountId string = ''
@@ -133,6 +136,8 @@ param hostNameSslStates array = []
 @description('Optional, default is false. If true, then a private endpoint must be assigned to the web app')
 param hasPrivateLink bool = false
 
+param paramSiteConfig object = {}
+
 @description('Optional. Site redundancy mode.')
 @allowed([
   'ActiveActive'
@@ -165,6 +170,7 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
 }]
 
 var webapp_dns_name = '.azurewebsites.net'
+
 
 // ============ //
 // Dependencies //
@@ -204,7 +210,10 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     keyVaultReferenceIdentity: !empty(keyVaultAccessIdentityResourceId) ? keyVaultAccessIdentityResourceId : null
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     vnetRouteAllEnabled: !empty(virtualNetworkSubnetId) ? true : false
-    siteConfig: siteConfigConfigurationMap[siteConfigSelection]
+    // siteConfig: union(siteConfigConfigurationMap[operatingSystem], {
+    //   ipSecurityRestrictions: !empty(networkRuleSetIpRules) ? networkRuleSetIpRules : []
+    // })
+    siteConfig: paramSiteConfig
     clientCertEnabled: false
     clientCertExclusionPaths: null
     clientCertMode: 'Optional'
@@ -217,6 +226,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     hyperV: false
     redundancyMode: redundancyMode
     publicNetworkAccess: hasPrivateLink ? 'Disabled' : 'Enabled'
+    
   }
 }
 
@@ -247,7 +257,7 @@ module app_slots 'web-app.slots.bicep' = [for (slot, index) in slots: {
     keyVaultAccessIdentityResourceId: slot.?keyVaultAccessIdentityResourceId ? slot.keyVaultAccessIdentityResourceId : keyVaultAccessIdentityResourceId
     storageAccountRequired: slot.?storageAccountRequired ? slot.storageAccountRequired : storageAccountRequired
     virtualNetworkSubnetId: slot.?virtualNetworkSubnetId ? slot.virtualNetworkSubnetId : virtualNetworkSubnetId
-    siteConfig: slot.?siteConfig ? slot.siteConfig : siteConfigConfigurationMap[siteConfigSelection]
+    siteConfig: slot.?siteConfig ? slot.siteConfig : siteConfigConfigurationMap[operatingSystem]
     storageAccountId: slot.?storageAccountId ? slot.storageAccountId : storageAccountId
     appInsightId: slot.?appInsightId ? slot.appInsightId : appInsightId
     setAzureWebJobsDashboard: slot.?setAzureWebJobsDashboard ? slot.setAzureWebJobsDashboard : setAzureWebJobsDashboard

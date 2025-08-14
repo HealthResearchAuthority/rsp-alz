@@ -73,6 +73,10 @@ param location string = deployment().location
 @description('DevOps Public IP Address')
 param parDevOpsPublicIPAddress string = ''
 
+// @description('IP addresses to be whitelisted for users to access CMS Portal')
+// param paramWhitelistIPs string
+
+
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
@@ -151,6 +155,9 @@ param parEnableFrontDoorHttpsRedirect bool = true
 
 @description('Enable Front Door Private Link to origin')
 param parEnableFrontDoorPrivateLink bool = false
+
+@description('Enable Function Apps Private Endpoints')
+param parEnableFunctionAppPrivateEndpoints bool = false
 
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
@@ -237,6 +244,12 @@ param parStorageAccountName string
 @secure()
 @description('The key for the storage account where the blob connection string will be stored.')
 param parStorageAccountKey string
+
+@description('Allowed hosts for the application to be used when the Web App is behind Front Door')
+param parAllowedHosts string
+
+@description('Indicates whether to use Front Door for the application')
+param parUseFrontDoor bool
 
 // ------------------
 // VARIABLES
@@ -417,6 +430,8 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       oneLoginIssuers: parOneLoginIssuers
       storageAccountName: parStorageAccountName
       storageAccountKey: parStorageAccountKey
+      allowedHosts: parAllowedHosts
+      useFrontDoor: parUseFrontDoor
     }
   }
 ]
@@ -441,21 +456,27 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 ]
 
-// Process scan Function App 
-module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-function.bicep' = [
+// Process scan Function App
+module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('processScanFnApp-${deployment().name}-deployment', 64)
     params: {
-      functionAppName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
+      appName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
       location: location
       tags: tags
+      sku: 'B1'
       appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
-      storageAccountName: 'stprosupld${parSpokeNetworks[i].parEnvironment}'
-      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      webAppBaseOs: 'Windows'
+      logAnalyticsWsId: logAnalyticsWorkspaceId
       subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: false
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
       spokeVNetId: existingVnet[i].id
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stpdoc${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
@@ -465,6 +486,7 @@ module processScanFnApp 'modules/07-process-scan-function/deploy.process-scan-fu
     dependsOn: [
       applicationsRG
       databaseserver
+      webApp  // Wait for webApp to create DNS zone first
     ]
   }
 ]
@@ -486,7 +508,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true
       enableEventGridSubscriptions: false // Set to true only after Function App code is deployed and webhook endpoint is ready
-      processScanWebhookEndpoint: processScanFnApp[i].outputs.webhookEndpoint
+      processScanWebhookEndpoint: 'https://${processScanFnApp[i].outputs.appHostName}/api/ProcessScanResultEventTrigger'
       retentionPolicyDays: {
         staging: parStorageConfig.staging.retention.retentionDays
         clean: parStorageConfig.clean.retention.retentionDays
@@ -528,7 +550,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
       adminLogin: parAdminLogin
       adminPassword: parSqlAdminPhrase
-      databases: ['applicationservice', 'identityservice', 'questionsetservice', 'rtsservice', 'cmsdatabase']
+      databases: ['applicationservice', 'identityservice', 'questionsetservice', 'rtsservice', 'cmsservice']
       spokePrivateEndpointSubnetName: pepSubnet[i].name // spoke[i].outputs.spokePrivateEndpointsSubnetName
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       sqlServerUAIName: storageServicesNaming[i].outputs.resourcesNames.sqlServerUserAssignedIdentity
@@ -706,8 +728,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       ]
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: parEnableFrontDoorPrivateLink
+      //paramWhitelistIPs: ''
     }
   }
 ]
@@ -733,10 +754,13 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
       deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        databaseserver[i].outputs.outputsqlServerUAIID
       ]
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: parEnableFrontDoorPrivateLink
+      //paramWhitelistIPs: paramWhitelistIPs
     }
+    dependsOn: [
+      databaseserver
+    ]
   }
 ]
 
@@ -759,17 +783,17 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'functionapp'
       storageAccountName: 'strtssync${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: false
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
     }
     dependsOn: [
       webApp
+      processScanFnApp
+      documentUpload
     ]
   }
 ]
@@ -793,16 +817,16 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'functionapp'
       storageAccountName: 'stfnnotify${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: false
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         // supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
       ]
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
     }
     dependsOn: [
+      processScanFnApp
       rtsfnApp
+      documentUpload
     ]
   }
 ]
@@ -854,21 +878,22 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
       kind: 'functionapp'
       storageAccountName: 'stdocapi${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: false
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-      devOpsPublicIPAddress: parDevOpsPublicIPAddress
-      isPrivate: false
     }
     dependsOn: [
+      processScanFnApp
       fnNotifyApp
       databaseserver
+      documentUpload
     ]
   }
 ]
+
 
 // Grant process scan function permissions to all document storage accounts. Handled seperately as there was circular dependency.
 module processScanFunctionPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
