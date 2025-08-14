@@ -480,7 +480,7 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
       kind: 'functionapp'
-      storageAccountName: 'stprocessdoc${parSpokeNetworks[i].parEnvironment}'
+      storageAccountName: 'stpdoc${parSpokeNetworks[i].parEnvironment}'
       deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
