@@ -136,7 +136,7 @@ param parSpokeNetworks = [
   }
 ]
 
-param parStorageAccountName = 'strspstagngdev'
+param parStorageAccountName = 'strrspstg'
 param parStorageAccountKey = ''
 
 // Allowed hosts for the systemtest_manual environment to be used when the Web App is behind Front Door
