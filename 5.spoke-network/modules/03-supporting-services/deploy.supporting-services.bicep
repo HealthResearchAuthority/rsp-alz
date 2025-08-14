@@ -64,6 +64,12 @@ param storageAccountName string
 @description('The key for the storage account where the blob connection string will be stored.')
 param storageAccountKey string
 
+@description('Allowed hosts for the application to be used when the Web App is behind Front Door')
+param allowedHosts string
+
+@description('Indicates whether to use Front Door for the application')
+param useFrontDoor bool
+
 // ------------------
 // Varaibles
 // ------------------
@@ -146,6 +152,8 @@ module appConfiguration './modules/app-configuration.bicep' = {
     oneLoginIssuers: oneLoginIssuers
     storageAccountName: storageAccountName
     storageAccountKey: storageAccountKey
+    allowedHosts: allowedHosts
+    useFrontDoor: useFrontDoor
   }
 }
 
