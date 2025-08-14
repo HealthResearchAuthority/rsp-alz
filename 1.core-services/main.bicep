@@ -92,6 +92,7 @@ module manageddevopspoolmodule 'modules/manageddevopspool.bicep' = {
     devopspoolSubnetName: 'snet-devopspool'
     spokeVNetAddressPrefixes: [vnetprefix]
     devopspoolpepSubnetPrefix: devopspoolpepSubnetPrefix
+    logAnalyticsWorkspaceId: loganalytics.outputs.outLogAnalyticsWorkspaceId
   }
 }
 

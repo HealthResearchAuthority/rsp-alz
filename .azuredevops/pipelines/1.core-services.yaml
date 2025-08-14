@@ -2,91 +2,141 @@
 name: 1.core-service-lza-deployment
 
 trigger: none
-pr: none
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - '1.core-services/**'
 
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-jobs:
-  # The lint job performs linting on the bicep code
-  - job: lint
-    pool: 
-      vmImage: 'ubuntu-latest'
+stages:
+  - stage: PRValidation
+    displayName: 'PR Validation for Core Services'
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    jobs:
+      # The lint job performs linting on the bicep code
+      - job: lint
+        displayName: 'Lint Core Services Templates'
+        pool: 
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - bash: az bicep build --file ./1.core-services/main.bicep
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
-    steps:
-      # Checks-out your repository under so your job can access it
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
+      - job: validate
+        displayName: 'Validate Core Services Deployment'
+        pool: 
+          vmImage: 'ubuntu-latest'
+        dependsOn: [lint]
+        condition: succeeded()
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ./1.core-services/main.bicep --management-group-id $(management-group-id) --parameters managementSubscriptionId=$(managementSubscriptionId)
 
-      # Runs the Bicep linter to ensure build is successful
-      - bash: az bicep build --file ./1.core-services/main.bicep
+      - job: preview
+        displayName: 'Preview Core Services Deployment'
+        pool: 
+          vmImage: 'ubuntu-latest'
+        dependsOn: [lint, validate]
+        condition: succeeded()
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - task: AzureCLI@2 
+            inputs: 
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment mg what-if \
+                  --location $(location) \
+                  --template-file ./1.core-services/main.bicep \
+                  --management-group-id $(management-group-id) \
+                  --parameters managementSubscriptionId=$(managementSubscriptionId)
 
-  - job: validate
-    pool: 
-      vmImage: 'ubuntu-latest'
-    dependsOn: [lint]
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2
-        inputs:
-          azureSubscription: $(azureServiceConnection)
-          scriptType: bash
-          scriptLocation: inlineScript
-          inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --template-file ./1.core-services/main.bicep --management-group-id $(management-group-id) --parameters managementSubscriptionId=$(managementSubscriptionId)
+  - stage: ManualDeployment
+    displayName: 'Manual Deployment for Core Services'
+    dependsOn: []
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - job: FinalWhatIf
+        displayName: 'Run What-If before Deployment'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
 
-  - job: preview
-    pool: 
-      vmImage: 'ubuntu-latest'
-    dependsOn: [lint, validate]
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2 
-        inputs: 
-          azureSubscription: $(azureServiceConnection)
-          scriptType: bash
-          scriptLocation: inlineScript
-          inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            az deployment mg what-if \
-              --location $(location) \
-              --template-file ./1.core-services/main.bicep \
-              --management-group-id $(management-group-id) \
-              --parameters managementSubscriptionId=$(managementSubscriptionId)
-  - job: deploy
-    pool: 
-      vmImage: 'ubuntu-latest'
-    dependsOn: [preview]
-    steps:
-      - checkout: self
-      - bash: |
-          az bicep install
-          az bicep version
-        displayName: 'Install Bicep CLI'
-      - task: AzureCLI@2 
-        name: deploy
-        inputs: 
-          azureSubscription: $(azureServiceConnection)
-          scriptType: bash
-          scriptLocation: inlineScript
-          failOnStandardError: true
-          inlineScript: |
-            az config set bicep.use_binary_from_path=false --only-show-errors
-            output=$(az deployment mg create \
-              --name "core-services-$(Build.BuildId)" \
-              --location $(location) \
-              --template-file ./1.core-services/main.bicep \
-              --management-group-id $(management-group-id) \
-              --parameters managementSubscriptionId=$(managementSubscriptionId))
+          - task: AzureCLI@2 
+            displayName: 'Final What-If'
+            inputs: 
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              failOnStandardError: true
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment mg what-if \
+                --location $(location) \
+                --template-file ./1.core-services/main.bicep \
+                --management-group-id $(management-group-id) \
+                --parameters managementSubscriptionId=$(managementSubscriptionId)
+
+      - deployment: deploy
+        displayName: 'Deploy Core Services'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [FinalWhatIf]
+        condition: succeeded()
+        environment: 'alz-bicep-deployment'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - bash: |
+                    az bicep install
+                    az bicep version
+                  displayName: 'Install Bicep CLI'
+
+                - task: AzureCLI@2 
+                  name: 'deploy'
+                  displayName: 'Deploy Core Services'
+                  inputs: 
+                    azureSubscription: $(azureServiceConnection)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    failOnStandardError: true
+                    inlineScript: |
+                      az config set bicep.use_binary_from_path=false --only-show-errors
+                      output=$(az deployment mg create \
+                        --location $(location) \
+                        --template-file ./1.core-services/main.bicep \
+                        --management-group-id $(management-group-id) \
+                        --parameters managementSubscriptionId=$(managementSubscriptionId))
+                      echo $output | jq .
+                      echo "##[section]"
