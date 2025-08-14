@@ -35,7 +35,7 @@ var subResourceNamesMap = {
   'Microsoft.ContainerRegistry': 'registry'
   'Microsoft.KeyVault': 'vault'
   'Microsoft.Sql': 'sqlServer'
-  'Microsoft.AppConfiguration': 'configurationStore'
+  'Microsoft.AppConfiguration': 'configurationStores'
   'Microsoft.Storage': 'blob'
   'Microsoft.Web': 'sites'
   'Microsoft.ServiceBus': 'namespace'

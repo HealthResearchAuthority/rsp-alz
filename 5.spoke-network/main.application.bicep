@@ -164,6 +164,12 @@ param parEnableFrontDoorPrivateLink bool = false
 @description('Enable Function Apps Private Endpoints')
 param parEnableFunctionAppPrivateEndpoints bool = false
 
+@description('Enable Key Vault Private Endpoints')
+param parEnableKeyVaultPrivateEndpoints bool = false
+
+@description('Enable App Configuration Private Endpoints')
+param parEnableAppConfigPrivateEndpoints bool = false
+
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
 
@@ -437,6 +443,8 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       storageAccountKey: parStorageAccountKey
       allowedHosts: parAllowedHosts
       useFrontDoor: parUseFrontDoor
+      enableKeyVaultPrivateEndpoints: parEnableKeyVaultPrivateEndpoints
+      enableAppConfigPrivateEndpoints: parEnableAppConfigPrivateEndpoints
     }
   }
 ]
