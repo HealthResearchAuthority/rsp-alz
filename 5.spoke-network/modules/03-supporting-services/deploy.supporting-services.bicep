@@ -28,8 +28,6 @@ param deployZoneRedundantResources bool = true
 @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param containerRegistryTier string = ''
 
-param privateDNSEnabled bool = true
-
 param resourcesNames object
 param sqlServerName string
 param networkingResourcesNames object
@@ -69,6 +67,12 @@ param allowedHosts string
 
 @description('Indicates whether to use Front Door for the application')
 param useFrontDoor bool
+
+@description('Enable Key Vault private endpoints')
+param enableKeyVaultPrivateEndpoints bool = false
+
+@description('Enable App Configuration private endpoints')  
+param enableAppConfigPrivateEndpoints bool = false
 
 // ------------------
 // Varaibles
@@ -116,7 +120,7 @@ module keyVault './modules/key-vault.bicep' = {
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     keyVaultPrivateEndpointName: resourcesNames.keyVaultPep
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
-    privateDNSEnabled: privateDNSEnabled
+    privateDNSEnabled: enableKeyVaultPrivateEndpoints
     privateDnsZoneName: keyVaultPrivateDnsZoneName
     keyVaultUserAssignedIdentityName: resourcesNames.keyVaultUserAssignedIdentity
     networkRuleSetIpRules: [
@@ -154,6 +158,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     storageAccountKey: storageAccountKey
     allowedHosts: allowedHosts
     useFrontDoor: useFrontDoor
+    enablePrivateEndpoints: enableAppConfigPrivateEndpoints
   }
 }
 

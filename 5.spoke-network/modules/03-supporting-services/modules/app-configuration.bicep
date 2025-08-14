@@ -62,6 +62,9 @@ param allowedHosts string
 @description('Indicates whether to use Front Door for the application')
 param useFrontDoor bool
 
+@description('Enable private endpoints for App Configuration')
+param enablePrivateEndpoints bool = false
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -304,7 +307,7 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
     }
   }
   properties: {
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: enablePrivateEndpoints ? 'Disabled' : 'Enabled'
   }
 }
 
@@ -353,7 +356,7 @@ module appConfigurationDataReaderAssignment '../../../../shared/bicep/role-assig
   }
 }
 
-module appConfigNetwork '../../../../shared/bicep/network/private-networking-spoke.bicep' = {
+module appConfigNetwork '../../../../shared/bicep/network/private-networking-spoke.bicep' = if (enablePrivateEndpoints) {
   name: 'appConfigNetwork-${uniqueString(configStore.id)}'
   scope: resourceGroup(networkingResourceGroup)
   params: {
