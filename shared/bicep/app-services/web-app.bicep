@@ -206,9 +206,6 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     keyVaultReferenceIdentity: !empty(keyVaultAccessIdentityResourceId) ? keyVaultAccessIdentityResourceId : null
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     vnetRouteAllEnabled: !empty(virtualNetworkSubnetId) ? true : false
-    // siteConfig: union(siteConfigConfigurationMap[operatingSystem], {
-    //   ipSecurityRestrictions: !empty(networkRuleSetIpRules) ? networkRuleSetIpRules : []
-    // })
     siteConfig: siteConfigConfigurationMap[operatingSystem]
     clientCertEnabled: false
     clientCertExclusionPaths: null
@@ -221,7 +218,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     hostNameSslStates: hostNameSslStates
     hyperV: false
     redundancyMode: redundancyMode
-    publicNetworkAccess: hasPrivateLink ? 'Disabled' : 'Enabled'
+    publicNetworkAccess: 'Enabled'
     
   }
 }

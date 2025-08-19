@@ -184,7 +184,6 @@ module storageFilesPrivateNetwork '../../../shared/bicep/network/private-network
       }
     ]
     subnetId: subnetPrivateEndpointSubnetId
-    //vnetSpokeResourceId: spokeVNetId
   }
   dependsOn: [
     storageBlobPrivateNetwork
@@ -244,6 +243,4 @@ module appServicePrivateEndpoint '../../../shared/bicep/network/private-networki
 output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: fnApp!.outputs.defaultHostName
 output webAppResourceId string = (kind == 'app') ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
 output systemAssignedPrincipalId string = (kind == 'app') ? webApp!.outputs.systemAssignedPrincipalId : fnApp!.outputs.systemAssignedPrincipalId
-// output webAppLocation string = webApp.outputs.location
-// output webAppSystemAssignedPrincipalId string = webApp.outputs.systemAssignedPrincipalId
 
