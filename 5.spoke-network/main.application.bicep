@@ -361,11 +361,6 @@ resource webAppSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-03-01' exi
   }
 ]
 
-// resource agwSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-03-01' existing = [for i in range(0, length(parSpokeNetworks)): {
-//   name: 'snet-agw'
-//   parent: existingVnet[i]
-// }]
-
 module sharedServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('sharedNamingDeployment-${deployment().name}', 64)
@@ -577,7 +572,6 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
       containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
       sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
       containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-      //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       storageRG: parSpokeNetworks[i].rgStorage
       appConfigURL: supportingServices[i].outputs.appConfigURL
       appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
@@ -612,7 +606,6 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
       containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
       sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
       containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-      //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       storageRG: parSpokeNetworks[i].rgStorage
       appConfigURL: supportingServices[i].outputs.appConfigURL
       appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
@@ -647,7 +640,6 @@ module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [
       containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
       sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
       containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-      //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       storageRG: parSpokeNetworks[i].rgStorage
       appConfigURL: supportingServices[i].outputs.appConfigURL
       appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
@@ -683,7 +675,6 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
       containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
       sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
       containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-      //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       storageRG: parSpokeNetworks[i].rgStorage
       appConfigURL: supportingServices[i].outputs.appConfigURL
       appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
