@@ -75,7 +75,8 @@ jobs:
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
                            parClientID=$(clientID) parClientSecret=$(clientSecret) \
                            logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
-                           parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
+                           parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
+                           paramWhitelistIPs=$(parWhitelistIPs)
 
   - job: preview
     pool:
@@ -107,7 +108,8 @@ jobs:
                            parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
                            parClientID=$(clientID) parClientSecret=$(clientSecret) \
                            logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
-                           parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
+                           parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
+                           paramWhitelistIPs=$(parWhitelistIPs)
 
   - job: deploy
     pool:
@@ -147,6 +149,7 @@ jobs:
                            parClientID=$(clientID) parClientSecret=$(clientSecret) \
                            logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                            parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
+                           paramWhitelistIPs=$(parWhitelistIPs) \
                            --deny-settings-mode none --action-on-unmanage deleteResources --yes)
             echo $output | jq .
             appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')

@@ -228,7 +228,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
 
 resource webConfig 'Microsoft.Web/sites/config@2022-09-01' = if (!empty(networkRuleSetIpRules)) {
   parent: app
-  name: 'appsettings'
+  name: 'web'
   properties: {
     ipSecurityRestrictions: networkRuleSetIpRules
   }
