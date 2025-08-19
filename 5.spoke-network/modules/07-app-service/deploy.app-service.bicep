@@ -20,8 +20,8 @@ param location string
 @description('Resource tags that we might need to add to all resources (i.e. Environment, Cost center, application name etc)')
 param tags object
 
-// @description('Optional. The IP ACL rules. Note, requires the \'acrSku\' to be \'Premium\'.')
-// param paramWhitelistIPs string = ''
+@description('Optional. The IP ACL rules. Note, requires the \'acrSku\' to be \'Premium\'.')
+param paramWhitelistIPs string = ''
 
 param subnetPrivateEndpointSubnetId string
 
@@ -60,24 +60,7 @@ param userAssignedIdentities array
 
 var slotName = 'staging'
 
-// var varWhitelistIPs = split(paramWhitelistIPs, ',')
-
-// var siteConfigConfigurationMap  = {
-//   windowsNet9 : {
-//     metadata :[
-//       {
-//         name:'CURRENT_STACK'
-//         value:'dotnet'
-//       }
-//     ]
-//     netFrameworkVersion: 'v9.0'
-//     use32BitWorkerProcess: false    
-//   }
-//   linuxNet9: {
-//     linuxFxVersion: 'DOTNETCORE|9.0'
-//     use32BitWorkerProcess: false    
-//   }
-// }
+ var varWhitelistIPs = split(paramWhitelistIPs, ',')
 
 var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
@@ -141,39 +124,10 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
         name: slotName
       }
     ] : []
-    // networkRuleSetIpRules: [for ip in varWhitelistIPs: {
-    //     ipAddressOrRange: '${ip}/32'
-    //     action: 'Allow'
-    //   }]
-    paramSiteConfig: webAppBaseOs =~ 'linux' ? {
-      linuxFxVersion: 'DOTNETCORE|9.0'
-      use32BitWorkerProcess: false 
-      ipSecurityRestrictions: [{
-        ipAddressOrRange: '217.38.8.142/32'
+    networkRuleSetIpRules: [for ip in varWhitelistIPs: {
+        ipAddressOrRange: '${ip}/32'
         action: 'Allow'
       }]
-    } : {
-    metadata :[
-      {
-        name:'CURRENT_STACK'
-        value:'dotnet'
-      }
-    ]
-    netFrameworkVersion: 'v9.0'
-    use32BitWorkerProcess: false 
-      ipSecurityRestrictions: [{
-        ipAddressOrRange: '217.38.8.142/32'
-        action: 'Allow'
-      }
-      {
-        ipAddressOrRange: '194.75.196.200/32'
-        action: 'Allow'
-      }
-      {
-        ipAddressOrRange: '51.141.70.232/32'
-        action: 'Allow'
-      }]
-    }
   }
 }
 

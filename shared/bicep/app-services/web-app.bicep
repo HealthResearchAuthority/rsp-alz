@@ -7,8 +7,8 @@
 @description('Required. Name of the site.')
 param name string
 
-// @description('Optional. The IP ACL rules. Note, requires the \'acrSku\' to be \'Premium\'.')
-// param networkRuleSetIpRules array = []
+@description('Optional. The IP ACL rules. Note, requires the \'acrSku\' to be \'Premium\'.')
+param networkRuleSetIpRules array = []
 
 @description('Optional. Location for all Resources.')
 param location string
@@ -45,8 +45,6 @@ param userAssignedIdentities object = {}
 
 @description('Optional. The resource ID of the assigned identity to be used to access a key vault with.')
 param keyVaultAccessIdentityResourceId string = ''
-
-
 
 @description('Optional. Checks if Customer provided storage account is required.')
 param storageAccountRequired bool = false
@@ -136,8 +134,6 @@ param hostNameSslStates array = []
 @description('Optional, default is false. If true, then a private endpoint must be assigned to the web app')
 param hasPrivateLink bool = false
 
-param paramSiteConfig object = {}
-
 @description('Optional. Site redundancy mode.')
 @allowed([
   'ActiveActive'
@@ -213,7 +209,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     // siteConfig: union(siteConfigConfigurationMap[operatingSystem], {
     //   ipSecurityRestrictions: !empty(networkRuleSetIpRules) ? networkRuleSetIpRules : []
     // })
-    siteConfig: paramSiteConfig
+    siteConfig: siteConfigConfigurationMap[operatingSystem]
     clientCertEnabled: false
     clientCertExclusionPaths: null
     clientCertMode: 'Optional'
@@ -227,6 +223,14 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     redundancyMode: redundancyMode
     publicNetworkAccess: hasPrivateLink ? 'Disabled' : 'Enabled'
     
+  }
+}
+
+resource webConfig 'Microsoft.Web/sites/config@2022-09-01' = if (!empty(networkRuleSetIpRules)) {
+  parent: app
+  name: 'appsettings'
+  properties: {
+    ipSecurityRestrictions: networkRuleSetIpRules
   }
 }
 
