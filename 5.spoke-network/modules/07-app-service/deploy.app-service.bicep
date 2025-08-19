@@ -60,7 +60,7 @@ param userAssignedIdentities array
 
 var slotName = 'staging'
 
- var varWhitelistIPs = split(paramWhitelistIPs, ',')
+ var varWhitelistIPs = filter(split(paramWhitelistIPs, ','), ip => !empty(trim(ip)))
 
 var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
