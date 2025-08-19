@@ -124,9 +124,11 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
         name: slotName
       }
     ] : []
-    networkRuleSetIpRules: [for ip in varWhitelistIPs: {
-        ipAddressOrRange: '${ip}/32'
+    networkRuleSetIpRules: [for (ip, index) in varWhitelistIPs: {
+        ipAddress: '${ip}/32'
         action: 'Allow'
+        name: 'Allow-IP-${index + 1}'
+        priority: 100 + index
       }]
   }
 }
