@@ -80,6 +80,9 @@ param parDevOpsPublicIPAddress string = ''
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
+@description('Indicates whether to use One Login for the application')
+param useOneLogin bool
+
 @description('Central Log Analytics Workspace ID')
 @secure()
 param logAnalyticsWorkspaceId string
@@ -432,6 +435,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       storageAccountKey: parStorageAccountKey
       allowedHosts: parAllowedHosts
       useFrontDoor: parUseFrontDoor
+      useOneLogin: useOneLogin
     }
   }
 ]

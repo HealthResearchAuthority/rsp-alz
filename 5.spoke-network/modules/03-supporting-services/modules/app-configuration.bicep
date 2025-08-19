@@ -62,6 +62,9 @@ param allowedHosts string
 @description('Indicates whether to use Front Door for the application')
 param useFrontDoor bool
 
+@description('Indicates whether to use One Login for the application')
+param useOneLogin bool
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -249,7 +252,7 @@ var featureFlags = [
     id: 'Auth.UseOneLogin'
     description: 'When enabled, Gov UK One Login will be used for authentication'
     label: null
-    enabled: false
+    enabled: useOneLogin
   }
   {
     id: 'WebApp.UseFrontDoor'

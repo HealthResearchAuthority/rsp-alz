@@ -144,3 +144,6 @@ param parAllowedHosts = '*'
 
 // indicates whether to use Front Door for the systemtest_manual environment
 param parUseFrontDoor = false
+
+@description('Indicates whether to use One Login for the application')
+param useOneLogin = false
