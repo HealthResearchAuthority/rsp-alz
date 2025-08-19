@@ -73,8 +73,8 @@ param location string = deployment().location
 @description('DevOps Public IP Address')
 param parDevOpsPublicIPAddress string = ''
 
-// @description('IP addresses to be whitelisted for users to access CMS Portal')
-// param paramWhitelistIPs string
+@description('IP addresses to be whitelisted for users to access CMS Portal')
+param paramWhitelistIPs string
 
 
 @description('Optional. The tags to be assigned to the created resources.')
@@ -760,7 +760,7 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
-      //paramWhitelistIPs: paramWhitelistIPs
+      paramWhitelistIPs: paramWhitelistIPs
     }
     dependsOn: [
       databaseserver
