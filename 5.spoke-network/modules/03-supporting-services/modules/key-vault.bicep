@@ -71,11 +71,6 @@ param keyVaultUserAssignedIdentityName string = ''
 
 var keyVaultResourceName = 'vault'
 
-//var hubVNetIdTokens = split(hubVNetId, '/')
-// var hubSubscriptionId = hubVNetIdTokens[2]
-// var hubResourceGroupName = hubVNetIdTokens[4]
-// var hubVNetName = hubVNetIdTokens[8]
-
 var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
 var spokeResourceGroupName = spokeVNetIdTokens[4]
@@ -88,11 +83,6 @@ var spokeVNetLinks = [
     vnetId: vnetSpoke.id
     registrationEnabled: false
   }
-  // {
-  //   vnetName: vnetHub.name
-  //   vnetId: vnetHub.id
-  //   registrationEnabled: false
-  // }
 ]
 
 var diagnosticsLogsSpecified = [for category in filter(diagnosticLogCategoriesToEnable, item => item != 'allLogs'): {
@@ -117,11 +107,6 @@ var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
 // ------------------
 // RESOURCES
 // ------------------
-
-// resource vnetHub  'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
-//   scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
-//   name: hubVNetName
-// }
 
 resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)  

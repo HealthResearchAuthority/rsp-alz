@@ -30,9 +30,6 @@ param logAnalyticsWorkspaceId string
 @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param deployZoneRedundantResources bool = true
 
-// @description('The name of the hub virtual network.')
-// param hubVNetName string = ''
-
 param resourcesNames object
 param networkRG string
 
@@ -45,12 +42,6 @@ var telemetryId = '9b4433d6-924a-4c07-b47c-7478619759c7-${location}-acasb'
 // ------------------
 // EXISTING RESOURCES
 // ------------------
-
-// @description('The existing hub virtual network.')
-// resource vnetHub 'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
-//   scope: resourceGroup(hubSubscriptionId, hubResourceGroupName)
-//   name: hubVNetName
-// }
 
 @description('The existing spoke virtual network.')
 resource spokeVNet 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
@@ -104,11 +95,6 @@ module containerAppsEnvironmentPrivateDnsZone '../../../shared/bicep/network/pri
         vnetId: spokeVNet.id
         registrationEnabled: false
       }
-      // {
-      //   vnetName: vnetHub.name  /* Link to hub */
-      //   vnetId: vnetHub.id
-      //   registrationEnabled: false
-      // }
     ]
     tags: tags
     aRecords: [

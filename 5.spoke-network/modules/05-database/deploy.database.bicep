@@ -57,11 +57,6 @@ var spokeVNetLinks = [
     vnetId: vnetSpoke.id
     registrationEnabled: false
   }
-  // {
-  //   vnetName: vnetHub.name
-  //   vnetId: vnetHub.id
-  //   registrationEnabled: false
-  // }
 ]
 
 // ------------------
