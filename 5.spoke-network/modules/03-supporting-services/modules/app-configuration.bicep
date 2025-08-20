@@ -316,8 +316,7 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
     }
   }
   properties: {
-    // Use 'Enabled' during deployment to avoid access issues, then rely on private endpoints for security
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: enablePrivateEndpoints ? 'Disabled' : 'Enabled'
   }
 }
 
