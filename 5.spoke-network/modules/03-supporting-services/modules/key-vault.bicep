@@ -65,6 +65,7 @@ param privateDnsZoneName string = ''
 
 param keyVaultUserAssignedIdentityName string = ''
 
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -131,12 +132,14 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     networkAcls: {
       bypass: 'AzureServices'
       defaultAction: 'Deny'
-      ipRules: networkRuleSetIpRules
+      ipRules: [for rule in networkRuleSetIpRules: {
+        value: rule.value
+      }]
     }
     enableSoftDelete: true
     softDeleteRetentionInDays: 7
     enablePurgeProtection: true  // It seems that you cannot set it to False even the first time. workaround is not to set it at all: https://github.com/Azure/bicep/issues/5223
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: 'Enabled'
     enableRbacAuthorization: true
     enabledForTemplateDeployment: true
   }

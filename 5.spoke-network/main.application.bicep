@@ -439,6 +439,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       enableKeyVaultPrivateEndpoints: parEnableKeyVaultPrivateEndpoints
       enableAppConfigPrivateEndpoints: parEnableAppConfigPrivateEndpoints
       useOneLogin: useOneLogin
+      paramWhitelistIPs: paramWhitelistIPs
     }
   }
 ]

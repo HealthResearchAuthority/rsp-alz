@@ -77,11 +77,26 @@ param enableKeyVaultPrivateEndpoints bool = false
 @description('Enable App Configuration private endpoints')  
 param enableAppConfigPrivateEndpoints bool = false
 
+@description('IP addresses to be whitelisted for users to access Key Vault')
+param paramWhitelistIPs string = ''
+
 // ------------------
 // Varaibles
 // ------------------
 
 var keyVaultPrivateDnsZoneName = 'privatelink.vaultcore.azure.net'
+
+
+var varWhitelistIPs = filter(split(paramWhitelistIPs, ','), ip => !empty(ip))
+var devOpsIPRule = {
+  action: 'Allow'
+  value: '${devOpsPublicIPAddress}/32'
+}
+var whitelistIPRules = [for ip in varWhitelistIPs: {
+  action: 'Allow'
+  value: '${ip}/32'
+}]
+var allAllowedIPs = concat([devOpsIPRule], whitelistIPRules)
 
 // ------------------
 // RESOURCES
@@ -126,12 +141,10 @@ module keyVault './modules/key-vault.bicep' = {
     privateDNSEnabled: enableKeyVaultPrivateEndpoints
     privateDnsZoneName: keyVaultPrivateDnsZoneName
     keyVaultUserAssignedIdentityName: resourcesNames.keyVaultUserAssignedIdentity
-    networkRuleSetIpRules: [
-      {
-        action: 'Allow'
-        value: '${devOpsPublicIPAddress}/32' // Specific IP or CIDR block to allow
-      }
-    ]
+    networkRuleSetIpRules: [for ip in allAllowedIPs: {
+      action: 'Allow'
+      value: ip
+    }]
   }
 }
 
