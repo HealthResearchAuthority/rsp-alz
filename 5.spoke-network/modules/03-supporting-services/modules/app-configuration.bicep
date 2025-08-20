@@ -316,7 +316,7 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
     }
   }
   properties: {
-    publicNetworkAccess: 'Enabled'
+    publicNetworkAccess: 'Disabled'
   }
 }
 
