@@ -316,7 +316,8 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
     }
   }
   properties: {
-    publicNetworkAccess: 'Disabled'
+    // Use 'Enabled' during deployment to avoid access issues, then rely on private endpoints for security
+    publicNetworkAccess: 'Enabled'
   }
 }
 
@@ -378,6 +379,7 @@ module appConfigNetwork '../../../../shared/bicep/network/private-networking-spo
     subnetId: spokePrivateEndpointSubnet.id
   }
 }
+
 
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
 output appConfigurationUserAssignedIdentityId string = appConfigurationUserAssignedIdentity.id
