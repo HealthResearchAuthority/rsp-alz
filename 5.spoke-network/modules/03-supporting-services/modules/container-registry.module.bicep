@@ -51,11 +51,6 @@ param networkingResourceGroup string
 var privateDnsZoneNames = 'privatelink.azurecr.io'
 var containerRegistryResourceName = 'registry'
 
-// var managementVNetIdTokens = split(managementVNetId, '/')
-// var managementSubscriptionId = managementVNetIdTokens[2]
-// var managementResourceGroupName = managementVNetIdTokens[4]
-// var managementVNetName = managementVNetIdTokens[8]
-
 var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
 var spokeResourceGroupName = spokeVNetIdTokens[4]
@@ -71,15 +66,6 @@ var spokeVNetLinks = [
     registrationEnabled: false
   }
 ]
-
-// ------------------
-// RESOURCES
-// ------------------
-
-// resource managementVNet  'Microsoft.Network/virtualNetworks@2022-07-01' existing = {
-//   scope: resourceGroup(managementSubscriptionId, managementResourceGroupName)
-//   name: managementVNetName
-// }
 
 resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)

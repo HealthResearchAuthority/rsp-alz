@@ -25,6 +25,9 @@ param logAnalyticsWorkspaceId string = ''
 
 param deployZoneRedundantResources bool = true
 
+@description('Indicates whether to use One Login for the application')
+param useOneLogin bool
+
 @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param containerRegistryTier string = ''
 
@@ -159,6 +162,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     allowedHosts: allowedHosts
     useFrontDoor: useFrontDoor
     enablePrivateEndpoints: enableAppConfigPrivateEndpoints
+    useOneLogin: useOneLogin
   }
 }
 
