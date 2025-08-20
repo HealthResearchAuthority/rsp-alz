@@ -73,6 +73,10 @@ param allowedHosts string
 @description('Indicates whether to use Front Door for the application')
 param useFrontDoor bool
 
+@secure()
+@description('The key for the Microsot Clarity project this is associated with.')
+param clarityProjectId string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -158,6 +162,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     allowedHosts: allowedHosts
     useFrontDoor: useFrontDoor
     useOneLogin: useOneLogin
+    clarityProjectId: clarityProjectId
   }
 }
 
