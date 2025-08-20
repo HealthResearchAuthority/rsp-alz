@@ -254,6 +254,10 @@ param parAllowedHosts string
 @description('Indicates whether to use Front Door for the application')
 param parUseFrontDoor bool
 
+@secure()
+@description('The key for the Microsot Clarity project this is associated with.')
+param parClarityProjectId string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -431,6 +435,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       allowedHosts: parAllowedHosts
       useFrontDoor: parUseFrontDoor
       useOneLogin: useOneLogin
+      clarityProjectId: parClarityProjectId
     }
   }
 ]
@@ -725,6 +730,37 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
       ]
       //paramWhitelistIPs: ''
     }
+  }
+]
+
+module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('cmsApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: 'B1'
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
+      appName: 'cmsportal-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Linux'
+      subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
+      kind: 'app'
+      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        databaseserver[i].outputs.outputsqlServerUAIID
+      ]
+      paramWhitelistIPs: paramWhitelistIPs
+    }
+    dependsOn: [
+      databaseserver
+    ]
   }
 ]
 
