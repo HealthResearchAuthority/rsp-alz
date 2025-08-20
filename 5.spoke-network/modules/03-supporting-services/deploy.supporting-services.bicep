@@ -141,10 +141,7 @@ module keyVault './modules/key-vault.bicep' = {
     privateDNSEnabled: enableKeyVaultPrivateEndpoints
     privateDnsZoneName: keyVaultPrivateDnsZoneName
     keyVaultUserAssignedIdentityName: resourcesNames.keyVaultUserAssignedIdentity
-    networkRuleSetIpRules: [for ip in allAllowedIPs: {
-      action: 'Allow'
-      value: ip
-    }]
+    networkRuleSetIpRules: allAllowedIPs
   }
 }
 
