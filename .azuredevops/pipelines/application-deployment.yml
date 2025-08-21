@@ -77,8 +77,7 @@ jobs:
                            logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                            parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                            paramWhitelistIPs=$(parWhitelistIPs) \
-                           parClarityProjectId=$(clarityProjectId) \
-                           parOneLoginPrivateKeyPem=$(oneLoginPrivateKeyPem)
+                           parClarityProjectId=$(clarityProjectId)
 
   - job: preview
     pool:
@@ -112,8 +111,7 @@ jobs:
                            logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                            parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                            paramWhitelistIPs=$(parWhitelistIPs) \
-                           parClarityProjectId=$(clarityProjectId) \
-                           parOneLoginPrivateKeyPem=$(oneLoginPrivateKeyPem)
+                           parClarityProjectId=$(clarityProjectId)
 
   - job: deploy
     pool:
@@ -155,7 +153,6 @@ jobs:
                            parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                            paramWhitelistIPs=$(parWhitelistIPs) \
                            parClarityProjectId=$(clarityProjectId) \
-                           parOneLoginPrivateKeyPem=$(oneLoginPrivateKeyPem) \
                            --deny-settings-mode none --action-on-unmanage deleteResources --yes)
             echo $output | jq .
             appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
