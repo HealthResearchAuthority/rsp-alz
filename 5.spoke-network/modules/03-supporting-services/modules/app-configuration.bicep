@@ -317,6 +317,11 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
   }
   properties: {
     publicNetworkAccess: enablePrivateEndpoints ? 'Disabled' : 'Enabled'
+    disableLocalAuth: true
+    dataPlaneProxy: {
+      authenticationMode: 'Pass-through'
+      privateLinkDelegation: 'Enabled'
+    }
   }
 }
 
