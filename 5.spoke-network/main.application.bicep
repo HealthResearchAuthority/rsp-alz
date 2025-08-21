@@ -769,6 +769,7 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
     }
     dependsOn: [
       databaseserver
+      webApp
     ]
   }
 ]
