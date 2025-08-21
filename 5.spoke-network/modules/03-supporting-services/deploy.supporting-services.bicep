@@ -80,6 +80,10 @@ param enableAppConfigPrivateEndpoints bool = false
 @description('IP addresses to be whitelisted for users to access Key Vault')
 param paramWhitelistIPs string = ''
 
+@secure()
+@description('The key for the Microsot Clarity project this is associated with.')
+param clarityProjectId string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -173,6 +177,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     useFrontDoor: useFrontDoor
     enablePrivateEndpoints: enableAppConfigPrivateEndpoints
     useOneLogin: useOneLogin
+    clarityProjectId: clarityProjectId
   }
 }
 

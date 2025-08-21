@@ -260,6 +260,10 @@ param parAllowedHosts string
 @description('Indicates whether to use Front Door for the application')
 param parUseFrontDoor bool
 
+@secure()
+@description('The key for the Microsot Clarity project this is associated with.')
+param parClarityProjectId string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -440,6 +444,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       enableAppConfigPrivateEndpoints: parEnableAppConfigPrivateEndpoints
       useOneLogin: useOneLogin
       paramWhitelistIPs: paramWhitelistIPs
+      clarityProjectId: parClarityProjectId
     }
   }
 ]

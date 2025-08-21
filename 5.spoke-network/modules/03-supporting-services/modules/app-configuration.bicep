@@ -69,6 +69,10 @@ param enablePrivateEndpoints bool = false
 @description('Indicates whether to use One Login for the application')
 param useOneLogin bool
 
+@secure()
+@description('The key for the Microsot Clarity project this is associated with.')
+param clarityProjectId string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -205,6 +209,11 @@ var keyValues = [
   {
     name: 'AppSettings:Azure:DocumentStorage:Blob:ConnectionString$portal'
     value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${storageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
+    contentType: null
+  }
+  {
+    name: 'AppSettings:ClarityProjectId$portal'
+    value: clarityProjectId
     contentType: null
   }
 ]
