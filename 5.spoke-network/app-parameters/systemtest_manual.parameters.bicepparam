@@ -150,3 +150,4 @@ param parUseFrontDoor = false
 
 @description('Indicates whether to use One Login for the application')
 param useOneLogin = false
+param paramWhitelistIPs = ''
