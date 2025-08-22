@@ -188,7 +188,7 @@ stages:
         displayName: 'Deploy Applications'
         pool:
           name: rsp-manageddevopspool
-        dependsOn: [FinalWhatIf]
+        dependsOn: [setup, FinalWhatIf]
         condition: succeeded()
         environment: 'alz-bicep-deployment'
         variables:
