@@ -182,7 +182,8 @@ stages:
                               parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
                               parClientID=$(clientID) parClientSecret=$(clientSecret) \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
-                              parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
+                              parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
+                              paramWhitelistIPs=$(parWhitelistIPs) parClarityProjectId=$(clarityProjectId)
 
       - deployment: deploy
         displayName: 'Deploy Applications'
