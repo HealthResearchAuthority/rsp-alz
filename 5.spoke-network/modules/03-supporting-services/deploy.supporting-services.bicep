@@ -31,8 +31,6 @@ param useOneLogin bool
 @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param containerRegistryTier string = ''
 
-param privateDNSEnabled bool = true
-
 param resourcesNames object
 param sqlServerName string
 param networkingResourcesNames object
@@ -73,6 +71,15 @@ param allowedHosts string
 @description('Indicates whether to use Front Door for the application')
 param useFrontDoor bool
 
+@description('Enable Key Vault private endpoints')
+param enableKeyVaultPrivateEndpoints bool = false
+
+@description('Enable App Configuration private endpoints')  
+param enableAppConfigPrivateEndpoints bool = false
+
+@description('IP addresses to be whitelisted for users to access Key Vault')
+param paramWhitelistIPs string = ''
+
 @secure()
 @description('The key for the Microsot Clarity project this is associated with.')
 param clarityProjectId string
@@ -82,6 +89,18 @@ param clarityProjectId string
 // ------------------
 
 var keyVaultPrivateDnsZoneName = 'privatelink.vaultcore.azure.net'
+
+
+var varWhitelistIPs = filter(split(paramWhitelistIPs, ','), ip => !empty(ip))
+var devOpsIPRule = {
+  action: 'Allow'
+  value: '${devOpsPublicIPAddress}/32'
+}
+var whitelistIPRules = [for ip in varWhitelistIPs: {
+  action: 'Allow'
+  value: '${ip}/32'
+}]
+var allAllowedIPs = !empty(devOpsPublicIPAddress) ? concat([devOpsIPRule], whitelistIPRules) : whitelistIPRules
 
 // ------------------
 // RESOURCES
@@ -123,15 +142,10 @@ module keyVault './modules/key-vault.bicep' = {
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
     keyVaultPrivateEndpointName: resourcesNames.keyVaultPep
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
-    privateDNSEnabled: privateDNSEnabled
+    privateDNSEnabled: enableKeyVaultPrivateEndpoints
     privateDnsZoneName: keyVaultPrivateDnsZoneName
     keyVaultUserAssignedIdentityName: resourcesNames.keyVaultUserAssignedIdentity
-    networkRuleSetIpRules: [
-      {
-        action: 'Allow'
-        value: '${devOpsPublicIPAddress}/32' // Specific IP or CIDR block to allow
-      }
-    ]
+    networkRuleSetIpRules: allAllowedIPs
   }
 }
 
@@ -161,6 +175,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     storageAccountKey: storageAccountKey
     allowedHosts: allowedHosts
     useFrontDoor: useFrontDoor
+    enablePrivateEndpoints: enableAppConfigPrivateEndpoints
     useOneLogin: useOneLogin
     clarityProjectId: clarityProjectId
   }
