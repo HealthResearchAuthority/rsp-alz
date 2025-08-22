@@ -100,7 +100,7 @@ var whitelistIPRules = [for ip in varWhitelistIPs: {
   action: 'Allow'
   value: '${ip}/32'
 }]
-var allAllowedIPs = concat([devOpsIPRule], whitelistIPRules)
+var allAllowedIPs = !empty(devOpsPublicIPAddress) ? concat([devOpsIPRule], whitelistIPRules) : whitelistIPRules
 
 // ------------------
 // RESOURCES
