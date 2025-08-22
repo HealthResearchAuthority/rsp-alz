@@ -62,6 +62,10 @@ param allowedHosts string
 @description('Indicates whether to use Front Door for the application')
 param useFrontDoor bool
 
+@description('Enable private endpoints for App Configuration')
+param enablePrivateEndpoints bool = false
+
+
 @description('Indicates whether to use One Login for the application')
 param useOneLogin bool
 
@@ -322,6 +326,11 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
   }
   properties: {
     publicNetworkAccess: 'Enabled'
+    disableLocalAuth: true
+    dataPlaneProxy: {
+      authenticationMode: 'Pass-through'
+      privateLinkDelegation: 'Enabled'
+    }
   }
 }
 
@@ -370,7 +379,7 @@ module appConfigurationDataReaderAssignment '../../../../shared/bicep/role-assig
   }
 }
 
-module appConfigNetwork '../../../../shared/bicep/network/private-networking-spoke.bicep' = {
+module appConfigNetwork '../../../../shared/bicep/network/private-networking-spoke.bicep' = if (enablePrivateEndpoints) {
   name: 'appConfigNetwork-${uniqueString(configStore.id)}'
   scope: resourceGroup(networkingResourceGroup)
   params: {
@@ -383,6 +392,7 @@ module appConfigNetwork '../../../../shared/bicep/network/private-networking-spo
     subnetId: spokePrivateEndpointSubnet.id
   }
 }
+
 
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
 output appConfigurationUserAssignedIdentityId string = appConfigurationUserAssignedIdentity.id

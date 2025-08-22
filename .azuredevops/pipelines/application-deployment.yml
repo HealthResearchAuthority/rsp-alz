@@ -90,7 +90,9 @@ stages:
                               parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
                               parClientID=$(clientID) parClientSecret=$(clientSecret) \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
-                              parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
+                              parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
+                              paramWhitelistIPs=$(parWhitelistIPs) \
+                              parClarityProjectId=$(clarityProjectId)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -124,7 +126,9 @@ stages:
                               parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
                               parClientID=$(clientID) parClientSecret=$(clientSecret) \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
-                              parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey)
+                              parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
+                              paramWhitelistIPs=$(parWhitelistIPs) \
+                              parClarityProjectId=$(clarityProjectId)
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment of Applications'
@@ -184,7 +188,7 @@ stages:
         displayName: 'Deploy Applications'
         pool:
           name: rsp-manageddevopspool
-        dependsOn: [FinalWhatIf]
+        dependsOn: [setup, FinalWhatIf]
         condition: succeeded()
         environment: 'alz-bicep-deployment'
         variables:
@@ -225,6 +229,8 @@ stages:
                                     parClientID=$(clientID) parClientSecret=$(clientSecret) \
                                     logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                                     parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
+                                    paramWhitelistIPs=$(parWhitelistIPs) \
+                                    parClarityProjectId=$(clarityProjectId) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')

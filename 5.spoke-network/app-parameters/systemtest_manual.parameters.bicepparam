@@ -37,7 +37,9 @@ param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
 param parEnableFrontDoorPrivateLink = true
-param parEnableFunctionAppPrivateEndpoints = true
+param parEnableFunctionAppPrivateEndpoints = false
+param parEnableKeyVaultPrivateEndpoints = false
+param parEnableAppConfigPrivateEndpoints = false
 param parFrontDoorCustomDomains = []
 
 param parDefenderForStorageConfig = {
@@ -148,3 +150,4 @@ param parUseFrontDoor = false
 
 @description('Indicates whether to use One Login for the application')
 param useOneLogin = false
+param paramWhitelistIPs = ''
