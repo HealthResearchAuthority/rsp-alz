@@ -156,6 +156,10 @@ stages:
           - group: ${{ parameters.env }}
         steps:
           - checkout: self
+          - script: |
+              echo "Installing Azure CLI..."
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            displayName: 'Install Azure CLI'
           - bash: |
               az bicep install
               az bicep version
@@ -196,7 +200,7 @@ stages:
                 - checkout: self
                 - script: |
                     echo "Installing Azure CLI..."
-                    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+                    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash 
                   displayName: 'Install Azure CLI'
                 - bash: |
                     az bicep install
