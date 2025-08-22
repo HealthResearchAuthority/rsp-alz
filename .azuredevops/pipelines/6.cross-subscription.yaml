@@ -74,7 +74,11 @@ stages:
                   --location $(location) \
                   --template-file ./6.cross-subscription/main.bicep \
                   --management-group-id $(management-group-id) \
-                  --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds)
+                  --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
+                        manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
+                        paramserviceIds=$(serviceIds)) \
+                        storageSubscriptionId="$(storageSubscriptionId)" \
+                        devboxSubscriptionId="$(devboxSubscriptionId)"
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment for Cross Subscription'
@@ -104,7 +108,11 @@ stages:
                   --location $(location) \
                   --template-file ./6.cross-subscription/main.bicep \
                   --management-group-id $(management-group-id) \
-                  --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds)
+                  --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
+                        manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
+                        paramserviceIds=$(serviceIds)) \
+                        storageSubscriptionId="$(storageSubscriptionId)" \
+                        devboxSubscriptionId="$(devboxSubscriptionId)"
 
       - deployment: deploy
         displayName: 'Deploy Cross Subscription'
@@ -138,6 +146,10 @@ stages:
                         --location $(location) \
                         --management-group-id $(management-group-id) \
                         --template-file ./6.cross-subscription/main.bicep \
-                        --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds))
+                        --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
+                              manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
+                              paramserviceIds=$(serviceIds)) \
+                              storageSubscriptionId="$(storageSubscriptionId)" \
+                              devboxSubscriptionId="$(devboxSubscriptionId)")
                       echo "Full Bicep Deployment Output:"
                       echo $output | jq .
