@@ -62,6 +62,13 @@ param allowedHosts string
 @description('Indicates whether to use Front Door for the application')
 param useFrontDoor bool
 
+@description('Indicates whether to use One Login for the application')
+param useOneLogin bool
+
+@secure()
+@description('The key for the Microsot Clarity project this is associated with.')
+param clarityProjectId string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -118,6 +125,11 @@ var keyValues = [
   {
     name: 'ConnectionStrings:RTSDatabaseConnection'
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=RtsService;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+    contentType: null
+  }
+  {
+    name: 'ConnectionStrings:cmsPortalDatabaseConnection'
+    value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=cmsservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
     contentType: null
   }
   {
@@ -195,6 +207,11 @@ var keyValues = [
     value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${storageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
+  {
+    name: 'AppSettings:ClarityProjectId$portal'
+    value: clarityProjectId
+    contentType: null
+  }
 ]
 
 var featureFlags = [
@@ -244,7 +261,7 @@ var featureFlags = [
     id: 'Auth.UseOneLogin'
     description: 'When enabled, Gov UK One Login will be used for authentication'
     label: null
-    enabled: false
+    enabled: useOneLogin
   }
   {
     id: 'WebApp.UseFrontDoor'

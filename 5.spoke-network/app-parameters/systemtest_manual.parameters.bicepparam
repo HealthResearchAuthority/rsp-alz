@@ -138,9 +138,13 @@ param parSpokeNetworks = [
 
 param parStorageAccountName = 'strrspstg'
 param parStorageAccountKey = ''
+param parClarityProjectId = ''
 
 // Allowed hosts for the systemtest_manual environment to be used when the Web App is behind Front Door
 param parAllowedHosts = '*'
 
 // indicates whether to use Front Door for the systemtest_manual environment
 param parUseFrontDoor = false
+
+@description('Indicates whether to use One Login for the application')
+param useOneLogin = false

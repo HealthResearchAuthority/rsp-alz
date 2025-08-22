@@ -10,15 +10,6 @@ param appServicePlanName string
 @maxLength(60)
 param appName string 
 
-// @description('Required. Name of the managed Identity that will be assigned to the web app.')
-// param appConfigmanagedIdentityId string
-
-// @description('Required. Name of the managed Identity that will be assigned to the web app.')
-// param keyVaultmanagedIdentityId string = ''
-
-// @description('Required. Name of the managed Identity that will be assigned to the web app.')
-// param sqlServermanagedIdentityId string = ''
-
 @description('Optional S1 is default. Defines the name, tier, size, family and capacity of the App Service Plan. Plans ending to _AZ, are deploying at least three instances in three Availability Zones. EP* is only for functions')
 @allowed([ 'B1','S1', 'S2', 'S3', 'P1V3', 'P2V3', 'P3V3', 'P1V3_AZ', 'P2V3_AZ', 'P3V3_AZ', 'EP1', 'EP2', 'EP3', 'ASE_I1V2_AZ', 'ASE_I2V2_AZ', 'ASE_I3V2_AZ', 'ASE_I1V2', 'ASE_I2V2', 'ASE_I3V2' ])
 param sku string
@@ -29,6 +20,8 @@ param location string
 @description('Resource tags that we might need to add to all resources (i.e. Environment, Cost center, application name etc)')
 param tags object
 
+@description('Optional. The IP ACL rules. Note, requires the \'acrSku\' to be \'Premium\'.')
+param paramWhitelistIPs string = ''
 
 param subnetPrivateEndpointSubnetId string
 
@@ -65,16 +58,9 @@ param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
 
 
-// @description('The name of an existing keyvault, that it will be used to store secrets (connection string)' )
-// param keyvaultName string
-
-
-// @description('Deploy an azure app configuration, or not')
-// param deployAppConfig bool
-
-// var webAppDnsZoneName = 'privatelink.azurewebsites.net'
-// var appConfigurationDnsZoneName = 'privatelink.azconfig.io'
 var slotName = 'staging'
+
+ var varWhitelistIPs = filter(split(paramWhitelistIPs, ','), ip => !empty(trim(ip)))
 
 var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
@@ -93,10 +79,6 @@ var networkAcls = deployAppPrivateEndPoint ? {
   defaultAction: 'Allow'
   bypass: 'AzureServices'
 }
-
-// resource keyvault 'Microsoft.KeyVault/vaults@2022-11-01' existing = {
-//   name: keyvaultName
-// }
 
 module appInsights '../../../shared/bicep/app-insights.bicep' = {
   name: take('${appName}-appInsights-Deployment', 64)
@@ -130,7 +112,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
     diagnosticWorkspaceId: logAnalyticsWsId   
     virtualNetworkSubnetId: subnetIdForVnetInjection
     appInsightId: appInsights.outputs.appInsResourceId
-    siteConfigSelection:  (webAppBaseOs =~ 'linux') ? 'linuxNet9' : 'windowsNet9'
+    operatingSystem:  (webAppBaseOs =~ 'linux') ? 'linuxNet9' : 'windowsNet9'
     hasPrivateLink: deployAppPrivateEndPoint
     systemAssignedIdentity: false
     userAssignedIdentities:  {
@@ -142,6 +124,12 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
         name: slotName
       }
     ] : []
+    networkRuleSetIpRules: [for (ip, index) in varWhitelistIPs: {
+        ipAddress: '${ip}/32'
+        action: 'Allow'
+        name: 'Allow-IP-${index + 1}'
+        priority: 100 + index
+      }]
   }
 }
 
@@ -196,7 +184,6 @@ module storageFilesPrivateNetwork '../../../shared/bicep/network/private-network
       }
     ]
     subnetId: subnetPrivateEndpointSubnetId
-    //vnetSpokeResourceId: spokeVNetId
   }
   dependsOn: [
     storageBlobPrivateNetwork
@@ -253,96 +240,7 @@ module appServicePrivateEndpoint '../../../shared/bicep/network/private-networki
   }
 }
 
-// module webAppPrivateDnsZone '../../../shared/bicep/network/private-dns-zone.bicep' = if ( !empty(subnetPrivateEndpointId)) {
-//   // conditional scope is not working: https://github.com/Azure/bicep/issues/7367
-//   //scope: empty(vnetHubResourceId) ? resourceGroup() : resourceGroup(vnetHubSplitTokens[2], vnetHubSplitTokens[4]) 
-//   scope: resourceGroup(privateEndpointRG)
-//   name: take('${replace(webAppDnsZoneName, '.', '-')}-PrivateDnsZoneDeployment', 64)
-//   params: {
-//     name: webAppDnsZoneName
-//     virtualNetworkLinks: virtualNetworkLinks
-//     tags: tags
-//   }
-// }
-
-// module pepWebApp '../../../shared/bicep/network/private-endpoint.bicep' = if ( !empty(subnetPrivateEndpointId)) {
-//   name:  take('pep-${webAppName}-Deployment', 64)
-//   scope: resourceGroup(privateEndpointRG)
-//   params: {
-//     name: take('pep-${webApp.outputs.name}', 64)
-//     location: location
-//     tags: tags
-//     privateDnsZonesId: ( !empty(subnetPrivateEndpointId)) ? webAppPrivateDnsZone.outputs.privateDnsZonesId : ''
-//     privateLinkServiceId: webApp.outputs.resourceId
-//     snetId: subnetPrivateEndpointId
-//     subresource: 'sites'
-//   }
-// }
-
-// module peWebAppSlot '../../../shared/bicep/private-endpoint.bicep' = if ( !empty(subnetPrivateEndpointId) && !deployAseV3) {
-//   name:  take('pe-${webAppName}-slot-${slotName}-Deployment', 64)
-//   params: {
-//     name: take('pe-${webAppName}-slot-${slotName}', 64)
-//     location: location
-//     tags: tags
-//     privateDnsZonesId: ( !empty(subnetPrivateEndpointId) && !deployAseV3 ) ? webAppPrivateDnsZone.outputs.privateDnsZonesId : ''
-//     privateLinkServiceId: webApp.outputs.resourceId
-//     snetId: subnetPrivateEndpointId
-//     subresource: 'sites-${slotName}'
-//   }
-// }
-
-// module azConfigPrivateDnsZone '../../../shared/bicep/private-dns-zone.bicep' = if ( !empty(subnetPrivateEndpointId) && deployAppConfig ) {
-//   // conditional scope is not working: https://github.com/Azure/bicep/issues/7367
-//   //scope: empty(vnetHubResourceId) ? resourceGroup() : resourceGroup(vnetHubSplitTokens[2], vnetHubSplitTokens[4]) 
-//   scope: resourceGroup(vnetHubSplitTokens[2], vnetHubSplitTokens[4])
-//   name: take('${replace(appConfigurationDnsZoneName, '.', '-')}-PrivateDnsZoneDeployment', 64)
-//   params: {
-//     name: appConfigurationDnsZoneName
-//     virtualNetworkLinks: virtualNetworkLinks
-//     tags: tags
-//   }
-// }
-// module peAzConfig '../../../shared/bicep/private-endpoint.bicep' = if ( !empty(subnetPrivateEndpointId)  && deployAppConfig) {
-//   name: take('pe-${appConfigurationName}-Deployment', 64)
-//   params: {
-//     name: ( !empty(subnetPrivateEndpointId)  && deployAppConfig) ? 'pe-${appConfigStore.outputs.name}' : ''
-//     location: location
-//     tags: tags
-//     privateDnsZonesId:  ( !empty(subnetPrivateEndpointId)  && deployAppConfig) ? azConfigPrivateDnsZone.outputs.privateDnsZonesId : ''
-//     privateLinkServiceId: ( !empty(subnetPrivateEndpointId)  && deployAppConfig) ? appConfigStore.outputs.resourceId : ''
-//     snetId: subnetPrivateEndpointId
-//     subresource: 'configurationStores'
-//   }
-// }
-
-// module webAppStagingSlotSystemIdentityOnAppConfigDataReader '../../../shared/bicep/role-assignments/role-assignment.bicep' = if ( deployAppConfig ) {
-//   name: 'webAppStagingSlotSystemIdentityOnAppConfigDataReader-Deployment'
-//   params: {
-//     name: 'ra-webAppStagingSlotSystemIdentityOnAppConfigDataReader'
-//     principalId: webAppUserAssignedManagedIdenity.outputs.principalId //webApp.outputs.slotSystemAssignedPrincipalIds[0]
-//     resourceId: ( deployAppConfig ) ?  appConfigStore.outputs.resourceId : ''
-//     roleDefinitionId: '516239f1-63e1-4d78-a4de-a74fb236a071'  //App Configuration Data Reader 
-//   }
-// }
-
-// module webAppStagingSlotSystemIdentityOnKeyvaultSecretsUser '../../../shared/bicep/role-assignments/role-assignment.bicep' = {
-//   name: 'webAppStagingSlotSystemIdentityOnKeyvaultSecretsUser-Deployment'
-//   params: {
-//     name: 'ra-webAppStagingSlotSystemIdentityOnKeyvaultSecretsUser'
-//     principalId: webAppUserAssignedManagedIdenity.outputs.principalId // webApp.outputs.slotSystemAssignedPrincipalIds[0]
-//     resourceId: keyvault.id
-//     roleDefinitionId: '4633458b-17de-408a-b874-0445c86b69e6'  //Key Vault Secrets User   
-//   }
-// }
-
-
-// output appConfigStoreName string =  deployAppConfig ? appConfigStore.outputs.name : ''
-// output appConfigStoreId string = deployAppConfig ? appConfigStore.outputs.resourceId : ''
-// output webAppName string = webApp.outputs.name
 output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: fnApp!.outputs.defaultHostName
 output webAppResourceId string = (kind == 'app') ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
 output systemAssignedPrincipalId string = (kind == 'app') ? webApp!.outputs.systemAssignedPrincipalId : fnApp!.outputs.systemAssignedPrincipalId
-// output webAppLocation string = webApp.outputs.location
-// output webAppSystemAssignedPrincipalId string = webApp.outputs.systemAssignedPrincipalId
 

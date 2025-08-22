@@ -73,21 +73,19 @@ param location string = deployment().location
 @description('DevOps Public IP Address')
 param parDevOpsPublicIPAddress string = ''
 
+@description('IP addresses to be whitelisted for users to access CMS Portal')
+param paramWhitelistIPs string
+
+
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
+
+@description('Indicates whether to use One Login for the application')
+param useOneLogin bool
 
 @description('Central Log Analytics Workspace ID')
 @secure()
 param logAnalyticsWorkspaceId string
-
-// @description('The FQDN of the Application Gateway. Must match the TLS Certificate.')
-// param applicationGatewayFqdn string
-
-// @description('Enable or disable Application Gateway Certificate (PFX).')
-// param enableApplicationGatewayCertificate bool 
-
-// @description('The name of the certificate key to use for Application Gateway certificate.')
-// param applicationGatewayCertificateKeyName string
 
 @description('Admin login for SQL Server')
 param parAdminLogin string = ''
@@ -256,6 +254,10 @@ param parAllowedHosts string
 @description('Indicates whether to use Front Door for the application')
 param parUseFrontDoor bool
 
+@secure()
+@description('The key for the Microsot Clarity project this is associated with.')
+param parClarityProjectId string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -363,11 +365,6 @@ resource webAppSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-03-01' exi
   }
 ]
 
-// resource agwSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-03-01' existing = [for i in range(0, length(parSpokeNetworks)): {
-//   name: 'snet-agw'
-//   parent: existingVnet[i]
-// }]
-
 module sharedServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('sharedNamingDeployment-${deployment().name}', 64)
@@ -437,6 +434,8 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       storageAccountKey: parStorageAccountKey
       allowedHosts: parAllowedHosts
       useFrontDoor: parUseFrontDoor
+      useOneLogin: useOneLogin
+      clarityProjectId: parClarityProjectId
     }
   }
 ]
@@ -555,7 +554,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
       adminLogin: parAdminLogin
       adminPassword: parSqlAdminPhrase
-      databases: ['applicationservice', 'identityservice', 'questionsetservice', 'rtsservice']
+      databases: ['applicationservice', 'identityservice', 'questionsetservice', 'rtsservice', 'cmsservice']
       spokePrivateEndpointSubnetName: pepSubnet[i].name // spoke[i].outputs.spokePrivateEndpointsSubnetName
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       sqlServerUAIName: storageServicesNaming[i].outputs.resourcesNames.sqlServerUserAssignedIdentity
@@ -578,7 +577,6 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
       containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
       sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
       containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-      //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       storageRG: parSpokeNetworks[i].rgStorage
       appConfigURL: supportingServices[i].outputs.appConfigURL
       appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
@@ -613,7 +611,6 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
       containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
       sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
       containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-      //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       storageRG: parSpokeNetworks[i].rgStorage
       appConfigURL: supportingServices[i].outputs.appConfigURL
       appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
@@ -648,7 +645,6 @@ module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [
       containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
       sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
       containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-      //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       storageRG: parSpokeNetworks[i].rgStorage
       appConfigURL: supportingServices[i].outputs.appConfigURL
       appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
@@ -684,7 +680,6 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
       containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
       sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
       containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-      //appConfigurationUserAssignedIdentityId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       storageRG: parSpokeNetworks[i].rgStorage
       appConfigURL: supportingServices[i].outputs.appConfigURL
       appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
@@ -733,7 +728,39 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       ]
+      //paramWhitelistIPs: ''
     }
+  }
+]
+
+module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('cmsApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: 'B1'
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
+      appName: 'cmsportal-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Linux'
+      subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
+      kind: 'app'
+      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        databaseserver[i].outputs.outputsqlServerUAIID
+      ]
+      paramWhitelistIPs: paramWhitelistIPs
+    }
+    dependsOn: [
+      databaseserver
+    ]
   }
 ]
 
