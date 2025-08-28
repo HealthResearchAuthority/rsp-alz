@@ -43,7 +43,7 @@ param bastionDnsName string
 
 // New Params for Azure Functions and Database
 @description('Admin username for the HARP Sync Database server')
-param harpSqlAdminLogin string = 'harpadmin'
+param harpSqlAdminLogin string = ''
 
 @secure()
 @description('Admin password for the HARP Sync SQL Server')

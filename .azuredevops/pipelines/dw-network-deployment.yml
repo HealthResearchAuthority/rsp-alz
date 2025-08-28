@@ -10,6 +10,9 @@ pr:
       - '7.datawarehouse/main.network.bicep'
       - '7.datawarehouse/network-parameters/**'
 
+variables:
+  - group: 'datawarehouse'
+
 parameters:
   - name: env
     displayName: Environment

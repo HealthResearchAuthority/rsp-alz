@@ -10,6 +10,9 @@ pr:
       - '7.datawarehouse/main.application.bicep'
       - '7.datawarehouse/app-parameters/**'
 
+variables:
+  - group: 'datawarehouse'
+
 parameters:
   - name: env
     displayName: Environment
@@ -60,7 +63,10 @@ stages:
                   --location $(location) \
                   --template-file ./datawarehouse/main.application.bicep \
                   --parameters ./datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
-                                adminUsername=$(adminUsername)
+                  adminUsername=$(adminUsername) \
+                  logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                  harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                  harpSqlAdminPassword=$(harpSqlAdminPassword)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -86,7 +92,10 @@ stages:
                   --location $(location) \
                   --template-file ./datawarehouse/main.application.bicep \
                   --parameters ./datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
-                                adminUsername=$(adminUsername)
+                  adminUsername=$(adminUsername) \
+                  logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                  harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                  harpSqlAdminPassword=$(harpSqlAdminPassword)
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment - Datawarehouse Applications'
@@ -115,7 +124,10 @@ stages:
                   --location $(location) \
                   --template-file ./datawarehouse/main.application.bicep \
                   --parameters ./datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
-                                adminUsername=$(adminUsername)
+                  adminUsername=$(adminUsername) \
+                  logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                  harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                  harpSqlAdminPassword=$(harpSqlAdminPassword)
       - deployment: deployApplication
         displayName: 'Deploy Datawarehouse Applications'
         pool:
@@ -146,7 +158,10 @@ stages:
                         --location $(location) \
                         --template-file ./datawarehouse/main.application.bicep \
                         --parameters ./datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
-                        adminUsername=$(adminUsername)
+                        adminUsername=$(adminUsername) \
+                        logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                        harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                        harpSqlAdminPassword=$(harpSqlAdminPassword)
                         --deny-settings-mode none --action-on-unmanage detach --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
