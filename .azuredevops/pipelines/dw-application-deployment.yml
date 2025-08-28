@@ -37,7 +37,7 @@ stages:
               az bicep install
               az bicep version
             displayName: 'Install Bicep CLI'
-          - bash: az bicep build --file ./datawarehouse/main.application.bicep
+          - bash: az bicep build --file ./7.datawarehouse/main.application.bicep
             displayName: 'Lint Bicep Templates'
 
       - job: validate
@@ -61,8 +61,8 @@ stages:
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub validate --name "DatawarehouseApplication-Validation-$(Build.BuildId)" \
                   --location $(location) \
-                  --template-file ./datawarehouse/main.application.bicep \
-                  --parameters ./datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
+                  --template-file ./7.datawarehouse/main.application.bicep \
+                  --parameters ./7.datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
                   adminUsername=$(adminUsername) \
                   logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                   harpSqlAdminLogin=$(harpSqlAdminLogin) \
@@ -90,8 +90,8 @@ stages:
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub what-if \
                   --location $(location) \
-                  --template-file ./datawarehouse/main.application.bicep \
-                  --parameters ./datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
+                  --template-file ./7.datawarehouse/main.application.bicep \
+                  --parameters ./7.datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
                   adminUsername=$(adminUsername) \
                   logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                   harpSqlAdminLogin=$(harpSqlAdminLogin) \
@@ -122,8 +122,8 @@ stages:
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub what-if \
                   --location $(location) \
-                  --template-file ./datawarehouse/main.application.bicep \
-                  --parameters ./datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
+                  --template-file ./7.datawarehouse/main.application.bicep \
+                  --parameters ./7.datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
                   adminUsername=$(adminUsername) \
                   logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                   harpSqlAdminLogin=$(harpSqlAdminLogin) \
@@ -156,8 +156,8 @@ stages:
                       az config set bicep.use_binary_from_path=false --only-show-errors
                       output=$(az stack sub create --name "dw-application-deployment-stack" \
                         --location $(location) \
-                        --template-file ./datawarehouse/main.application.bicep \
-                        --parameters ./datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
+                        --template-file ./7.datawarehouse/main.application.bicep \
+                        --parameters ./7.datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
                         adminUsername=$(adminUsername) \
                         logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                         harpSqlAdminLogin=$(harpSqlAdminLogin) \
