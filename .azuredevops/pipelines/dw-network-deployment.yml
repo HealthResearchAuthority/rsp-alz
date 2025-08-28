@@ -154,7 +154,6 @@ stages:
                         --parameters ./7.datawarehouse/network-parameters/{{ parameters.env }}.parameters.bicepparam \
                         GatewayIp=$(GatewayIp) \
                         bgpPeeringAddress=$(bgpPeeringAddress) \
-                        --deny-settings-mode none --action-on-unmanage detach --yes)
+                        --deny-settings-mode none --yes)
                       echo $output | jq .
-                      appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
-                      echo "##vso[task.setvariable variable=appResourceGroupName;isoutput=true]$appResourceGroup"
+                      echo "##[section]Datawarehouse Application Deployment Completed Successfully"

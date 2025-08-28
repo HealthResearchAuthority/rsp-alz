@@ -162,7 +162,8 @@ stages:
                         logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                         harpSqlAdminLogin=$(harpSqlAdminLogin) \
                         harpSqlAdminPassword=$(harpSqlAdminPassword)
-                        --deny-settings-mode none --action-on-unmanage detach --yes)
+                        --deny-settings-mode none --yes)
                       echo $output | jq .
-                      appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
-                      echo "##vso[task.setvariable variable=appResourceGroupName;isoutput=true]$appResourceGroup"
+                      echo "##[section]Datawarehouse Application Deployment Completed Successfully"
+
+                      echo "##vso[task.setvariable variable=functionAppIds;isoutput=true]$(echo $output | jq -r '.properties.outputs.functionAppIds.value')"
