@@ -54,7 +54,7 @@ stages:
             displayName: 'Install Bicep CLI'
           - task: AzureCLI@2
             inputs:
-              azureSubscription: $(azureSubscription) #or $(azureServiceConnection)
+              azureSubscription: $(azureServiceConnection)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -83,7 +83,7 @@ stages:
           - task: AzureCLI@2
             displayName: 'What-If Analysis'
             inputs:
-              azureSubscription: $(azureSubscription)
+              azureSubscription: $(azureServiceConnection)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -115,7 +115,7 @@ stages:
           - task: AzureCLI@2
             displayName: 'What-If Analysis'
             inputs:
-              azureSubscription: $(azureSubscription)
+              azureSubscription: $(azureServiceConnection)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
@@ -148,7 +148,7 @@ stages:
                   name: deployApplications
                   displayName: 'Deploy Datawarehouse Applications'
                   inputs:
-                    azureSubscription: $(azureSubscription)
+                    azureSubscription: $(azureServiceConnection)
                     scriptType: bash
                     scriptLocation: inlineScript
                     failOnStandardError: true
