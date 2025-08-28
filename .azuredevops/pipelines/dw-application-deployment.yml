@@ -62,7 +62,7 @@ stages:
                 az deployment sub validate --name "DatawarehouseApplication-Validation-$(Build.BuildId)" \
                   --location $(location) \
                   --template-file ./7.datawarehouse/main.application.bicep \
-                  --parameters ./7.datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
+                  --parameters ./7.datawarehouse/application-parameters/${{ parameters.env }}.parameters.bicepparam \
                   adminUsername=$(adminUsername) \
                   logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                   harpSqlAdminLogin=$(harpSqlAdminLogin) \
@@ -91,7 +91,7 @@ stages:
                 az deployment sub what-if \
                   --location $(location) \
                   --template-file ./7.datawarehouse/main.application.bicep \
-                  --parameters ./7.datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
+                  --parameters ./7.datawarehouse/application-parameters/${{ parameters.env }}.parameters.bicepparam \
                   adminUsername=$(adminUsername) \
                   logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                   harpSqlAdminLogin=$(harpSqlAdminLogin) \
@@ -123,7 +123,7 @@ stages:
                 az deployment sub what-if \
                   --location $(location) \
                   --template-file ./7.datawarehouse/main.application.bicep \
-                  --parameters ./7.datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
+                  --parameters ./7.datawarehouse/application-parameters/${{ parameters.env }}.parameters.bicepparam \
                   adminUsername=$(adminUsername) \
                   logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                   harpSqlAdminLogin=$(harpSqlAdminLogin) \
