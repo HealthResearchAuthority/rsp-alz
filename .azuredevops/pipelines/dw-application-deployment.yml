@@ -62,11 +62,11 @@ stages:
                 az deployment sub validate --name "DatawarehouseApplication-Validation-$(Build.BuildId)" \
                   --location $(location) \
                   --template-file ./7.datawarehouse/main.application.bicep \
-                  --parameters ./7.datawarehouse/application-parameters/${{ parameters.env }}.parameters.bicepparam \
-                  adminUsername=$(adminUsername) \
-                  logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
-                  harpSqlAdminLogin=$(harpSqlAdminLogin) \
-                  harpSqlAdminPassword=$(harpSqlAdminPassword)
+                  --parameters ./7.datawarehouse/app-parameters/${{ parameters.env }}.parameters.bicepparam \
+                    adminUsername=$(adminUsername) \
+                    logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                    harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                    harpSqlAdminPassword=$(harpSqlAdminPassword)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -91,11 +91,11 @@ stages:
                 az deployment sub what-if \
                   --location $(location) \
                   --template-file ./7.datawarehouse/main.application.bicep \
-                  --parameters ./7.datawarehouse/application-parameters/${{ parameters.env }}.parameters.bicepparam \
-                  adminUsername=$(adminUsername) \
-                  logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
-                  harpSqlAdminLogin=$(harpSqlAdminLogin) \
-                  harpSqlAdminPassword=$(harpSqlAdminPassword)
+                  --parameters ./7.datawarehouse/app-parameters/${{ parameters.env }}.parameters.bicepparam \
+                    adminUsername=$(adminUsername) \
+                    logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                    harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                    harpSqlAdminPassword=$(harpSqlAdminPassword)
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment - Datawarehouse Applications'
@@ -123,11 +123,11 @@ stages:
                 az deployment sub what-if \
                   --location $(location) \
                   --template-file ./7.datawarehouse/main.application.bicep \
-                  --parameters ./7.datawarehouse/application-parameters/${{ parameters.env }}.parameters.bicepparam \
-                  adminUsername=$(adminUsername) \
-                  logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
-                  harpSqlAdminLogin=$(harpSqlAdminLogin) \
-                  harpSqlAdminPassword=$(harpSqlAdminPassword)
+                  --parameters ./7.datawarehouse/app-parameters/${{ parameters.env }}.parameters.bicepparam \
+                    adminUsername=$(adminUsername) \
+                    logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                    harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                    harpSqlAdminPassword=$(harpSqlAdminPassword)
       - deployment: deployApplication
         displayName: 'Deploy Datawarehouse Applications'
         pool:
@@ -157,11 +157,11 @@ stages:
                       output=$(az deployment sub create --name "dw-application-deployment-$(Build.BuildId)" \
                         --location $(location) \
                         --template-file ./7.datawarehouse/main.application.bicep \
-                        --parameters ./7.datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
-                        adminUsername=$(adminUsername) \
-                        logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
-                        harpSqlAdminLogin=$(harpSqlAdminLogin) \
-                        harpSqlAdminPassword=$(harpSqlAdminPassword))
+                        --parameters ./7.datawarehouse/app-parameters/{{ parameters.env }}.parameters.bicepparam \
+                          adminUsername=$(adminUsername) \
+                          logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                          harpSqlAdminLogin=$(harpSqlAdminLogin) \
+                          harpSqlAdminPassword=$(harpSqlAdminPassword))
                       echo $output | jq .
                       echo "##[section]Datawarehouse Application Deployment Completed Successfully"
 
