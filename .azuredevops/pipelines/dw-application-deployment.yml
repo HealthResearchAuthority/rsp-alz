@@ -154,15 +154,14 @@ stages:
                     failOnStandardError: true
                     inlineScript: |
                       az config set bicep.use_binary_from_path=false --only-show-errors
-                      output=$(az stack sub create --name "dw-application-deployment-stack" \
+                      output=$(az deployment sub create --name "dw-application-deployment-$(Build.BuildId)" \
                         --location $(location) \
                         --template-file ./7.datawarehouse/main.application.bicep \
                         --parameters ./7.datawarehouse/application-parameters/{{ parameters.env }}.parameters.bicepparam \
                         adminUsername=$(adminUsername) \
                         logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                         harpSqlAdminLogin=$(harpSqlAdminLogin) \
-                        harpSqlAdminPassword=$(harpSqlAdminPassword)
-                        --deny-settings-mode none --yes)
+                        harpSqlAdminPassword=$(harpSqlAdminPassword))
                       echo $output | jq .
                       echo "##[section]Datawarehouse Application Deployment Completed Successfully"
 

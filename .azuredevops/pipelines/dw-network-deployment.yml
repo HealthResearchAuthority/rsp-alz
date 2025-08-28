@@ -148,12 +148,11 @@ stages:
                     failOnStandardError: true
                     inlineScript: |
                       az config set bicep.use_binary_from_path=false --only-show-errors
-                      output=$(az stack sub create --name "dw-network-deployment-stack" \
+                      output=$(az deployment sub create --name "dw-network-deployment-$(Build.BuildId)" \
                         --location $(location) \
                         --template-file ./7.datawarehouse/main.network.bicep \
                         --parameters ./7.datawarehouse/network-parameters/{{ parameters.env }}.parameters.bicepparam \
                         GatewayIp=$(GatewayIp) \
-                        bgpPeeringAddress=$(bgpPeeringAddress) \
-                        --deny-settings-mode none --yes)
+                        bgpPeeringAddress=$(bgpPeeringAddress))
                       echo $output | jq .
                       echo "##[section]Datawarehouse Application Deployment Completed Successfully"
