@@ -17,8 +17,8 @@ param vpnGatewayName string
 @description('Connection name for VPN')
 param connectionName string
 
-@description('Name of Azure DevOps account')
-param devopsAccountName string
+// @description('Name of Azure DevOps account')
+// param devopsAccountName string
 
 @description('Remote VNet ID for Devbox')
 param devboxVnetId string
@@ -51,7 +51,7 @@ module dw_network './modules/dw-network.bicep' = {
     publicIpName: publicIpName
     vpnGatewayName: vpnGatewayName
     devboxVnetId: devboxVnetId
-    devopsAccountName: devopsAccountName
+    // devopsAccountName: devopsAccountName
     localNetworkGatewayName: localNetworkGatewayName
     devVnetId: devVnetId
     remoteLocalGatewayId: remoteLocalGatewayId

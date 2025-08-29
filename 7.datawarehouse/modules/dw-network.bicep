@@ -13,8 +13,8 @@ param vpnGatewayName string
 @description('Connection name for VPN')
 param connectionName string
 
-@description('Name of Azure DevOps account')
-param devopsAccountName string
+// @description('Name of Azure DevOps account')
+// param devopsAccountName string
 
 @description('Remote VNet ID for Devbox')
 param devboxVnetId string
@@ -252,10 +252,10 @@ resource devPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@20
   }
 }
 
-resource devopsAccount 'Microsoft.VisualStudio/account@2014-04-01-preview' = {
-  name: devopsAccountName
-  location: resourceGroup().location
-  properties: {
-    AccountURL: 'https://dev.azure.com/${devopsAccountName}/'
-  }
-}
+// resource devopsAccount 'Microsoft.VisualStudio/account@2014-04-01-preview' = {
+//   name: devopsAccountName
+//   location: resourceGroup().location
+//   properties: {
+//     AccountURL: 'https://dev.azure.com/${devopsAccountName}/'
+//   }
+// }
