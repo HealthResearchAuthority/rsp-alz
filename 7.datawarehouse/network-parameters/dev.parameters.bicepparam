@@ -4,7 +4,7 @@ param connectionName = 'VysiionSite'
 
 param devboxVnetId = '/subscriptions/9ef9a127-7a6e-452e-b18d-d2e2e89ffa92/resourceGroups/rg-rsp-devcenter/providers/Microsoft.Network/virtualNetworks/vnet-dbox-rsp-uksouth'
 
-param devopsAccountName = 'HRADataWarehouse'
+// param devopsAccountName = 'HRADataWarehouse'
 
 param localNetworkGatewayName = 'HRADataWarehouseNetworkGateway'
 
