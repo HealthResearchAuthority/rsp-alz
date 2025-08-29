@@ -10,6 +10,9 @@ param location string = resourceGroup().location
 @description('Optional. The tags to be assigned to created resources')
 param tags object = {}
 
+@description('Whether to create private endpoints for storage and function apps')
+param createPrivateEndpoints bool = true
+
 @description('The resource ID of the Vnet to which the private endpoint will be connected')
 param spokeVNetId string
 
@@ -117,7 +120,7 @@ module storageAccounts '../../shared/bicep/storage/storage.bicep' = [for (funcAp
   }
 }]
 
-module storageBlobPrivateEndpoints '../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps: {
+module storageBlobPrivateEndpoints '../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps: if (createPrivateEndpoints) {
   name: 'storageBlobPE-${funcApp.name}'
   params: {
     location: location
@@ -136,7 +139,7 @@ module storageBlobPrivateEndpoints '../../shared/bicep/network/private-networkin
   }
 }]
 
-module storageFilePrivateEndpoints '../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps: {
+module storageFilePrivateEndpoints '../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps: if (createPrivateEndpoints) {
   name: 'storageFilePE-${funcApp.name}'
   params: {
     location: location
@@ -166,7 +169,7 @@ module functionAppsDeployment '../../shared/bicep/app-services/function-app.bice
     location: location
     tags: tags
     serverFarmResourceId: appServicePlans[index].outputs.resourceId
-    hasPrivateEndpoint: true
+    hasPrivateEndpoint: createPrivateEndpoints
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     storageAccountName: funcApp.storageAccountName
     runtime: 'dotnet-isolated'
@@ -195,14 +198,16 @@ module functionAppsDeployment '../../shared/bicep/app-services/function-app.bice
       }
     ] : [])
   }
-  dependsOn: [
+  dependsOn: createPrivateEndpoints ? [
     storageAccounts
     storageBlobPrivateEndpoints
     storageFilePrivateEndpoints
+  ] : [
+    storageAccounts
   ]
 }]
 
-module functionAppPrivateEndpoints '../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps: {
+module functionAppPrivateEndpoints '../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps: if (createPrivateEndpoints) {
   name: 'functionAppPE-${funcApp.name}'
   params: {
     location: location
@@ -240,3 +245,9 @@ output appServicePlanNames array = [for (funcApp, index) in functionApps: {
   name: funcApp.appServicePlanName
   id: appServicePlans[index].outputs.resourceId
 }]
+
+output functionAppResourceIds array = [for (funcApp, index) in functionApps: functionAppsDeployment[index].outputs.functionAppId]
+
+output storageAccountResourceIds array = [for (funcApp, index) in functionApps: storageAccounts[index].outputs.id]
+
+output storageAccountNamesArray array = [for (funcApp, index) in functionApps: funcApp.storageAccountName]

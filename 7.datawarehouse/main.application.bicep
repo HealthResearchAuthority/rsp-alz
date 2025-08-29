@@ -124,8 +124,9 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
     spokeVNetId: dw_application.outputs.vnetID
     spokePrivateEndpointSubnetName: 'snet-privateendpoints'
     functionAppSubnetName: 'HRADataWarehouseVirtualNetworkSubnet'
-    sqlDBManagedIdentityClientId: ''
+    sqlDBManagedIdentityClientId: '' //TODO: Create Managed Identity
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    createPrivateEndpoints: false
     userAssignedIdentities: []
     environment: environment
     tags: {
@@ -136,6 +137,30 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
   dependsOn: [
     harpSyncDatabase
   ]
+}
+
+module networkPrivateEndpoints 'modules/dw-private-endpoints.bicep' = if (enableHarpDeployment) {
+  name: 'deployNetworkPrivateEndpoints'
+  scope: resourceGroup('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D')
+  params: {
+    location: targetRg.location
+    vnetId: dw_application.outputs.vnetID
+    privateEndpointSubnetName: 'snet-privateendpoints'
+    environment: environment
+    tags: {
+      Environment: environment
+      Purpose: 'HARP Data Sync'
+      Component: 'Network'
+    }
+    // sqlServerResourceId: enableHarpDeployment ? harpSyncDatabase.?outputs.?sqlServerId ?? '' : ''
+    // sqlServerName: harpSqlServerName
+
+    functionAppResourceIds: enableHarpDeployment ? (harpSyncFunctions.?outputs.?functionAppResourceIds ?? []) : []
+    functionAppNames: ['func-harp-data-sync', 'func-validate-irasid']
+
+    storageAccountResourceIds: enableHarpDeployment ? (harpSyncFunctions.?outputs.?storageAccountResourceIds ?? []) : []
+    storageAccountNames: enableHarpDeployment ? (harpSyncFunctions.?outputs.?storageAccountNamesArray ?? []) : []
+  }
 }
 
 // Outputs
