@@ -2,6 +2,8 @@ targetScope = 'subscription'
 
 param targetRgName string = 'HRA-Data-DataModelling'
 
+param location string = 'uksouth'
+
 @description('Name of the ERStudioDB VM')
 param virtualMachines_HRA_Data_ERStudioDB_name string
 
@@ -93,7 +95,7 @@ module harpSyncDatabase '../5.spoke-network/modules/05-database/deploy.database.
   name: 'deployHarpSyncDatabase'
   scope: targetRg
   params: {
-    location: targetRg.location
+    location: location
     sqlServerName: harpSqlServerName
     adminLogin: harpSqlAdminLogin
     adminPassword: harpSqlAdminPassword
@@ -104,7 +106,7 @@ module harpSyncDatabase '../5.spoke-network/modules/05-database/deploy.database.
     networkingResourcesNames: {
       azuresqlserverpep: 'pep-${harpSqlServerName}'
     }
-    networkingResourceGroup: targetRgName
+    networkingResourceGroup: 'VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D'
     auditRetentionDays: 30
     enableSqlServerAuditing:true
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
@@ -120,7 +122,7 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
   name: 'deployHarpSyncFunctions'
   scope: targetRg
   params: {
-    location: targetRg.location
+    location: location
     spokeVNetId: resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
     spokePrivateEndpointSubnetName: 'snet-privateendpoints'
     functionAppSubnetName: 'HRADataWarehouseVirtualNetworkSubnet'
