@@ -98,7 +98,7 @@ module harpSyncDatabase '../5.spoke-network/modules/05-database/deploy.database.
     adminLogin: harpSqlAdminLogin
     adminPassword: harpSqlAdminPassword
     databases: ['harpprojectdata']
-    spokeVNetId: dw_application.outputs.vnetID
+    spokeVNetId: resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
     spokePrivateEndpointSubnetName: 'snet-privatenedpoints'
     sqlServerUAIName: harpSqlServerUAIName
     networkingResourcesNames: {
@@ -121,7 +121,7 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
   scope: targetRg
   params: {
     location: targetRg.location
-    spokeVNetId: dw_application.outputs.vnetID
+    spokeVNetId: resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
     spokePrivateEndpointSubnetName: 'snet-privateendpoints'
     functionAppSubnetName: 'HRADataWarehouseVirtualNetworkSubnet'
     sqlDBManagedIdentityClientId: '' //TODO: Create Managed Identity
@@ -144,7 +144,7 @@ module networkPrivateEndpoints 'modules/dw-private-endpoints.bicep' = if (enable
   scope: resourceGroup('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D')
   params: {
     location: targetRg.location
-    vnetId: dw_application.outputs.vnetID
+    vnetId: resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
     privateEndpointSubnetName: 'snet-privateendpoints'
     environment: environment
     tags: {
@@ -164,7 +164,7 @@ module networkPrivateEndpoints 'modules/dw-private-endpoints.bicep' = if (enable
 }
 
 // Outputs
-output vnetId string = dw_application.outputs.vnetID
+output vnetId string = resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
 output sqlServerName string = enableHarpDeployment ? harpSyncDatabase.?outputs.?sqlServer_name ?? '' : ''
 output functionAppIds array = enableHarpDeployment ? (harpSyncFunctions.?outputs.?functionAppNames ?? []) : []
 output harpDatabaseNames array = enableHarpDeployment ? (harpSyncDatabase.?outputs.?database_names ?? []) : []
