@@ -157,7 +157,7 @@ stages:
                       output=$(az deployment sub create --name "dw-application-deployment-$(Build.BuildId)" \
                         --location $(location) \
                         --template-file ./7.datawarehouse/main.application.bicep \
-                        --parameters ./7.datawarehouse/app-parameters/{{ parameters.env }}.parameters.bicepparam \
+                        --parameters ./7.datawarehouse/app-parameters/${{ parameters.env }}.parameters.bicepparam \
                           adminUsername=$(adminUsername) \
                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                           harpSqlAdminLogin=$(harpSqlAdminLogin) \
