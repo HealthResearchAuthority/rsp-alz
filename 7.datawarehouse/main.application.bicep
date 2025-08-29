@@ -64,6 +64,11 @@ resource targetRg 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: targetRgName
 }
 
+// resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
+//   scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
+//   name: spokeVNetName
+// }
+
 module dw_application 'modules/dw-application.bicep' = {
   name: 'deployApplication'
   scope: targetRg
@@ -100,7 +105,7 @@ module harpSyncDatabase '../5.spoke-network/modules/05-database/deploy.database.
     adminLogin: harpSqlAdminLogin
     adminPassword: harpSqlAdminPassword
     databases: ['harpprojectdata']
-    spokeVNetId: resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
+    spokeVNetId: '/subscriptions/461016b5-8363-472e-81be-eef6aad08353/resourceGroups/VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D/providers/Microsoft.Network/virtualNetworks/HRADataWarehouseVirtualNetwork'
     spokePrivateEndpointSubnetName: 'snet-privatenedpoints'
     sqlServerUAIName: harpSqlServerUAIName
     networkingResourcesNames: {
@@ -123,7 +128,7 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
   scope: targetRg
   params: {
     location: location
-    spokeVNetId: resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
+    spokeVNetId: '/subscriptions/461016b5-8363-472e-81be-eef6aad08353/resourceGroups/VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D/providers/Microsoft.Network/virtualNetworks/HRADataWarehouseVirtualNetwork'
     spokePrivateEndpointSubnetName: 'snet-privateendpoints'
     functionAppSubnetName: 'HRADataWarehouseVirtualNetworkSubnet'
     sqlDBManagedIdentityClientId: '' //TODO: Create Managed Identity
@@ -146,7 +151,7 @@ module networkPrivateEndpoints 'modules/dw-private-endpoints.bicep' = if (enable
   scope: resourceGroup('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D')
   params: {
     location: targetRg.location
-    vnetId: resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
+    vnetId: '/subscriptions/461016b5-8363-472e-81be-eef6aad08353/resourceGroups/VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D/providers/Microsoft.Network/virtualNetworks/HRADataWarehouseVirtualNetwork'
     privateEndpointSubnetName: 'snet-privateendpoints'
     environment: environment
     tags: {
@@ -166,7 +171,7 @@ module networkPrivateEndpoints 'modules/dw-private-endpoints.bicep' = if (enable
 }
 
 // Outputs
-output vnetId string = resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
+// output vnetId string = resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
 output sqlServerName string = enableHarpDeployment ? harpSyncDatabase.?outputs.?sqlServer_name ?? '' : ''
 output functionAppIds array = enableHarpDeployment ? (harpSyncFunctions.?outputs.?functionAppNames ?? []) : []
 output harpDatabaseNames array = enableHarpDeployment ? (harpSyncDatabase.?outputs.?database_names ?? []) : []
