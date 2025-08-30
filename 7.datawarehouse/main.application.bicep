@@ -168,6 +168,9 @@ module networkPrivateEndpoints 'modules/dw-private-endpoints.bicep' = if (enable
     storageAccountResourceIds: enableHarpDeployment ? (harpSyncFunctions.?outputs.?storageAccountResourceIds ?? []) : []
     storageAccountNames: enableHarpDeployment ? (harpSyncFunctions.?outputs.?storageAccountNamesArray ?? []) : []
   }
+  dependsOn: [
+    harpSyncFunctions
+  ]
 }
 
 // Outputs
