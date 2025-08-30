@@ -43,12 +43,12 @@ var spokeVNetName = spokeVNetIdTokens[8]
 var functionApps = [
   {
     name: 'func-harp-data-sync'
-    storageAccountName: 'stharpdatasync'
+    storageAccountName: 'stharpdatasync${environment}${substring(uniqueString(resourceGroup().id, 'harpdatasync'), 0, 6)}'
     appServicePlanName: 'asp-harp-data-sync-uks'
   }
   {
     name: 'func-validate-irasid'
-    storageAccountName: 'stvalidateirasid'
+    storageAccountName: 'stvalidateirasid${environment}${substring(uniqueString(resourceGroup().id, 'validateirasid'), 0, 6)}'
     appServicePlanName: 'asp-validate-irasid-uks'
   }
 ]
