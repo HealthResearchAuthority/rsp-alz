@@ -133,7 +133,6 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
     functionAppSubnetName: 'HRADataWarehouseVirtualNetworkSubnet'
     sqlDBManagedIdentityClientId: '' //TODO: Create Managed Identity
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    createPrivateEndpoints: false
     userAssignedIdentities: []
     environment: environment
     tags: {
@@ -146,35 +145,8 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
   ]
 }
 
-module networkPrivateEndpoints 'modules/dw-private-endpoints.bicep' = if (enableHarpDeployment) {
-  name: 'deployNetworkPrivateEndpoints'
-  scope: resourceGroup('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D')
-  params: {
-    location: targetRg.location
-    vnetId: '/subscriptions/461016b5-8363-472e-81be-eef6aad08353/resourceGroups/VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D/providers/Microsoft.Network/virtualNetworks/HRADataWarehouseVirtualNetwork'
-    privateEndpointSubnetName: 'snet-privateendpoints'
-    environment: environment
-    tags: {
-      Environment: environment
-      Purpose: 'HARP Data Sync'
-      Component: 'Network'
-    }
-    // sqlServerResourceId: enableHarpDeployment ? harpSyncDatabase.?outputs.?sqlServerId ?? '' : ''
-    // sqlServerName: harpSqlServerName
-
-    functionAppResourceIds: enableHarpDeployment ? (harpSyncFunctions.?outputs.?functionAppResourceIds ?? []) : []
-    functionAppNames: ['func-harp-data-sync', 'func-validate-irasid']
-
-    storageAccountResourceIds: enableHarpDeployment ? (harpSyncFunctions.?outputs.?storageAccountResourceIds ?? []) : []
-    storageAccountNames: enableHarpDeployment ? (harpSyncFunctions.?outputs.?storageAccountNamesArray ?? []) : []
-  }
-  dependsOn: [
-    harpSyncFunctions
-  ]
-}
-
 // Outputs
-// output vnetId string = resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
+output vnetId string = resourceId('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D', 'Microsoft.Network/virtualNetworks', 'HRADataWarehouseVirtualNetwok')
 output sqlServerName string = enableHarpDeployment ? harpSyncDatabase.?outputs.?sqlServer_name ?? '' : ''
 output functionAppIds array = enableHarpDeployment ? (harpSyncFunctions.?outputs.?functionAppNames ?? []) : []
 output harpDatabaseNames array = enableHarpDeployment ? (harpSyncDatabase.?outputs.?database_names ?? []) : []
