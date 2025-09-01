@@ -76,7 +76,7 @@ stages:
                   --management-group-id $(management-group-id) \
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                        paramserviceIds=$(serviceIds)) \
+                        paramserviceIds=$(serviceIds) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
@@ -110,7 +110,7 @@ stages:
                   --management-group-id $(management-group-id) \
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                        paramserviceIds=$(serviceIds)) \
+                        paramserviceIds=$(serviceIds) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
@@ -148,7 +148,7 @@ stages:
                         --template-file ./6.cross-subscription/main.bicep \
                         --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                               manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                              paramserviceIds=$(serviceIds)) \
+                              paramserviceIds=$(serviceIds) \
                               storageSubscriptionId="$(storageSubscriptionId)" \
                               devboxSubscriptionId="$(devboxSubscriptionId)")
                       echo "Full Bicep Deployment Output:"
