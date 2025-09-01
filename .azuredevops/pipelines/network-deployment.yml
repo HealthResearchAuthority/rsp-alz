@@ -52,12 +52,7 @@ stages:
           displayName: 'Run SAST Analysis'
           inputs:
             tools: 'checkov,templateanalyzer'
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish SARIF Results'
-          inputs:
-            PathtoPublish: '$(Build.ArtifactStagingDirectory)/.sast'
-            ArtifactName: 'SARIF-Results'
-            publishLocation: 'Container'
+        
 
       - job: validate
         displayName: 'Validate Network Deployment'
