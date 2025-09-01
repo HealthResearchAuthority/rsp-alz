@@ -41,12 +41,29 @@ stages:
               az bicep version
             displayName: 'Install Bicep CLI'
           - bash: az bicep build --file ./5.spoke-network/main.network.bicep
+      
+      - job: SAST
+        displayName: 'SAST Analysis'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        - checkout: self
+        - task: MicrosoftSecurityDevOps@1
+          displayName: 'Run SAST Analysis'
+          inputs:
+            categories: 'checkov,templateanalyzer'
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish SARIF Results'
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)/.sast'
+            ArtifactName: 'SARIF-Results'
+            publishLocation: 'Container'
 
       - job: validate
         displayName: 'Validate Network Deployment'
         pool:
           vmImage: 'ubuntu-latest'
-        dependsOn: [lint]
+        dependsOn: [lint, SAST]
         condition: succeeded()
         variables:
           - group: ${{ parameters.env }}
