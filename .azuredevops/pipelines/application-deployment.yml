@@ -68,7 +68,7 @@ stages:
         - task: MicrosoftSecurityDevOps@1
           displayName: 'Run SAST Analysis'
           inputs:
-            categories: 'checkov,templateanalyzer'
+            tools: 'checkov,templateanalyzer'
         - task: PublishBuildArtifacts@1
           displayName: 'Publish SARIF Results'
           inputs:
