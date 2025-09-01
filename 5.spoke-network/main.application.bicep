@@ -469,41 +469,6 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
   }
 ]
 
-// Process scan Function App
-module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
-  for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
-    name: take('processScanFnApp-${deployment().name}-deployment', 64)
-    params: {
-      appName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
-      location: location
-      tags: tags
-      sku: 'B1'
-      appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
-      webAppBaseOs: 'Windows'
-      logAnalyticsWsId: logAnalyticsWorkspaceId
-      subnetIdForVnetInjection: webAppSubnet[i].id
-      deploySlot: false
-      privateEndpointRG: parSpokeNetworks[i].rgNetworking
-      spokeVNetId: existingVnet[i].id
-      subnetPrivateEndpointSubnetId: pepSubnet[i].id
-      kind: 'functionapp'
-      storageAccountName: 'stpdoc${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
-      userAssignedIdentities: [
-        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-        databaseserver[i].outputs.outputsqlServerUAIID
-      ]
-      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-    }
-    dependsOn: [
-      applicationsRG
-      databaseserver
-      webApp  // Wait for webApp to create DNS zone first
-    ]
-  }
-]
-
 // Document upload storage with malware scanning enabled (other storage accounts inherit subscription-level settings)
 module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -774,6 +739,42 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
+// Process scan Function App
+module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('processScanFnApp-${deployment().name}-deployment', 64)
+    params: {
+      appName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
+      location: location
+      tags: tags
+      sku: 'B1'
+      appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
+      webAppBaseOs: 'Windows'
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: false
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stpdoc${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        databaseserver[i].outputs.outputsqlServerUAIID
+      ]
+      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+    }
+    dependsOn: [
+      applicationsRG
+      databaseserver
+      webApp  // Wait for webApp to create DNS zone first
+      umbracoCMS
+    ]
+  }
+]
+
 module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
@@ -802,6 +803,7 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     }
     dependsOn: [
       webApp
+      umbracoCMS
       processScanFnApp
       documentUpload
     ]
@@ -834,37 +836,11 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
       ]
     }
     dependsOn: [
+      webApp
+      umbracoCMS
       processScanFnApp
       rtsfnApp
       documentUpload
-    ]
-  }
-]
-
-module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
-  for i in range(0, length(parSpokeNetworks)): if (parEnableFrontDoor) {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
-    name: take('frontDoor-${deployment().name}-deployment', 64)
-    params: {
-      location: location
-      tags: tags
-      resourcesNames: applicationServicesNaming[i].outputs.resourcesNames
-      originHostName: webApp[i].outputs.appHostName
-      webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
-      enableWaf: true
-      wafMode: parFrontDoorWafMode
-      enableRateLimiting: parEnableFrontDoorRateLimiting
-      rateLimitThreshold: parFrontDoorRateLimitThreshold
-      customDomains: parFrontDoorCustomDomains
-      enableCaching: parEnableFrontDoorCaching
-      cacheDuration: parFrontDoorCacheDuration
-      enableHttpsRedirect: parEnableFrontDoorHttpsRedirect
-      enableManagedTls: true
-      webAppResourceId: webApp[i].outputs.webAppResourceId
-      enablePrivateLink: parEnableFrontDoorPrivateLink
-    }
-    dependsOn: [
-      webApp
     ]
   }
 ]
@@ -896,9 +872,11 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
     }
     dependsOn: [
-      processScanFnApp
       fnNotifyApp
-      databaseserver
+      webApp
+      umbracoCMS
+      processScanFnApp
+      rtsfnApp
       documentUpload
     ]
   }
@@ -918,6 +896,34 @@ module processScanFunctionPermissions '../shared/bicep/role-assignments/process-
     dependsOn: [
       processScanFnApp
       documentUpload
+    ]
+  }
+]
+
+module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): if (parEnableFrontDoor) {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('frontDoor-${deployment().name}-deployment', 64)
+    params: {
+      location: location
+      tags: tags
+      resourcesNames: applicationServicesNaming[i].outputs.resourcesNames
+      originHostName: webApp[i].outputs.appHostName
+      webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
+      enableWaf: true
+      wafMode: parFrontDoorWafMode
+      enableRateLimiting: parEnableFrontDoorRateLimiting
+      rateLimitThreshold: parFrontDoorRateLimitThreshold
+      customDomains: parFrontDoorCustomDomains
+      enableCaching: parEnableFrontDoorCaching
+      cacheDuration: parFrontDoorCacheDuration
+      enableHttpsRedirect: parEnableFrontDoorHttpsRedirect
+      enableManagedTls: true
+      webAppResourceId: webApp[i].outputs.webAppResourceId
+      enablePrivateLink: parEnableFrontDoorPrivateLink
+    }
+    dependsOn: [
+      webApp
     ]
   }
 ]

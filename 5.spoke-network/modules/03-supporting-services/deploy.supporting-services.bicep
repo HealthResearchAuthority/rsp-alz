@@ -98,7 +98,7 @@ var devOpsIPRule = {
 }
 var whitelistIPRules = [for ip in varWhitelistIPs: {
   action: 'Allow'
-  value: '${ip}/32'
+  value: contains(ip, '/') ? ip : '${ip}/32' // '${ip}/32'
 }]
 var allAllowedIPs = !empty(devOpsPublicIPAddress) ? concat([devOpsIPRule], whitelistIPRules) : whitelistIPRules
 
