@@ -57,12 +57,30 @@ stages:
               az bicep version
             displayName: 'Install Bicep CLI'
           - bash: az bicep build --file ./5.spoke-network/main.application.bicep
+      
+      - job: SAST
+        displayName: 'SAST Analysis'
+        pool:
+          name: rsp-manageddevopspool
+        dependsOn: setup
+        steps:
+        - checkout: self
+        - task: MicrosoftSecurityDevOps@1
+          displayName: 'Run SAST Analysis'
+          inputs:
+            categories: 'checkov,templateanalyzer'
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish SARIF Results'
+          inputs:
+            PathtoPublish: '$(Build.ArtifactStagingDirectory)/.sast'
+            ArtifactName: 'SARIF-Results'
+            publishLocation: 'Container'
 
       - job: validate
         displayName: 'Validate Application Deployment'
         pool:
           name: rsp-manageddevopspool
-        dependsOn: [setup, lint]
+        dependsOn: [setup, lint, SAST]
         condition: succeeded()
         variables:
           - name: devOpsPublicIP
@@ -129,6 +147,7 @@ stages:
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                               paramWhitelistIPs=$(parWhitelistIPs) \
                               parClarityProjectId=$(clarityProjectId)
+
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment of Applications'
