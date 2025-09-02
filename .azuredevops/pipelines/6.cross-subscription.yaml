@@ -40,7 +40,8 @@ stages:
           displayName: 'Run SAST Analysis'
           inputs:
             tools: 'checkov,templateanalyzer'
-          workingDirectory: '6.cross-subscription'
+          env:
+            GDN_RUN_WORKINGDIRECTORY: '6.cross-subscription'
 
       - job: validate
         displayName: 'Validate Cross Subscription Deployment'
