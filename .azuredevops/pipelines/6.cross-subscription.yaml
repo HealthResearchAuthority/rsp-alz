@@ -11,7 +11,7 @@ pr:
       - '6.cross-subscription/**'
 
 variables:
-  - group: 'CrossSubscription'
+  - group: 'CrossSubscription-Keyvault'  # Service connection and other secrets
 
 stages:
   - stage: PRValidation
@@ -49,7 +49,7 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 az config set bicep.use_binary_from_path=false --only-show-errors
-                az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(serviceIds)
+                az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(ServiceIDsforCrossSubscription)
 
       - job: preview
         displayName: 'Preview Cross Subscription Deployments'
@@ -76,7 +76,7 @@ stages:
                   --management-group-id $(management-group-id) \
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                        paramserviceIds=$(serviceIds) \
+                        paramserviceIds=$(ServiceIDsforCrossSubscription) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
@@ -110,7 +110,7 @@ stages:
                   --management-group-id $(management-group-id) \
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                        paramserviceIds=$(serviceIds) \
+                        paramserviceIds=$(ServiceIDsforCrossSubscription) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
@@ -148,7 +148,7 @@ stages:
                         --template-file ./6.cross-subscription/main.bicep \
                         --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                               manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                              paramserviceIds=$(serviceIds) \
+                              paramserviceIds=$(ServiceIDsforCrossSubscription) \
                               storageSubscriptionId="$(storageSubscriptionId)" \
                               devboxSubscriptionId="$(devboxSubscriptionId)")
                       echo "Full Bicep Deployment Output:"

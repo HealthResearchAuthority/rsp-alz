@@ -149,5 +149,5 @@ param parAllowedHosts = '*'
 param parUseFrontDoor = false
 
 @description('Indicates whether to use One Login for the application')
-param useOneLogin = false
+param useOneLogin = true
 param paramWhitelistIPs = ''
