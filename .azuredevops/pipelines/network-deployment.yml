@@ -48,11 +48,12 @@ stages:
           vmImage: 'ubuntu-latest'
         steps:
         - checkout: self
-        - task: MicrosoftSecurityDevOps@1
+                - task: MicrosoftSecurityDevOps@1
           displayName: 'Run SAST Analysis'
-          inputs:
+                    inputs:
             tools: 'checkov,templateanalyzer'
-          workingDirectory: '5.spoke-network'
+          env:
+            GDN_RUN_WORKINGDIRECTORY: '5.spoke-network'
         
 
       - job: validate
