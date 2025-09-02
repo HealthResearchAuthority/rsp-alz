@@ -40,7 +40,7 @@ stages:
           displayName: 'Run SAST Analysis'
           inputs:
             tools: 'checkov,templateanalyzer'
-        workingDirectory: '6.cross-subscription'
+          workingDirectory: '6.cross-subscription'
 
       - job: validate
         displayName: 'Validate Cross Subscription Deployment'
