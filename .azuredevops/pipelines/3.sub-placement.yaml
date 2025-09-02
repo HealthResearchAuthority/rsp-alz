@@ -37,7 +37,7 @@ stages:
           displayName: 'Run SAST Analysis'
           inputs:
             tools: 'checkov,templateanalyzer'
-          workingDirectory: '3.sub-placement'
+        workingDirectory: '3.sub-placement'
 
       - job: validate
         displayName: 'Validate Subscription-Placement Deployment'

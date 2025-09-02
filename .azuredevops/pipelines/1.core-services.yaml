@@ -39,7 +39,7 @@ stages:
           displayName: 'Run SAST Analysis'
           inputs:
             tools: 'checkov,templateanalyzer'
-          workingDirectory: '1.core-services'
+        workingDirectory: '1.core-services'
 
       - job: validate
         displayName: 'Validate Core Services Deployment'
