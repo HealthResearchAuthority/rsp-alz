@@ -71,11 +71,6 @@ resource harpSyncRG 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: harpSyncResourceGroupName
 }
 
-// resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
-//   scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
-//   name: spokeVNetName
-// }
-
 module dw_application 'modules/dw-application.bicep' = {
   name: 'deployApplication'
   scope: targetRg
@@ -154,8 +149,8 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
 }
 
 // Outputs
-output sqlServerName string = enableHarpDeployment ? harpSyncDatabase.?outputs.?sqlServer_name ?? '' : ''
-output functionAppIds array = enableHarpDeployment ? (harpSyncFunctions.?outputs.?functionAppNames ?? []) : []
-output harpDatabaseNames array = enableHarpDeployment ? (harpSyncDatabase.?outputs.?database_names ?? []) : []
-output sqlServerUAIId string = enableHarpDeployment ? harpSyncDatabase.?outputs.?outputsqlServerUAIID ?? '' : ''
+// output sqlServerName string = enableHarpDeployment ? harpSyncDatabase.?outputs.?sqlServer_name ?? '' : ''
+// output functionAppIds array = enableHarpDeployment ? (harpSyncFunctions.?outputs.?functionAppNames ?? []) : []
+// output harpDatabaseNames array = enableHarpDeployment ? (harpSyncDatabase.?outputs.?database_names ?? []) : []
+// output sqlServerUAIId string = enableHarpDeployment ? harpSyncDatabase.?outputs.?outputsqlServerUAIID ?? '' : ''
 

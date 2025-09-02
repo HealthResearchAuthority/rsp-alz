@@ -47,6 +47,17 @@ var bastionSubnetPrefix = '172.18.2.0/26'
 var privateEndpointSubnetPrefix = '172.18.3.0/26'
 var functionAppSubnetPrefix = '172.18.4.0/26'
 
+module functionAppsNSG '../../shared/bicep/network/nsg.bicep' = {
+  name: 'functionapps-nsg'
+  scope: resourceGroup('VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D')
+  params: {
+    name: 'nsg-function-apps-dev-uks'
+    location: resourceGroup().location
+    tags: {}
+    securityRules: []
+  }
+}
+
 module vnet '../../shared/bicep/network/vnet.bicep' = {
   name: 'vnet-datawarehouse-deployment'
   params: {
@@ -88,6 +99,9 @@ module vnet '../../shared/bicep/network/vnet.bicep' = {
         properties: {
           addressPrefix: functionAppSubnetPrefix
           privateEndpointNetworkPolicies: 'Disabled'
+          networkSecurityGroup: {
+            id: functionAppsNSG.outputs.nsgId
+          }
           delegations: [
             {
               name: 'Microsoft.Web.serverFarms'

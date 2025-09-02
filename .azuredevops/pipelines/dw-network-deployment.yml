@@ -27,8 +27,8 @@ stages:
     condition: eq(variables['Build.Reason'], 'PullRequest')
 
     jobs:
-      - job: lint
-        displayName: 'Lint Datawarehouse Templates'
+      - job: setup
+        displayName: 'Checkout and Install Bicep'
         pool:
           vmImage: 'ubuntu-latest'
         steps:
@@ -37,6 +37,12 @@ stages:
               az bicep install
               az bicep version
             displayName: 'Install Bicep CLI'
+      - job: lint
+        displayName: 'Lint Datawarehouse Templates'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup]
+        steps:
           - bash: az bicep build --file ./7.datawarehouse/main.network.bicep
             displayName: 'Lint Bicep Templates'
 
@@ -44,14 +50,9 @@ stages:
         displayName: 'Validate Datawarehouse Bicep Templates'
         pool:
           vmImage: 'ubuntu-latest'
-        dependsOn: lint
+        dependsOn: [setup, lint]
         condition: succeeded()
         steps:
-          - checkout: self
-          - bash: |
-              az bicep install
-              az bicep version
-            displayName: 'Install Bicep CLI'
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(azureServiceConnection)
@@ -70,14 +71,9 @@ stages:
         displayName: 'Preview Network Deployment'
         pool:
           vmImage: 'ubuntu-latest'
-        dependsOn: [lint, validate]
+        dependsOn: [setup, lint, validate]
         condition: succeeded()
         steps:
-          - checkout: self
-          - bash: |
-              az bicep install
-              az bicep version
-            displayName: 'Install Bicep CLI'
           - task: AzureCLI@2
             displayName: 'What-If Analysis'
             inputs:
@@ -98,8 +94,8 @@ stages:
     dependsOn: []
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     jobs:
-      - job: PreDeploymentCheck
-        displayName: 'Pre-Deployment Validation'
+      - job: setup
+        displayName: 'Checkout and Install Bicep'
         pool:
           vmImage: 'ubuntu-latest'
         steps:
@@ -108,6 +104,12 @@ stages:
               az bicep install
               az bicep version
             displayName: 'Install Bicep CLI'
+      - job: PreDeploymentCheck
+        displayName: 'Pre-Deployment Validation'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup]
+        steps:
           - task: AzureCLI@2
             displayName: 'What-If Analysis'
             inputs:
@@ -126,18 +128,13 @@ stages:
         displayName: 'Deploy Datawarehouse Network'
         pool:
           vmImage: 'ubuntu-latest'
-        dependsOn: [PreDeploymentCheck]
+        dependsOn: [setup, PreDeploymentCheck]
         condition: succeeded()
         environment: 'datawarehouse-deployment'
         strategy:
           runOnce:
             deploy:
               steps:
-                - checkout: self
-                - bash: |
-                    az bicep install
-                    az bicep version
-                  displayName: 'Install Bicep CLI'
                 - task: AzureCLI@2
                   name: deployNetwork
                   displayName: 'Deploy Datawarehouse Network'

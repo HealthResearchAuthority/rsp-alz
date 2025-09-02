@@ -31,7 +31,7 @@ param userAssignedIdentities array = []
 @description('Environment name (dev, prod)')
 param environment string = 'dev'
 
-@description('Optional S1 is default. Defines the name, tier, size, family and capacity of the App Service Plan. Plans ending to _AZ, are deploying at least three instances in three Availability Zones. EP* is only for functions')
+@description('Defines the name, tier, size, family and capacity of the App Service Plan. Plans ending to _AZ, are deploying at least three instances in three Availability Zones. EP* is only for functions')
 @allowed([ 'B1','S1', 'S2', 'S3', 'P1V3', 'P2V3', 'P3V3', 'P1V3_AZ', 'P2V3_AZ', 'P3V3_AZ', 'EP1', 'EP2', 'EP3', 'ASE_I1V2_AZ', 'ASE_I2V2_AZ', 'ASE_I3V2_AZ', 'ASE_I1V2', 'ASE_I2V2', 'ASE_I3V2' ])
 param sku string
 
@@ -203,9 +203,6 @@ module functionAppsDeployment '../../shared/bicep/app-services/function-app.bice
     hasPrivateEndpoint: true
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     storageAccountName: funcApp.storageAccountName
-    // runtime: 'dotnet-isolated'
-    // runtimeVersion: '~4'
-    // dotnetVersion: '9.0'
     userAssignedIdentities: length(userAssignedIdentities) > 0 ? {
       type: 'UserAssigned'
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
@@ -215,26 +212,9 @@ module functionAppsDeployment '../../shared/bicep/app-services/function-app.bice
     appInsightId: appInsights.outputs.appInsResourceId
     kind: 'functionapp'
     virtualNetworkSubnetId: functionAppSubnet.id
-    // appSettings: concat([
-    //   {
-    //     name: 'FUNCTIONS_WORKER_RUNTIME'
-    //     value: 'dotnet-isolated'
-    //   }
-    //   {
-    //     name: 'FUNCTIONS_EXTENSION_VERSION'
-    //     value: '~4'
-    //   }
-    // ], !empty(sqlDBManagedIdentityClientId) ? [
-    //   {
-    //     name: 'AZURE_CLIENT_ID'
-    //     value: sqlDBManagedIdentityClientId
-    //   }
-    // ] : [])
   }
   dependsOn:  [
     storageAccounts
-    // storageBlobPrivateEndpoints
-    // storageFilePrivateEndpoints
   ]
 }]
 

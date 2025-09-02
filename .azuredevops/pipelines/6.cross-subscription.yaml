@@ -18,9 +18,9 @@ stages:
     displayName: 'PR Validation for Cross Subscription'
     condition: eq(variables['Build.Reason'], 'PullRequest')
     jobs:
-      - job: lint
-        displayName: 'Lint Cross Subscription Templates'
-        pool: 
+      - job: setup
+        displayName: 'Checkout and Install Bicep'
+        pool:
           vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
@@ -28,20 +28,21 @@ stages:
               az bicep install
               az bicep version
             displayName: 'Install Bicep CLI'
+      - job: lint
+        displayName: 'Lint Cross Subscription Templates'
+        pool: 
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup]
+        steps:
           - bash: az bicep build --file ./6.cross-subscription/main.bicep
 
       - job: validate
         displayName: 'Validate Cross Subscription Deployment'
         pool: 
           vmImage: 'ubuntu-latest'
-        dependsOn: [lint]
+        dependsOn: [setup, lint]
         condition: succeeded()
         steps:
-          - checkout: self
-          - bash: |
-              az bicep install
-              az bicep version
-            displayName: 'Install Bicep CLI'
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(azureServiceConnection)
@@ -55,14 +56,9 @@ stages:
         displayName: 'Preview Cross Subscription Deployments'
         pool: 
           vmImage: 'ubuntu-latest'
-        dependsOn: [lint, validate]
+        dependsOn: [setup, lint, validate]
         condition: succeeded()
         steps:
-          - checkout: self
-          - bash: |
-              az bicep install
-              az bicep version
-            displayName: 'Install Bicep CLI'
           - task: AzureCLI@2 
             inputs: 
               azureSubscription: $(azureServiceConnection)
@@ -85,9 +81,9 @@ stages:
     dependsOn: []
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     jobs:
-      - job: FinalWhatIf
-        displayName: 'Run What-If before Deployment'
-        pool: 
+      - job: setup
+        displayName: 'Checkout and Install Bicep'
+        pool:
           vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
@@ -95,7 +91,12 @@ stages:
               az bicep install
               az bicep version
             displayName: 'Install Bicep CLI'
-
+      - job: FinalWhatIf
+        displayName: 'Run What-If before Deployment'
+        pool: 
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup]
+        steps:
           - task: AzureCLI@2
             displayName: 'Final What-If' 
             inputs: 
@@ -118,19 +119,13 @@ stages:
         displayName: 'Deploy Cross Subscription'
         pool: 
           vmImage: 'ubuntu-latest'
-        dependsOn: [FinalWhatIf]
+        dependsOn: [setup, FinalWhatIf]
         condition: succeeded()
         environment: 'alz-bicep-deployment'
         strategy:
           runOnce:
             deploy:
               steps:
-                - checkout: self
-                - bash: |
-                    az bicep install
-                    az bicep version
-                  displayName: 'Install Bicep CLI'
-
                 - task: AzureCLI@2
                   displayName: 'Deploy Cross Subscription'
                   name: deploy
