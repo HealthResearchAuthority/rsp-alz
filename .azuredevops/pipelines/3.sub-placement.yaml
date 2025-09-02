@@ -27,11 +27,23 @@ stages:
             displayName: 'Install Bicep CLI'
           - bash: az bicep build --file ./3.sub-placement/main.bicep
 
+      - job: SAST
+        displayName: 'SAST Analysis'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        - checkout: self
+        - task: MicrosoftSecurityDevOps@1
+          displayName: 'Run SAST Analysis'
+          inputs:
+            tools: 'checkov,templateanalyzer'
+          workingDirectory: '3.sub-placement'
+
       - job: validate
         displayName: 'Validate Subscription-Placement Deployment'
         pool: 
           vmImage: 'ubuntu-latest'
-        dependsOn: [lint]
+        dependsOn: [lint, SAST]
         condition: succeeded()
         steps:
           - checkout: self

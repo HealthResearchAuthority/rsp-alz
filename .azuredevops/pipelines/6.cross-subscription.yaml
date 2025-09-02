@@ -30,11 +30,23 @@ stages:
             displayName: 'Install Bicep CLI'
           - bash: az bicep build --file ./6.cross-subscription/main.bicep
 
+      - job: SAST
+        displayName: 'SAST Analysis'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        - checkout: self
+        - task: MicrosoftSecurityDevOps@1
+          displayName: 'Run SAST Analysis'
+          inputs:
+            tools: 'checkov,templateanalyzer'
+          workingDirectory: '6.cross-subscription'
+
       - job: validate
         displayName: 'Validate Cross Subscription Deployment'
         pool: 
           vmImage: 'ubuntu-latest'
-        dependsOn: [lint]
+        dependsOn: [lint, SAST]
         condition: succeeded()
         steps:
           - checkout: self
