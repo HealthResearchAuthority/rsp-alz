@@ -125,7 +125,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
       }
     ] : []
     networkRuleSetIpRules: [for (ip, index) in varWhitelistIPs: {
-        ipAddress: '${ip}/32'
+        ipAddress: contains(ip, '/') ? ip : '${ip}/32'
         action: 'Allow'
         name: 'Allow-IP-${index + 1}'
         priority: 100 + index
