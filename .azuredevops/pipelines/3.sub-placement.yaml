@@ -115,6 +115,11 @@ stages:
           runOnce:
             deploy:
               steps:
+                - checkout: self
+                - bash: |
+                    az bicep install
+                    az bicep version
+                  displayName: 'Install Bicep CLI'
                 - task: AzureCLI@2 
                   name: 'deploy'
                   displayName: 'Deploy Sub Placement'

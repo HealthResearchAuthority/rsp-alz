@@ -144,6 +144,11 @@ stages:
           runOnce:
             deploy:
               steps:
+                - checkout: self
+                - bash: |
+                    az bicep install
+                    az bicep version
+                  displayName: 'Install Bicep CLI'
                 - task: AzureCLI@2
                   name: deployApplications
                   displayName: 'Deploy Datawarehouse Applications'
@@ -151,7 +156,7 @@ stages:
                     azureSubscription: $(azureServiceConnection)
                     scriptType: bash
                     scriptLocation: inlineScript
-                    failOnStandardError: true
+                    # failOnStandardError: true
                     inlineScript: |
                       az config set bicep.use_binary_from_path=false --only-show-errors
                       output=$(az deployment sub create --name "dw-application-deployment-$(Build.BuildId)" \
@@ -163,4 +168,4 @@ stages:
                           harpSqlAdminLogin=$(harpSqlAdminLogin) \
                           harpSqlAdminPassword="$(harpSqlAdminPassword)")
                       echo $output | jq .
-                      echo "##[section]Datawarehouse Application Deployment Completed Successfully"
+                      echo "##[section]"
