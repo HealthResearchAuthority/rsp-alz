@@ -11,7 +11,7 @@ pr:
       - '6.cross-subscription/**'
 
 variables:
-  - group: 'CrossSubscription-Keyvault'  # Service connection and other secrets
+  - group: 'CrossSubscription'  # Variable group with parameters for cross subscription connect to Keyvault
 
 stages:
   - stage: PRValidation
@@ -49,7 +49,7 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 az config set bicep.use_binary_from_path=false --only-show-errors
-                az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIds=$(ServiceIDsforCrossSubscription)
+                az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto)
 
       - job: preview
         displayName: 'Preview Cross Subscription Deployments'
@@ -76,7 +76,7 @@ stages:
                   --management-group-id $(management-group-id) \
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                        paramserviceIds=$(ServiceIDsforCrossSubscription) \
+                        paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
@@ -85,6 +85,15 @@ stages:
     dependsOn: []
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     jobs:
+      - job: setup
+        displayName: 'Get Devops Public IP'
+        steps:
+          - bash: | 
+              ipaddress=$(curl -s http://ipinfo.io/ip)
+              ipaddressipify=$(curl -s https://api.ipify.org)
+              echo "##vso[task.setvariable variable=ipaddress;isOutput=true;]$ipaddress"
+              echo "##vso[task.setvariable variable=ipaddressipify;isOutput=true;]$ipaddressipify"
+            name: fetchPublicIP
       - job: FinalWhatIf
         displayName: 'Run What-If before Deployment'
         pool: 
@@ -110,7 +119,7 @@ stages:
                   --management-group-id $(management-group-id) \
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                        paramserviceIds=$(ServiceIDsforCrossSubscription) \
+                        paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
@@ -120,6 +129,9 @@ stages:
           vmImage: 'ubuntu-latest'
         dependsOn: [FinalWhatIf]
         condition: succeeded()
+        variables:
+          - name: devOpsPublicIP
+            value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
         environment: 'alz-bicep-deployment'
         strategy:
           runOnce:
@@ -130,7 +142,6 @@ stages:
                     az bicep install
                     az bicep version
                   displayName: 'Install Bicep CLI'
-
                 - task: AzureCLI@2
                   displayName: 'Deploy Cross Subscription'
                   name: deploy
@@ -148,7 +159,7 @@ stages:
                         --template-file ./6.cross-subscription/main.bicep \
                         --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                               manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                              paramserviceIds=$(ServiceIDsforCrossSubscription) \
+                              paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
                               storageSubscriptionId="$(storageSubscriptionId)" \
                               devboxSubscriptionId="$(devboxSubscriptionId)")
                       echo "Full Bicep Deployment Output:"
