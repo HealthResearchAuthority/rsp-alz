@@ -108,7 +108,7 @@ var keyValues = [
   }
   {
     name: 'AppSettings:AuthSettings:AuthCookieTimeout$portal' // Auth cookie timeout in seconds
-    value: 900
+    value: 3600
     contentType: null
   }
   {
@@ -173,7 +173,7 @@ var keyValues = [
   }
   {
     name: 'AppSettings:OneLogin:AuthCookieTimeout$portal' // Auth cookie timeout for Gov UK One Login in seconds
-    value: 900
+    value: 3600
     contentType: null
   }
   {
@@ -188,7 +188,7 @@ var keyValues = [
   }
   {
     name: 'AppSettings:SessionTimeout$portal' // Session timeout in seconds
-    value: 900
+    value: 3600
     contentType: null
   }
   {

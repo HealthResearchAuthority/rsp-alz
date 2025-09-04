@@ -38,8 +38,8 @@ param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
 param parEnableFrontDoorPrivateLink = true
 param parEnableFunctionAppPrivateEndpoints = true
-param parEnableKeyVaultPrivateEndpoints = false
-param parEnableAppConfigPrivateEndpoints = false
+param parEnableKeyVaultPrivateEndpoints = true
+param parEnableAppConfigPrivateEndpoints = true
 param parFrontDoorCustomDomains = []
 
 param parDefenderForStorageConfig = {
@@ -124,9 +124,9 @@ param parSpokeNetworks = [
     zoneRedundancy: false
     ddosProtectionEnabled: 'Disabled'
     containerRegistryTier: 'Premium'
-    deploy: false
-    configurePrivateDNS: false
-    devBoxPeering: false
+    deploy: true
+    configurePrivateDNS: true
+    devBoxPeering: true
     rgNetworking: 'rg-rsp-networking-spoke-systemtest-uks'
     vnet: 'vnet-rsp-networking-manualtest-uks-spoke'
     rgapplications: 'rg-rsp-applications-spoke-systemtest-uks'
@@ -142,7 +142,7 @@ param parStorageAccountName = 'strrspstg'
 param parStorageAccountKey = ''
 
 // Allowed hosts for the systemtest_manual environment to be used when the Web App is behind Front Door
-param parAllowedHosts = '*'
+param parAllowedHosts = 'fd-rsp-applications-manualtest-uks-a9ducvbchybpasgn.a01.azurefd.net;irasportal-manualtest.azurewebsites.net'
 
 // indicates whether to use Front Door for the systemtest_manual environment
 param parUseFrontDoor = true
