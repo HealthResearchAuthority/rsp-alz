@@ -145,10 +145,10 @@ param parStorageAccountKey = ''
 param parAllowedHosts = '*'
 
 // indicates whether to use Front Door for the systemtest_auto environment
-param parUseFrontDoor = false
+param parUseFrontDoor = true
 
 @description('Indicates whether to use One Login for the application')
-param useOneLogin = false
+param useOneLogin = true
 
 param paramWhitelistIPs =  ''
 

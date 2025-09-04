@@ -146,7 +146,7 @@ param parClarityProjectId = ''
 param parAllowedHosts = '*'
 
 // indicates whether to use Front Door for the systemtest_manual environment
-param parUseFrontDoor = false
+param parUseFrontDoor = true
 
 @description('Indicates whether to use One Login for the application')
 param useOneLogin = true

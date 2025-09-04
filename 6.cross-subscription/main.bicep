@@ -8,7 +8,13 @@ targetScope = 'managementGroup'
 param paramvnetPeeringsVNetIDs string
 
 @description('The IDs of the Azure service to be used for the private endpoint.')
-param paramserviceIds string
+param paramserviceIdsdev string
+
+@description('The IDs of the Azure service to be used for the private endpoint.')
+param paramserviceIdsauto string
+
+@description('The IDs of the Azure service to be used for the private endpoint.')
+param paramserviceIdsmanual string
 
 @description('VNet ID under managed devops pool subscription where the VNet peering will be created.')
 param manageddevopspoolVnetID string
@@ -53,7 +59,11 @@ var vnetInfoArray = [
   }
 ]
 
-var pepServiceIDArray = split(paramserviceIds, ',')
+var pepServiceIDArraydev = split(paramserviceIdsdev, ',')
+var pepServiceIDArrayauto = split(paramserviceIdsauto, ',')
+var pepServiceIDArraymanual = split(paramserviceIdsmanual, ',')
+
+var allserviceIDs = union(pepServiceIDArraydev, pepServiceIDArrayauto, pepServiceIDArraymanual)
 
 @description('Deploy VNet Peering')
 module vnetpeeringmodule 'modules/vnetpeering/vnetpeering.bicep' = {
@@ -72,7 +82,7 @@ module privateNetworking 'modules/privatenetworking/privatenetworking.bicep' = {
   scope: subscription(managementSubscriptionId)
   params: {
     sourceVNetID: manageddevopspoolVnetID
-    serviceIds: pepServiceIDArray
+    serviceIds: allserviceIDs
     managementSubscriptionId: managementSubscriptionId
     managementResourceGroupName: managementResourceGroupName
   }
@@ -94,6 +104,6 @@ module devboxStorageEndpoints 'modules/devbox-storage-endpoints/devbox-storage-e
   }
 }
 
-output serviceIDs array = [for serviceId in pepServiceIDArray: {
+output serviceIDs array = [for serviceId in allserviceIDs: {
   serviceId: serviceId
 }]

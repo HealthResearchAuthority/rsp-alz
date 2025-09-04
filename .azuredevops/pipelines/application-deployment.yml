@@ -43,7 +43,7 @@ stages:
 
       - job: lint
         displayName: 'Lint Application Templates'
-        dependsOn: [setup]
+        dependsOn: setup
         pool:
           name: rsp-manageddevopspool
         steps:
@@ -81,6 +81,7 @@ stages:
           - name: devOpsPublicIP
             value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
           - group: ${{ parameters.env }}
+          - group: ${{ parameters.env }}-keyvault
         steps:
           - checkout: self
           - script: |
@@ -117,6 +118,7 @@ stages:
           - name: devOpsPublicIP
             value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
           - group: ${{ parameters.env }}
+          - group: ${{ parameters.env }}-keyvault
         steps:
           - checkout: self
           - script: |
@@ -172,6 +174,7 @@ stages:
           - name: devOpsPublicIP
             value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
           - group: ${{ parameters.env }}
+          - group: ${{ parameters.env }}-keyvault
         steps:
           - checkout: self
           - script: |
@@ -212,6 +215,7 @@ stages:
           - name: devOpsIPIFYPublicIP
             value: $[dependencies.setup.outputs['fetchPublicIP.ipaddressipify']]
           - group: ${{ parameters.env }}
+          - group: ${{ parameters.env }}-keyvault
         strategy:
           runOnce:
             deploy:
