@@ -16,10 +16,9 @@ stages:
     displayName: 'PR Validation for Core Services'
     condition: eq(variables['Build.Reason'], 'PullRequest')
     jobs:
-      # The lint job performs linting on the bicep code
-      - job: lint
-        displayName: 'Lint Core Services Templates'
-        pool: 
+      - job: setup
+        displayName: 'Checkout and Install Bicep'
+        pool:
           vmImage: 'ubuntu-latest'
         steps:
           - checkout: self
@@ -27,6 +26,13 @@ stages:
               az bicep install
               az bicep version
             displayName: 'Install Bicep CLI'
+
+      - job: lint
+        displayName: 'Lint Core Services Templates'
+        pool: 
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup]
+        steps:
           - bash: az bicep build --file ./1.core-services/main.bicep
 
       - job: SAST
@@ -47,14 +53,9 @@ stages:
         displayName: 'Validate Core Services Deployment'
         pool: 
           vmImage: 'ubuntu-latest'
-        dependsOn: [lint, SAST]
+        dependsOn: [setup, lint, SAST]
         condition: succeeded()
         steps:
-          - checkout: self
-          - bash: |
-              az bicep install
-              az bicep version
-            displayName: 'Install Bicep CLI'
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(azureServiceConnection)
@@ -68,14 +69,9 @@ stages:
         displayName: 'Preview Core Services Deployment'
         pool: 
           vmImage: 'ubuntu-latest'
-        dependsOn: [lint, validate]
+        dependsOn: [setup, lint, validate]
         condition: succeeded()
         steps:
-          - checkout: self
-          - bash: |
-              az bicep install
-              az bicep version
-            displayName: 'Install Bicep CLI'
           - task: AzureCLI@2 
             inputs: 
               azureSubscription: $(azureServiceConnection)
@@ -94,8 +90,8 @@ stages:
     dependsOn: []
     condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
     jobs:
-      - job: FinalWhatIf
-        displayName: 'Run What-If before Deployment'
+      - job: setup
+        displayName: 'Checkout and Install Bicep'
         pool:
           vmImage: 'ubuntu-latest'
         steps:
@@ -104,6 +100,12 @@ stages:
               az bicep install
               az bicep version
             displayName: 'Install Bicep CLI'
+      - job: FinalWhatIf
+        displayName: 'Run What-If before Deployment'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup]
+        steps:
 
           - task: AzureCLI@2 
             displayName: 'Final What-If'
@@ -124,7 +126,7 @@ stages:
         displayName: 'Deploy Core Services'
         pool:
           vmImage: 'ubuntu-latest'
-        dependsOn: [FinalWhatIf]
+        dependsOn: [setup, FinalWhatIf]
         condition: succeeded()
         environment: 'alz-bicep-deployment'
         strategy:
@@ -136,7 +138,6 @@ stages:
                     az bicep install
                     az bicep version
                   displayName: 'Install Bicep CLI'
-
                 - task: AzureCLI@2 
                   name: 'deploy'
                   displayName: 'Deploy Core Services'

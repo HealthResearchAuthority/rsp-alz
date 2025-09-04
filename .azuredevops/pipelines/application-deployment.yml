@@ -43,7 +43,7 @@ stages:
 
       - job: lint
         displayName: 'Lint Application Templates'
-        dependsOn: setup
+        dependsOn: [setup]
         pool:
           name: rsp-manageddevopspool
         steps:
