@@ -239,7 +239,7 @@ stages:
                                     parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                                     paramWhitelistIPs=$(parWhitelistIPs) \
                                     parClarityProjectId=$(clarityProjectId) \ 
-                                    parOneLoginPrivateKeyPem="$(oneLoginPrivateKeyPem)" \
+                                    parOneLoginPrivateKeyPem=$(oneLoginPrivateKeyPem) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
