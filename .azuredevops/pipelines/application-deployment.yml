@@ -64,7 +64,6 @@ stages:
           name: rsp-manageddevopspool
         dependsOn: setup
         steps:
-        - checkout: self
         - task: MicrosoftSecurityDevOps@1
           displayName: 'Run SAST Analysis'
           inputs:

@@ -48,11 +48,24 @@ stages:
           - bash: az bicep build --file ./7.datawarehouse/main.application.bicep
             displayName: 'Lint Bicep Templates'
 
+      - job: SAST
+        displayName: 'SAST Analysis'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        - task: MicrosoftSecurityDevOps@1
+          displayName: 'Run SAST Analysis'
+          inputs:
+            tools: 'checkov,templateanalyzer'
+            artifactName: 'CodeAnalysisLogs'
+          env:
+            GDN_RUN_WORKINGDIRECTORY: '7.datawarehouse'
+
       - job: validate
         displayName: 'Validate Datawarehouse Bicep Templates'
         pool:
           vmImage: 'ubuntu-latest'
-        dependsOn: [setup, lint]
+        dependsOn: [setup, lint, SAST]
         condition: succeeded()
         steps:
           - task: AzureCLI@2
