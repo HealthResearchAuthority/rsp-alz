@@ -47,12 +47,26 @@ stages:
         dependsOn: [setup]
         steps:
           - bash: az bicep build --file ./5.spoke-network/main.network.bicep
+      
+      - job: SAST
+        displayName: 'SAST Analysis'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        - task: MicrosoftSecurityDevOps@1
+          displayName: 'Run SAST Analysis'
+          inputs:
+            tools: 'checkov,templateanalyzer'
+            artifactName: 'CodeAnalysisLogs'
+          env:
+            GDN_RUN_WORKINGDIRECTORY: '5.spoke-network'
+        
 
       - job: validate
         displayName: 'Validate Network Deployment'
         pool:
           vmImage: 'ubuntu-latest'
-        dependsOn: [setup, lint]
+        dependsOn: [setup, lint, SAST]
         condition: succeeded()
         variables:
           - group: ${{ parameters.env }}

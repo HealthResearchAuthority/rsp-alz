@@ -57,12 +57,25 @@ stages:
               az bicep version
             displayName: 'Install Bicep CLI'
           - bash: az bicep build --file ./5.spoke-network/main.application.bicep
+      
+      - job: SAST
+        displayName: 'SAST Analysis'
+        pool:
+          name: rsp-manageddevopspool
+        dependsOn: setup
+        steps:
+        - task: MicrosoftSecurityDevOps@1
+          displayName: 'Run SAST Analysis'
+          inputs:
+            tools: 'checkov,templateanalyzer'
+            artifactName: 'CodeAnalysisLogs'
+        
 
       - job: validate
         displayName: 'Validate Application Deployment'
         pool:
           name: rsp-manageddevopspool
-        dependsOn: [setup, lint]
+        dependsOn: [setup, lint, SAST]
         condition: succeeded()
         variables:
           - name: devOpsPublicIP
@@ -93,8 +106,7 @@ stages:
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                               paramWhitelistIPs=$(parWhitelistIPs) \
-                              parClarityProjectId=$(clarityProjectId) \
-                              parOneLoginPrivateKeyPem = "$(oneLoginPrivateKeyPem)"
+                              parClarityProjectId=$(clarityProjectId)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -131,8 +143,8 @@ stages:
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                               paramWhitelistIPs=$(parWhitelistIPs) \
-                              parClarityProjectId=$(clarityProjectId) \
-                              parOneLoginPrivateKeyPem="$(oneLoginPrivateKeyPem)"
+                              parClarityProjectId=$(clarityProjectId)
+
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment of Applications'
@@ -188,8 +200,7 @@ stages:
                               parClientID=$(clientID) parClientSecret=$(clientSecret) \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
-                              paramWhitelistIPs=$(parWhitelistIPs) parClarityProjectId=$(clarityProjectId) \
-                              parOneLoginPrivateKeyPem="$(oneLoginPrivateKeyPem)"
+                              paramWhitelistIPs=$(parWhitelistIPs) parClarityProjectId=$(clarityProjectId)
 
       - deployment: deploy
         displayName: 'Deploy Applications'
@@ -238,8 +249,7 @@ stages:
                                     logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                                     parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                                     paramWhitelistIPs=$(parWhitelistIPs) \
-                                    parClarityProjectId=$(clarityProjectId) \ 
-                                    parOneLoginPrivateKeyPem=$(oneLoginPrivateKeyPem) \
+                                    parClarityProjectId=$(clarityProjectId) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
