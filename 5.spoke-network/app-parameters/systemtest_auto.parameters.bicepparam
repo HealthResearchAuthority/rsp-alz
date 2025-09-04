@@ -29,7 +29,7 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 param parSqlAuditRetentionDays = 15
 
 // Azure Front Door Configuration
-param parEnableFrontDoor = false
+param parEnableFrontDoor = true
 param parFrontDoorWafMode = 'Detection'
 param parEnableFrontDoorRateLimiting = true
 param parFrontDoorRateLimitThreshold = 1000
@@ -145,10 +145,10 @@ param parStorageAccountKey = ''
 param parAllowedHosts = '*'
 
 // indicates whether to use Front Door for the systemtest_auto environment
-param parUseFrontDoor = false
+param parUseFrontDoor = true
 
 @description('Indicates whether to use One Login for the application')
-param useOneLogin = false
+param useOneLogin = true
 
 param paramWhitelistIPs =  ''
 

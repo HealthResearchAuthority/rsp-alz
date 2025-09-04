@@ -137,12 +137,12 @@ resource sqldatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [fo
     name: 'GP_S_Gen5'
     tier: 'GeneralPurpose'
     family: 'Gen5'
-    capacity: 12
+    capacity: 6
     size: '6GB'
   }
   properties: {
     createMode: 'Default'
-    minCapacity: 6
+    minCapacity: 4
     zoneRedundant: false
   }
 }]

@@ -81,6 +81,7 @@ stages:
           - name: devOpsPublicIP
             value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
           - group: ${{ parameters.env }}
+          - group: ${{ parameters.env }}-keyvault
         steps:
           - checkout: self
           - script: |
@@ -91,6 +92,7 @@ stages:
               az bicep install
               az bicep version
             displayName: 'Install Bicep CLI'
+
           - task: AzureCLI@2
             inputs:
               azureSubscription: $(${{ parameters.env }})
@@ -117,6 +119,7 @@ stages:
           - name: devOpsPublicIP
             value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
           - group: ${{ parameters.env }}
+          - group: ${{ parameters.env }}-keyvault
         steps:
           - checkout: self
           - script: |
@@ -151,9 +154,20 @@ stages:
     jobs:
       - job: setup
         displayName: 'Get DevOps Public IP'
+        variables:
+          - group: ${{ parameters.env }}
+          - group: ${{ parameters.env }}-keyvault
         pool:
           name: rsp-manageddevopspool
         steps:
+          - bash: | 
+              echo "$(parWhitelistIPs)"
+            name: parWhitelistIPs
+            displayName: 'WhitelistIPs'
+          - bash: | 
+              echo "$(clarityProjectId)"
+            name: clarityProjectId
+            displayName: 'Clarity Project ID'
           - bash: | 
               ipaddress=$(curl -s http://ipinfo.io/ip)
               ipaddressipify=$(curl -s https://api.ipify.org)
@@ -172,6 +186,7 @@ stages:
           - name: devOpsPublicIP
             value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
           - group: ${{ parameters.env }}
+          - group: ${{ parameters.env }}-keyvault
         steps:
           - checkout: self
           - script: |
@@ -212,6 +227,7 @@ stages:
           - name: devOpsIPIFYPublicIP
             value: $[dependencies.setup.outputs['fetchPublicIP.ipaddressipify']]
           - group: ${{ parameters.env }}
+          - group: ${{ parameters.env }}-keyvault
         strategy:
           runOnce:
             deploy:
