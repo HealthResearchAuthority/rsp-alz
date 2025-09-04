@@ -1,0 +1,160 @@
+# This workflow will deploy the network resources
+name: datawarehouse-network-deployment
+trigger: none
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - '7.datawarehouse/main.network.bicep'
+      - '7.datawarehouse/network-parameters/**'
+
+variables:
+  - group: 'datawarehouse'
+
+parameters:
+  - name: env
+    displayName: Environment
+    type: string
+    default: dev
+    values:
+      - dev
+
+stages:
+  - stage: PRValidation
+    displayName: 'PR Validation for Datawarehouse Network'
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+
+    jobs:
+      - job: setup
+        displayName: 'Checkout and Install Bicep'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+      - job: lint
+        displayName: 'Lint Datawarehouse Templates'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup]
+        steps:
+          - bash: az bicep build --file ./7.datawarehouse/main.network.bicep
+            displayName: 'Lint Bicep Templates'
+
+      - job: validate
+        displayName: 'Validate Datawarehouse Bicep Templates'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup, lint]
+        condition: succeeded()
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub validate --name "DatawarehouseNetwork-Validation-$(Build.BuildId)" \
+                  --location $(location) \
+                  --template-file ./7.datawarehouse/main.network.bicep \
+                  --parameters ./7.datawarehouse/network-parameters/${{ parameters.env }}.parameters.bicepparam \
+                                GatewayIp=$(GatewayIp) \
+                                bgpPeeringAddress=$(bgpPeeringAddress)
+
+      - job: preview
+        displayName: 'Preview Network Deployment'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup, lint, validate]
+        condition: succeeded()
+        steps:
+          - task: AzureCLI@2
+            displayName: 'What-If Analysis'
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub what-if \
+                  --location $(location) \
+                  --template-file ./7.datawarehouse/main.network.bicep \
+                  --parameters ./7.datawarehouse/network-parameters/${{ parameters.env }}.parameters.bicepparam \
+                                GatewayIp=$(GatewayIp) \
+                                bgpPeeringAddress=$(bgpPeeringAddress)
+
+  - stage: ManualDeployment
+    displayName: 'Manual Deployment - Datawarehouse Network'
+    dependsOn: []
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - job: setup
+        displayName: 'Checkout and Install Bicep'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+      - job: PreDeploymentCheck
+        displayName: 'Pre-Deployment Validation'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup]
+        steps:
+          - task: AzureCLI@2
+            displayName: 'What-If Analysis'
+            inputs:
+              azureSubscription: $(azureServiceConnection)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub what-if \
+                  --location $(location) \
+                  --template-file ./7.datawarehouse/main.network.bicep \
+                  --parameters ./7.datawarehouse/network-parameters/${{ parameters.env }}.parameters.bicepparam \
+                                GatewayIp=$(GatewayIp) \
+                                bgpPeeringAddress=$(bgpPeeringAddress)
+      - deployment: deployNetwork
+        displayName: 'Deploy Datawarehouse Network'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup, PreDeploymentCheck]
+        condition: succeeded()
+        environment: 'datawarehouse-deployment'
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - bash: |
+                    az bicep install
+                    az bicep version
+                  displayName: 'Install Bicep CLI'
+                - task: AzureCLI@2
+                  name: deployNetwork
+                  displayName: 'Deploy Datawarehouse Network'
+                  inputs:
+                    azureSubscription: $(azureServiceConnection)
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    # failOnStandardError: true
+                    inlineScript: |
+                      az config set bicep.use_binary_from_path=false --only-show-errors
+                      output=$(az deployment sub create --name "dw-network-deployment-$(Build.BuildId)" \
+                        --location $(location) \
+                        --template-file ./7.datawarehouse/main.network.bicep \
+                        --parameters ./7.datawarehouse/network-parameters/${{ parameters.env }}.parameters.bicepparam \
+                        GatewayIp=$(GatewayIp) \
+                        bgpPeeringAddress=$(bgpPeeringAddress))
+                      echo $output | jq .
+                      echo "##[section]"
