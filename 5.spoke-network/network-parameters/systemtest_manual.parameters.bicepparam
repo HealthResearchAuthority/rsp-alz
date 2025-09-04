@@ -25,3 +25,5 @@ param parSpokeNetworks = [
     }
   }
 ]
+
+param logAnalyticsWorkspaceId =  ''
