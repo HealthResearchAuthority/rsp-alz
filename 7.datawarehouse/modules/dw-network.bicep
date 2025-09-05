@@ -46,6 +46,8 @@ var gatewaySubnetPrefix = '172.18.1.0/27'
 var bastionSubnetPrefix = '172.18.2.0/26'
 var privateEndpointSubnetPrefix = '172.18.3.0/26'
 var functionAppSubnetPrefix = '172.18.4.0/26'
+var remoteDbSubnetPrefix = '10.10.1.0/24'
+var devboxSubnetPrefix = '10.0.0.0/24'
 
 module functionAppsNSG '../../shared/bicep/network/nsg.bicep' = {
   name: 'functionapps-nsg'
@@ -221,13 +223,40 @@ resource connection 'Microsoft.Network/connections@2024-05-01' = {
     routingWeight: 0
     enableBgp: false
     useLocalAzureIpAddress: false
-    usePolicyBasedTrafficSelectors: false
+    usePolicyBasedTrafficSelectors: true
     expressRouteGatewayBypass: false
     enablePrivateLinkFastPath: false
     dpdTimeoutSeconds: 45
     connectionMode: 'Default'
+    trafficSelectorPolicies: [
+      {
+        localAddressRanges: [
+          functionAppSubnetPrefix
+        ]
+        remoteAddressRanges: [
+          remoteDbSubnetPrefix
+        ]
+      }
+      {
+        localAddressRanges: [
+          devboxSubnetPrefix
+        ]
+        remoteAddressRanges: [
+          remoteDbSubnetPrefix
+        ]
+      }
+      {
+        localAddressRanges: [
+          dataSubnetPrefix
+        ]
+        remoteAddressRanges: [
+          remoteDbSubnetPrefix
+        ]
+      }
+    ]
   }
 }
+
 
 resource vnetResource 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
   name: vnetName
