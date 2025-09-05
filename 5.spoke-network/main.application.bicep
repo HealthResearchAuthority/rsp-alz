@@ -713,7 +713,7 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
     name: take('cmsApp-${deployment().name}-deployment', 64)
     params: {
       tags: {}
-      sku: 'B1'
+      sku: 'B3'
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
       appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
