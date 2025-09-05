@@ -218,7 +218,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     hostNameSslStates: hostNameSslStates
     hyperV: false
     redundancyMode: redundancyMode
-    publicNetworkAccess: hasPrivateLink ? 'Disabled' : 'Enabled'
+    publicNetworkAccess: 'Enabled' //hasPrivateLink ? 'Disabled' : 'Enabled'
     
   }
 }
