@@ -29,7 +29,7 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 param parSqlAuditRetentionDays = 15
 
 // Azure Front Door Configuration
-param parEnableFrontDoor = false
+param parEnableFrontDoor = true
 param parFrontDoorWafMode = 'Detection'
 param parEnableFrontDoorRateLimiting = true
 param parFrontDoorRateLimitThreshold = 1000
@@ -38,7 +38,7 @@ param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
 param parEnableFrontDoorPrivateLink = true
 param parEnableFunctionAppPrivateEndpoints = true
-param parEnableKeyVaultPrivateEndpoints = false
+param parEnableKeyVaultPrivateEndpoints = true
 param parEnableAppConfigPrivateEndpoints = false
 param parFrontDoorCustomDomains = []
 
@@ -126,7 +126,7 @@ param parSpokeNetworks = [
     containerRegistryTier: 'Premium'
     deploy: false
     configurePrivateDNS: false
-    devBoxPeering: false
+    devBoxPeering: true
     rgNetworking: 'rg-rsp-networking-spoke-systemtestauto-uks'
     vnet: 'vnet-rsp-networking-automationtest-uks-spoke'
     rgapplications: 'rg-rsp-applications-spoke-systemtestauto-uks'
@@ -142,7 +142,7 @@ param parStorageAccountName = 'strrspstg'
 param parStorageAccountKey = ''
 
 // Allowed hosts for the systemtest_auto environment to be used when the Web App is behind Front Door
-param parAllowedHosts = '*'
+param parAllowedHosts = 'fd-rsp-applications-automationtest-uks-e7f6hkg3c5edhxex.a03.azurefd.net;irasportal-automationtest.azurewebsites.net'
 
 // indicates whether to use Front Door for the systemtest_auto environment
 param parUseFrontDoor = true

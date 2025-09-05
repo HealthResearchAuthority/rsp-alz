@@ -29,7 +29,7 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 param parSqlAuditRetentionDays = 15
 
 // Azure Front Door Configuration
-param parEnableFrontDoor = false
+param parEnableFrontDoor = true
 param parFrontDoorWafMode = 'Detection'
 param parEnableFrontDoorRateLimiting = true
 param parFrontDoorRateLimitThreshold = 1000
@@ -37,9 +37,9 @@ param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
 param parEnableFrontDoorPrivateLink = true
-param parEnableFunctionAppPrivateEndpoints = false
-param parEnableKeyVaultPrivateEndpoints = false
-param parEnableAppConfigPrivateEndpoints = false
+param parEnableFunctionAppPrivateEndpoints = true
+param parEnableKeyVaultPrivateEndpoints = true
+param parEnableAppConfigPrivateEndpoints = true
 param parFrontDoorCustomDomains = []
 
 param parDefenderForStorageConfig = {
@@ -124,9 +124,9 @@ param parSpokeNetworks = [
     zoneRedundancy: false
     ddosProtectionEnabled: 'Disabled'
     containerRegistryTier: 'Premium'
-    deploy: false
-    configurePrivateDNS: false
-    devBoxPeering: false
+    deploy: true
+    configurePrivateDNS: true
+    devBoxPeering: true
     rgNetworking: 'rg-rsp-networking-spoke-systemtest-uks'
     vnet: 'vnet-rsp-networking-manualtest-uks-spoke'
     rgapplications: 'rg-rsp-applications-spoke-systemtest-uks'
@@ -140,14 +140,16 @@ param parSpokeNetworks = [
 
 param parStorageAccountName = 'strrspstg'
 param parStorageAccountKey = ''
-param parClarityProjectId = ''
 
 // Allowed hosts for the systemtest_manual environment to be used when the Web App is behind Front Door
-param parAllowedHosts = '*'
+param parAllowedHosts = 'fd-rsp-applications-manualtest-uks-a9ducvbchybpasgn.a01.azurefd.net;irasportal-manualtest.azurewebsites.net'
 
 // indicates whether to use Front Door for the systemtest_manual environment
 param parUseFrontDoor = true
 
 @description('Indicates whether to use One Login for the application')
 param useOneLogin = true
+
 param paramWhitelistIPs = ''
+
+param parClarityProjectId = ''
