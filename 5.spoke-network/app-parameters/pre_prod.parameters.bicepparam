@@ -89,6 +89,27 @@ param parStorageConfig = {
   }
 }
 
+// SKU configuration for all resource types - Pre-Production environment (production-like)
+param parSkuConfig = {
+  appServicePlan: {
+    webApp: 'P1V3'      // Premium tier for production-like performance
+    functionApp: 'P1V3' // Premium tier for functions
+    cmsApp: 'P1V3'      // Premium tier for CMS
+  }
+  sqlDatabase: {
+    name: 'GP_Gen5'             // General Purpose (non-serverless)
+    tier: 'GeneralPurpose'       // General Purpose tier
+    family: 'Gen5'               // Gen5 hardware
+    capacity: 12                 // 12 vCores for pre-production
+    minCapacity: 8               // Higher minimum capacity
+    storageSize: '100GB'         // Larger storage for pre-prod
+    zoneRedundant: true          // Zone redundancy enabled
+  }
+  keyVault: 'standard'           // Standard tier (premium if HSM needed)
+  appConfiguration: 'standard'   // Standard tier
+  frontDoor: 'Premium_AzureFrontDoor'  // Premium for advanced features
+}
+
 // Network security configuration for pre-production environment
 param parNetworkSecurityConfig = {
   defaultAction: 'Deny'        

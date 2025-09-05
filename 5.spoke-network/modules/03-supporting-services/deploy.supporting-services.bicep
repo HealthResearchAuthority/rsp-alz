@@ -84,6 +84,12 @@ param paramWhitelistIPs string = ''
 @description('The key for the Microsot Clarity project this is associated with.')
 param clarityProjectId string
 
+@description('Key Vault SKU')
+param keyVaultSku string = 'standard'
+
+@description('App Configuration SKU')
+param appConfigurationSku string = 'standard'
+
 // ------------------
 // Varaibles
 // ------------------
@@ -146,6 +152,7 @@ module keyVault './modules/key-vault.bicep' = {
     privateDnsZoneName: keyVaultPrivateDnsZoneName
     keyVaultUserAssignedIdentityName: resourcesNames.keyVaultUserAssignedIdentity
     networkRuleSetIpRules: allAllowedIPs
+    keyVaultSku: keyVaultSku
   }
 }
 
@@ -178,6 +185,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     enablePrivateEndpoints: enableAppConfigPrivateEndpoints
     useOneLogin: useOneLogin
     clarityProjectId: clarityProjectId
+    appConfigurationSku: appConfigurationSku
   }
 }
 

@@ -73,6 +73,9 @@ param useOneLogin bool
 @description('The key for the Microsot Clarity project this is associated with.')
 param clarityProjectId string
 
+@description('App Configuration SKU name')
+param appConfigurationSku string = 'standard'
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -316,7 +319,7 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
   name: configStoreName
   location: location
   sku: {
-    name: 'standard'
+    name: appConfigurationSku
   }
   identity: {
     type: 'UserAssigned'

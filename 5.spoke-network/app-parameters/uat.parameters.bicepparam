@@ -6,6 +6,26 @@ param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
 
+param parIrasContainerImageTag = 'rsp-irasservice:latest'
+
+param parUserServiceContainerImageTag = 'rsp-usermanagementservice:latest'
+
+param parQuestionSetContainerImageTag = 'rsp-questionsetservice:latest'
+
+param parRtsContainerImageTag = 'rsp-rtsservice:latest'
+
+param parClientID = ''
+
+param parClientSecret = ''
+
+param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
+
+param parOneLoginPrivateKeyPem = ''
+
+param parOneLoginClientId = 'WlsPS-_Zpm64UhTpf5zj9_BnAN4'
+
+param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
+
 param parSqlAuditRetentionDays = 15
 
 // Azure Front Door Configuration
@@ -88,6 +108,27 @@ param parStorageConfig = {
   }
 }
 
+// SKU configuration for all resource types - UAT environment (balanced performance/cost)
+param parSkuConfig = {
+  appServicePlan: {
+    webApp: 'S2'        // Standard tier for better performance
+    functionApp: 'S1'   // Standard tier for functions
+    cmsApp: 'S1'        // Standard tier for CMS
+  }
+  sqlDatabase: {
+    name: 'GP_Gen5'             // General Purpose (non-serverless)
+    tier: 'GeneralPurpose'       // General Purpose tier
+    family: 'Gen5'               // Gen5 hardware
+    capacity: 8                  // 8 vCores for UAT performance
+    minCapacity: 4               // Minimum capacity
+    storageSize: '32GB'          // More storage for UAT
+    zoneRedundant: true          // Zone redundancy for UAT
+  }
+  keyVault: 'standard'           // Standard tier
+  appConfiguration: 'standard'   // Standard tier
+  frontDoor: 'Premium_AzureFrontDoor'  // Premium for advanced features
+}
+
 // Network security configuration for UAT environment
 param parNetworkSecurityConfig = {
   defaultAction: 'Deny'        
@@ -113,5 +154,23 @@ param parSpokeNetworks = [
     rgSharedServices: 'rg-rsp-sharedservices-spoke-uat-uks'
     rgStorage: 'rg-rsp-storage-spoke-uat-uks'
     deployWebAppSlot: false
+    IDGENV: 'test'
+    appInsightsConnectionString: 'InstrumentationKey=225c2ec1-bb7d-4c33-9d5f-cb89c117f2d6;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=3dc21d1c-0655-44cc-8ad3-cb4eab8c8c67'
   }
 ]
+
+param parStorageAccountName = 'strrspstg'
+param parStorageAccountKey = ''
+
+// Allowed hosts for the UAT environment to be used when the Web App is behind Front Door
+param parAllowedHosts = '*'
+
+// indicates whether to use Front Door for the UAT environment
+param parUseFrontDoor = true
+
+@description('Indicates whether to use One Login for the application')
+param useOneLogin = true
+
+param paramWhitelistIPs = ''
+
+param parClarityProjectId = ''

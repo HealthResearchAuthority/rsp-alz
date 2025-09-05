@@ -108,6 +108,27 @@ param parStorageConfig = {
   }
 }
 
+// SKU configuration for all resource types - systemtest_manual environment
+param parSkuConfig = {
+  appServicePlan: {
+    webApp: 'B1'        // Basic tier for test environments
+    functionApp: 'B1'   // Basic tier for test environments
+    cmsApp: 'B1'        // Basic tier for test environments
+  }
+  sqlDatabase: {
+    name: 'GP_S_Gen5'           // General Purpose Serverless
+    tier: 'GeneralPurpose'       // General Purpose tier
+    family: 'Gen5'               // Gen5 hardware
+    capacity: 6                  // 6 vCores (test environment)
+    minCapacity: 4               // Minimum 4 vCores for serverless
+    storageSize: '6GB'           // Small storage for test
+    zoneRedundant: false         // No zone redundancy for cost savings
+  }
+  keyVault: 'standard'           // Standard tier (cost-effective)
+  appConfiguration: 'standard'   // Standard tier (test doesn't need premium)
+  frontDoor: 'Premium_AzureFrontDoor'  // Premium for WAF and private link features
+}
+
 // Network security configuration for manual test environment
 param parNetworkSecurityConfig = {
   defaultAction: 'Deny'
