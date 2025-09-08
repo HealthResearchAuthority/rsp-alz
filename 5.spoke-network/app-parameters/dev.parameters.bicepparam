@@ -113,7 +113,7 @@ param parSkuConfig = {
   appServicePlan: {
     webApp: 'B1'        // Basic tier for cost optimization
     functionApp: 'B1'   // Basic tier for cost optimization  
-    cmsApp: 'B1'        // Basic tier for cost optimization
+    cmsApp: 'B3'        // Basic tier for cost optimization
   }
   sqlDatabase: {
     name: 'GP_S_Gen5'           // General Purpose Serverless

@@ -120,7 +120,7 @@ param parNetworkSecurityConfig = {
 
 param parSpokeNetworks = [
   {
-    subscriptionId: ''
+    subscriptionId: 'd27a0dcc-453d-4bfa-9c3d-1447c6ea0119'
     parEnvironment: 'prod'
     workloadName: 'container-app'
     zoneRedundancy: false

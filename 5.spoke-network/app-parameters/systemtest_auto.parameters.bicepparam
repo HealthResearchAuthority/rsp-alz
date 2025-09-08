@@ -113,7 +113,7 @@ param parSkuConfig = {
   appServicePlan: {
     webApp: 'B1'        // Basic tier for test environments
     functionApp: 'B1'   // Basic tier for test environments
-    cmsApp: 'B1'        // Basic tier for test environments
+    cmsApp: 'B3'        // Basic tier for test environments
   }
   sqlDatabase: {
     name: 'GP_S_Gen5'           // General Purpose Serverless
