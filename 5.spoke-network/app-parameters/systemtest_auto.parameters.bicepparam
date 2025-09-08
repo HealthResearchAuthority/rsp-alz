@@ -153,3 +153,5 @@ param useOneLogin = true
 param paramWhitelistIPs =  ''
 
 param parClarityProjectId = ''
+
+param parCmsUri = 'https://cmsportal-automationtest.azurewebsites.net/umbraco/api'

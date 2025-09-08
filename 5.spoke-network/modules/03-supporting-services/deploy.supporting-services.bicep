@@ -84,6 +84,9 @@ param paramWhitelistIPs string = ''
 @description('The key for the Microsot Clarity project this is associated with.')
 param clarityProjectId string
 
+@description('The URI of the CMS where content related to this application is managed')
+param cmsUri string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -178,6 +181,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     enablePrivateEndpoints: enableAppConfigPrivateEndpoints
     useOneLogin: useOneLogin
     clarityProjectId: clarityProjectId
+    cmsUri: cmsUri
   }
 }
 

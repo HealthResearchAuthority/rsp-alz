@@ -73,6 +73,9 @@ param useOneLogin bool
 @description('The key for the Microsot Clarity project this is associated with.')
 param clarityProjectId string
 
+@description('The URI of the CMS where content related to this application is managed')
+param cmsUri string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -214,6 +217,11 @@ var keyValues = [
   {
     name: 'AppSettings:ClarityProjectId$portal'
     value: clarityProjectId
+    contentType: null
+  }
+  {
+    name: 'AppSettings:CmsUri$portal'
+    value: cmsUri
     contentType: null
   }
 ]
