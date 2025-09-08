@@ -111,22 +111,22 @@ param parStorageConfig = {
 // SKU configuration for all resource types - UAT environment (balanced performance/cost)
 param parSkuConfig = {
   appServicePlan: {
-    webApp: 'S2'        // Standard tier for better performance
-    functionApp: 'S1'   // Standard tier for functions
-    cmsApp: 'S1'        // Standard tier for CMS
+    webApp: 'S2'
+    functionApp: 'S1'
+    cmsApp: 'S1'
   }
   sqlDatabase: {
-    name: 'GP_Gen5'             // General Purpose (non-serverless)
-    tier: 'GeneralPurpose'       // General Purpose tier
-    family: 'Gen5'               // Gen5 hardware
-    capacity: 8                  // 8 vCores for UAT performance
-    minCapacity: 4               // Minimum capacity
-    storageSize: '32GB'          // More storage for UAT
-    zoneRedundant: true          // Zone redundancy for UAT
+    name: 'GP_Gen5'
+    tier: 'GeneralPurpose'
+    family: 'Gen5'
+    capacity: 8
+    minCapacity: 4
+    storageSize: '32GB'
+    zoneRedundant: true
   }
-  keyVault: 'standard'           // Standard tier
-  appConfiguration: 'standard'   // Standard tier
-  frontDoor: 'Premium_AzureFrontDoor'  // Premium for advanced features
+  keyVault: 'standard'
+  appConfiguration: 'standard'
+  frontDoor: 'Premium_AzureFrontDoor'
 }
 
 // Network security configuration for UAT environment

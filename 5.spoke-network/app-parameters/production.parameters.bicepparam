@@ -92,22 +92,22 @@ param parStorageConfig = {
 // SKU configuration for all resource types - Production environment (high performance & availability)
 param parSkuConfig = {
   appServicePlan: {
-    webApp: 'P2V3_AZ'   // Premium with zone redundancy for max availability
-    functionApp: 'P1V3_AZ' // Premium with zone redundancy for functions
-    cmsApp: 'P1V3_AZ'   // Premium with zone redundancy for CMS
+    webApp: 'P2V3_AZ'
+    functionApp: 'P1V3_AZ'
+    cmsApp: 'P1V3_AZ'
   }
   sqlDatabase: {
-    name: 'BC_Gen5'             // Business Critical for best performance
-    tier: 'BusinessCritical'     // Business Critical tier
-    family: 'Gen5'               // Gen5 hardware
-    capacity: 16                 // 16 vCores for production load
-    minCapacity: 8               // High minimum capacity
-    storageSize: '250GB'         // Large storage for production
-    zoneRedundant: true          // Zone redundancy for HA
+    name: 'BC_Gen5'
+    tier: 'BusinessCritical'
+    family: 'Gen5'
+    capacity: 16
+    minCapacity: 8
+    storageSize: '250GB'
+    zoneRedundant: true
   }
-  keyVault: 'premium'            // Premium tier for HSM support in production
-  appConfiguration: 'standard'   // Standard tier is sufficient
-  frontDoor: 'Premium_AzureFrontDoor'  // Premium for all advanced features
+  keyVault: 'premium'
+  appConfiguration: 'standard'
+  frontDoor: 'Premium_AzureFrontDoor'
 }
 
 // Network security configuration for production environment
