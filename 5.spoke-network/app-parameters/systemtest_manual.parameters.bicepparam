@@ -154,4 +154,4 @@ param paramWhitelistIPs = ''
 
 param parClarityProjectId = ''
 
-param parCmsUri = 'https://cmsportal-manualtest.azurewebsites.net/umbraco/api'
+param parCmsUri = ''
