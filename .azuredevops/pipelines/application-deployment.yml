@@ -108,7 +108,8 @@ stages:
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                               paramWhitelistIPs=$(parWhitelistIPs) \
                               parClarityProjectId=$(clarityProjectId) \
-                              parCmsUri=$(cmsUri)
+                              parCmsUri=$(cmsUri) \
+                              parLogoutUrl=$(logoutUrl)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -146,7 +147,8 @@ stages:
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                               paramWhitelistIPs=$(parWhitelistIPs) \
                               parClarityProjectId=$(clarityProjectId) \
-                              parCmsUri=$(cmsUri)
+                              parCmsUri=$(cmsUri) \
+                              parLogoutUrl=$(logoutUrl)
 
 
   - stage: ManualDeployment
@@ -218,7 +220,8 @@ stages:
                               parClientID=$(clientID) parClientSecret=$(clientSecret) \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
-                              paramWhitelistIPs=$(parWhitelistIPs) parClarityProjectId=$(clarityProjectId) parCmsUri=$(cmsUri)
+                              paramWhitelistIPs=$(parWhitelistIPs) parClarityProjectId=$(clarityProjectId) parCmsUri=$(cmsUri) \
+                              parLogoutUrl=$(logoutUrl)
 
       - deployment: deploy
         displayName: 'Deploy Applications'
@@ -269,6 +272,7 @@ stages:
                                     paramWhitelistIPs=$(parWhitelistIPs) \
                                     parClarityProjectId=$(clarityProjectId) \
                                     parCmsUri=$(cmsUri) \
+                                    parLogoutUrl=$(logoutUrl) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
