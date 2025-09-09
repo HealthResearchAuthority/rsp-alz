@@ -36,15 +36,15 @@ param parFrontDoorRateLimitThreshold = 1000
 param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
-param parEnableFrontDoorPrivateLink = false
+param parEnableFrontDoorPrivateLink = true
 param parEnableFunctionAppPrivateEndpoints = true
-param parEnableKeyVaultPrivateEndpoints = false
+param parEnableKeyVaultPrivateEndpoints = true
 param parEnableAppConfigPrivateEndpoints = false
 param parFrontDoorCustomDomains = []
 
 param parDefenderForStorageConfig = {
   enabled: true
-  enableMalwareScanning: true
+  enableMalwareScanning: false
   enableSensitiveDataDiscovery: true
   enforce: false
 }
@@ -69,7 +69,7 @@ param parStorageConfig = {
     }
     retention: {
       enabled: false                        
-      retentionDays: 0                      
+      retentionDays: 7                      
     }
   }
   staging: {
@@ -86,7 +86,7 @@ param parStorageConfig = {
     }
     retention: {
       enabled: true                         
-      retentionDays: 30                     
+      retentionDays: 15                     
     }
   }
   quarantine: {
@@ -103,7 +103,7 @@ param parStorageConfig = {
     }
     retention: {
       enabled: true                         
-      retentionDays: 90                     
+      retentionDays: 30                     
     }
   }
 }
@@ -111,18 +111,18 @@ param parStorageConfig = {
 // SKU configuration for all resource types - UAT environment (balanced performance/cost)
 param parSkuConfig = {
   appServicePlan: {
-    webApp: 'S2'
-    functionApp: 'S1'
-    cmsApp: 'S1'
+    webApp: 'B3'
+    functionApp: 'B3'
+    cmsApp: 'B3'
   }
   sqlDatabase: {
-    name: 'GP_Gen5'
+    name: 'GP_S_Gen5'
     tier: 'GeneralPurpose'
     family: 'Gen5'
-    capacity: 8
+    capacity: 6
     minCapacity: 4
-    storageSize: '32GB'
-    zoneRedundant: true
+    storageSize: '6GB'
+    zoneRedundant: false
   }
   keyVault: 'standard'
   appConfiguration: 'standard'
