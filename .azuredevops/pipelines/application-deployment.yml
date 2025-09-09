@@ -107,7 +107,8 @@ stages:
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                               paramWhitelistIPs=$(parWhitelistIPs) \
-                              parClarityProjectId=$(clarityProjectId)
+                              parClarityProjectId=$(clarityProjectId) \
+                              parCmsUri=$(cmsUri)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -144,7 +145,8 @@ stages:
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                               paramWhitelistIPs=$(parWhitelistIPs) \
-                              parClarityProjectId=$(clarityProjectId)
+                              parClarityProjectId=$(clarityProjectId) \
+                              parCmsUri=$(cmsUri)
 
 
   - stage: ManualDeployment
@@ -168,6 +170,10 @@ stages:
               echo "$(clarityProjectId)"
             name: clarityProjectId
             displayName: 'Clarity Project ID'
+          - bash: | 
+              echo "$(cmsUri)"
+            name: cmsUri
+            displayName: 'CMS URI'
           - bash: | 
               ipaddress=$(curl -s http://ipinfo.io/ip)
               ipaddressipify=$(curl -s https://api.ipify.org)
@@ -212,7 +218,7 @@ stages:
                               parClientID=$(clientID) parClientSecret=$(clientSecret) \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
-                              paramWhitelistIPs=$(parWhitelistIPs) parClarityProjectId=$(clarityProjectId)
+                              paramWhitelistIPs=$(parWhitelistIPs) parClarityProjectId=$(clarityProjectId) parCmsUri=$(cmsUri)
 
       - deployment: deploy
         displayName: 'Deploy Applications'
@@ -262,6 +268,7 @@ stages:
                                     parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                                     paramWhitelistIPs=$(parWhitelistIPs) \
                                     parClarityProjectId=$(clarityProjectId) \
+                                    parCmsUri=$(cmsUri) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')

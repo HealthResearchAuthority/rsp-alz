@@ -333,6 +333,9 @@ param parUseFrontDoor bool
 @description('The key for the Microsot Clarity project this is associated with.')
 param parClarityProjectId string
 
+@description('The URI of the CMS where content related to this application is managed')
+param parCmsUri string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -516,6 +519,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       clarityProjectId: parClarityProjectId
       keyVaultSku: parSkuConfig.keyVault
       appConfigurationSku: parSkuConfig.appConfiguration
+      cmsUri: parCmsUri
     }
   }
 ]

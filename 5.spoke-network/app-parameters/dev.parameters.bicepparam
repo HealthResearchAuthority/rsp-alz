@@ -162,6 +162,7 @@ param parSpokeNetworks = [
 param parStorageAccountName = 'strspstagngdev'
 param parStorageAccountKey = ''
 param parClarityProjectId = ''
+param parCmsUri = ''
 
 // Allowed hosts for the dev environment to be used when the Web App is behind Front Door
 param parAllowedHosts = 'fd-rsp-applications-dev-uks-cveeakgqdgbqexbz.a03.azurefd.net;irasportal-dev.azurewebsites.net'
