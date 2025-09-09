@@ -87,6 +87,9 @@ param clarityProjectId string
 @description('The URI of the CMS where content related to this application is managed')
 param cmsUri string
 
+@description('The URL to redirect to on logout from auth provider')
+param logoutUrl string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -182,6 +185,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     useOneLogin: useOneLogin
     clarityProjectId: clarityProjectId
     cmsUri: cmsUri
+    logoutUrl: logoutUrl
   }
 }
 

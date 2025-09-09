@@ -76,6 +76,9 @@ param clarityProjectId string
 @description('The URI of the CMS where content related to this application is managed')
 param cmsUri string
 
+@description('The URL to redirect to on logout from auth provider')
+param logoutUrl string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -222,6 +225,11 @@ var keyValues = [
   {
     name: 'AppSettings:CmsUri$portal'
     value: cmsUri
+    contentType: null
+  }
+  {
+    name: 'AppSettings:LogoutUrl$portal'
+    value: logoutUrl
     contentType: null
   }
 ]
