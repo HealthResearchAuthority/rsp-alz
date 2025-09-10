@@ -228,7 +228,7 @@ var keyValues = [
     contentType: null
   }
   {
-    name: 'AppSettings:LogoutUrl$portal'
+    name: 'AppSettings:AuthSettings:LogoutUrl$portal'
     value: logoutUrl
     contentType: null
   }
