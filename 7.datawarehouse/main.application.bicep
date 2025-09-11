@@ -148,9 +148,3 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
   ]
 }
 
-// Outputs
-// output sqlServerName string = enableHarpDeployment ? harpSyncDatabase.?outputs.?sqlServer_name ?? '' : ''
-// output functionAppIds array = enableHarpDeployment ? (harpSyncFunctions.?outputs.?functionAppNames ?? []) : []
-// output harpDatabaseNames array = enableHarpDeployment ? (harpSyncDatabase.?outputs.?database_names ?? []) : []
-// output sqlServerUAIId string = enableHarpDeployment ? harpSyncDatabase.?outputs.?outputsqlServerUAIID ?? '' : ''
-
