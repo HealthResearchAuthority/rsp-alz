@@ -143,8 +143,5 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
       Purpose: 'HARP Data Sync'
     }
   }
-  dependsOn: [
-    harpSyncDatabase
-  ]
 }
 

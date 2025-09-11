@@ -109,28 +109,6 @@ module appServicePlans '../../shared/bicep/app-services/app-service-plan.bicep' 
   }
 }]
 
-// module storageAccounts '../../shared/bicep/storage/storage.bicep' = [for (funcApp, index) in functionApps: {
-//   name: 'storage-${funcApp.name}'
-//   params: {
-//     name: funcApp.storageAccountName
-//     location: location
-//     sku: 'Standard_LRS'
-//     kind: 'StorageV2'
-//     supportsHttpsTrafficOnly: true
-//     tags: tags
-//     networkAcls: {
-//       defaultAction: 'Deny'
-//       bypass: 'AzureServices'
-//       virtualNetworkRules: [
-//         {
-//           id: functionAppSubnet.id
-//           action: 'Allow'
-//         }
-//       ]
-//     }
-//   }
-// }]
-
 module blobPrivateDnsZone '../../shared/bicep/network/private-dns-zone.bicep' = {
   name: 'blobPrivateDnsZone'
   params: {
@@ -226,24 +204,8 @@ module functionAppPrivateDnsZone '../../shared/bicep/network/private-dns-zone.bi
 //   ]
 // }]
 
-// module functionAppPrivateEndpoints '../../shared/bicep/network/private-endpoint.bicep' = [for (funcApp, index) in functionApps: {
-//   name: 'funcAppPE-${funcApp.name}'
-//   params: {
-//     location: location
-//     name: 'pep-${funcApp.name}'
-//     snetId: spokePrivateEndpointSubnet.id
-//     privateLinkServiceId: functionAppsDeployment[index].outputs.functionAppId
-//     subresource: 'sites'
-//     privateDnsZonesId: functionAppPrivateDnsZone.outputs.privateDnsZonesId
-//     tags: tags
-//   }
-//   dependsOn: [
-//     storageBlobPrivateEndpoints
-//     storageFilePrivateEndpoints
-//   ]
-// }]
 
-module fnstorage '../../../shared/bicep/storage/storage.bicep' = [for (funcApp, index) in functionApps:{
+module fnstorage '../../shared/bicep/storage/storage.bicep' = [for (funcApp, index) in functionApps:{
   name: 'storage-${funcApp.name}'
   params: {
     name: funcApp.storageAccountName
@@ -256,12 +218,12 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = [for (funcApp, 
   }
 }]
 
-module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps: {
-  name:take('rtsfnStorageBlobPrivateNetwork-${deployment().name}', 64)
+module storageBlobPrivateNetwork '../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps: {
+  name:'storageBlobPE-${funcApp.name}'
   params: {
     location: location
-    azServicePrivateDnsZoneName: 'privatelink.blob.${environment().suffixes.storage}'
-    azServiceId: fnstorage!.outputs.id
+    azServicePrivateDnsZoneName: 'privatelink.blob.${az.environment().suffixes.storage}'
+    azServiceId: fnstorage[index].outputs.id
     privateEndpointName: 'pep-${funcApp.storageAccountName}-blob'
     privateEndpointSubResourceName: 'blob'
     virtualNetworkLinks: [
@@ -275,12 +237,12 @@ module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networki
   }
 }]
 
-module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps: {
-  name:take('rtsfnStorageFilePrivateNetwork-${deployment().name}', 64)
+module storageFilesPrivateNetwork '../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps: {
+  name:'storageFilePE-${funcApp.name}'
   params: {
     location: location
-    azServicePrivateDnsZoneName: 'privatelink.file.${environment().suffixes.storage}'
-    azServiceId: fnstorage!.outputs.id
+    azServicePrivateDnsZoneName: 'privatelink.file.${az.environment().suffixes.storage}'
+    azServiceId: fnstorage[index].outputs.id
     privateEndpointName: 'pep-${funcApp.storageAccountName}-file'
     privateEndpointSubResourceName: 'file'
     virtualNetworkLinks: [
@@ -297,13 +259,14 @@ module storageFilesPrivateNetwork '../../../shared/bicep/network/private-network
   ]
 }]
 
-module fnApp '../../../shared/bicep/app-services/function-app.bicep' = [for (funcApp, index) in functionApps: {
+module fnApp '../../shared/bicep/app-services/function-app.bicep' = [for (funcApp, index) in functionApps: {
   name: 'functionApp-${funcApp.name}'
   params: {
     kind: 'functionapp'
     functionAppName:  funcApp.name
     location: location
     serverFarmResourceId: appServicePlans[index].outputs.resourceId
+    hasPrivateEndpoint: true
     virtualNetworkSubnetId: functionAppSubnet.id
     appInsightId: appInsights.outputs.appInsResourceId
     userAssignedIdentities:  {
@@ -318,23 +281,21 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = [for (fun
   ]
 }]
 
-module appServicePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps {
+module functionAppPrivateEndpoints '../../shared/bicep/network/private-endpoint.bicep' = [for (funcApp, index) in functionApps: {
   name: 'funcAppPE-${funcApp.name}'
   params: {
     location: location
-    azServicePrivateDnsZoneName: 'privatelink.azurewebsites.net'
-    azServiceId: kind == fnApp[index].outputs.functionAppId
-    privateEndpointName: 'pep-${funcApp.name}'
-    privateEndpointSubResourceName: 'sites'
-    virtualNetworkLinks: [
-      {
-        vnetName: spokeVNetName
-        vnetId: vnetSpoke.id
-        registrationEnabled: false
-      }
-    ]
-    subnetId: spokePrivateEndpointSubnet.id
+    name: 'pep-${funcApp.name}'
+    snetId: spokePrivateEndpointSubnet.id
+    privateLinkServiceId: fnApp[index].outputs.functionAppId
+    subresource: 'sites'
+    privateDnsZonesId: functionAppPrivateDnsZone.outputs.privateDnsZonesId
+    tags: tags
   }
+  dependsOn: [
+    storageBlobPrivateNetwork
+    storageFilesPrivateNetwork
+  ]
 }]
 
 // Outputs
@@ -346,7 +307,7 @@ output functionAppNames array = [for (funcApp, index) in functionApps: {
 
 output storageAccountNames array = [for (funcApp, index) in functionApps: {
   name: funcApp.storageAccountName
-  id: fnStorage[index].outputs.id
+  id: fnstorage[index].outputs.id
 }]
 
 output appServicePlanNames array = [for (funcApp, index) in functionApps: {
