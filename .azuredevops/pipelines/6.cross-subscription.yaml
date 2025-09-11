@@ -168,6 +168,7 @@ stages:
                               manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                               paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
                               paramserviceIdsmanual=$(serviceIdsmanual) \
+                              paramserviceIdsuat=$(serviceIdsuat) \
                               storageSubscriptionId="$(storageSubscriptionId)" \
                               devboxSubscriptionId="$(devboxSubscriptionId)")
                       echo "Full Bicep Deployment Output:"

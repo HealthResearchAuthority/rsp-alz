@@ -16,6 +16,9 @@ param paramserviceIdsauto string
 @description('The IDs of the Azure service to be used for the private endpoint.')
 param paramserviceIdsmanual string
 
+@description('The IDs of the Azure service to be used for the private endpoint.')
+param paramserviceIdsuat string
+
 @description('VNet ID under managed devops pool subscription where the VNet peering will be created.')
 param manageddevopspoolVnetID string
 
@@ -62,6 +65,7 @@ var vnetInfoArray = [
 var pepServiceIDArraydev = split(paramserviceIdsdev, ',')
 var pepServiceIDArrayauto = split(paramserviceIdsauto, ',')
 var pepServiceIDArraymanual = split(paramserviceIdsmanual, ',')
+var pepServiceIDArrayuat = split(paramserviceIdsuat, ',')
 
 var allserviceIDs = union(pepServiceIDArraydev, pepServiceIDArrayauto, pepServiceIDArraymanual)
 
