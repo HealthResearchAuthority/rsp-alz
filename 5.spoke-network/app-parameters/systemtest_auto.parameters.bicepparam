@@ -108,6 +108,27 @@ param parStorageConfig = {
   }
 }
 
+// SKU configuration for all resource types - systemtest_auto environment
+param parSkuConfig = {
+  appServicePlan: {
+    webApp: 'B1'
+    functionApp: 'B1'
+    cmsApp: 'B3'
+  }
+  sqlDatabase: {
+    name: 'GP_S_Gen5'
+    tier: 'GeneralPurpose'
+    family: 'Gen5'
+    capacity: 6
+    minCapacity: 4
+    storageSize: '6GB'
+    zoneRedundant: false
+  }
+  keyVault: 'standard'
+  appConfiguration: 'standard'
+  frontDoor: 'Premium_AzureFrontDoor'
+}
+
 // Network security configuration for auto test environment
 param parNetworkSecurityConfig = {
   defaultAction: 'Deny'

@@ -65,6 +65,9 @@ param privateDnsZoneName string = ''
 
 param keyVaultUserAssignedIdentityName string = ''
 
+@description('Key Vault SKU name')
+param keyVaultSku string = 'standard'
+
 
 // ------------------
 // VARIABLES
@@ -127,7 +130,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' = {
     tenantId: subscription().tenantId
     sku: {
       family: 'A'
-      name: 'standard'
+      name: keyVaultSku
     }
     networkAcls: {
       bypass: 'AzureServices'

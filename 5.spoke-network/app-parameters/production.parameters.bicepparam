@@ -89,6 +89,27 @@ param parStorageConfig = {
   }
 }
 
+// SKU configuration for all resource types - Production environment (high performance & availability)
+param parSkuConfig = {
+  appServicePlan: {
+    webApp: 'P2V3_AZ'
+    functionApp: 'P1V3_AZ'
+    cmsApp: 'P1V3_AZ'
+  }
+  sqlDatabase: {
+    name: 'BC_Gen5'
+    tier: 'BusinessCritical'
+    family: 'Gen5'
+    capacity: 16
+    minCapacity: 8
+    storageSize: '250GB'
+    zoneRedundant: true
+  }
+  keyVault: 'premium'
+  appConfiguration: 'standard'
+  frontDoor: 'Premium_AzureFrontDoor'
+}
+
 // Network security configuration for production environment
 param parNetworkSecurityConfig = {
   defaultAction: 'Deny'        
@@ -99,7 +120,7 @@ param parNetworkSecurityConfig = {
 
 param parSpokeNetworks = [
   {
-    subscriptionId: ''
+    subscriptionId: 'd27a0dcc-453d-4bfa-9c3d-1447c6ea0119'
     parEnvironment: 'prod'
     workloadName: 'container-app'
     zoneRedundancy: false

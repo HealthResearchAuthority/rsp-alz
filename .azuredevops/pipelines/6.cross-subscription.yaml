@@ -63,7 +63,7 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 az config set bicep.use_binary_from_path=false --only-show-errors
-                az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) paramserviceIdsmanual=$(serviceIdsmanual) storageSubscriptionId="$(storageSubscriptionId)" devboxSubscriptionId="$(devboxSubscriptionId)"
+                az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) storageSubscriptionId="$(storageSubscriptionId)" devboxSubscriptionId="$(devboxSubscriptionId)"
 
       - job: preview
         displayName: 'Preview Cross Subscription Deployments'
@@ -86,7 +86,7 @@ stages:
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                         paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
-                        paramserviceIdsmanual=$(serviceIdsmanual) \
+                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
@@ -126,7 +126,7 @@ stages:
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                         paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
-                        paramserviceIdsmanual=$(serviceIdsmanual) \
+                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
@@ -168,6 +168,7 @@ stages:
                               manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                               paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
                               paramserviceIdsmanual=$(serviceIdsmanual) \
+                              paramserviceIdsuat=$(serviceIdsuat) \
                               storageSubscriptionId="$(storageSubscriptionId)" \
                               devboxSubscriptionId="$(devboxSubscriptionId)")
                       echo "Full Bicep Deployment Output:"

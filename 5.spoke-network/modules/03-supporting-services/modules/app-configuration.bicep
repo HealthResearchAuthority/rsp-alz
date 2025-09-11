@@ -73,6 +73,9 @@ param useOneLogin bool
 @description('The key for the Microsot Clarity project this is associated with.')
 param clarityProjectId string
 
+@description('App Configuration SKU name')
+param appConfigurationSku string = 'standard'
+
 @description('The URI of the CMS where content related to this application is managed')
 param cmsUri string
 
@@ -332,7 +335,7 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
   name: configStoreName
   location: location
   sku: {
-    name: 'standard'
+    name: appConfigurationSku
   }
   identity: {
     type: 'UserAssigned'
