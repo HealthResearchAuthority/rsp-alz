@@ -67,7 +67,7 @@ var pepServiceIDArrayauto = split(paramserviceIdsauto, ',')
 var pepServiceIDArraymanual = split(paramserviceIdsmanual, ',')
 var pepServiceIDArrayuat = split(paramserviceIdsuat, ',')
 
-var allserviceIDs = union(pepServiceIDArraydev, pepServiceIDArrayauto, pepServiceIDArraymanual)
+var allserviceIDs = union(pepServiceIDArraydev, pepServiceIDArrayauto, pepServiceIDArraymanual, pepServiceIDArrayuat)
 
 @description('Deploy VNet Peering')
 module vnetpeeringmodule 'modules/vnetpeering/vnetpeering.bicep' = {
