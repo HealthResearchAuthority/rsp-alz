@@ -53,7 +53,7 @@ param parDefenderForStorageConfig = {
 
 param parOverrideSubscriptionLevelSettings = true
 
-param parSkipExistingRoleAssignments = false
+param parSkipExistingRoleAssignments = true
 
 // Storage configuration for all storage account types 
 param parStorageConfig = {
