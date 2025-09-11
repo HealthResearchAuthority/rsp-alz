@@ -151,60 +151,6 @@ module functionAppPrivateDnsZone '../../shared/bicep/network/private-dns-zone.bi
   }
 }
 
-// module storageBlobPrivateEndpoints '../../shared/bicep/network/private-endpoint.bicep' = [for (funcApp, index) in functionApps: {
-//   name: 'storageBlobPE-${funcApp.name}'
-//   params: {
-//     location: location
-//     name: 'pep-${funcApp.storageAccountName}-blob'
-//     snetId: spokePrivateEndpointSubnet.id
-//     privateLinkServiceId: storageAccounts[index].outputs.id
-//     subresource: 'blob'
-//     privateDnsZonesId: blobPrivateDnsZone.outputs.privateDnsZonesId
-//     tags: tags
-//   }
-// }]
-
-// module storageFilePrivateEndpoints '../../shared/bicep/network/private-endpoint.bicep' = [for (funcApp, index) in functionApps: {
-//   name: 'storageFilePE-${funcApp.name}'
-//   params: {
-//     location: location
-//     name: 'pep-${funcApp.storageAccountName}-file'
-//     snetId: spokePrivateEndpointSubnet.id
-//     privateLinkServiceId: storageAccounts[index].outputs.id
-//     subresource: 'file'
-//     privateDnsZonesId: blobPrivateDnsZone.outputs.privateDnsZonesId
-//     tags: tags
-//   }
-//   dependsOn: [
-//     storageBlobPrivateEndpoints
-//   ]
-// }]
-
-// // Function Apps
-// module functionAppsDeployment '../../shared/bicep/app-services/function-app.bicep' = [for (funcApp, index) in functionApps:{
-//   name: 'functionApp-${funcApp.name}'
-//   params: {
-//     functionAppName: funcApp.name
-//     location: location
-//     tags: tags
-//     serverFarmResourceId: appServicePlans[index].outputs.resourceId
-//     hasPrivateEndpoint: true
-//     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
-//     storageAccountName: funcApp.storageAccountName
-//     userAssignedIdentities:  {
-//       type: 'UserAssigned'
-//       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
-//     }
-//     appInsightId: appInsights.outputs.appInsResourceId
-//     kind: 'functionapp'
-//     virtualNetworkSubnetId: functionAppSubnet.id
-//   }
-//   dependsOn:  [
-//     storageAccounts
-//   ]
-// }]
-
-
 module fnstorage '../../shared/bicep/storage/storage.bicep' = [for (funcApp, index) in functionApps:{
   name: 'storage-${funcApp.name}'
   params: {
