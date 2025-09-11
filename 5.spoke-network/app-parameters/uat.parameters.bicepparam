@@ -1,5 +1,7 @@
 using '../main.application.bicep'
 
+param parLogoutUrl = ''
+
 param logAnalyticsWorkspaceId = ''
 
 param parAdminLogin = ''
