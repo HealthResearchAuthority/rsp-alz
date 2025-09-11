@@ -227,21 +227,41 @@ module fnApp '../../shared/bicep/app-services/function-app.bicep' = [for (funcAp
   ]
 }]
 
-module functionAppPrivateEndpoints '../../shared/bicep/network/private-endpoint.bicep' = [for (funcApp, index) in functionApps: {
+// module functionAppPrivateEndpoints '../../shared/bicep/network/private-endpoint.bicep' = [for (funcApp, index) in functionApps: {
+//   name: 'funcAppPE-${funcApp.name}'
+//   params: {
+//     location: location
+//     name: 'pep-${funcApp.name}'
+//     snetId: spokePrivateEndpointSubnet.id
+//     privateLinkServiceId: fnApp[index].outputs.functionAppId
+//     subresource: 'sites'
+//     privateDnsZonesId: functionAppPrivateDnsZone.outputs.privateDnsZonesId
+//     tags: tags
+//   }
+//   dependsOn: [
+//     storageBlobPrivateNetwork
+//     storageFilesPrivateNetwork
+//   ]
+// }]
+
+// Private endpoint for App Service/Function App using existing private-networking-spoke module
+module appServicePrivateEndpoint '../../shared/bicep/network/private-networking-spoke.bicep' = [for (funcApp, index) in functionApps: {
   name: 'funcAppPE-${funcApp.name}'
   params: {
     location: location
-    name: 'pep-${funcApp.name}'
-    snetId: spokePrivateEndpointSubnet.id
-    privateLinkServiceId: fnApp[index].outputs.functionAppId
-    subresource: 'sites'
-    privateDnsZonesId: functionAppPrivateDnsZone.outputs.privateDnsZonesId
-    tags: tags
+    azServicePrivateDnsZoneName: 'privatelink.azurewebsites.net'
+    azServiceId: fnApp[index].outputs.functionAppId
+    privateEndpointName: 'pep-${funcApp.name}'
+    privateEndpointSubResourceName: 'sites'
+    virtualNetworkLinks: [
+      {
+        vnetName: spokeVNetName
+        vnetId: vnetSpoke.id
+        registrationEnabled: false
+      }
+    ]
+    subnetId: spokePrivateEndpointSubnet.id
   }
-  dependsOn: [
-    storageBlobPrivateNetwork
-    storageFilesPrivateNetwork
-  ]
 }]
 
 // Outputs
