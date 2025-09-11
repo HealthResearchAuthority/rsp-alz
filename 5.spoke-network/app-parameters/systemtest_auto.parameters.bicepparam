@@ -176,3 +176,5 @@ param paramWhitelistIPs =  ''
 param parClarityProjectId = ''
 
 param parCmsUri = ''
+
+param parLogoutUrl = ''

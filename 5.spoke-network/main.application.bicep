@@ -336,6 +336,9 @@ param parClarityProjectId string
 @description('The URI of the CMS where content related to this application is managed')
 param parCmsUri string
 
+@description('The URL to redirect to on logout from auth provider')
+param parLogoutUrl string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -520,6 +523,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       keyVaultSku: parSkuConfig.keyVault
       appConfigurationSku: parSkuConfig.appConfiguration
       cmsUri: parCmsUri
+      logoutUrl: parLogoutUrl
     }
   }
 ]
