@@ -340,13 +340,13 @@ module appServicePrivateEndpoint '../../../shared/bicep/network/private-networki
 // Outputs
 output functionAppNames array = [for (funcApp, index) in functionApps: {
   name: funcApp.name
-  id: functionAppsDeployment[index].outputs.functionAppId
-  defaultHostName: functionAppsDeployment[index].outputs.defaultHostName
+  id: fnApp[index].outputs.functionAppId
+  defaultHostName: fnApp[index].outputs.defaultHostName
 }]
 
 output storageAccountNames array = [for (funcApp, index) in functionApps: {
   name: funcApp.storageAccountName
-  id: storageAccounts[index].outputs.id
+  id: fnStorage[index].outputs.id
 }]
 
 output appServicePlanNames array = [for (funcApp, index) in functionApps: {
