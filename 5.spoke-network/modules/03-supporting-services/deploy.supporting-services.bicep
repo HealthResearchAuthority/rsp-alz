@@ -84,6 +84,10 @@ param paramWhitelistIPs string = ''
 @description('The key for the Microsot Clarity project this is associated with.')
 param clarityProjectId string
 
+@secure()
+@description('The key for the Google Analytics project this is associated with.')
+param googleTagId string
+
 @description('The URI of the CMS where content related to this application is managed')
 param cmsUri string
 
@@ -184,6 +188,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     enablePrivateEndpoints: enableAppConfigPrivateEndpoints
     useOneLogin: useOneLogin
     clarityProjectId: clarityProjectId
+    googleTagId: googleTagId
     cmsUri: cmsUri
     logoutUrl: logoutUrl
   }

@@ -154,6 +154,8 @@ param paramWhitelistIPs = ''
 
 param parClarityProjectId = ''
 
+param parGoogleTagId = ''
+
 param parCmsUri = ''
 
 param parLogoutUrl = ''
