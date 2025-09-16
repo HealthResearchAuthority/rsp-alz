@@ -264,6 +264,10 @@ param parUseFrontDoor bool
 @description('The key for the Microsot Clarity project this is associated with.')
 param parClarityProjectId string
 
+@secure()
+@description('The key for the Google Analytics project this is associated with.')
+param parGoogleTagId string
+
 @description('The URI of the CMS where content related to this application is managed')
 param parCmsUri string
 
@@ -451,6 +455,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       useOneLogin: useOneLogin
       paramWhitelistIPs: paramWhitelistIPs
       clarityProjectId: parClarityProjectId
+      googleTagId: parGoogleTagId
       cmsUri: parCmsUri
       logoutUrl: parLogoutUrl
     }
