@@ -109,8 +109,7 @@ stages:
                               paramWhitelistIPs=$(parWhitelistIPs) \
                               parClarityProjectId=$(clarityProjectId) \
                               parCmsUri=$(cmsUri) \
-                              parLogoutUrl=$(logoutUrl) \
-                              parOneLoginPrivateKeyPem=$(oneLoginPrivateKeyPem)
+                              parLogoutUrl=$(logoutUrl)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -149,8 +148,7 @@ stages:
                               paramWhitelistIPs=$(parWhitelistIPs) \
                               parClarityProjectId=$(clarityProjectId) \
                               parCmsUri=$(cmsUri) \
-                              parLogoutUrl=$(logoutUrl) \
-                              parOneLoginPrivateKeyPem=$(oneLoginPrivateKeyPem)
+                              parLogoutUrl=$(logoutUrl)
 
 
   - stage: ManualDeployment
@@ -223,7 +221,7 @@ stages:
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                               paramWhitelistIPs=$(parWhitelistIPs) parClarityProjectId=$(clarityProjectId) parCmsUri=$(cmsUri) \
-                              parLogoutUrl=$(logoutUrl) parOneLoginPrivateKeyPem=$(oneLoginPrivateKeyPem)
+                              parLogoutUrl=$(logoutUrl)
 
       - deployment: deploy
         displayName: 'Deploy Applications'
@@ -275,7 +273,6 @@ stages:
                                     parClarityProjectId=$(clarityProjectId) \
                                     parCmsUri=$(cmsUri) \
                                     parLogoutUrl=$(logoutUrl) \
-                                    parOneLoginPrivateKeyPem=$(oneLoginPrivateKeyPem) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
