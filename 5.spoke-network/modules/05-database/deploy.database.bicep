@@ -37,6 +37,17 @@ param enableSqlServerAuditing bool = true
 @description('The resource id of an existing Azure Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
 
+@description('SQL Database SKU configuration')
+param sqlDatabaseSkuConfig object = {
+  name: 'GP_S_Gen5'
+  tier: 'GeneralPurpose'
+  family: 'Gen5'
+  capacity: 12
+  minCapacity: 6
+  storageSize: '6GB'
+  zoneRedundant: false
+}
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -128,22 +139,21 @@ resource masterDb 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
 }
 
 // Database on SQL Server Resource
-//ToDo SKU config to come from Environment specific parameters from Main.bicep
 resource sqldatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [for i in range(0, length(databases)): {
   name: databases[i]
   parent: SQL_Server
   location: location
   sku: {
-    name: 'GP_S_Gen5'
-    tier: 'GeneralPurpose'
-    family: 'Gen5'
-    capacity: 6
-    size: '6GB'
+    name: sqlDatabaseSkuConfig.name
+    tier: sqlDatabaseSkuConfig.tier
+    family: sqlDatabaseSkuConfig.family
+    capacity: sqlDatabaseSkuConfig.capacity
+    size: sqlDatabaseSkuConfig.storageSize
   }
   properties: {
     createMode: 'Default'
-    minCapacity: 4
-    zoneRedundant: false
+    minCapacity: sqlDatabaseSkuConfig.minCapacity
+    zoneRedundant: sqlDatabaseSkuConfig.zoneRedundant
   }
 }]
 

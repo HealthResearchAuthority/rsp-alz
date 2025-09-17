@@ -23,6 +23,9 @@ param sqlDBManagedIdentityClientId string = ''
 @description('Conditional. The name of the parent Storage Account. Required if the template is used in a standalone deployment.')
 param storageAccountName string
 
+@description('Optional. Name of the Azure Files share used for function content.')
+param contentShareName string = ''
+
 @description('Optional. Runtime for Function App.')
 @allowed([
   'node'
@@ -115,6 +118,13 @@ var privateEndpointSettings = hasPrivateEndpoint ? [
   }
 ] : []
 
+var contentShareSettings = empty(contentShareName) ? [] : [
+  {
+    name: 'WEBSITE_CONTENTSHARE'
+    value: contentShareName
+  }
+]
+
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
   location: location
@@ -127,7 +137,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     siteConfig: {
       netFrameworkVersion: dotnetVersion
-      appSettings: concat(defaultSettings, privateEndpointSettings, appSettings)
+      appSettings: concat(defaultSettings, privateEndpointSettings, contentShareSettings, appSettings)
       alwaysOn: true
     }
   }
@@ -138,3 +148,4 @@ output functionAppName string = functionApp.name
 output functionAppId string = functionApp.id
 output defaultHostName string = functionApp.properties.defaultHostName
 output systemAssignedPrincipalId string = functionApp.identity.?principalId ?? ''
+

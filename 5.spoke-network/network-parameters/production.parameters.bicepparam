@@ -2,7 +2,7 @@ using '../main.network.bicep'
 
 param parSpokeNetworks = [
   {
-    subscriptionId: ''
+    subscriptionId: 'd27a0dcc-453d-4bfa-9c3d-1447c6ea0119'
     ipRange: '10.7.0.0/16'
     parEnvironment: 'prod'
     zoneRedundancy: true

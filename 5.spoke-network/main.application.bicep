@@ -63,6 +63,54 @@ type allStorageConfig = {
   quarantine: storageTypeConfig
 }
 
+@description('Complete SKU configuration for all resource types')
+type skuConfig = {
+  @description('App Service Plan configuration')
+  appServicePlan: {
+    @description('Web app SKU')
+    webApp: ('B1' | 'B3'| 'S1' | 'S2' | 'S3' | 'P1V3' | 'P2V3' | 'P3V3' | 'P1V3_AZ' | 'P2V3_AZ' | 'P3V3_AZ' | 'EP1' | 'EP2' | 'EP3' | 'ASE_I1V2_AZ' | 'ASE_I2V2_AZ' | 'ASE_I3V2_AZ' | 'ASE_I1V2' | 'ASE_I2V2' | 'ASE_I3V2')
+    
+    @description('Function app SKU')
+    functionApp: ('B1' | 'B3'| 'S1' | 'S2' | 'S3' | 'P1V3' | 'P2V3' | 'P3V3' | 'P1V3_AZ' | 'P2V3_AZ' | 'P3V3_AZ' | 'EP1' | 'EP2' | 'EP3' | 'ASE_I1V2_AZ' | 'ASE_I2V2_AZ' | 'ASE_I3V2_AZ' | 'ASE_I1V2' | 'ASE_I2V2' | 'ASE_I3V2')
+    
+    @description('CMS app SKU')
+    cmsApp: ('B1' | 'B3'| 'S1' | 'S2' | 'S3' | 'P1V3' | 'P2V3' | 'P3V3' | 'P1V3_AZ' | 'P2V3_AZ' | 'P3V3_AZ' | 'EP1' | 'EP2' | 'EP3' | 'ASE_I1V2_AZ' | 'ASE_I2V2_AZ' | 'ASE_I3V2_AZ' | 'ASE_I1V2' | 'ASE_I2V2' | 'ASE_I3V2')
+  }
+  
+  @description('SQL Database configuration')
+  sqlDatabase: {
+    @description('Database SKU name')
+    name: string
+    
+    @description('Database tier')
+    tier: string
+    
+    @description('Hardware family')
+    family: string
+    
+    @description('vCore capacity')
+    capacity: int
+    
+    @description('Minimum capacity for serverless')
+    minCapacity: int
+    
+    @description('Storage size')
+    storageSize: string
+    
+    @description('Zone redundancy')
+    zoneRedundant: bool
+  }
+  
+  @description('Key Vault SKU')
+  keyVault: ('standard' | 'premium')
+  
+  @description('App Configuration SKU')
+  appConfiguration: ('standard' | 'free')
+  
+  @description('Front Door SKU')
+  frontDoor: ('Standard_AzureFrontDoor' | 'Premium_AzureFrontDoor')
+}
+
 // ------------------
 // PARAMETERS
 // ------------------
@@ -238,6 +286,27 @@ param parStorageConfig allStorageConfig = {
       retentionDays: 15
     }
   }
+}
+
+@description('Comprehensive SKU configuration for all resource types')
+param parSkuConfig skuConfig = {
+  appServicePlan: {
+    webApp: 'B1'
+    functionApp: 'B1'
+    cmsApp: 'B1'
+  }
+  sqlDatabase: {
+    name: 'GP_S_Gen5'
+    tier: 'GeneralPurpose'
+    family: 'Gen5'
+    capacity: 12
+    minCapacity: 6
+    storageSize: '6GB'
+    zoneRedundant: false
+  }
+  keyVault: 'standard'
+  appConfiguration: 'standard'
+  frontDoor: 'Premium_AzureFrontDoor'
 }
 
 @description('Network security configuration for storage accounts')
@@ -455,6 +524,8 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       useOneLogin: useOneLogin
       paramWhitelistIPs: paramWhitelistIPs
       clarityProjectId: parClarityProjectId
+      keyVaultSku: parSkuConfig.keyVault
+      appConfigurationSku: parSkuConfig.appConfiguration
       googleTagId: parGoogleTagId
       cmsUri: parCmsUri
       logoutUrl: parLogoutUrl
@@ -550,6 +621,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       auditRetentionDays: parSqlAuditRetentionDays
       enableSqlServerAuditing: true
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      sqlDatabaseSkuConfig: parSkuConfig.sqlDatabase
     }
   }
 ]
@@ -699,7 +771,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
     name: take('webApp-${deployment().name}-deployment', 64)
     params: {
       tags: {}
-      sku: 'B1'
+      sku: parSkuConfig.appServicePlan.webApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
       appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
@@ -726,7 +798,7 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
     name: take('cmsApp-${deployment().name}-deployment', 64)
     params: {
       tags: {}
-      sku: 'B3'
+      sku: parSkuConfig.appServicePlan.cmsApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
       appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
@@ -761,7 +833,7 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       appName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
       location: location
       tags: tags
-      sku: 'B1'
+      sku: parSkuConfig.appServicePlan.functionApp
       appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
       webAppBaseOs: 'Windows'
       logAnalyticsWsId: logAnalyticsWorkspaceId
@@ -794,7 +866,7 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     name: take('rtsfnApp-${deployment().name}-deployment', 64)
     params: {
       tags: {}
-      sku: 'B1'
+      sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
       appServicePlanName: 'asp-rsp-fnsyncrtsApp-manualtest-uks'
@@ -829,7 +901,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
     name: take('fnNotifyApp-${deployment().name}-deployment', 64)
     params: {
       tags: {}
-      sku: 'B1'
+      sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
       appServicePlanName: 'asp-rsp-fnNotifyApp-manualtest-uks'
@@ -864,7 +936,7 @@ module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
     name: take('fnDocumentApiApp-${deployment().name}-deployment', 64)
     params: {
       tags: {}
-      sku: 'B1'
+      sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
       appServicePlanName: 'asp-rsp-fnDocApi-${parSpokeNetworks[i].parEnvironment}-uks'
@@ -934,6 +1006,7 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
       enableManagedTls: true
       webAppResourceId: webApp[i].outputs.webAppResourceId
       enablePrivateLink: parEnableFrontDoorPrivateLink
+      frontDoorSku: parSkuConfig.frontDoor
     }
     dependsOn: [
       webApp

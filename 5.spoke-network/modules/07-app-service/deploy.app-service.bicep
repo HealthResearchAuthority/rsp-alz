@@ -58,7 +58,10 @@ param userAssignedIdentities array
 
 var slotName = 'staging'
 
- var varWhitelistIPs = filter(split(paramWhitelistIPs, ','), ip => !empty(trim(ip)))
+var varWhitelistIPs = filter(split(paramWhitelistIPs, ','), ip => !empty(trim(ip)))
+var contentShareName = kind == 'functionapp' ? take(replace(toLower('${appName}-content'), '_', '-'), 63) : ''
+var storageAccountSanitized = toLower(replace(storageAccountName, '-', ''))
+var storageAccountResourceName = length(storageAccountSanitized) > 24 ? substring(storageAccountSanitized, 0, 24) : storageAccountSanitized
 
 var spokeVNetIdTokens = split(spokeVNetId, '/')
 var spokeSubscriptionId = spokeVNetIdTokens[2]
@@ -144,6 +147,22 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
   }
 }
 
+resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = if(kind == 'functionapp') {
+  name: '${storageAccountResourceName}/default'
+  dependsOn: [
+    fnstorage
+  ]
+}
+
+resource storageContentShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = if(kind == 'functionapp' && !empty(contentShareName)) {
+  parent: storageFileService
+  name: contentShareName
+  properties: {
+    enabledProtocols: 'SMB'
+    shareQuota: 10240
+  }
+}
+
 module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && deployAppPrivateEndPoint == true) {
   name:take('rtsfnStorageBlobPrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
@@ -203,6 +222,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
     }
     storageAccountName: storageAccountName
+    contentShareName: contentShareName
     hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
   }
@@ -241,4 +261,8 @@ module appServicePrivateEndpoint '../../../shared/bicep/network/private-networki
 output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: fnApp!.outputs.defaultHostName
 output webAppResourceId string = (kind == 'app') ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
 output systemAssignedPrincipalId string = (kind == 'app') ? webApp!.outputs.systemAssignedPrincipalId : fnApp!.outputs.systemAssignedPrincipalId
+
+
+
+
 

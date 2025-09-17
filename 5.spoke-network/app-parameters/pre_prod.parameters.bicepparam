@@ -89,6 +89,27 @@ param parStorageConfig = {
   }
 }
 
+// SKU configuration for all resource types - Pre-Production environment (production-like)
+param parSkuConfig = {
+  appServicePlan: {
+    webApp: 'P1V3'
+    functionApp: 'P1V3'
+    cmsApp: 'P1V3'
+  }
+  sqlDatabase: {
+    name: 'GP_Gen5'
+    tier: 'GeneralPurpose'
+    family: 'Gen5'
+    capacity: 12
+    minCapacity: 8
+    storageSize: '100GB'
+    zoneRedundant: true
+  }
+  keyVault: 'standard'
+  appConfiguration: 'standard'
+  frontDoor: 'Premium_AzureFrontDoor'
+}
+
 // Network security configuration for pre-production environment
 param parNetworkSecurityConfig = {
   defaultAction: 'Deny'        
@@ -99,7 +120,7 @@ param parNetworkSecurityConfig = {
 
 param parSpokeNetworks = [
   {
-    subscriptionId: ''
+    subscriptionId: 'be1174fc-09c8-470f-9409-d0054ab9586a'
     parEnvironment: 'preprod'
     workloadName: 'container-app'
     zoneRedundancy: true
