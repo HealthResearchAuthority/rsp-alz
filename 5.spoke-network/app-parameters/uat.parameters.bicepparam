@@ -180,3 +180,15 @@ param parClarityProjectId = ''
 param parCmsUri = ''
 
 param parGoogleTagId = ''
+
+param parApiRequestMaxConcurrency = 8
+
+param parApiRequestPageSize = 50
+
+param parRtsApiBaseUrl = ''
+
+param parRtsApiClientId = ''
+
+param parRtsApiClientSecret = ''
+
+param parRtsAuthApiBaseUrl = ''

@@ -86,6 +86,25 @@ param cmsUri string
 @description('The URL to redirect to on logout from auth provider')
 param logoutUrl string
 
+@description('Maximum concurrent API requests')
+param apiRequestMaxConcurrency int
+
+@description('API request page size')
+param apiRequestPageSize int
+
+@description('Base URL for RTS API')
+param rtsApiBaseUrl string
+
+@description('Client ID for RTS API authentication')
+param rtsApiClientId string
+
+@secure()
+@description('Client secret for RTS API authentication')
+param rtsApiClientSecret string
+
+@description('Base URL for RTS authentication API')
+param rtsAuthApiBaseUrl string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -242,6 +261,36 @@ var keyValues = [
   {
     name: 'AppSettings:AuthSettings:LogoutUrl$portal'
     value: logoutUrl
+    contentType: null
+  }
+  {
+    name: 'AppSettings:ApiRequestMaxConcurrency'
+    value: string(apiRequestMaxConcurrency)
+    contentType: null
+  }
+  {
+    name: 'AppSettings:ApiRequestPageSize'
+    value: string(apiRequestPageSize)
+    contentType: null
+  }
+  {
+    name: 'AppSettings:RtsApiBaseUrl'
+    value: rtsApiBaseUrl
+    contentType: null
+  }
+  {
+    name: 'AppSettings:RtsApiClientId'
+    value: rtsApiClientId
+    contentType: null
+  }
+  {
+    name: 'AppSettings:RtsApiClientSecret'
+    value: rtsApiClientSecret
+    contentType: null
+  }
+  {
+    name: 'AppSettings:RtsAuthApiBaseUrl'
+    value: rtsAuthApiBaseUrl
     contentType: null
   }
 ]

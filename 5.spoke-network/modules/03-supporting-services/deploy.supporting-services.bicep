@@ -100,6 +100,25 @@ param cmsUri string
 @description('The URL to redirect to on logout from auth provider')
 param logoutUrl string
 
+@description('Maximum concurrent API requests')
+param apiRequestMaxConcurrency int
+
+@description('API request page size')
+param apiRequestPageSize int
+
+@description('Base URL for RTS API')
+param rtsApiBaseUrl string
+
+@description('Client ID for RTS API authentication')
+param rtsApiClientId string
+
+@secure()
+@description('Client secret for RTS API authentication')
+param rtsApiClientSecret string
+
+@description('Base URL for RTS authentication API')
+param rtsAuthApiBaseUrl string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -199,6 +218,12 @@ module appConfiguration './modules/app-configuration.bicep' = {
     googleTagId: googleTagId
     cmsUri: cmsUri
     logoutUrl: logoutUrl
+    apiRequestMaxConcurrency: apiRequestMaxConcurrency
+    apiRequestPageSize: apiRequestPageSize
+    rtsApiBaseUrl: rtsApiBaseUrl
+    rtsApiClientId: rtsApiClientId
+    rtsApiClientSecret: rtsApiClientSecret
+    rtsAuthApiBaseUrl: rtsAuthApiBaseUrl
   }
 }
 

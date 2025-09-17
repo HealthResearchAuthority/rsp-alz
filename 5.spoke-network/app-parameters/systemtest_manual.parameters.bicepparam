@@ -180,3 +180,15 @@ param parGoogleTagId = ''
 param parCmsUri = ''
 
 param parLogoutUrl = ''
+
+param parApiRequestMaxConcurrency = 8
+
+param parApiRequestPageSize = 50
+
+param parRtsApiBaseUrl = ''
+
+param parRtsApiClientId = ''
+
+param parRtsApiClientSecret = ''
+
+param parRtsAuthApiBaseUrl = ''
