@@ -135,11 +135,6 @@ var keyValues = [
     contentType: null
   }
   {
-    name: 'ConnectionStrings:QuestionSetServiceDatabaseConnection'
-    value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=questionsetservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
-    contentType: null
-  }
-  {
     name: 'ConnectionStrings:RTSDatabaseConnection'
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=RtsService;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
     contentType: null
@@ -156,11 +151,6 @@ var keyValues = [
   }
   {
     name: 'AppSettings:Sentinel$portal'
-    value: '0'
-    contentType: null
-  }
-  {
-    name: 'AppSettings:Sentinel$questionsetservice'
     value: '0'
     contentType: null
   }

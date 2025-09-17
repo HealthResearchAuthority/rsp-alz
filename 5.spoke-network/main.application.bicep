@@ -147,9 +147,6 @@ param parIrasContainerImageTag string
 @description('User Service Container image tag.')
 param parUserServiceContainerImageTag string
 
-@description('QuestionSet Service Container image tag.')
-param parQuestionSetContainerImageTag string
-
 @description('RTS Service Container image tag.')
 param parRtsContainerImageTag string
 
@@ -612,7 +609,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
       adminLogin: parAdminLogin
       adminPassword: parSqlAdminPhrase
-      databases: ['applicationservice', 'identityservice', 'questionsetservice', 'rtsservice', 'cmsservice']
+      databases: ['applicationservice', 'identityservice', 'rtsservice', 'cmsservice']
       spokePrivateEndpointSubnetName: pepSubnet[i].name // spoke[i].outputs.spokePrivateEndpointsSubnetName
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       sqlServerUAIName: storageServicesNaming[i].outputs.resourcesNames.sqlServerUserAssignedIdentity
@@ -694,41 +691,6 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
   }
 ]
 
-module questionsetapp 'modules/06-container-app/deploy.container-app.bicep' = [
-  for i in range(0, length(parSpokeNetworks)): {
-    name: take('questionsetapp-${deployment().name}-deployment', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
-    params: {
-      location: location
-      tags: tags
-      containerRegistryUserAssignedIdentityId: supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
-      sqlServerUserAssignedIdentityName: databaseserver[i].outputs.outputsqlServerUAIName
-      containerAppsEnvironmentId: containerAppsEnvironment[i].outputs.containerAppsEnvironmentId
-      storageRG: parSpokeNetworks[i].rgStorage
-      appConfigURL: supportingServices[i].outputs.appConfigURL
-      appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
-      appInsightsConnectionString: parSpokeNetworks[i].appInsightsConnectionString
-      containerRegistryLoginServer: supportingServices[i].outputs.containerRegistryLoginServer
-      containerAppName: 'questionsetservice'
-      containerImageTag: '${supportingServices[i].outputs.containerRegistryLoginServer}/${parQuestionSetContainerImageTag}'
-      containerImageName: 'questionsetservice'
-      configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
-      webAppURLConfigKey: 'AppSettings:QuestionSetServiceUri'
-      sharedservicesRG: parSpokeNetworks[i].rgSharedServices
-      userAssignedIdentities: [
-        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-        supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
-        databaseserver[i].outputs.outputsqlServerUAIID
-      ]
-    }
-    dependsOn: [
-      databaseserver
-      irasserviceapp
-      usermanagementapp
-    ]
-  }
-]
-
 module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('rtsserviceapp-${deployment().name}-deployment', 64)
@@ -760,7 +722,6 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
       databaseserver
       irasserviceapp
       usermanagementapp
-      questionsetapp
     ]
   }
 ]
