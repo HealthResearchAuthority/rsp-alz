@@ -12,8 +12,6 @@ param parIrasContainerImageTag = 'rsp-irasservice:latest'
 
 param parUserServiceContainerImageTag = 'rsp-usermanagementservice:latest'
 
-param parQuestionSetContainerImageTag = 'rsp-questionsetservice:latest'
-
 param parRtsContainerImageTag = 'rsp-rtsservice:latest'
 
 param parClientID = ''
