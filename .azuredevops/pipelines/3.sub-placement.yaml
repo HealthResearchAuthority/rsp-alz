@@ -143,7 +143,7 @@ stages:
                     failOnStandardError: true
                     inlineScript: |
                       az config set bicep.use_binary_from_path=false --only-show-errors
-                      output=$(az deployment mg \
+                      output=$(az deployment mg create \
                       --location $(location) \
                       --template-file ./3.sub-placement/main.bicep \
                       --management-group-id $(management-group-id))

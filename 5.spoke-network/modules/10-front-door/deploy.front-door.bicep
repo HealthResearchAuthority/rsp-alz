@@ -55,6 +55,9 @@ param webAppResourceId string = ''
 @description('Optional. Enable Private Link to origin.')
 param enablePrivateLink bool = false
 
+@description('Front Door SKU')
+param frontDoorSku string = 'Premium_AzureFrontDoor'
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -96,7 +99,7 @@ module wafPolicy '../../../shared/bicep/front-door/waf-policy.bicep' = if (enabl
     name: wafPolicyName
     location: 'global'
     tags: tags
-    skuName: 'Premium_AzureFrontDoor'
+    skuName: frontDoorSku
     policyMode: wafMode
     enabled: true
     enableManagedRules: true
@@ -113,7 +116,7 @@ module frontDoorProfile '../../../shared/bicep/front-door/front-door-profile.bic
     name: frontDoorProfileName
     location: 'global'
     tags: tags
-    skuName: 'Premium_AzureFrontDoor'
+    skuName: frontDoorSku
     identityType: 'SystemAssigned'
     originResponseTimeoutSeconds: 60
   }

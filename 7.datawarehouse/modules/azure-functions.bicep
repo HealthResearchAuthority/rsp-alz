@@ -109,14 +109,14 @@ module storageAccounts '../../shared/bicep/storage/storage.bicep' = [for (funcAp
     supportsHttpsTrafficOnly: true
     tags: tags
     networkAcls: {
-      defaultAction: 'Allow'
-      // bypass: 'AzureServices'
-      // virtualNetworkRules: [
-      //   {
-      //     id: functionAppSubnet.id
-      //     action: 'Allow'
-      //   }
-      // ]
+      defaultAction: 'Deny'
+      bypass: 'AzureServices'
+      virtualNetworkRules: [
+        {
+          id: functionAppSubnet.id
+          action: 'Allow'
+        }
+      ]
     }
   }
 }]
@@ -184,7 +184,7 @@ module storageFilePrivateEndpoints '../../shared/bicep/network/private-endpoint.
     snetId: spokePrivateEndpointSubnet.id
     privateLinkServiceId: storageAccounts[index].outputs.id
     subresource: 'file'
-    privateDnsZonesId: blobPrivateDnsZone.outputs.privateDnsZonesId
+    privateDnsZonesId: filePrivateDnsZone.outputs.privateDnsZonesId
     tags: tags
   }
   dependsOn: [
