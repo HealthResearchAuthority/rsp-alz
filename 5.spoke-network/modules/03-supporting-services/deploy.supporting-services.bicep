@@ -90,6 +90,10 @@ param keyVaultSku string = 'standard'
 @description('App Configuration SKU')
 param appConfigurationSku string = 'standard'
 
+@secure()
+@description('The key for the Google Analytics project this is associated with.')
+param googleTagId string
+
 @description('The URI of the CMS where content related to this application is managed')
 param cmsUri string
 
@@ -192,6 +196,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     useOneLogin: useOneLogin
     clarityProjectId: clarityProjectId
     appConfigurationSku: appConfigurationSku
+    googleTagId: googleTagId
     cmsUri: cmsUri
     logoutUrl: logoutUrl
   }
