@@ -207,7 +207,6 @@ The repository deploys a comprehensive application infrastructure including:
 - **Container Apps**: Microservices architecture with dedicated container apps for:
   - IRAS Service (`irasservice`)
   - User Management Service (`usermanagementservice`)
-  - Question Set Service (`questionsetservice`)
   - RTS Service (`rtsservice`)
 
 ### Function Apps
@@ -221,7 +220,6 @@ The repository deploys a comprehensive application infrastructure including:
 - **Databases**: Multiple databases for different services:
   - `applicationservice`
   - `identityservice`
-  - `questionsetservice`
   - `rtsservice`
 
 ### Shared Services
