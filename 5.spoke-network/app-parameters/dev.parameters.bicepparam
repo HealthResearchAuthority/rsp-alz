@@ -174,3 +174,15 @@ param parUseFrontDoor = true
 param useOneLogin = true
 param paramWhitelistIPs = ''
 
+param parApiRequestMaxConcurrency = 8
+
+param parApiRequestPageSize = 50
+
+param parRtsApiBaseUrl = ''
+
+param parRtsApiClientId = ''
+
+param parRtsApiClientSecret = ''
+
+param parRtsAuthApiBaseUrl = ''
+
