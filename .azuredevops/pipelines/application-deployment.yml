@@ -9,6 +9,7 @@ pr:
     include:
       - '5.spoke-network/main.application.bicep'
       - '5.spoke-network/app-parameters/**'
+      - '.azuredevops/pipelines/application-deployment.yml'
 
 parameters:
   - name: env
@@ -133,6 +134,10 @@ stages:
               echo "Installing Azure CLI..."
               curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
             displayName: 'Install Azure CLI'
+          - script: |
+              echo "Run NS Lookup"
+              nslookup appcs-rsp-shared-2i2oq-dev-uks.azconfig.io
+            displayName: 'Run NSLookup'
           - bash: |
               az bicep install
               az bicep version

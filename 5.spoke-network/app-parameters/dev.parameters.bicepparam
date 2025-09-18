@@ -185,10 +185,3 @@ param parRtsApiClientId = ''
 param parRtsApiClientSecret = ''
 
 param parRtsAuthApiBaseUrl = ''
-
-
-
-
-
-
-
