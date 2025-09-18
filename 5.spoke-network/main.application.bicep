@@ -830,7 +830,7 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
-      appServicePlanName: 'asp-rsp-fnsyncrtsApp-manualtest-uks'
+      appServicePlanName: 'asp-rsp-fnsyncrtsApp-${parSpokeNetworks[i].parEnvironment}-uks'
       appName: 'func-rts-data-sync-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Windows'
       subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
@@ -856,77 +856,7 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
-module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
-  for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
-    name: take('fnNotifyApp-${deployment().name}-deployment', 64)
-    params: {
-      tags: {}
-      sku: parSkuConfig.appServicePlan.functionApp
-      logAnalyticsWsId: logAnalyticsWorkspaceId
-      location: location
-      appServicePlanName: 'asp-rsp-fnNotifyApp-manualtest-uks'
-      appName: 'func-notify-${parSpokeNetworks[i].parEnvironment}'
-      webAppBaseOs: 'Windows'
-      subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
-      deploySlot: parSpokeNetworks[i].deployWebAppSlot
-      privateEndpointRG: parSpokeNetworks[i].rgNetworking
-      spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
-      subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
-      kind: 'functionapp'
-      storageAccountName: 'stfnnotify${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
-      userAssignedIdentities: [
-        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-        // supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
-      ]
-    }
-    dependsOn: [
-      webApp
-      umbracoCMS
-      processScanFnApp
-      rtsfnApp
-      documentUpload
-    ]
-  }
-]
 
-module fnDocumentApiApp 'modules/07-app-service/deploy.app-service.bicep' = [
-  for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
-    name: take('fnDocumentApiApp-${deployment().name}-deployment', 64)
-    params: {
-      tags: {}
-      sku: parSkuConfig.appServicePlan.functionApp
-      logAnalyticsWsId: logAnalyticsWorkspaceId
-      location: location
-      appServicePlanName: 'asp-rsp-fnDocApi-${parSpokeNetworks[i].parEnvironment}-uks'
-      appName: 'func-documentapi-${parSpokeNetworks[i].parEnvironment}'
-      webAppBaseOs: 'Windows'
-      subnetIdForVnetInjection: webAppSubnet[i].id
-      deploySlot: parSpokeNetworks[i].deployWebAppSlot
-      privateEndpointRG: parSpokeNetworks[i].rgNetworking
-      spokeVNetId: existingVnet[i].id
-      subnetPrivateEndpointSubnetId: pepSubnet[i].id
-      kind: 'functionapp'
-      storageAccountName: 'stdocapi${parSpokeNetworks[i].parEnvironment}'
-      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
-      userAssignedIdentities: [
-        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
-        databaseserver[i].outputs.outputsqlServerUAIID
-      ]
-      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
-    }
-    dependsOn: [
-      fnNotifyApp
-      webApp
-      umbracoCMS
-      processScanFnApp
-      rtsfnApp
-      documentUpload
-    ]
-  }
-]
 
 
 // Grant process scan function permissions to all document storage accounts. Handled seperately as there was circular dependency.
