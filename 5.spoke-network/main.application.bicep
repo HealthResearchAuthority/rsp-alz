@@ -929,3 +929,22 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
     ]
   }
 ]
+
+// Post-deployment App Configuration update with Front Door and Web App URLs
+module appConfigUpdate 'modules/11-app-config-update/deploy.app-config-update.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): if (parEnableFrontDoor && parUseFrontDoor) {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgSharedServices)
+    name: take('appConfigUpdate-${deployment().name}-deployment-${i}', 64)
+    params: {
+      configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
+      frontDoorHostName: frontDoor[i]!.outputs.frontDoorEndpointHostName
+      webAppHostName: webApp[i].outputs.appHostName
+      useFrontDoor: parUseFrontDoor
+    }
+    dependsOn: [
+      frontDoor
+      supportingServices
+      webApp
+    ]
+  }
+]
