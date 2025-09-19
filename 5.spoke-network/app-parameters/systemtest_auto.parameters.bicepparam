@@ -161,6 +161,8 @@ param parStorageAccountName = 'strrspstg'
 param parStorageAccountKey = ''
 
 // Allowed hosts for the systemtest_auto environment to be used when the Web App is behind Front Door
+// NOTE: This value is used for initial deployment. When Front Door is enabled,
+// the app-config-update module will automatically update this with dynamic URLs
 param parAllowedHosts = 'fd-rsp-applications-automationtest-uks-e7f6hkg3c5edhxex.a03.azurefd.net;irasportal-automationtest.azurewebsites.net'
 
 // indicates whether to use Front Door for the systemtest_auto environment
