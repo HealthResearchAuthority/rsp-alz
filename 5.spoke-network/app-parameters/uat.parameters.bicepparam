@@ -20,9 +20,7 @@ param parClientSecret = ''
 
 param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
 
-param parOneLoginPrivateKeyPem = ''
 
-param parOneLoginClientId = 'WlsPS-_Zpm64UhTpf5zj9_BnAN4'
 
 param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
@@ -163,6 +161,8 @@ param parStorageAccountName = 'strrspstg'
 param parStorageAccountKey = ''
 
 // Allowed hosts for the UAT environment to be used when the Web App is behind Front Door
+// NOTE: This value is used for initial deployment. When Front Door is enabled,
+// the app-config-update module will automatically update this with dynamic URLs
 param parAllowedHosts = '*'
 
 // indicates whether to use Front Door for the UAT environment
@@ -187,8 +187,5 @@ param parApiRequestPageSize = 50
 
 param parRtsApiBaseUrl = ''
 
-param parRtsApiClientId = ''
-
-param parRtsApiClientSecret = ''
 
 param parRtsAuthApiBaseUrl = ''

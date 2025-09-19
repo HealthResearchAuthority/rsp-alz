@@ -18,9 +18,7 @@ param parClientSecret = ''
 
 param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
 
-param parOneLoginPrivateKeyPem = ''
 
-param parOneLoginClientId = 'GJVVaSadH1BG8GXohuWK3U8lUAA'
 
 param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
@@ -166,7 +164,9 @@ param parPortalUrl = ''
 param parLogoutUrl = ''
 
 // Allowed hosts for the dev environment to be used when the Web App is behind Front Door
-param parAllowedHosts = 'fd-rsp-applications-dev-uks-cveeakgqdgbqexbz.a03.azurefd.net;irasportal-dev.azurewebsites.net'
+// NOTE: This value is used for initial deployment. When Front Door is enabled,
+// the app-config-update module will automatically update this with dynamic URLs
+param parAllowedHosts = '*'
 
 // indicates whether to use Front Door for the dev environment
 param parUseFrontDoor = true
@@ -181,9 +181,6 @@ param parApiRequestPageSize = 50
 
 param parRtsApiBaseUrl = ''
 
-param parRtsApiClientId = ''
-
-param parRtsApiClientSecret = ''
 
 param parRtsAuthApiBaseUrl = ''
 
