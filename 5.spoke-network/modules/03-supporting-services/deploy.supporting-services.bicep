@@ -231,7 +231,6 @@ module appConfiguration './modules/app-configuration.bicep' = {
       oneLoginPrivateKeyPemSecretUri: keyVaultSecrets.outputs.oneLoginPrivateKeyPemSecretUri
     }
   }
-  dependsOn: [keyVaultSecrets]
 }
 
 @description('Role assignment for App Configuration managed identity to read Key Vault secrets.')
@@ -244,7 +243,6 @@ module appConfigKeyVaultAccess '../../../shared/bicep/role-assignments/role-assi
     roleDefinitionId: '4633458b-17de-408a-b874-0445c86b69e6' // Key Vault Secrets User
     principalType: 'ServicePrincipal'
   }
-  dependsOn: [appConfiguration, keyVault]
 }
 
 // module serviceBus './modules/service-bus.module.bicep' = {
