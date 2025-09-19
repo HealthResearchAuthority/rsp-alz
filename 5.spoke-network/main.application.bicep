@@ -160,12 +160,6 @@ param parClientSecret string
 @description('Token issuing authority for Gov UK One Login')
 param parOneLoginAuthority string
 
-@secure()
-@description('Private RSA key for signing the token')
-param parOneLoginPrivateKeyPem string
-
-@description('ClientId for the registered service in Gov UK One Login')
-param parOneLoginClientId string
 
 @description('Valid token issuers for Gov UK One Login')
 param parOneLoginIssuers array
@@ -531,8 +525,6 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       clientSecret: parClientSecret
       devOpsPublicIPAddress: parDevOpsPublicIPAddress
       oneLoginAuthority: parOneLoginAuthority
-      oneLoginPrivateKeyPem: parOneLoginPrivateKeyPem
-      oneLoginClientId: parOneLoginClientId
       oneLoginIssuers: parOneLoginIssuers
       storageAccountName: parStorageAccountName
       storageAccountKey: parStorageAccountKey

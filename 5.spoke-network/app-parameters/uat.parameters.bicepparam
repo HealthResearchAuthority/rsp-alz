@@ -20,9 +20,7 @@ param parClientSecret = ''
 
 param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
 
-param parOneLoginPrivateKeyPem = ''
 
-param parOneLoginClientId = 'WlsPS-_Zpm64UhTpf5zj9_BnAN4'
 
 param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
