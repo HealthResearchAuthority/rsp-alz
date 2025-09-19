@@ -103,12 +103,6 @@ param apiRequestPageSize int
 @description('Base URL for RTS API')
 param rtsApiBaseUrl string
 
-@description('Client ID for RTS API authentication')
-param rtsApiClientId string
-
-@secure()
-@description('Client secret for RTS API authentication')
-param rtsApiClientSecret string
 
 @description('Base URL for RTS authentication API')
 param rtsAuthApiBaseUrl string
@@ -223,12 +217,13 @@ module appConfiguration './modules/app-configuration.bicep' = {
     apiRequestMaxConcurrency: apiRequestMaxConcurrency
     apiRequestPageSize: apiRequestPageSize
     rtsApiBaseUrl: rtsApiBaseUrl
-    rtsApiClientId: rtsApiClientId
-    rtsApiClientSecret: rtsApiClientSecret
     rtsAuthApiBaseUrl: rtsAuthApiBaseUrl
     keyVaultSecretUris: {
       oneLoginClientIdSecretUri: keyVaultSecrets.outputs.oneLoginClientIdSecretUri
       oneLoginPrivateKeyPemSecretUri: keyVaultSecrets.outputs.oneLoginPrivateKeyPemSecretUri
+      rtsApiClientIdSecretUri: keyVaultSecrets.outputs.rtsApiClientIdSecretUri
+      rtsApiClientSecretSecretUri: keyVaultSecrets.outputs.rtsApiClientSecretSecretUri
+      documentBlobStorageAccountKeySecretUri: keyVaultSecrets.outputs.documentBlobStorageAccountKeySecretUri
     }
   }
 }

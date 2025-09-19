@@ -89,12 +89,6 @@ param apiRequestPageSize int
 @description('Base URL for RTS API')
 param rtsApiBaseUrl string
 
-@description('Client ID for RTS API authentication')
-param rtsApiClientId string
-
-@secure()
-@description('Client secret for RTS API authentication')
-param rtsApiClientSecret string
 
 @description('Base URL for RTS authentication API')
 param rtsAuthApiBaseUrl string
@@ -268,13 +262,13 @@ var keyValues = [
   }
   {
     name: 'AppSettings:RtsApiClientId'
-    value: rtsApiClientId
-    contentType: null
+    value: '{"uri":"${keyVaultSecretUris.rtsApiClientIdSecretUri}"}'
+    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
   {
     name: 'AppSettings:RtsApiClientSecret'
-    value: rtsApiClientSecret
-    contentType: null
+    value: '{"uri":"${keyVaultSecretUris.rtsApiClientSecretSecretUri}"}'
+    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
   {
     name: 'AppSettings:RtsAuthApiBaseUrl'

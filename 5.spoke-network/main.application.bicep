@@ -343,12 +343,6 @@ param parApiRequestPageSize int = 50
 @description('Base URL for RTS API')
 param parRtsApiBaseUrl string = ''
 
-@description('Client ID for RTS API authentication')
-param parRtsApiClientId string = ''
-
-@secure()
-@description('Client secret for RTS API authentication')
-param parRtsApiClientSecret string = ''
 
 @description('Base URL for RTS authentication API')
 param parRtsAuthApiBaseUrl string = ''
@@ -540,8 +534,6 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       apiRequestMaxConcurrency: parApiRequestMaxConcurrency
       apiRequestPageSize: parApiRequestPageSize
       rtsApiBaseUrl: parRtsApiBaseUrl
-      rtsApiClientId: parRtsApiClientId
-      rtsApiClientSecret: parRtsApiClientSecret
       rtsAuthApiBaseUrl: parRtsAuthApiBaseUrl
     }
   }

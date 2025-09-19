@@ -112,8 +112,6 @@ stages:
                               parCmsUri=$(cmsUri) \
                               parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
-                              parRtsApiClientId=$(rtsApiClientId) \
-                              parRtsApiClientSecret=$(rtsApiClientSecret) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl)
 
       - job: preview
@@ -156,8 +154,6 @@ stages:
                               parCmsUri=$(cmsUri) \
                               parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
-                              parRtsApiClientId=$(rtsApiClientId) \
-                              parRtsApiClientSecret=$(rtsApiClientSecret) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl)
 
 
@@ -236,8 +232,8 @@ stages:
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
                               paramWhitelistIPs=$(parWhitelistIPs) parClarityProjectId=$(clarityProjectId) parCmsUri=$(cmsUri) \
                               parLogoutUrl=$(logoutUrl) parGoogleTagId=$(googleTagId) \
-                              parRtsApiBaseUrl=$(rtsApiBaseUrl) parRtsApiClientId=$(rtsApiClientId) \
-                              parRtsApiClientSecret=$(rtsApiClientSecret) parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl)
+                              parRtsApiBaseUrl=$(rtsApiBaseUrl) \
+                              parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl)
 
       - deployment: deploy
         displayName: 'Deploy Applications'
@@ -291,8 +287,6 @@ stages:
                                     parCmsUri=$(cmsUri) \
                                     parLogoutUrl=$(logoutUrl) \
                                     parRtsApiBaseUrl=$(rtsApiBaseUrl) \
-                                    parRtsApiClientId=$(rtsApiClientId) \
-                                    parRtsApiClientSecret=$(rtsApiClientSecret) \
                                     parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .

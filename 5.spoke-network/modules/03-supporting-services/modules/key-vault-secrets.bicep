@@ -26,6 +26,26 @@ var oneLoginSecrets = [
   }
 ]
 
+// RTS API secrets with placeholder values - actual values to be updated manually via portal
+var rtsApiSecrets = [
+  {
+    name: 'rtsApiClientId'
+    value: 'placeholder-rts-client-id-to-be-updated-manually'
+  }
+  {
+    name: 'rtsApiClientSecret'
+    value: 'placeholder-rts-client-secret-to-be-updated-manually'
+  }
+]
+
+// Storage account secrets with placeholder values - actual values to be updated manually via portal
+var storageSecrets = [
+  {
+    name: 'documentBlobStorageAccountKey'
+    value: 'placeholder-document-storage-key-to-be-updated-manually'
+  }
+]
+
 // ------------------
 //    RESOURCES
 // ------------------
@@ -46,6 +66,30 @@ resource oneLoginSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' 
   }
 ]
 
+resource rtsApiSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = [
+  for secret in rtsApiSecrets: {
+    parent: keyVault
+    name: secret.name
+    tags: tags
+    properties: {
+      value: secret.value
+      contentType: 'text/plain'
+    }
+  }
+]
+
+resource storageSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = [
+  for secret in storageSecrets: {
+    parent: keyVault
+    name: secret.name
+    tags: tags
+    properties: {
+      value: secret.value
+      contentType: 'text/plain'
+    }
+  }
+]
+
 // ------------------
 //    OUTPUTS
 // ------------------
@@ -53,8 +97,23 @@ resource oneLoginSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' 
 @description('Array of OneLogin secret names that were created.')
 output oneLoginSecretNames array = [for secret in oneLoginSecrets: secret.name]
 
+@description('Array of RTS API secret names that were created.')
+output rtsApiSecretNames array = [for secret in rtsApiSecrets: secret.name]
+
+@description('Array of storage secret names that were created.')
+output storageSecretNames array = [for secret in storageSecrets: secret.name]
+
 @description('Key Vault URI for oneLoginClientId secret.')
 output oneLoginClientIdSecretUri string = '${keyVault.properties.vaultUri}secrets/oneLoginClientId'
 
 @description('Key Vault URI for oneLoginPrivateKeyPem secret.')
 output oneLoginPrivateKeyPemSecretUri string = '${keyVault.properties.vaultUri}secrets/oneLoginPrivateKeyPem'
+
+@description('Key Vault URI for rtsApiClientId secret.')
+output rtsApiClientIdSecretUri string = '${keyVault.properties.vaultUri}secrets/rtsApiClientId'
+
+@description('Key Vault URI for rtsApiClientSecret secret.')
+output rtsApiClientSecretSecretUri string = '${keyVault.properties.vaultUri}secrets/rtsApiClientSecret'
+
+@description('Key Vault URI for documentBlobStorageAccountKey secret.')
+output documentBlobStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/documentBlobStorageAccountKey'
