@@ -177,6 +177,8 @@ param parGoogleTagId = ''
 
 param parCmsUri = ''
 
+param parPortalUrl = ''
+
 param parLogoutUrl = ''
 
 param parApiRequestMaxConcurrency = 8
