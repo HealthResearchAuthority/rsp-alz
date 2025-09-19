@@ -177,6 +177,8 @@ param parClarityProjectId = ''
 
 param parCmsUri = ''
 
+param parPortalUrl = ''
+
 param parGoogleTagId = ''
 
 param parApiRequestMaxConcurrency = 8

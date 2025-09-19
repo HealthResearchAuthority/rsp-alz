@@ -83,6 +83,9 @@ param googleTagId string
 @description('The URI of the CMS where content related to this application is managed')
 param cmsUri string
 
+@description('The URI of the Portal application')
+param portalUrl string
+
 @description('The URL to redirect to on logout from auth provider')
 param logoutUrl string
 
@@ -281,6 +284,11 @@ var keyValues = [
   {
     name: 'AppSettings:RtsAuthApiBaseUrl'
     value: rtsAuthApiBaseUrl
+    contentType: null
+  }
+   {
+    name: 'PortalUrl'
+    value: portalUrl
     contentType: null
   }
 ]
