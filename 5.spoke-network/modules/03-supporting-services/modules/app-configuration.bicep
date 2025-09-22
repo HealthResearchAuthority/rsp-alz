@@ -287,7 +287,7 @@ var keyValues = [
     contentType: null
   }
    {
-    name: 'PortalUrl'
+    name: 'AppSettings:PortalUrl'
     value: portalUrl
     contentType: null
   }
