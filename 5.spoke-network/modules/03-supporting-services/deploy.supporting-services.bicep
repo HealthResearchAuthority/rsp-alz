@@ -91,6 +91,9 @@ param googleTagId string
 @description('The URI of the CMS where content related to this application is managed')
 param cmsUri string
 
+@description('The URL of the Portal application')
+param portalUrl string
+
 @description('The URL to redirect to on logout from auth provider')
 param logoutUrl string
 
@@ -213,6 +216,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     appConfigurationSku: appConfigurationSku
     googleTagId: googleTagId
     cmsUri: cmsUri
+    portalUrl: portalUrl
     logoutUrl: logoutUrl
     apiRequestMaxConcurrency: apiRequestMaxConcurrency
     apiRequestPageSize: apiRequestPageSize

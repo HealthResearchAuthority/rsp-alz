@@ -112,7 +112,8 @@ stages:
                               parCmsUri=$(cmsUri) \
                               parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
-                              parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl)
+                              parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
+                              parPortalUrl=$(portalUrl)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -154,7 +155,8 @@ stages:
                               parCmsUri=$(cmsUri) \
                               parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
-                              parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl)
+                              parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
+                              parPortalUrl=$(portalUrl)
 
 
   - stage: ManualDeployment
@@ -186,6 +188,10 @@ stages:
               echo "$(cmsUri)"
             name: cmsUri
             displayName: 'CMS URI'
+          - bash: | 
+              echo "$(portalUrl)"
+            name: portalUrl
+            displayName: 'Portal URI'
           - bash: | 
               ipaddress=$(curl -s http://ipinfo.io/ip)
               ipaddressipify=$(curl -s https://api.ipify.org)
@@ -233,7 +239,8 @@ stages:
                               paramWhitelistIPs=$(parWhitelistIPs) parClarityProjectId=$(clarityProjectId) parCmsUri=$(cmsUri) \
                               parLogoutUrl=$(logoutUrl) parGoogleTagId=$(googleTagId) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
-                              parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl)
+                              parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
+                              parPortalUrl=$(portalUrl)
 
       - deployment: deploy
         displayName: 'Deploy Applications'
@@ -288,6 +295,7 @@ stages:
                                     parLogoutUrl=$(logoutUrl) \
                                     parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                                     parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
+                                    parPortalUrl=$(portalUrl) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')

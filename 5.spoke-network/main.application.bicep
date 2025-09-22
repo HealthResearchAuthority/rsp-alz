@@ -331,6 +331,9 @@ param parGoogleTagId string
 @description('The URI of the CMS where content related to this application is managed')
 param parCmsUri string
 
+@description('The URL of the Portal application')
+param parPortalUrl string
+
 @description('The URL to redirect to on logout from auth provider')
 param parLogoutUrl string
 
@@ -530,6 +533,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       appConfigurationSku: parSkuConfig.appConfiguration
       googleTagId: parGoogleTagId
       cmsUri: parCmsUri
+      portalUrl: parPortalUrl
       logoutUrl: parLogoutUrl
       apiRequestMaxConcurrency: parApiRequestMaxConcurrency
       apiRequestPageSize: parApiRequestPageSize

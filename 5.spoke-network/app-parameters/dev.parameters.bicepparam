@@ -160,6 +160,7 @@ param parStorageAccountKey = ''
 param parClarityProjectId = ''
 param parGoogleTagId = ''
 param parCmsUri = ''
+param parPortalUrl = ''
 param parLogoutUrl = ''
 
 // Allowed hosts for the dev environment to be used when the Web App is behind Front Door
