@@ -63,6 +63,18 @@ param spokeNetworkingRGName string
 // @description('DevBox Vnet Name')
 // param parDevBoxVNetPeeringVNetName string = ''
 
+param caeFlowLogName string
+
+param pepFlowLogName string
+
+param agwFlowLogName string
+
+param webappFlowLogName string
+
+param environment string
+
+param rgNetworkWatcher string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -156,6 +168,11 @@ resource spokeNetworkingResourceGroup 'Microsoft.Resources/resourceGroups@2021-0
   tags: tags
 }
 
+@description('The spoke resource group. This would normally be already provisioned by your subscription vending process.')
+resource spokeNetworkWatcherResourceGroup 'Microsoft.Resources/resourceGroups@2021-04-01' existing = {
+  name: rgNetworkWatcher
+}
+
 @description('The spoke virtual network in which the workload will run from. This virtual network would normally already be provisioned by your subscription vending process, and only the subnets would need to be configured.')
 module vnetSpoke '../../../shared/bicep/network/vnet.bicep' = {
   name: take('vnetSpoke-${deployment().name}', 64)
@@ -182,6 +199,20 @@ module nsgContainerAppsEnvironment '../../../shared/bicep/network/nsg.bicep' = {
   }
 }
 
+@description('Flow Logs for for the Container Apps cluster NSG.')
+module flContainerAppsEnvironment '../../../shared/bicep/network/flow-logs.bicep' = {
+  name: take('flContainerAppsEnvironment-${deployment().name}', 64)
+  scope: spokeNetworkWatcherResourceGroup
+  params: {
+    location: location
+    flStorageAccountName: 'stflcae${environment}'
+    flowLogName: caeFlowLogName
+    targetResourceId: nsgContainerAppsEnvironment.outputs.nsgId
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    subnetIdForNsgFlowLog: vnetSpokeCreated::spokeInfraSubnet.id
+  }
+}
+
 @description('NSG Rules for the Application Gateway.')
 module nsgAppGw '../../../shared/bicep/network/nsg.bicep' = if (!empty(spokeApplicationGatewaySubnetAddressPrefix)) {
   name: take('nsgAppGw-${deployment().name}', 64)
@@ -192,6 +223,20 @@ module nsgAppGw '../../../shared/bicep/network/nsg.bicep' = if (!empty(spokeAppl
     tags: tags
     securityRules: nsgAppGwRules
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
+  }
+}
+
+@description('Flow Logs for for the Application Gateway NSG.')
+module flAppGw '../../../shared/bicep/network/flow-logs.bicep' = if (!empty(spokeApplicationGatewaySubnetAddressPrefix)){
+  name: take('flAppGw-${deployment().name}', 64)
+  scope: spokeNetworkWatcherResourceGroup
+  params: {
+    location: location
+    flStorageAccountName: 'stflagw${environment}'
+    flowLogName: agwFlowLogName
+    targetResourceId: nsgContainerAppsEnvironment.outputs.nsgId
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    subnetIdForNsgFlowLog: vnetSpokeCreated::spokeApplicationGatewaySubnet.id
   }
 }
 
@@ -208,6 +253,20 @@ module nsgPep '../../../shared/bicep/network/nsg.bicep' = {
   }
 }
 
+@description('Flow Logs for for the Private endpoint NSG.')
+module flPep '../../../shared/bicep/network/flow-logs.bicep' = {
+  name: take('flPep-${deployment().name}', 64)
+  scope: spokeNetworkWatcherResourceGroup
+  params: {
+    location: location
+    flStorageAccountName: 'stflpep${environment}'
+    flowLogName: pepFlowLogName
+    targetResourceId: nsgContainerAppsEnvironment.outputs.nsgId
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    subnetIdForNsgFlowLog: vnetSpokeCreated::spokePrivateEndpointsSubnet.id
+  }
+}
+
 @description('NSG Rules for App service.')
 module nsgWebApp '../../../shared/bicep/network/nsg.bicep' = {
   name: take('nsgWebApp-${deployment().name}', 64)
@@ -218,6 +277,20 @@ module nsgWebApp '../../../shared/bicep/network/nsg.bicep' = {
     tags: tags
     securityRules: []
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
+  }
+}
+
+@description('Flow Logs for for the App Service NSG.')
+module flWebApp '../../../shared/bicep/network/flow-logs.bicep' = {
+  name: take('flWebApp-${deployment().name}', 64)
+  scope: spokeNetworkWatcherResourceGroup
+  params: {
+    location: location
+    flStorageAccountName: 'stflwebapp${environment}'
+    flowLogName: webappFlowLogName
+    targetResourceId: nsgContainerAppsEnvironment.outputs.nsgId
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    subnetIdForNsgFlowLog: vnetSpokeCreated::spokeWebAppSubnet.id
   }
 }
 

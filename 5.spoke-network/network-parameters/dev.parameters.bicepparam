@@ -2,6 +2,16 @@ using '../main.network.bicep'
 
 param logAnalyticsWorkspaceId = ''
 
+// param networkWatcherRGName = 'NetworkWatcherRG'
+
+param caeFlowLogName = 'flcae'
+
+param pepFlowLogName = 'flpep'
+
+param agwFlowLogName = 'flagw'
+
+param webappFlowLogName = 'flwebapp'
+
 param parSpokeNetworks = [
   {
     subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'
@@ -25,6 +35,8 @@ param parSpokeNetworks = [
         addressPrefix: '10.1.12.32/27' // 32 IPs
       }
     }
+    rgNetworkWatcher: 'NetworkWatcherRG'
+    networkWatcherName: 'NetworkWatcher_uksouth'
   }
 ]
 
