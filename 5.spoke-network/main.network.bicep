@@ -20,9 +20,26 @@ param deployAzurePolicies bool = true
 @description('Array of spoke network configurations')
 param parSpokeNetworks array = []
 
+// @description('Name of the Network Watcher attached to your subscription. Format: NetworkWatcher_<region_name>')
+// param networkWatcherName string = 'NetworkWatcher_${location}'
+
+// param networkWatcherRGName string
+
+param caeFlowLogName string
+
+param pepFlowLogName string
+
+param agwFlowLogName string
+
+param webappFlowLogName string
+
 // ------------------
 // RESOURCES
 // ------------------
+resource networkWatcher 'Microsoft.Network/networkWatchers@2022-01-01' existing = [for i in range(0, length(parSpokeNetworks)): {
+  name: parSpokeNetworks[i].networkWatcherName
+  scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgNetworkWatcher)
+}]
 
 module networkingRG '../shared/bicep/resourceGroup.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('networkingRG-${deployment().name}', 64)
@@ -59,6 +76,12 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     resourcesNames: networkingnaming[i].outputs.resourcesNames
     spokeNetworkingRGName: parSpokeNetworks[i].rgNetworking
+    environment: parSpokeNetworks[i].parEnvironment
+    caeFlowLogName: '${networkWatcher[i].name}/${caeFlowLogName}${parSpokeNetworks[i].parEnvironment}'
+    pepFlowLogName: '${networkWatcher[i].name}/${pepFlowLogName}${parSpokeNetworks[i].parEnvironment}'
+    agwFlowLogName: '${networkWatcher[i].name}/${agwFlowLogName}${parSpokeNetworks[i].parEnvironment}'
+    webappFlowLogName: '${networkWatcher[i].name}/${webappFlowLogName}${parSpokeNetworks[i].parEnvironment}'
+    rgNetworkWatcher: parSpokeNetworks[i].rgNetworkWatcher
   }
 }]
 
