@@ -143,6 +143,11 @@ var keyValues = [
     contentType: null
   }
   {
+    name: 'ConnectionStrings:validateIRASIDDatabaseConnection'
+    value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=harpprojectdata;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+    contentType: null
+  }
+  {
     name: 'AppSettings:Sentinel$applicationservice'
     value: '0'
     contentType: null
