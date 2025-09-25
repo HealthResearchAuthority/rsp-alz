@@ -107,7 +107,7 @@ output storageSecretNames array = [for secret in storageSecrets: secret.name]
 output oneLoginClientIdSecretUri string = '${keyVault.properties.vaultUri}secrets/oneLoginClientId'
 
 @description('Key Vault URI for oneLoginPrivateKeyPem secret.')
-output oneLoginPrivateKeyPemSecretUri string = '${keyVault.properties.vaultUri}secrets/oneLoginPrivateKeyPem'
+output oneLoginPrivateKeyPemSecret string = '${keyVault.properties.vaultUri}secrets/oneLoginPrivateKeyPem'
 
 @description('Key Vault URI for rtsApiClientId secret.')
 output rtsApiClientIdSecretUri string = '${keyVault.properties.vaultUri}secrets/rtsApiClientId'

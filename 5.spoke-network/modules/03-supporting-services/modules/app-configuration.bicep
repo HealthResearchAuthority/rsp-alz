@@ -185,7 +185,7 @@ var keyValues = [
   }
   {
     name: 'AppSettings:OneLogin:PrivateKeyPem$portal'
-    value: '{"uri":"${keyVaultSecretUris.oneLoginPrivateKeyPemSecretUri}"}'
+    value: '{"uri":"${keyVaultSecretUris.oneLoginPrivateKeyPemSecret}"}'
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
   {

@@ -224,7 +224,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     rtsAuthApiBaseUrl: rtsAuthApiBaseUrl
     keyVaultSecretUris: {
       oneLoginClientIdSecretUri: keyVaultSecrets.outputs.oneLoginClientIdSecretUri
-      oneLoginPrivateKeyPemSecretUri: keyVaultSecrets.outputs.oneLoginPrivateKeyPemSecretUri
+      oneLoginPrivateKeyPemSecret: keyVaultSecrets.outputs.oneLoginPrivateKeyPemSecret
       rtsApiClientIdSecretUri: keyVaultSecrets.outputs.rtsApiClientIdSecretUri
       rtsApiClientSecretSecretUri: keyVaultSecrets.outputs.rtsApiClientSecretSecretUri
       documentBlobStorageAccountKeySecretUri: keyVaultSecrets.outputs.documentBlobStorageAccountKeySecretUri
