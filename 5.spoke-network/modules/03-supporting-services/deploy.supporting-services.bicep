@@ -50,12 +50,6 @@ param clientSecret string
 @description('Token issuing authority for Gov UK One Login')
 param oneLoginAuthority string
 
-@secure()
-@description('Private RSA key for signing the token')
-param oneLoginPrivateKeyPem string
-
-@description('ClientId for the registered service in Gov UK One Login')
-param oneLoginClientId string
 
 @description('Valid token issuers for Gov UK One Login')
 param oneLoginIssuers array
@@ -112,12 +106,6 @@ param apiRequestPageSize int
 @description('Base URL for RTS API')
 param rtsApiBaseUrl string
 
-@description('Client ID for RTS API authentication')
-param rtsApiClientId string
-
-@secure()
-@description('Client secret for RTS API authentication')
-param rtsApiClientSecret string
 
 @description('Base URL for RTS authentication API')
 param rtsAuthApiBaseUrl string
@@ -188,6 +176,16 @@ module keyVault './modules/key-vault.bicep' = {
   }
 }
 
+@description('Key Vault secrets deployment with placeholder values for OneLogin integration.')
+module keyVaultSecrets './modules/key-vault-secrets.bicep' = {
+  name: 'keyVaultSecrets-${uniqueString(resourceGroup().id)}'
+  params: {
+    keyVaultName: resourcesNames.keyVault
+    tags: tags
+  }
+  dependsOn: [keyVault]
+}
+
 @description('Azure App configuration to hold information required at the application for various environments')
 module appConfiguration './modules/app-configuration.bicep' = {
   name: 'appConfiguration-${uniqueString(resourceGroup().id)}'
@@ -207,8 +205,6 @@ module appConfiguration './modules/app-configuration.bicep' = {
     clientID: clientID
     clientSecret: clientSecret
     oneLoginAuthority: oneLoginAuthority
-    oneLoginPrivateKeyPem: oneLoginPrivateKeyPem
-    oneLoginClientId: oneLoginClientId
     oneLoginIssuers: oneLoginIssuers
     storageAccountName: storageAccountName
     storageAccountKey: storageAccountKey
@@ -225,9 +221,26 @@ module appConfiguration './modules/app-configuration.bicep' = {
     apiRequestMaxConcurrency: apiRequestMaxConcurrency
     apiRequestPageSize: apiRequestPageSize
     rtsApiBaseUrl: rtsApiBaseUrl
-    rtsApiClientId: rtsApiClientId
-    rtsApiClientSecret: rtsApiClientSecret
     rtsAuthApiBaseUrl: rtsAuthApiBaseUrl
+    keyVaultSecretUris: {
+      oneLoginClientIdSecretUri: keyVaultSecrets.outputs.oneLoginClientIdSecretUri
+      oneLoginPrivateKeyPemSecret: keyVaultSecrets.outputs.oneLoginPrivateKeyPemSecret
+      rtsApiClientIdSecretUri: keyVaultSecrets.outputs.rtsApiClientIdSecretUri
+      rtsApiClientSecretSecretUri: keyVaultSecrets.outputs.rtsApiClientSecretSecretUri
+      documentBlobStorageAccountKeySecretUri: keyVaultSecrets.outputs.documentBlobStorageAccountKeySecretUri
+    }
+  }
+}
+
+@description('Role assignment for App Configuration managed identity to read Key Vault secrets.')
+module appConfigKeyVaultAccess '../../../shared/bicep/role-assignments/role-assignment.bicep' = {
+  name: 'appConfigKeyVaultAccess-${uniqueString(resourceGroup().id)}'
+  params: {
+    name: 'appConfig-keyVault-secretsUser-role-assignment'
+    principalId: appConfiguration.outputs.appConfigurationUserAssignedIdentityPrincipalId
+    resourceId: keyVault.outputs.keyVaultId
+    roleDefinitionId: '4633458b-17de-408a-b874-0445c86b69e6' // Key Vault Secrets User
+    principalType: 'ServicePrincipal'
   }
 }
 

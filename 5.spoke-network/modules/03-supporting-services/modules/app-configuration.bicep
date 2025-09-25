@@ -41,12 +41,6 @@ param clientSecret string
 @description('Token issuing authority for Gov UK One Login')
 param oneLoginAuthority string
 
-@secure()
-@description('Private RSA key for signing the token')
-param oneLoginPrivateKeyPem string
-
-@description('ClientId for the registered service in Gov UK One Login')
-param oneLoginClientId string
 
 @description('Valid token issuers for Gov UK One Login')
 param oneLoginIssuers array
@@ -98,15 +92,13 @@ param apiRequestPageSize int
 @description('Base URL for RTS API')
 param rtsApiBaseUrl string
 
-@description('Client ID for RTS API authentication')
-param rtsApiClientId string
-
-@secure()
-@description('Client secret for RTS API authentication')
-param rtsApiClientSecret string
 
 @description('Base URL for RTS authentication API')
 param rtsAuthApiBaseUrl string
+
+
+@description('Key Vault secret URIs for OneLogin integration')
+param keyVaultSecretUris object
 
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
@@ -193,8 +185,8 @@ var keyValues = [
   }
   {
     name: 'AppSettings:OneLogin:PrivateKeyPem$portal'
-    value: oneLoginPrivateKeyPem
-    contentType: null
+    value: '{"uri":"${keyVaultSecretUris.oneLoginPrivateKeyPemSecret}"}'
+    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
   {
     name: 'AppSettings:OneLogin:AuthCookieTimeout$portal' // Auth cookie timeout for Gov UK One Login in seconds
@@ -203,8 +195,8 @@ var keyValues = [
   }
   {
     name: 'AppSettings:OneLogin:ClientId'
-    value: oneLoginClientId
-    contentType: null
+    value: '{"uri":"${keyVaultSecretUris.oneLoginClientIdSecretUri}"}'
+    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
   {
     name: 'AppSettings:OneLogin:Issuers'
@@ -273,13 +265,13 @@ var keyValues = [
   }
   {
     name: 'AppSettings:RtsApiClientId'
-    value: rtsApiClientId
-    contentType: null
+    value: '{"uri":"${keyVaultSecretUris.rtsApiClientIdSecretUri}"}'
+    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
   {
     name: 'AppSettings:RtsApiClientSecret'
-    value: rtsApiClientSecret
-    contentType: null
+    value: '{"uri":"${keyVaultSecretUris.rtsApiClientSecretSecretUri}"}'
+    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
   {
     name: 'AppSettings:RtsAuthApiBaseUrl'
