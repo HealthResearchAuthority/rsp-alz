@@ -1,0 +1,166 @@
+# This workflow will deploy the monitoring resources
+name: monitoring-deployment
+trigger: none
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - '2.monitoring-alerts/main.bicep'
+      - '2.monitoring-alerts/parameters/**'
+
+
+parameters:
+  - name: env
+    displayName: Environment
+    type: string
+    default: dev
+    values:
+      - dev
+      - systemtest_manual
+      - systemtest_auto
+      - systemtest_int
+      - uat
+      - pre_prod
+      - production
+
+stages:
+  - stage: PRValidation
+    displayName: 'PR Validation Monitoring Deployment'
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    jobs:
+      - job: setup
+        displayName: 'Checkout and Install Bicep'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+      - job: lint
+        displayName: 'Lint Monitoring Templates'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup]
+        steps:
+          - bash: az bicep build --file ./2.monitoring-alerts/main.bicep
+      
+      - job: SAST
+        displayName: 'SAST Analysis'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+        - task: MicrosoftSecurityDevOps@1
+          displayName: 'Run SAST Analysis'
+          inputs:
+            tools: 'checkov,templateanalyzer'
+            artifactName: 'CodeAnalysisLogs'
+          env:
+            GDN_RUN_WORKINGDIRECTORY: '2.monitoring-alerts'
+        
+
+      - job: validate
+        displayName: 'Validate Monitoring Deployment'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup, lint, SAST]
+        condition: succeeded()
+        variables:
+          - group: ${{ parameters.env }}
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(${{ parameters.env }})
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub validate --name "Monitoring-$(Build.BuildId)" --location $(location) --template-file ./2.monitoring-alerts/main.bicep  \
+                  --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam
+
+      - job: preview
+        displayName: 'Preview Monitoring Deployment'
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup, lint, validate]
+        condition: succeeded()
+        variables:
+          - group: ${{ parameters.env }}
+        steps:
+          - task: AzureCLI@2
+            inputs:
+              azureSubscription: $(${{ parameters.env }})
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub what-if --location $(location) --template-file ./2.monitoring-alerts/main.bicep \
+                  --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam
+
+
+  - stage: ManualDeployment
+    displayName: 'Manual Deployment of Monitoring Resources'
+    dependsOn: []
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    jobs:
+      - job: setup
+        displayName: 'Checkout and Install Bicep'
+        pool:
+          vmImage: 'ubuntu-latest'
+        steps:
+          - checkout: self
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+      - job: FinalWhatIf
+        displayName: 'Run What-If before Deployment'
+        pool: 
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup]
+        steps:
+          - task: AzureCLI@2
+            displayName: 'Final What-If' 
+            inputs: 
+              azureSubscription: $(${{ parameters.env }})
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub what-if --location $(location) --template-file ./2.monitoring-alerts/main.bicep \
+                  --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam
+
+      - deployment: deploy
+        pool:
+          vmImage: 'ubuntu-latest'
+        dependsOn: [setup, FinalWhatIf]
+        condition: succeeded()
+        environment: 'alz-bicep-deployment'
+        variables:
+          - group: ${{ parameters.env }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - bash: |
+                    az bicep install
+                    az bicep version
+                  displayName: 'Install Bicep CLI'
+                - task: AzureCLI@2
+                  name: deploy
+                  inputs:
+                    azureSubscription: $(${{ parameters.env }})
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    failOnStandardError: true
+                    inlineScript: |
+                      az config set bicep.use_binary_from_path=false --only-show-errors
+                      output=$(az stack sub create --name "monitoring-deployment-stack" --location $(location) --template-file ./2.monitoring-alerts/main.bicep  \
+                        --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam \
+                                    logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                                    --deny-settings-mode none --action-on-unmanage deleteResources --yes)
+                      echo $output | jq .
