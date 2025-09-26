@@ -68,8 +68,6 @@ stages:
           vmImage: 'ubuntu-latest'
         dependsOn: [setup, lint, SAST]
         condition: succeeded()
-        variables:
-          - group: ${{ parameters.env }}
         steps:
           - task: AzureCLI@2
             inputs:
@@ -87,8 +85,6 @@ stages:
           vmImage: 'ubuntu-latest'
         dependsOn: [setup, lint, validate]
         condition: succeeded()
-        variables:
-          - group: ${{ parameters.env }}
         steps:
           - task: AzureCLI@2
             inputs:
@@ -139,8 +135,6 @@ stages:
         dependsOn: [setup, FinalWhatIf]
         condition: succeeded()
         environment: 'alz-bicep-deployment'
-        variables:
-          - group: ${{ parameters.env }}
         strategy:
           runOnce:
             deploy:
