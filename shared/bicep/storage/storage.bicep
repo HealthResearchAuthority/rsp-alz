@@ -34,6 +34,9 @@ param sku string = 'Standard_GRS'
 @description('Optional. Storage Account Access Tier.')
 param accessTier string = 'Hot'
 
+@description('Optional. Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key.')
+param allowSharedKeyAccess bool = true
+
 @description('Optional. Allows HTTPS traffic only to storage service if sets to true.')
 param supportsHttpsTrafficOnly bool = true
 
@@ -57,6 +60,7 @@ resource storage 'Microsoft.Storage/storageAccounts@2022-05-01' = {
   })  
   properties: {
     accessTier: accessTier
+    allowSharedKeyAccess: allowSharedKeyAccess
     supportsHttpsTrafficOnly: supportsHttpsTrafficOnly
     networkAcls: networkAcls
     publicNetworkAccess: 'Enabled'
