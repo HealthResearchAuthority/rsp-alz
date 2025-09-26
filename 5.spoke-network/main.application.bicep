@@ -160,12 +160,6 @@ param parClientSecret string
 @description('Token issuing authority for Gov UK One Login')
 param parOneLoginAuthority string
 
-@secure()
-@description('Private RSA key for signing the token')
-param parOneLoginPrivateKeyPem string
-
-@description('ClientId for the registered service in Gov UK One Login')
-param parOneLoginClientId string
 
 @description('Valid token issuers for Gov UK One Login')
 param parOneLoginIssuers array
@@ -352,12 +346,6 @@ param parApiRequestPageSize int = 50
 @description('Base URL for RTS API')
 param parRtsApiBaseUrl string = ''
 
-@description('Client ID for RTS API authentication')
-param parRtsApiClientId string = ''
-
-@secure()
-@description('Client secret for RTS API authentication')
-param parRtsApiClientSecret string = ''
 
 @description('Base URL for RTS authentication API')
 param parRtsAuthApiBaseUrl string = ''
@@ -531,8 +519,6 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       clientSecret: parClientSecret
       devOpsPublicIPAddress: parDevOpsPublicIPAddress
       oneLoginAuthority: parOneLoginAuthority
-      oneLoginPrivateKeyPem: parOneLoginPrivateKeyPem
-      oneLoginClientId: parOneLoginClientId
       oneLoginIssuers: parOneLoginIssuers
       storageAccountName: parStorageAccountName
       storageAccountKey: parStorageAccountKey
@@ -552,8 +538,6 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       apiRequestMaxConcurrency: parApiRequestMaxConcurrency
       apiRequestPageSize: parApiRequestPageSize
       rtsApiBaseUrl: parRtsApiBaseUrl
-      rtsApiClientId: parRtsApiClientId
-      rtsApiClientSecret: parRtsApiClientSecret
       rtsAuthApiBaseUrl: parRtsAuthApiBaseUrl
     }
   }
@@ -929,6 +913,25 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
       frontDoorSku: parSkuConfig.frontDoor
     }
     dependsOn: [
+      webApp
+    ]
+  }
+]
+
+// Post-deployment App Configuration update with Front Door and Web App URLs
+module appConfigUpdate 'modules/11-app-config-update/deploy.app-config-update.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): if (parEnableFrontDoor && parUseFrontDoor) {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgSharedServices)
+    name: take('appConfigUpdate-${deployment().name}-deployment-${i}', 64)
+    params: {
+      configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
+      frontDoorHostName: frontDoor[i]!.outputs.frontDoorEndpointHostName
+      webAppHostName: webApp[i].outputs.appHostName
+      useFrontDoor: parUseFrontDoor
+    }
+    dependsOn: [
+      frontDoor
+      supportingServices
       webApp
     ]
   }
