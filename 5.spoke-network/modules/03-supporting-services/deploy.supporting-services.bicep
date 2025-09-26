@@ -28,6 +28,9 @@ param deployZoneRedundantResources bool = true
 @description('Indicates whether to use One Login for the application')
 param useOneLogin bool
 
+@description('Optional. Whether to create Key Vault secrets with placeholder values. Set to false to skip secret creation after initial deployment.')
+param createSecretsWithPlaceholders bool = false
+
 @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param containerRegistryTier string = ''
 
@@ -182,6 +185,7 @@ module keyVaultSecrets './modules/key-vault-secrets.bicep' = {
   params: {
     keyVaultName: resourcesNames.keyVault
     tags: tags
+    createSecretsWithPlaceholders: createSecretsWithPlaceholders
   }
   dependsOn: [keyVault]
 }

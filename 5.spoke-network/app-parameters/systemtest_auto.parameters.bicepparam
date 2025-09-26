@@ -49,6 +49,8 @@ param parOverrideSubscriptionLevelSettings = true
 
 param parSkipExistingRoleAssignments = true
 
+param parCreateKVSecretsWithPlaceholders = true
+
 // Storage configuration for all storage account types 
 param parStorageConfig = {
   clean: {

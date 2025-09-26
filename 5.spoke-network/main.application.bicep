@@ -224,6 +224,9 @@ param parOverrideSubscriptionLevelSettings bool = false
 @description('Skip creating role assignments if they already exist (for redeployments)')
 param parSkipExistingRoleAssignments bool = false
 
+@description('Create Key Vault secrets with placeholder values. Set to false to skip secret creation after initial deployment.')
+param parCreateKVSecretsWithPlaceholders bool = false
+
 @description('Comprehensive storage configuration for all storage account types')
 param parStorageConfig allStorageConfig = {
   clean: {
@@ -539,6 +542,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       apiRequestPageSize: parApiRequestPageSize
       rtsApiBaseUrl: parRtsApiBaseUrl
       rtsAuthApiBaseUrl: parRtsAuthApiBaseUrl
+      createSecretsWithPlaceholders: parCreateKVSecretsWithPlaceholders
     }
   }
 ]

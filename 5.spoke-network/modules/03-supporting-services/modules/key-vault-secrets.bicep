@@ -10,6 +10,9 @@ param keyVaultName string
 @description('Optional. Tags to be assigned to the created resources.')
 param tags object = {}
 
+@description('Optional. Whether to create secrets with placeholder values. Set to false to skip secret creation and only output URIs for existing secrets.')
+param createSecretsWithPlaceholders bool = false
+
 // ------------------
 //    VARIABLES
 // ------------------
@@ -55,7 +58,7 @@ resource keyVault 'Microsoft.KeyVault/vaults@2022-07-01' existing = {
 }
 
 resource oneLoginSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = [
-  for secret in oneLoginSecrets: {
+  for secret in oneLoginSecrets: if (createSecretsWithPlaceholders) {
     parent: keyVault
     name: secret.name
     tags: tags
@@ -67,7 +70,7 @@ resource oneLoginSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' 
 ]
 
 resource rtsApiSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = [
-  for secret in rtsApiSecrets: {
+  for secret in rtsApiSecrets: if (createSecretsWithPlaceholders) {
     parent: keyVault
     name: secret.name
     tags: tags
@@ -79,7 +82,7 @@ resource rtsApiSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = 
 ]
 
 resource storageSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = [
-  for secret in storageSecrets: {
+  for secret in storageSecrets: if (createSecretsWithPlaceholders) {
     parent: keyVault
     name: secret.name
     tags: tags
@@ -94,13 +97,13 @@ resource storageSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' =
 //    OUTPUTS
 // ------------------
 
-@description('Array of OneLogin secret names that were created.')
+@description('Array of OneLogin secret names that were created or referenced.')
 output oneLoginSecretNames array = [for secret in oneLoginSecrets: secret.name]
 
-@description('Array of RTS API secret names that were created.')
+@description('Array of RTS API secret names that were created or referenced.')
 output rtsApiSecretNames array = [for secret in rtsApiSecrets: secret.name]
 
-@description('Array of storage secret names that were created.')
+@description('Array of storage secret names that were created or referenced.')
 output storageSecretNames array = [for secret in storageSecrets: secret.name]
 
 @description('Key Vault URI for oneLoginClientId secret.')
