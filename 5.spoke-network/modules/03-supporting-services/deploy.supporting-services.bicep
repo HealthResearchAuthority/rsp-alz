@@ -248,6 +248,16 @@ module appConfigKeyVaultAccess '../../../shared/bicep/role-assignments/role-assi
   }
 }
 
+@description('User-assigned managed identity for the Process Scan Function App.')
+module processScanFunctionIdentity '../../../shared/bicep/managed-identity.bicep' = {
+  name: 'processScanFunctionIdentity-${uniqueString(resourceGroup().id)}'
+  params: {
+    name: 'id-func-processscan-${resourceGroup().location}'
+    location: location
+    tags: tags
+  }
+}
+
 // module serviceBus './modules/service-bus.module.bicep' = {
 //   name: 'serviceBus-${uniqueString(resourceGroup().id)}'
 //   params: {
@@ -294,5 +304,12 @@ output keyVaultUserAssignedIdentityId string = keyVault.outputs.keyVaultUserAssi
 
 output appConfigURL string = appConfiguration.outputs.appConfigURL
 output appConfigIdentityClientID string = appConfiguration.outputs.appConfigMIClientID
+
+@description('The resource ID of the user-assigned managed identity for the Process Scan Function App.')
+output processScanFunctionUserAssignedIdentityId string = processScanFunctionIdentity.outputs.id
+
+@description('The principal ID of the user-assigned managed identity for the Process Scan Function App.')
+output processScanFunctionUserAssignedIdentityPrincipalId string = processScanFunctionIdentity.outputs.principalId
+
 // output serviceBusReceiverManagedIdentityID string = serviceBus.outputs.serviceBusReceiverManagedIdentityId
 // output serviceBusSenderManagedIdentity string = serviceBus.outputs.serviceBusSenderManagedIdentityId
