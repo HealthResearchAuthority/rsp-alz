@@ -57,20 +57,13 @@ var actionGroupNames = {
 
 var alertRuleNames = {
   security: {
-    defenderAlerts: '${namingPrefix}-defender-alerts'
-    keyVaultAccess: '${namingPrefix}-keyvault-access'
-    storageSecurityEvents: '${namingPrefix}-storage-security'
-    nsgChanges: '${namingPrefix}-nsg-changes'
+    securityOperations: '${namingPrefix}-security-operations'
   }
   policy: {
-    policyAssignmentChanges: '${namingPrefix}-policy-assignment-changes'
-    complianceStateChanges: '${namingPrefix}-compliance-state-changes'
-    policyExemptions: '${namingPrefix}-policy-exemptions'
+    policyOperations: '${namingPrefix}-policy-operations'
   }
   admin: {
-    resourceGroupChanges: '${namingPrefix}-resource-group-changes'
-    roleAssignmentChanges: '${namingPrefix}-role-assignment-changes'
-    subscriptionConfigChanges: '${namingPrefix}-subscription-config-changes'
+    adminOperations: '${namingPrefix}-admin-operations'
   }
 }
 

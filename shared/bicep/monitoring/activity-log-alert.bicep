@@ -37,7 +37,10 @@ param scopes array
 ])
 param category string
 
-@description('Operation name for the alert (e.g., Microsoft.Storage/storageAccounts/write)')
+@description('Operation names for the alert (uses OR logic)')
+param operationNames array = []
+
+@description('Single operation name (legacy - use operationNames instead)')
 param operationName string = ''
 
 @description('Resource type for the alert')
@@ -86,7 +89,15 @@ var baseConditions = [
   }
 ]
 
-var operationCondition = !empty(operationName) ? [{
+// Helper to build operation conditions
+var operationConditionsArray = [for opName in operationNames: {
+  field: 'operationName'
+  equals: opName
+}]
+
+var operationConditions = !empty(operationNames) ? [{
+  anyOf: operationConditionsArray
+}] : !empty(operationName) ? [{
   field: 'operationName'
   equals: operationName
 }] : []
@@ -128,7 +139,7 @@ var levelCondition = !empty(level) ? [{
 
 var allConditions = concat(
   baseConditions,
-  operationCondition,
+  operationConditions,
   resourceTypeCondition,
   resourceGroupCondition,
   resourceNameCondition,
