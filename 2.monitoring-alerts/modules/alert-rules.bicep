@@ -54,6 +54,7 @@ module securityOperationsAlerts '../../shared/bicep/monitoring/activity-log-aler
     actionGroupIds: [actionGroups.security.id]
     scopes: [subscriptionScope]
     category: 'Administrative'
+    resourceProvider: 'Microsoft.Security'
     operationNames: [
       'Microsoft.Security/policies/write'
       'Microsoft.Security/securitySolutions/write'
@@ -78,6 +79,7 @@ module policyOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.
     actionGroupIds: [actionGroups.policy.id]
     scopes: [subscriptionScope]
     category: 'Administrative'
+    resourceProvider: 'Microsoft.Authorization'
     operationNames: [
       'Microsoft.Authorization/policyAssignments/write'
       'Microsoft.Authorization/policyAssignments/delete'
@@ -90,25 +92,60 @@ module policyOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.
 // ADMINISTRATIVE ALERT RULES
 // ------------------
 
-// Administrative operations alert
-module adminOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.bicep' = if (enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin)) {
-  name: 'deploy-admin-operations-alerts'
+// SQL firewall operations alert
+module sqlFirewallAlerts '../../shared/bicep/monitoring/activity-log-alert.bicep' = if (enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin)) {
+  name: 'deploy-sql-firewall-alerts'
   params: {
-    alertRuleName: alertRuleNames.admin.adminOperations
-    alertDescription: 'Alert on SQL firewall rules and NSG operations'
+    alertRuleName: '${alertRuleNames.admin.adminOperations}-sql'
+    alertDescription: 'Alert on SQL server firewall rule operations'
     enabled: true
     actionGroupIds: [actionGroups.admin.id]
     scopes: [subscriptionScope]
     category: 'Administrative'
+    resourceProvider: 'Microsoft.Sql'
     operationNames: [
       'Microsoft.Sql/servers/firewallRules/write'
       'Microsoft.Sql/servers/firewallRules/delete'
+    ]
+    tags: defaultTags
+  }
+}
+
+// Network Security Group operations alert
+module nsgOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.bicep' = if (enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin)) {
+  name: 'deploy-nsg-operations-alerts'
+  params: {
+    alertRuleName: '${alertRuleNames.admin.adminOperations}-nsg'
+    alertDescription: 'Alert on Network Security Group operations'
+    enabled: true
+    actionGroupIds: [actionGroups.admin.id]
+    scopes: [subscriptionScope]
+    category: 'Administrative'
+    resourceProvider: 'Microsoft.Network'
+    operationNames: [
       'Microsoft.Network/networkSecurityGroups/write'
       'Microsoft.Network/networkSecurityGroups/delete'
-      'Microsoft.ClassicNetwork/networkSecurityGroups/write'
-      'Microsoft.ClassicNetwork/networkSecurityGroups/delete'
       'Microsoft.Network/networkSecurityGroups/securityRules/write'
       'Microsoft.Network/networkSecurityGroups/securityRules/delete'
+    ]
+    tags: defaultTags
+  }
+}
+
+// Classic Network Security Group operations alert
+module classicNsgOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.bicep' = if (enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin)) {
+  name: 'deploy-classic-nsg-operations-alerts'
+  params: {
+    alertRuleName: '${alertRuleNames.admin.adminOperations}-classic-nsg'
+    alertDescription: 'Alert on Classic Network Security Group operations'
+    enabled: true
+    actionGroupIds: [actionGroups.admin.id]
+    scopes: [subscriptionScope]
+    category: 'Administrative'
+    resourceProvider: 'Microsoft.ClassicNetwork'
+    operationNames: [
+      'Microsoft.ClassicNetwork/networkSecurityGroups/write'
+      'Microsoft.ClassicNetwork/networkSecurityGroups/delete'
       'Microsoft.ClassicNetwork/networkSecurityGroups/securityRules/write'
       'Microsoft.ClassicNetwork/networkSecurityGroups/securityRules/delete'
     ]
@@ -129,6 +166,8 @@ output alertRuleIds object = {
     policyOperations: enablePolicyAlerts && contains(actionGroups, 'policy') && !empty(actionGroups.policy) ? policyOperationsAlerts.outputs.activityLogAlertId : ''
   }
   admin: {
-    adminOperations: enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin) ? adminOperationsAlerts.outputs.activityLogAlertId : ''
+    sqlFirewallOperations: enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin) ? sqlFirewallAlerts.outputs.activityLogAlertId : ''
+    nsgOperations: enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin) ? nsgOperationsAlerts.outputs.activityLogAlertId : ''
+    classicNsgOperations: enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin) ? classicNsgOperationsAlerts.outputs.activityLogAlertId : ''
   }
 }
