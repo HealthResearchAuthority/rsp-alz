@@ -35,6 +35,9 @@ param environment string = 'dev'
 @allowed([ 'B1','S1', 'S2', 'S3', 'P1V3', 'P2V3', 'P3V3', 'P1V3_AZ', 'P2V3_AZ', 'P3V3_AZ', 'EP1', 'EP2', 'EP3', 'ASE_I1V2_AZ', 'ASE_I2V2_AZ', 'ASE_I3V2_AZ', 'ASE_I1V2', 'ASE_I2V2', 'ASE_I3V2' ])
 param sku string
 
+@description('App Configuration managed identity resource ID')
+param appConfigurationUserAssignedIdentityId string = ''
+
 // --------------------
 //    VARIABLES
 // --------------------
@@ -205,7 +208,7 @@ module functionAppsDeployment '../../shared/bicep/app-services/function-app.bice
     storageAccountName: funcApp.storageAccountName
     userAssignedIdentities: length(userAssignedIdentities) > 0 ? {
       type: 'UserAssigned'
-      userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
+      userAssignedIdentities: reduce(concat(userAssignedIdentities, !empty(appConfigurationUserAssignedIdentityId) ? [appConfigurationUserAssignedIdentityId] : []), {}, (result, id) => union(result, { '${id}': {} }))
     } : {
       type: 'SystemAssigned'
     }
