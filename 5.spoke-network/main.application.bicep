@@ -141,6 +141,9 @@ param parAdminLogin string = ''
 @description('SQL Admin Password')
 param parSqlAdminPhrase string
 
+@description('Enable or disable SQL Server password authentication (default: true)')
+param parEnableSqlAdminLogin bool = true
+
 @description('Iras Service Container image tag.')
 param parIrasContainerImageTag string
 
@@ -632,6 +635,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       enableSqlServerAuditing: true
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       sqlDatabaseSkuConfig: parSkuConfig.sqlDatabase
+      enableSqlAdminLogin: parEnableSqlAdminLogin
     }
   }
 ]
