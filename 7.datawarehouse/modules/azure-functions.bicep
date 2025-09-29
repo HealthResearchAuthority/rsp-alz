@@ -35,6 +35,7 @@ param environment string = 'dev'
 @allowed([ 'B1','S1', 'S2', 'S3', 'P1V3', 'P2V3', 'P3V3', 'P1V3_AZ', 'P2V3_AZ', 'P3V3_AZ', 'EP1', 'EP2', 'EP3', 'ASE_I1V2_AZ', 'ASE_I2V2_AZ', 'ASE_I3V2_AZ', 'ASE_I1V2', 'ASE_I2V2', 'ASE_I3V2' ])
 param sku string
 
+
 // --------------------
 //    VARIABLES
 // --------------------
@@ -49,11 +50,13 @@ var functionApps = [
     name: 'func-harp-data-sync'
     storageAccountName: 'stharpdatasync${environment}'
     appServicePlanName: 'asp-harp-data-sync-uks'
+    appServicePlanNameLinux: 'asp-harp-data-sync-linux'
   }
   {
     name: 'func-validate-irasid'
     storageAccountName: 'stvalidateirasid${environment}'
     appServicePlanName: 'asp-validate-irasid-uks'
+    appServicePlanNameLinux: 'asp-validate-irasid-linux'
   }
 ]
 
@@ -77,15 +80,15 @@ resource functionAppSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-07-01
   name: functionAppSubnetName
 }
 
-module appInsights '../../shared/bicep/app-insights.bicep' = {
-  name: 'appInsights-harp-functions'
+module appInsights '../../shared/bicep/app-insights.bicep' = [for (funcApp, index) in functionApps: {
+  name: 'appInsights-harp-functions-${funcApp.name}'
   params: {
-    name: 'appi-harp-functions-${environment}'
+    name: 'appi-${funcApp.name}-${environment}'
     location: location
     tags: tags
     workspaceResourceId: logAnalyticsWorkspaceId
   }
-}
+}]
 
 module appServicePlans '../../shared/bicep/app-services/app-service-plan.bicep' = [for (funcApp, index) in functionApps: {
   name: 'appServicePlan-${funcApp.name}'
@@ -99,6 +102,18 @@ module appServicePlans '../../shared/bicep/app-services/app-service-plan.bicep' 
   }
 }]
 
+module appServicePlansLinux '../../shared/bicep/app-services/app-service-plan.bicep' = [for (funcApp, index) in functionApps: {
+  name: 'appServicePlanLinux-${funcApp.name}'
+  params: {
+    name: funcApp.appServicePlanNameLinux
+    location: location
+    tags: tags
+    sku: sku
+    serverOS: 'Linux'
+    diagnosticWorkspaceId: logAnalyticsWorkspaceId
+  }
+}]
+
 module storageAccounts '../../shared/bicep/storage/storage.bicep' = [for (funcApp, index) in functionApps: {
   name: 'storage-${funcApp.name}'
   params: {
@@ -107,6 +122,7 @@ module storageAccounts '../../shared/bicep/storage/storage.bicep' = [for (funcAp
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     supportsHttpsTrafficOnly: true
+    allowSharedKeyAccess: true
     tags: tags
     networkAcls: {
       defaultAction: 'Deny'
@@ -199,7 +215,7 @@ module functionAppsDeployment '../../shared/bicep/app-services/function-app.bice
     functionAppName: funcApp.name
     location: location
     tags: tags
-    serverFarmResourceId: appServicePlans[index].outputs.resourceId
+    serverFarmResourceId: appServicePlansLinux[index].outputs.resourceId
     hasPrivateEndpoint: true
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     storageAccountName: funcApp.storageAccountName
@@ -209,8 +225,8 @@ module functionAppsDeployment '../../shared/bicep/app-services/function-app.bice
     } : {
       type: 'SystemAssigned'
     }
-    appInsightId: appInsights.outputs.appInsResourceId
-    kind: 'functionapp'
+    appInsightId: appInsights[index].outputs.appInsResourceId
+    kind: 'functionapp,linux'
     virtualNetworkSubnetId: functionAppSubnet.id
   }
   dependsOn:  [

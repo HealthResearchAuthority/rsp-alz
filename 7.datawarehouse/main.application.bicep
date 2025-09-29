@@ -63,6 +63,9 @@ param logAnalyticsWorkspaceId string
 @description('Enable deployment of Azure Functions and Database')
 param enableHarpDeployment bool = true
 
+@description('Enable private endpoints for App Configuration')
+param enableAppConfigPrivateEndpoints bool = false
+
 resource targetRg 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: targetRgName
 }
@@ -97,6 +100,8 @@ module dw_application 'modules/dw-application.bicep' = {
 
 var harpSqlServerUAIName = 'id-sql-harp-dw-${environment}'
 var harpSqlServerName = 'sql-harp-dw-${environment}-uks'
+var appConfigStoreName = 'appconfig-harp-dw-${environment}-uks'
+var appConfigUserAssignedIdentityName = 'id-appconfig-harp-dw-${environment}'
 
 module harpSyncDatabase '../5.spoke-network/modules/05-database/deploy.database.bicep' = if (enableHarpDeployment) {
   name: 'deployHarpSyncDatabase'
@@ -117,6 +122,7 @@ module harpSyncDatabase '../5.spoke-network/modules/05-database/deploy.database.
     auditRetentionDays: 30
     enableSqlServerAuditing:true
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    enableSqlAdminLogin: false
     tags: {
       Environment: environment
       Purpose: 'HARP Data Sync'
@@ -124,6 +130,24 @@ module harpSyncDatabase '../5.spoke-network/modules/05-database/deploy.database.
   }
 }
 
+module harpAppConfiguration 'modules/app-configuration.bicep' = if (enableHarpDeployment) {
+  name: 'deployHarpAppConfiguration'
+  scope: harpSyncRG
+  params: {
+    location: location
+    configStoreName: appConfigStoreName
+    appConfigurationUserAssignedIdentityName: appConfigUserAssignedIdentityName
+    sqlServerName: harpSqlServerName
+    spokeVNetId: '/subscriptions/461016b5-8363-472e-81be-eef6aad08353/resourceGroups/VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D/providers/Microsoft.Network/virtualNetworks/HRADataWarehouseVirtualNetwork'
+    spokePrivateEndpointSubnetName: 'snet-privateendpoints'
+    enablePrivateEndpoints: enableAppConfigPrivateEndpoints
+    harpDatabaseName: 'harpprojectdata'
+    tags: {
+      Environment: environment
+      Purpose: 'HARP Data Sync'
+    }
+  }
+}
 
 module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeployment) {
   name: 'deployHarpSyncFunctions'
@@ -136,16 +160,16 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
     functionAppSubnetName: 'snet-functionapps'
     sqlDBManagedIdentityClientId: enableHarpDeployment ? (harpSyncDatabase.?outputs.?outputsqlServerUAIClientID ?? '') : ''
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
-    userAssignedIdentities: enableHarpDeployment && !empty(harpSyncDatabase.?outputs.?outputsqlServerUAIID ?? '') ? [harpSyncDatabase.?outputs.?outputsqlServerUAIID] : []
+    userAssignedIdentities: enableHarpDeployment ? union(
+      !empty(harpSyncDatabase.?outputs.?outputsqlServerUAIID ?? '') ? [harpSyncDatabase.?outputs.?outputsqlServerUAIID] : [],
+      !empty(harpAppConfiguration.?outputs.?appConfigurationUserAssignedIdentityId ?? '') ? [harpAppConfiguration.?outputs.?appConfigurationUserAssignedIdentityId] : []
+    ) : []
     environment: environment
     tags: {
       Environment: environment
       Purpose: 'HARP Data Sync'
     }
   }
-  dependsOn: [
-    harpSyncDatabase
-  ]
 }
 
 // Outputs
