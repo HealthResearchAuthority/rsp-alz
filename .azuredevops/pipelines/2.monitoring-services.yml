@@ -150,7 +150,6 @@ stages:
                     azureSubscription: $(${{ parameters.env }})
                     scriptType: bash
                     scriptLocation: inlineScript
-                    failOnStandardError: true
                     inlineScript: |
                       az config set bicep.use_binary_from_path=false --only-show-errors
                       output=$(az stack sub create --name "monitoring-deployment-stack" --location $(location) --template-file ./2.monitoring-alerts/main.bicep  \
