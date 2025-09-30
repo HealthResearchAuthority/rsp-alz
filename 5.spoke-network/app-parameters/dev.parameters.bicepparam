@@ -24,9 +24,9 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 15
 
-param parEnableSqlAdminLogin = false
+param parEnableSqlAdminLogin = true
 
-param parAllowSharedKeyAccess = false
+param parAllowSharedKeyAccess = true
 
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
