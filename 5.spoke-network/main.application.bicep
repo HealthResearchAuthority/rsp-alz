@@ -144,6 +144,9 @@ param parSqlAdminPhrase string
 @description('Enable or disable SQL Server password authentication (default: true)')
 param parEnableSqlAdminLogin bool = true
 
+@description('Optional. Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key.')
+param parAllowSharedKeyAccess bool
+
 @description('Iras Service Container image tag.')
 param parIrasContainerImageTag string
 
@@ -611,6 +614,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
         parStorageConfig.quarantine.encryption,
         supportingServices[i].outputs.keyVaultId
       )
+      allowSharedKeyAccess: parAllowSharedKeyAccess
     }
     dependsOn: [
       defenderStorage
@@ -833,6 +837,7 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
         supportingServices[i].outputs.processScanFunctionUserAssignedIdentityId
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+      allowSharedKeyAccess: parAllowSharedKeyAccess
     }
     dependsOn: [
       applicationsRG
@@ -868,6 +873,7 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+      allowSharedKeyAccess: parAllowSharedKeyAccess
     }
     dependsOn: [
       webApp

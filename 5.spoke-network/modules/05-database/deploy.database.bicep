@@ -9,7 +9,7 @@ param adminLogin string = ''
 @secure()
 param adminPassword string
 
-@description('Enable or disable SQL Server auditing (default: true)')
+@description('Enable or disable SQL Server password authentication (default: true)')
 param enableSqlAdminLogin bool = true
 
 param databases array = []

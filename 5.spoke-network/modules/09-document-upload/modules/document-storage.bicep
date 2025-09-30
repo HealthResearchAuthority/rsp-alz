@@ -68,6 +68,9 @@ param enableEnhancedMonitoring bool = false
 @description('Enable blob index tags for forensic tagging')
 param enableBlobIndexTags bool = false
 
+@description('Optional. Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key.')
+param allowSharedKeyAccess bool = true
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -175,6 +178,7 @@ module storageAccount '../../../../shared/bicep/storage/storage-with-encryption.
     kind: storageConfig.?kind ?? 'StorageV2'
     sku: storageConfig.sku
     accessTier: storageConfig.accessTier
+    allowSharedKeyAccess: allowSharedKeyAccess
     supportsHttpsTrafficOnly: effectiveNetworkSecurity.httpsTrafficOnly
     networkAcls: {
       defaultAction: effectiveNetworkSecurity.defaultAction

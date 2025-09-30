@@ -102,6 +102,9 @@ param quarantineStorageEncryption object = {
   keyRotationEnabled: true
 }
 
+@description('Optional. Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key.')
+param allowSharedKeyAccess bool = true
+
 // ------------------
 // RESOURCES
 // ------------------
@@ -121,6 +124,7 @@ module stagingStorage 'modules/document-storage.bicep' = {
     enableDeleteRetentionPolicy: retentionPolicyDays.staging > 0
     retentionPolicyDays: retentionPolicyDays.staging
     networkSecurityConfig: networkSecurityConfig
+    allowSharedKeyAccess: allowSharedKeyAccess
     // Encryption support for staging (NEW FEATURE)
     enableEncryption: stagingStorageEncryption.enabled
     encryptionConfig: stagingStorageEncryption
@@ -154,6 +158,7 @@ module cleanStorage 'modules/document-storage.bicep' = {
     networkSecurityConfig: networkSecurityConfig
     enableEncryption: cleanStorageEncryption.enabled
     encryptionConfig: cleanStorageEncryption
+    allowSharedKeyAccess: allowSharedKeyAccess
   }
   dependsOn: [
     stagingStorage  // Deploy after staging to avoid DNS zone conflicts
@@ -175,6 +180,7 @@ module quarantineStorage 'modules/document-storage.bicep' = {
     enableDeleteRetentionPolicy: retentionPolicyDays.quarantine > 0
     retentionPolicyDays: retentionPolicyDays.quarantine
     networkSecurityConfig: networkSecurityConfig
+    allowSharedKeyAccess: allowSharedKeyAccess
     // Encryption support for quarantine (NEW FEATURE)
     enableEncryption: quarantineStorageEncryption.enabled
     encryptionConfig: quarantineStorageEncryption

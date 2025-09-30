@@ -50,6 +50,9 @@ param kind string
 @description('Client ID of the managed identity to be used for the SQL DB connection string. For Function App Only')
 param sqlDBManagedIdentityClientId string = ''
 
+@description('Optional. Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key.')
+param allowSharedKeyAccess bool = true
+
 param deploySlot bool
 
 param deployAppPrivateEndPoint bool
@@ -142,6 +145,7 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     supportsHttpsTrafficOnly: true
+    allowSharedKeyAccess: allowSharedKeyAccess
     tags: {}
     networkAcls: networkAcls 
   }
