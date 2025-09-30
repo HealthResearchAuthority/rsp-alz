@@ -26,7 +26,7 @@ param parSqlAuditRetentionDays = 15
 
 param parEnableSqlAdminLogin = false
 
-param parAllowSharedKeyAccess = true
+param parAllowSharedKeyAccess = false
 
 // Azure Front Door Configuration
 param parEnableFrontDoor = true

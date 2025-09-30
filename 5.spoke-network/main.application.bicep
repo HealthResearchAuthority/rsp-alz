@@ -142,7 +142,7 @@ param parAdminLogin string = ''
 param parSqlAdminPhrase string
 
 @description('Enable or disable SQL Server password authentication (default: true)')
-param parEnableSqlAdminLogin bool = true
+param parEnableSqlAdminLogin bool
 
 @description('Optional. Indicates whether the storage account permits requests to be authorized with the account access key via Shared Key.')
 param parAllowSharedKeyAccess bool
