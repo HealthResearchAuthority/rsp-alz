@@ -19,6 +19,9 @@ param paramserviceIdsmanual string
 @description('The IDs of the Azure service to be used for the private endpoint.')
 param paramserviceIdsuat string
 
+@description('The IDs of the Azure service to be used for the private endpoint.')
+param paramserviceIdspreprod string
+
 @description('VNet ID under managed devops pool subscription where the VNet peering will be created.')
 param manageddevopspoolVnetID string
 
@@ -66,8 +69,9 @@ var pepServiceIDArraydev = split(paramserviceIdsdev, ',')
 var pepServiceIDArrayauto = split(paramserviceIdsauto, ',')
 var pepServiceIDArraymanual = split(paramserviceIdsmanual, ',')
 var pepServiceIDArrayuat = split(paramserviceIdsuat, ',')
+var pepServiceIDArraypreprod = split(paramserviceIdspreprod, ',')
 
-var allserviceIDs = union(pepServiceIDArraydev, pepServiceIDArrayauto, pepServiceIDArraymanual, pepServiceIDArrayuat)
+var allserviceIDs = union(pepServiceIDArraydev, pepServiceIDArrayauto, pepServiceIDArraymanual, pepServiceIDArrayuat, pepServiceIDArraypreprod)
 
 @description('Deploy VNet Peering')
 module vnetpeeringmodule 'modules/vnetpeering/vnetpeering.bicep' = {

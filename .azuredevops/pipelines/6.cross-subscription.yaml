@@ -169,6 +169,7 @@ stages:
                               paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
                               paramserviceIdsmanual=$(serviceIdsmanual) \
                               paramserviceIdsuat=$(serviceIdsuat) \
+                              paramserviceIdspreprod=$(serviceIdspreprod) \
                               storageSubscriptionId="$(storageSubscriptionId)" \
                               devboxSubscriptionId="$(devboxSubscriptionId)")
                       echo "Full Bicep Deployment Output:"
