@@ -86,7 +86,7 @@ stages:
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                         paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
-                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) \
+                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) paramserviceIdspreprod=$(serviceIdspreprod) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
@@ -126,7 +126,7 @@ stages:
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                         paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
-                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) \
+                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) paramserviceIdspreprod=$(serviceIdspreprod)  \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
