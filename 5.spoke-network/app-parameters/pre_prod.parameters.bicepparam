@@ -47,7 +47,7 @@ param parDefenderForStorageConfig = {
 
 param parOverrideSubscriptionLevelSettings = true
 
-param parSkipExistingRoleAssignments = false
+param parSkipExistingRoleAssignments = true
 
 param parCreateKVSecretsWithPlaceholders = true
 
