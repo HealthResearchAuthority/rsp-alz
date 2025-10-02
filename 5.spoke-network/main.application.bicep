@@ -213,6 +213,12 @@ param parEnableAppConfigPrivateEndpoints bool = false
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
 
+@description('Enable CMS portal Front Door route')
+param parEnableCmsFrontDoorRoute bool = false
+
+@description('CMS portal route path pattern')
+param parCmsFrontDoorRoutePath string = '/cms-portal/*'
+
 @description('Microsoft Defender for Storage configuration')
 param parDefenderForStorageConfig object = {
   enabled: false
@@ -792,12 +798,13 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'app'
-      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink
+      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink || parEnableCmsFrontDoorRoute
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
-      paramWhitelistIPs: paramWhitelistIPs
+      // Remove IP whitelist when using Front Door route (traffic will be secured via Front Door)
+      paramWhitelistIPs: parEnableCmsFrontDoorRoute ? '' : paramWhitelistIPs
     }
     dependsOn: [
       databaseserver
@@ -906,8 +913,20 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
       location: location
       tags: tags
       resourcesNames: applicationServicesNaming[i].outputs.resourcesNames
+
+      // IRAS Portal Origin
       originHostName: webApp[i].outputs.appHostName
       webAppName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
+      webAppResourceId: webApp[i].outputs.webAppResourceId
+
+      // CMS Portal Origin
+      enableCmsRoute: parEnableCmsFrontDoorRoute
+      cmsOriginHostName: umbracoCMS[i].outputs.appHostName
+      cmsWebAppName: 'cmsportal-${parSpokeNetworks[i].parEnvironment}'
+      cmsWebAppResourceId: umbracoCMS[i].outputs.webAppResourceId
+      cmsRoutePathPattern: parCmsFrontDoorRoutePath
+
+      // Front Door Configuration
       enableWaf: true
       wafMode: parFrontDoorWafMode
       enableRateLimiting: parEnableFrontDoorRateLimiting
@@ -917,12 +936,12 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
       cacheDuration: parFrontDoorCacheDuration
       enableHttpsRedirect: parEnableFrontDoorHttpsRedirect
       enableManagedTls: true
-      webAppResourceId: webApp[i].outputs.webAppResourceId
       enablePrivateLink: parEnableFrontDoorPrivateLink
       frontDoorSku: parSkuConfig.frontDoor
     }
     dependsOn: [
       webApp
+      umbracoCMS
     ]
   }
 ]

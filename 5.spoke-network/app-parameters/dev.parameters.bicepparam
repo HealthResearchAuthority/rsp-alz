@@ -38,6 +38,10 @@ param parEnableKeyVaultPrivateEndpoints = true
 param parEnableAppConfigPrivateEndpoints = true
 param parFrontDoorCustomDomains = []
 
+// CMS Front Door Configuration
+param parEnableCmsFrontDoorRoute = true
+param parCmsFrontDoorRoutePath = '/cms-portal/*'
+
 param parDefenderForStorageConfig = {
   enabled: true
   enableMalwareScanning: false
