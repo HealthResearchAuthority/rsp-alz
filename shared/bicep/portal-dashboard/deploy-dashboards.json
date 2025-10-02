@@ -5,7 +5,7 @@
     "_generator": {
       "name": "bicep",
       "version": "0.31.92.45157",
-      "templateHash": "11427928390125668341"
+      "templateHash": "4426102797987515134"
     }
   },
   "parameters": {
@@ -52,6 +52,29 @@
                 "position": {
                   "x": 0,
                   "y": 0,
+                  "colSpan": 16,
+                  "rowSpan": 2
+                },
+                "metadata": {
+                  "inputs": [],
+                  "type": "Extension/HubsExtension/PartType/MarkdownPart",
+                  "settings": {
+                    "content": {
+                      "settings": {
+                        "content": "# IRAS Portal - Application Insights\n\n**Monitoring**: Web Application Health & Performance  \n**Time Range**: Last 24 hours  \n**Auto-Refresh**: Every 2 hours\n\n---",
+                        "title": "",
+                        "subtitle": "",
+                        "markdownSource": 1,
+                        "markdownUri": null
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "position": {
+                  "x": 0,
+                  "y": 2,
                   "colSpan": 3,
                   "rowSpan": 3
                 },
@@ -61,7 +84,7 @@
                   "settings": {
                     "content": {
                       "settings": {
-                        "content": "### Performance",
+                        "content": "### 📊 Performance",
                         "title": "",
                         "subtitle": "",
                         "markdownSource": 1,
@@ -529,7 +552,7 @@
                   "settings": {
                     "content": {
                       "settings": {
-                        "content": "### Failures",
+                        "content": "### ❌ Failures",
                         "title": "",
                         "subtitle": "",
                         "markdownSource": 1,
@@ -562,7 +585,7 @@
                               "namespace": "microsoft.insights/components",
                               "metricVisualization": {
                                 "resourceDisplayName": "appi-irasportal-manualtest",
-                                "color": "#EC008C"
+                                "color": "#E81123"
                               }
                             }
                           ],
@@ -612,7 +635,7 @@
                               "namespace": "microsoft.insights/components",
                               "metricVisualization": {
                                 "resourceDisplayName": "appi-irasportal-manualtest",
-                                "color": "#EC008C"
+                                "color": "#E81123"
                               }
                             }
                           ],
@@ -827,7 +850,7 @@
                   "settings": {
                     "content": {
                       "settings": {
-                        "content": "### Usage",
+                        "content": "### 👥 Usage",
                         "title": "",
                         "subtitle": "",
                         "markdownSource": 1,
@@ -1332,6 +1355,11 @@
             "filterLocale": {
               "value": "en-us"
             },
+            "refreshInterval": {
+              "value": {
+                "interval": 7200000
+              }
+            },
             "filters": {
               "value": {
                 "MsPortalFx_TimeRange": {
@@ -1379,6 +1407,29 @@
                 "position": {
                   "x": 0,
                   "y": 0,
+                  "colSpan": 16,
+                  "rowSpan": 2
+                },
+                "metadata": {
+                  "inputs": [],
+                  "type": "Extension/HubsExtension/PartType/MarkdownPart",
+                  "settings": {
+                    "content": {
+                      "settings": {
+                        "content": "# IRAS Services - Application Insights\n\n**Monitoring**: Container Apps (Microservices) Health & Performance  \n**Time Range**: Last 24 hours  \n**Auto-Refresh**: Every 2 hours\n\n---",
+                        "title": "",
+                        "subtitle": "",
+                        "markdownSource": 1,
+                        "markdownUri": null
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "position": {
+                  "x": 0,
+                  "y": 2,
                   "colSpan": 3,
                   "rowSpan": 3
                 },
@@ -1388,7 +1439,7 @@
                   "settings": {
                     "content": {
                       "settings": {
-                        "content": "### Performance",
+                        "content": "### 📊 Performance",
                         "title": "",
                         "subtitle": "",
                         "markdownSource": 1,
@@ -1856,7 +1907,7 @@
                   "settings": {
                     "content": {
                       "settings": {
-                        "content": "### Failures",
+                        "content": "### ❌ Failures",
                         "title": "",
                         "subtitle": "",
                         "markdownSource": 1,
@@ -1889,7 +1940,7 @@
                               "namespace": "microsoft.insights/components",
                               "metricVisualization": {
                                 "resourceDisplayName": "appi-rsp-applications-manualtest-uks",
-                                "color": "#EC008C"
+                                "color": "#E81123"
                               }
                             }
                           ],
@@ -1939,7 +1990,7 @@
                               "namespace": "microsoft.insights/components",
                               "metricVisualization": {
                                 "resourceDisplayName": "appi-rsp-applications-manualtest-uks",
-                                "color": "#EC008C"
+                                "color": "#E81123"
                               }
                             }
                           ],
@@ -2154,7 +2205,7 @@
                   "settings": {
                     "content": {
                       "settings": {
-                        "content": "### Usage",
+                        "content": "### 👥 Usage",
                         "title": "",
                         "subtitle": "",
                         "markdownSource": 1,
@@ -2658,6 +2709,11 @@
             },
             "filterLocale": {
               "value": "en-us"
+            },
+            "refreshInterval": {
+              "value": {
+                "interval": 7200000
+              }
             },
             "filters": {
               "value": {
