@@ -14,9 +14,6 @@ param wafPolicyId string
 @description('Required. The resource ID of the Front Door endpoint.')
 param endpointId string
 
-@description('Required. The patterns to match for the security policy.')
-param patternsToMatch array
-
 // ------------------
 // RESOURCES
 // ------------------
@@ -41,7 +38,7 @@ resource securityPolicy 'Microsoft.Cdn/profiles/securityPolicies@2023-05-01' = {
               id: endpointId
             }
           ]
-          patternsToMatch: patternsToMatch
+          patternsToMatch: ['/*']
         }
       ]
     }

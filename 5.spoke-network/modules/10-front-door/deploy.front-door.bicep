@@ -237,7 +237,6 @@ module securityPolicy '../../../shared/bicep/front-door/security-policy.bicep' =
     frontDoorProfileName: frontDoorProfile.outputs.name
     wafPolicyId: wafPolicy!.outputs.resourceId
     endpointId: frontDoorEndpoint.outputs.resourceId
-    patternsToMatch: enableCmsRoute ? [cmsRoutePathPattern, '/*'] : ['/*']
   }
   dependsOn: [
     route
@@ -277,4 +276,4 @@ output cmsOriginGroupId string = enableCmsRoute ? cmsOriginGroup!.outputs.resour
 output cmsRoutePath string = enableCmsRoute ? cmsRoutePathPattern : ''
 
 @description('The resource ID of the consolidated security policy.')
-output securityPolicyId string = enableWaf ? securityPolicy.outputs.resourceId : ''
+output securityPolicyId string = enableWaf ? securityPolicy!.outputs.resourceId : ''

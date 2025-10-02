@@ -921,9 +921,9 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
 
       // CMS Portal Origin
       enableCmsRoute: parEnableCmsFrontDoorRoute
-      cmsOriginHostName: umbracoCMS[i].outputs.appHostName
+      cmsOriginHostName: parEnableCmsFrontDoorRoute ? umbracoCMS[i].outputs.appHostName : ''
       cmsWebAppName: 'cmsportal-${parSpokeNetworks[i].parEnvironment}'
-      cmsWebAppResourceId: umbracoCMS[i].outputs.webAppResourceId
+      cmsWebAppResourceId: parEnableCmsFrontDoorRoute ? umbracoCMS[i].outputs.webAppResourceId : ''
       cmsRoutePathPattern: parCmsFrontDoorRoutePath
 
       // Front Door Configuration
