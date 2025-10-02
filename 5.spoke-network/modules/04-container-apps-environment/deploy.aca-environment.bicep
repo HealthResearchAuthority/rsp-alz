@@ -131,3 +131,5 @@ output containerAppsEnvironmentId string = containerAppsEnvironment.outputs.cont
 output containerAppsEnvironmentName string = containerAppsEnvironment.outputs.containerAppsEnvironmentName
 
 output applicationInsightsName string =  (enableApplicationInsights)? applicationInsights!.outputs.appInsNname : ''
+
+output applicationInsightsResourceId string = (enableApplicationInsights) ? applicationInsights!.outputs.appInsResourceId : ''
