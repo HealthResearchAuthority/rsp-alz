@@ -206,7 +206,7 @@ module cmsRoute '../../../shared/bicep/front-door/route.bicep' = if (enableCmsRo
     linkToDefaultDomain: true
     httpsRedirect: enableHttpsRedirect
     caching: cachingConfig
-    wafPolicyId: enableWaf ? wafPolicy!.outputs.resourceId : ''
+    wafPolicyId: '' // WAF policy will be attached via consolidated security policy
   }
 }
 
@@ -225,8 +225,24 @@ module route '../../../shared/bicep/front-door/route.bicep' = {
     linkToDefaultDomain: true
     httpsRedirect: enableHttpsRedirect
     caching: cachingConfig
-    wafPolicyId: enableWaf ? wafPolicy!.outputs.resourceId : ''
+    wafPolicyId: '' // WAF policy will be attached via consolidated security policy
   }
+}
+
+// Consolidated Security Policy for all routes
+module securityPolicy '../../../shared/bicep/front-door/security-policy.bicep' = if (enableWaf) {
+  name: take('security-policy-${deployment().name}', 64)
+  params: {
+    name: '${frontDoorProfileName}-security-policy'
+    frontDoorProfileName: frontDoorProfile.outputs.name
+    wafPolicyId: wafPolicy!.outputs.resourceId
+    endpointId: frontDoorEndpoint.outputs.resourceId
+    patternsToMatch: enableCmsRoute ? [cmsRoutePathPattern, '/*'] : ['/*']
+  }
+  dependsOn: [
+    route
+    cmsRoute
+  ]
 }
 
 // ------------------
@@ -259,3 +275,6 @@ output cmsOriginGroupId string = enableCmsRoute ? cmsOriginGroup!.outputs.resour
 
 @description('The CMS route path pattern.')
 output cmsRoutePath string = enableCmsRoute ? cmsRoutePathPattern : ''
+
+@description('The resource ID of the consolidated security policy.')
+output securityPolicyId string = enableWaf ? securityPolicy.outputs.resourceId : ''
