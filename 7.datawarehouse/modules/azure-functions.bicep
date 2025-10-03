@@ -50,13 +50,11 @@ var functionApps = [
     name: 'func-harp-data-sync'
     storageAccountName: 'stharpdatasync${environment}'
     appServicePlanName: 'asp-harp-data-sync-uks'
-    appServicePlanNameLinux: 'asp-harp-data-sync-linux'
   }
   {
     name: 'func-validate-irasid'
     storageAccountName: 'stvalidateirasid${environment}'
     appServicePlanName: 'asp-validate-irasid-uks'
-    appServicePlanNameLinux: 'asp-validate-irasid-uks'
   }
 ]
 
@@ -105,7 +103,7 @@ module appServicePlans '../../shared/bicep/app-services/app-service-plan.bicep' 
 module appServicePlansLinux '../../shared/bicep/app-services/app-service-plan.bicep' = [for (funcApp, index) in functionApps: {
   name: 'appServicePlanLinux-${funcApp.name}'
   params: {
-    name: funcApp.appServicePlanNameLinux
+    name: funcApp.appServicePlanName
     location: location
     tags: tags
     sku: sku
