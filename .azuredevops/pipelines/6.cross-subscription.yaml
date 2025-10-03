@@ -169,6 +169,7 @@ stages:
                         --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                               manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                               paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
+                              paramserviceIdsdw=$(serviceIdsDW) \
                               paramserviceIdsmanual=$(serviceIdsmanual) \
                               paramserviceIdsuat=$(serviceIdsuat) \
                               paramserviceIdspreprod=$(serviceIdspreprod) \
