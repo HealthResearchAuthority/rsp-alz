@@ -87,6 +87,7 @@ stages:
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                         paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
                         paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) paramserviceIdspreprod=$(serviceIdspreprod) \
+                        paramserviceIdsdw=$(serviceIdsDW) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
@@ -127,6 +128,7 @@ stages:
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                         paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
                         paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) paramserviceIdspreprod=$(serviceIdspreprod)  \
+                        paramserviceIdsdw=$(serviceIdsDW) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
                         devboxSubscriptionId="$(devboxSubscriptionId)"
 
