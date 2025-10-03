@@ -56,7 +56,7 @@ var functionApps = [
     name: 'func-validate-irasid'
     storageAccountName: 'stvalidateirasid${environment}'
     appServicePlanName: 'asp-validate-irasid-uks'
-    appServicePlanNameLinux: 'asp-validate-irasid-linux'
+    appServicePlanNameLinux: 'asp-validate-irasid-uks'
   }
 ]
 
