@@ -95,18 +95,6 @@ module appServicePlans '../../shared/bicep/app-services/app-service-plan.bicep' 
     location: location
     tags: tags
     sku: sku
-    serverOS: 'Windows'
-    diagnosticWorkspaceId: logAnalyticsWorkspaceId
-  }
-}]
-
-module appServicePlansLinux '../../shared/bicep/app-services/app-service-plan.bicep' = [for (funcApp, index) in functionApps: {
-  name: 'appServicePlanLinux-${funcApp.name}'
-  params: {
-    name: funcApp.appServicePlanName
-    location: location
-    tags: tags
-    sku: sku
     serverOS: 'Linux'
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
   }
@@ -213,7 +201,7 @@ module functionAppsDeployment '../../shared/bicep/app-services/function-app.bice
     functionAppName: funcApp.name
     location: location
     tags: tags
-    serverFarmResourceId: appServicePlansLinux[index].outputs.resourceId
+    serverFarmResourceId: appServicePlans[index].outputs.resourceId
     hasPrivateEndpoint: true
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     storageAccountName: funcApp.storageAccountName
