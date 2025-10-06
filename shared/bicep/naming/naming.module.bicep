@@ -85,6 +85,7 @@ var resourceNames = {
   frontDoorEndpoint: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.frontDoorEndpoint)
   frontDoorOriginGroup: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.frontDoorOriginGroup)
   frontDoorRoute: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.frontDoorRoute)
+  frontDoorRuleSet: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.frontDoorRuleSet)
   frontDoorWaf: replace(namingBase, resourceTypeToken, naming.resourceTypeAbbreviations.frontDoorWaf)
   azureAISearch: replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azureAISearch )
   azureAISearchPep: '${naming.resourceTypeAbbreviations.privateEndpoint}-${replace ( namingBaseUnique, resourceTypeToken, naming.resourceTypeAbbreviations.azureAISearch )}'
@@ -105,3 +106,4 @@ var resourceNames = {
 
 output resourcesNames object = resourceNames
 output resourceTypeAbbreviations object = resourceTypeAbbreviations
+

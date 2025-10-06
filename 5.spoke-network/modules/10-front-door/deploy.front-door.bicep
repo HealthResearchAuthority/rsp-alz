@@ -83,6 +83,24 @@ var originGroupName = resourcesNames.frontDoorOriginGroup
 var cmsOriginGroupName = '${resourcesNames.frontDoorOriginGroup}-cms'
 var routeName = resourcesNames.frontDoorRoute
 var cmsRouteName = '${resourcesNames.frontDoorRoute}-cms'
+var cmsRuleSetName = '${resourcesNames.frontDoorRuleSet}-cms'
+var cmsPathRewriteRule = {
+  name: '${cmsRuleSetName}-path-rewrite'
+  order: 1
+  matchProcessingBehavior: 'Continue'
+  conditions: []
+  actions: [
+    {
+      name: 'UrlRewrite'
+      parameters: {
+        sourcePattern: '/'
+        destination: '/umbraco/'
+        preserveUnmatchedPath: true
+        typeName: 'DeliveryRuleUrlRewriteActionParameters'
+      }
+    }
+  ]
+}
 var wafPolicyName = replace(resourcesNames.frontDoorWaf, '-', '')
 
 var originConfig = {
@@ -191,6 +209,16 @@ module cmsOriginGroup '../../../shared/bicep/front-door/origin-group.bicep' = if
   }
 }
 
+// CMS Portal Rule Set (rewrite path to prepend /umbraco)
+module cmsRouteRuleSet '../../../shared/bicep/front-door/rule-set.bicep' = if (enableCmsRoute) {
+  name: take('cms-ruleset-${deployment().name}', 64)
+  params: {
+    name: cmsRuleSetName
+    frontDoorProfileName: frontDoorProfile.outputs.name
+    rules: [cmsPathRewriteRule]
+  }
+}
+
 // CMS Portal Route (specific path - must come first)
 module cmsRoute '../../../shared/bicep/front-door/route.bicep' = if (enableCmsRoute) {
   name: take('cms-route-${deployment().name}', 64)
@@ -207,6 +235,7 @@ module cmsRoute '../../../shared/bicep/front-door/route.bicep' = if (enableCmsRo
     httpsRedirect: enableHttpsRedirect
     caching: cachingConfig
     wafPolicyId: '' // WAF policy will be attached via consolidated security policy
+    ruleSetId: cmsRouteRuleSet.outputs.resourceId
   }
 }
 
@@ -277,3 +306,8 @@ output cmsRoutePath string = enableCmsRoute ? cmsRoutePathPattern : ''
 
 @description('The resource ID of the consolidated security policy.')
 output securityPolicyId string = enableWaf ? securityPolicy!.outputs.resourceId : ''
+
+@description('The resource ID of the CMS route rule set.')
+output cmsRuleSetId string = enableCmsRoute ? cmsRouteRuleSet!.outputs.resourceId : ''
+
+

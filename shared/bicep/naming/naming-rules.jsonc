@@ -15,6 +15,7 @@
         "frontDoorEndpoint": "fd",
         "frontDoorOriginGroup": "og",
         "frontDoorRoute": "rt",
+        "frontDoorRuleSet": "rs",
         "frontDoorWaf": "waf",
         "keyVault": "kv",
         "logAnalyticsWorkspace": "log",
