@@ -945,3 +945,22 @@ module appConfigUpdate 'modules/11-app-config-update/deploy.app-config-update.bi
     ]
   }
 ]
+
+// Application Insights Dashboards
+module dashboards '../shared/bicep/portal-dashboard/deploy-dashboards.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('dashboards-${deployment().name}-deployment', 64)
+    params: {
+      irasPortalAppInsightsId: webApp[i].outputs.appInsightsResourceId
+      irasServicesAppInsightsId: containerAppsEnvironment[i].outputs.applicationInsightsResourceId
+      environment: parSpokeNetworks[i].parEnvironment
+      location: location
+      tags: tags
+    }
+    dependsOn: [
+      webApp
+      containerAppsEnvironment
+    ]
+  }
+]
