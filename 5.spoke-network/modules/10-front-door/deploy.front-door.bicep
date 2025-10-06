@@ -83,9 +83,9 @@ var originGroupName = resourcesNames.frontDoorOriginGroup
 var cmsOriginGroupName = '${resourcesNames.frontDoorOriginGroup}-cms'
 var routeName = resourcesNames.frontDoorRoute
 var cmsRouteName = '${resourcesNames.frontDoorRoute}-cms'
-var cmsRuleSetName = '${resourcesNames.frontDoorRuleSet}-cms'
+var cmsRuleSetName = replace('${resourcesNames.frontDoorRuleSet}cms', '-', '')
 var cmsPathRewriteRule = {
-  name: '${cmsRuleSetName}-path-rewrite'
+  name: '${cmsRuleSetName}pathrewrite'
   order: 1
   matchProcessingBehavior: 'Continue'
   conditions: []
