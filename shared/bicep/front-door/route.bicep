@@ -55,6 +55,9 @@ param wafPolicyId string = ''
 @description('Optional. The resource ID of the rule set.')
 param ruleSetId string = ''
 
+@description('Optional. Origin path to override the path in the request sent to the origin.')
+param originPath string = ''
+
 // ------------------
 // RESOURCES
 // ------------------
@@ -78,6 +81,7 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2023-05-01' = {
     originGroup: {
       id: originGroupId
     }
+    originPath: !empty(originPath) ? originPath : null
     supportedProtocols: supportedProtocols
     patternsToMatch: patternsToMatch
     forwardingProtocol: forwardingProtocol

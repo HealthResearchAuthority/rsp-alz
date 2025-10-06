@@ -230,6 +230,7 @@ module cmsRoute '../../../shared/bicep/front-door/route.bicep' = if (enableCmsRo
     customDomains: []
     supportedProtocols: ['Http', 'Https']
     patternsToMatch: [cmsRoutePathPattern]
+    originPath: '/'
     forwardingProtocol: 'HttpsOnly'
     linkToDefaultDomain: true
     httpsRedirect: enableHttpsRedirect
