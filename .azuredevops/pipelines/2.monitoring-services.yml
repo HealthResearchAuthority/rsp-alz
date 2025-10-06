@@ -155,6 +155,5 @@ stages:
                       az config set bicep.use_binary_from_path=false --only-show-errors
                       output=$(az stack sub create --name "monitoring-deployment-stack" --location $(location) --template-file ./2.monitoring-alerts/main.bicep  \
                         --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam \
-                                    logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
