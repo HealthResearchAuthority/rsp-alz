@@ -6,8 +6,8 @@
         "parts": [
           {
             "position": {
-              "x": 3,
-              "y": 2,
+              "x": 0,
+              "y": 0,
               "colSpan": 3,
               "rowSpan": 6
             },
@@ -31,8 +31,8 @@
           },
           {
             "position": {
-              "x": 6,
-              "y": 2,
+              "x": 3,
+              "y": 0,
               "colSpan": 6,
               "rowSpan": 6
             },
@@ -83,8 +83,8 @@
           },
           {
             "position": {
-              "x": 12,
-              "y": 2,
+              "x": 9,
+              "y": 0,
               "colSpan": 6,
               "rowSpan": 6
             },
@@ -138,7 +138,7 @@
           {
             "position": {
               "x": 0,
-              "y": 8,
+              "y": 6,
               "colSpan": 2,
               "rowSpan": 8
             },
@@ -159,7 +159,7 @@
           {
             "position": {
               "x": 2,
-              "y": 8,
+              "y": 6,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -222,7 +222,7 @@
           {
             "position": {
               "x": 8,
-              "y": 8,
+              "y": 6,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -274,7 +274,7 @@
           {
             "position": {
               "x": 14,
-              "y": 8,
+              "y": 6,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -383,7 +383,7 @@
           {
             "position": {
               "x": 2,
-              "y": 12,
+              "y": 10,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -501,7 +501,7 @@
           {
             "position": {
               "x": 8,
-              "y": 12,
+              "y": 10,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -610,7 +610,7 @@
           {
             "position": {
               "x": 14,
-              "y": 12,
+              "y": 10,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -719,7 +719,7 @@
           {
             "position": {
               "x": 0,
-              "y": 16,
+              "y": 14,
               "colSpan": 2,
               "rowSpan": 8
             },
@@ -740,7 +740,7 @@
           {
             "position": {
               "x": 2,
-              "y": 16,
+              "y": 14,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -804,7 +804,7 @@
           {
             "position": {
               "x": 8,
-              "y": 16,
+              "y": 14,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -886,15 +886,15 @@
                           "resourceMetadata": {
                             "id": "/subscriptions/TEMPLATE_SUBSCRIPTION_ID/resourceGroups/TEMPLATE_RESOURCE_GROUP/providers/Microsoft.Cdn/profiles/TEMPLATE_FRONTDOOR_PROFILE"
                           },
-                          "name": "OriginHealthPercentage",
-                          "aggregationType": 4,
+                          "name": "OriginRequestCount",
+                          "aggregationType": 7,
                           "namespace": "microsoft.cdn/profiles",
                           "metricVisualization": {
-                            "displayName": "Origin Health Percentage"
+                            "displayName": "Origin Request Count"
                           }
                         }
                       ],
-                      "title": "FrontDoor Origin Health",
+                      "title": "FrontDoor Origin Requests",
                       "titleKind": 2,
                       "visualization": {
                         "chartType": 2,
@@ -919,24 +919,13 @@
                     }
                   }
                 }
-              },
-              "filters": {
-                "OriginGroup": {
-                  "model": {
-                    "operator": "equals",
-                    "values": [
-                      "TEMPLATE_ORIGIN_GROUP_1",
-                      "TEMPLATE_ORIGIN_GROUP_2"
-                    ]
-                  }
-                }
               }
             }
           },
           {
             "position": {
               "x": 14,
-              "y": 16,
+              "y": 14,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -1066,7 +1055,7 @@
           {
             "position": {
               "x": 2,
-              "y": 20,
+              "y": 18,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -1085,17 +1074,8 @@
                   "isOptional": true
                 },
                 {
-                  "name": "formatResults",
-                  "isOptional": true
-                },
-                {
                   "name": "partTitle",
                   "value": "Query 1",
-                  "isOptional": true
-                },
-                {
-                  "name": "query",
-                  "value": "Resources\r\n| where type == \"microsoft.cdn/profiles/afdendpoints\"\r\n| where name contains \"TEMPLATE_ENVIRONMENT\" or resourceGroup contains \"TEMPLATE_ENVIRONMENT\"\r\n| extend origins = properties.origins\r\n| mv-expand origins\r\n| project\r\n    profile = tostring(split(id, \"/\")[8]),\r\n    endpointName = name,\r\n    endpointHost = tostring(properties.hostName),\r\n    originName = tostring(origins.name),\r\n    originHostName = tostring(origins.properties.hostName),\r\n    enabledState = tostring(origins.properties.enabledState),\r\n    priority = tostring(origins.properties.priority),\r\n    weight = tostring(origins.properties.weight),\r\n    httpPort = tostring(origins.properties.httpPort),\r\n    httpsPort = tostring(origins.properties.httpsPort),\r\n    location,\r\n    resourceGroup\r\n| order by profile, endpointName, originName asc\r\n\r\n\r\n",
                   "isOptional": true
                 },
                 {
@@ -1104,6 +1084,16 @@
                     "scope": 0,
                     "values": []
                   },
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "value": true,
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where type == \"microsoft.cdn/profiles/afdendpoints\"\r\n| where name contains \"TEMPLATE_ENVIRONMENT\" or resourceGroup contains \"TEMPLATE_ENVIRONMENT\"\r\n| extend origins = properties.origins\r\n| mv-expand origins\r\n| project\r\n    profile = tostring(split(id, \"/\")[8]),\r\n    endpointName = name,\r\n    originName = tostring(origins.name),\r\n    originHostName = origins.properties.hostName,\r\n    enabledState = tostring(origins.properties.enabledState),\r\n    resourceGroup\r\n| order by profile, endpointName, originName asc",
                   "isOptional": true
                 }
               ],
@@ -1118,7 +1108,7 @@
           {
             "position": {
               "x": 8,
-              "y": 20,
+              "y": 18,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -1232,23 +1222,13 @@
                     }
                   }
                 }
-              },
-              "filters": {
-                "Endpoint": {
-                  "model": {
-                    "operator": "equals",
-                    "values": [
-                      "TEMPLATE_FRONTDOOR_ENDPOINT"
-                    ]
-                  }
-                }
               }
             }
           },
           {
             "position": {
               "x": 14,
-              "y": 20,
+              "y": 18,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -1300,7 +1280,32 @@
           {
             "position": {
               "x": 0,
-              "y": 24,
+              "y": 22,
+              "colSpan": 2,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "__My data__\n\nThis tile lets you put custom content on your dashboard. It supports plain text, __Markdown__, and even limited HTML like images <img width='10' src='https://portal.azure.com/favicon.ico'/> and <a href='https://azure.microsoft.com' target='_blank'>links</a> that open in a new tab.\n",
+                  "title": "My title",
+                  "subtitle": "My subtitle",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              },
+              "partHeader": {
+                "title": "Database Summary",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 22,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -1351,8 +1356,369 @@
           },
           {
             "position": {
-              "x": 6,
-              "y": 24,
+              "x": 8,
+              "y": 22,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "region": "uksouth",
+                            "resourceType": "microsoft.sql/servers/databases",
+                            "subscription": {
+                              "subscriptionId": "TEMPLATE_SUBSCRIPTION_ID",
+                              "displayName": "TEMPLATE_SUBSCRIPTION_NAME",
+                              "uniqueDisplayName": "TEMPLATE_SUBSCRIPTION_NAME"
+                            }
+                          },
+                          "name": "allocated_data_storage",
+                          "aggregationType": 3,
+                          "namespace": "microsoft.sql/servers/databases",
+                          "metricVisualization": {
+                            "displayName": "Data space allocated",
+                            "resourceDisplayName": "TEMPLATE_SUBSCRIPTION_NAME"
+                          }
+                        }
+                      ],
+                      "title": "Data space allocated for SQL Databases",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "grouping": {
+                        "dimension": "Microsoft.ResourceId"
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 86400000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "region": "uksouth",
+                            "resourceType": "microsoft.sql/servers/databases",
+                            "subscription": {
+                              "subscriptionId": "TEMPLATE_SUBSCRIPTION_ID",
+                              "displayName": "TEMPLATE_SUBSCRIPTION_NAME",
+                              "uniqueDisplayName": "TEMPLATE_SUBSCRIPTION_NAME"
+                            }
+                          },
+                          "name": "allocated_data_storage",
+                          "aggregationType": 3,
+                          "namespace": "microsoft.sql/servers/databases",
+                          "metricVisualization": {
+                            "displayName": "Data space allocated",
+                            "resourceDisplayName": "TEMPLATE_SUBSCRIPTION_NAME"
+                          }
+                        },
+                        {
+                          "resourceMetadata": {
+                            "region": "uksouth",
+                            "resourceType": "microsoft.sql/servers/databases",
+                            "subscription": {
+                              "subscriptionId": "TEMPLATE_SUBSCRIPTION_ID",
+                              "displayName": "TEMPLATE_SUBSCRIPTION_NAME",
+                              "uniqueDisplayName": "TEMPLATE_SUBSCRIPTION_NAME"
+                            }
+                          },
+                          "name": "storage",
+                          "aggregationType": 3,
+                          "namespace": "microsoft.sql/servers/databases",
+                          "metricVisualization": {
+                            "displayName": "Data space used",
+                            "resourceDisplayName": "TEMPLATE_SUBSCRIPTION_NAME"
+                          }
+                        }
+                      ],
+                      "title": "Data space information for SQL Databases",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      },
+                      "grouping": {
+                        "dimension": "Microsoft.ResourceId",
+                        "sort": 1,
+                        "top": 10
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "local",
+                    "granularity": "auto",
+                    "relative": "1440m"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 14,
+              "y": 22,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "region": "uksouth",
+                            "resourceType": "microsoft.sql/servers/databases",
+                            "subscription": {
+                              "subscriptionId": "TEMPLATE_SUBSCRIPTION_ID",
+                              "displayName": "TEMPLATE_SUBSCRIPTION_NAME",
+                              "uniqueDisplayName": "TEMPLATE_SUBSCRIPTION_NAME"
+                            }
+                          },
+                          "name": "connection_failed_user_error",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.sql/servers/databases",
+                          "metricVisualization": {
+                            "displayName": "Failed Connections : User Errors",
+                            "resourceDisplayName": "TEMPLATE_SUBSCRIPTION_NAME"
+                          }
+                        }
+                      ],
+                      "title": "Database Failed Connections",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "filterCollection": {
+                        "filters": [
+                          {
+                            "key": "Microsoft.ResourceId",
+                            "operator": 1,
+                            "values": [
+                              "TEMPLATE_MASTER_DATABASE_FILTER"
+                            ]
+                          }
+                        ]
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 86400000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "region": "uksouth",
+                            "resourceType": "microsoft.sql/servers/databases",
+                            "subscription": {
+                              "subscriptionId": "TEMPLATE_SUBSCRIPTION_ID",
+                              "displayName": "TEMPLATE_SUBSCRIPTION_NAME",
+                              "uniqueDisplayName": "TEMPLATE_SUBSCRIPTION_NAME"
+                            }
+                          },
+                          "name": "connection_failed_user_error",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.sql/servers/databases",
+                          "metricVisualization": {
+                            "displayName": "Failed Connections : User Errors",
+                            "resourceDisplayName": "TEMPLATE_SUBSCRIPTION_NAME"
+                          }
+                        }
+                      ],
+                      "title": "Database Failed Connections",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "Microsoft.ResourceId": {
+                  "model": {
+                    "operator": "notEquals",
+                    "values": [
+                      "TEMPLATE_MASTER_DATABASE_FILTER"
+                    ]
+                  }
+                },
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "local",
+                    "granularity": "auto",
+                    "relative": "1440m"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 26,
+              "colSpan": 8,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where type == \"microsoft.web/sites\"\r\n| where name contains \"TEMPLATE_ENVIRONMENT\" or resourceGroup contains \"TEMPLATE_ENVIRONMENT\"\r\n| project name, location, properties.state, kind",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "App Services",
+                "subtitle": "Azure Resource Graph"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 8,
+              "y": 26,
               "colSpan": 6,
               "rowSpan": 4
             },
@@ -1410,58 +1776,6 @@
                 "subtitle": "Azure Resource Graph"
               }
             }
-          },
-          {
-            "position": {
-              "x": 12,
-              "y": 24,
-              "colSpan": 8,
-              "rowSpan": 4
-            },
-            "metadata": {
-              "inputs": [
-                {
-                  "name": "chartType",
-                  "isOptional": true
-                },
-                {
-                  "name": "isShared",
-                  "isOptional": true
-                },
-                {
-                  "name": "queryId",
-                  "isOptional": true
-                },
-                {
-                  "name": "formatResults",
-                  "isOptional": true
-                },
-                {
-                  "name": "partTitle",
-                  "value": "Query 1",
-                  "isOptional": true
-                },
-                {
-                  "name": "query",
-                  "value": "Resources\r\n| where type == \"microsoft.web/sites\"\r\n| where name contains \"TEMPLATE_ENVIRONMENT\" or resourceGroup contains \"TEMPLATE_ENVIRONMENT\"\r\n| project name, location, properties.state, kind",
-                  "isOptional": true
-                },
-                {
-                  "name": "queryScope",
-                  "value": {
-                    "scope": 0,
-                    "values": []
-                  },
-                  "isOptional": true
-                }
-              ],
-              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
-              "settings": {},
-              "partHeader": {
-                "title": "App Services",
-                "subtitle": "Azure Resource Graph"
-              }
-            }
           }
         ]
       }
@@ -1493,13 +1807,15 @@
                 "value": "Past 24 hours"
               },
               "filteredPartIds": [
-                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f340",
-                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f2fc",
-                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f31e",
-                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f2d0",
-                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f109",
-                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f0bd",
-                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f0e0"
+                "StartboardPart-MonitorChartPart-aea51503-4127-4e43-b640-0f8ff3640036",
+                "StartboardPart-MonitorChartPart-aea51503-4127-4e43-b640-0f8ff364001a",
+                "StartboardPart-MonitorChartPart-aea51503-4127-4e43-b640-0f8ff364001c",
+                "StartboardPart-MonitorChartPart-aea51503-4127-4e43-b640-0f8ff364001e",
+                "StartboardPart-MonitorChartPart-aea51503-4127-4e43-b640-0f8ff3640020",
+                "StartboardPart-MonitorChartPart-aea51503-4127-4e43-b640-0f8ff3640026",
+                "StartboardPart-MonitorChartPart-aea51503-4127-4e43-b640-0f8ff3640028",
+                "StartboardPart-MonitorChartPart-aea51503-4127-4e43-b640-0f8ff364002c",
+                "StartboardPart-MonitorChartPart-aea51503-4127-4e43-b640-0f8ff3640038"
               ]
             }
           }

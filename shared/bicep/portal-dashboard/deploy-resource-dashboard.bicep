@@ -35,6 +35,12 @@ param originGroup1Name string = 'og-rsp-applications-${environment}-uks'
 @description('Optional. Origin Group 2 name.')
 param originGroup2Name string = 'og-rsp-applications-${environment}-uks-cms'
 
+@description('Optional. Subscription display name for SQL metrics.')
+param subscriptionDisplayName string = 'hra-rsp-${environment}'
+
+@description('Optional. Master database filter for SQL metrics.')
+param masterDatabaseFilter string = '/SUBSCRIPTIONS/${toUpper(subscriptionId)}/RESOURCEGROUPS/${toUpper(resourceGroupName)}/PROVIDERS/MICROSOFT.SQL/SERVERS/RSPSQLSERVER${toUpper(environment)}/DATABASES/MASTER'
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -51,6 +57,8 @@ var templateFrontDoorProfile = 'TEMPLATE_FRONTDOOR_PROFILE'
 var templateFrontDoorEndpoint = 'TEMPLATE_FRONTDOOR_ENDPOINT'
 var templateOriginGroup1 = 'TEMPLATE_ORIGIN_GROUP_1'
 var templateOriginGroup2 = 'TEMPLATE_ORIGIN_GROUP_2'
+var templateSubscriptionName = 'TEMPLATE_SUBSCRIPTION_NAME'
+var templateMasterDatabaseFilter = 'TEMPLATE_MASTER_DATABASE_FILTER'
 
 // Load dashboard template and convert to string for replacement
 var resourceDashboardTemplateString = string(loadJsonContent('iras-resource-dashboard-template.json').properties)
@@ -65,9 +73,11 @@ var step6 = replace(step5, templateFrontDoorProfile, frontDoorProfileName)
 var step7 = replace(step6, templateFrontDoorEndpoint, frontDoorEndpoint)
 var step8 = replace(step7, templateOriginGroup1, originGroup1Name)
 var step9 = replace(step8, templateOriginGroup2, originGroup2Name)
+var step10 = replace(step9, templateSubscriptionName, subscriptionDisplayName)
+var step11 = replace(step10, templateMasterDatabaseFilter, masterDatabaseFilter)
 
 // Parse back to JSON
-var resourceDashboardProperties = json(step9)
+var resourceDashboardProperties = json(step11)
 
 // Dashboard title and name
 var dashboardTitle = 'IRAS Resources - ${environment}'
