@@ -980,7 +980,7 @@ module resourceDashboard '../shared/bicep/portal-dashboard/deploy-resource-dashb
     dependsOn: [
       webApp
       containerAppsEnvironment
-      frontDoor
+      // frontDoor
     ]
   }
 ]
