@@ -964,3 +964,31 @@ module dashboards '../shared/bicep/portal-dashboard/deploy-dashboards.bicep' = [
     ]
   }
 ]
+
+// Tactical Report Function App
+module tacticalReportFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('tacticalReportFnApp-${deployment().name}-deployment', 64)
+    params: {
+      appName: 'func-tacticalreport-${parSpokeNetworks[i].parEnvironment}'
+      location: location
+      tags: tags
+      sku: parSkuConfig.appServicePlan.functionApp
+      appServicePlanName: 'asp-rsp-fntactrep-${parSpokeNetworks[i].parEnvironment}-uks'
+      webAppBaseOs: 'Linux'
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: false
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'sttactical${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      ]
+    }
+  }
+]
