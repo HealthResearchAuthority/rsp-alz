@@ -1,5 +1,7 @@
 using '../main.network.bicep'
 
+param logAnalyticsWorkspaceId = ''
+
 param parSpokeNetworks = [
   {
     subscriptionId: 'd27a0dcc-453d-4bfa-9c3d-1447c6ea0119'
@@ -14,13 +16,13 @@ param parSpokeNetworks = [
         addressPrefix: '10.7.0.0/18'
       }
       webAppSubnet: {
-        addressPrefix: '10.3.128.0/18'
+        addressPrefix: '10.7.128.0/18'
       }
       appGatewaySubnet: {
-        addressPrefix: '10.7.64.0/24'
+        addressPrefix: '10.7.64.0/27'
       }
       privateEndPointSubnet: {
-        addressPrefix: '10.7.65.0/24'
+        addressPrefix: '10.7.32.0/23'
       }
     }
   }
