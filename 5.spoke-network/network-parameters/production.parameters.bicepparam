@@ -19,10 +19,10 @@ param parSpokeNetworks = [
         addressPrefix: '10.7.128.0/18'
       }
       appGatewaySubnet: {
-        addressPrefix: '10.7.64.0/27'
+        addressPrefix: '10.7.64.0/24'
       }
       privateEndPointSubnet: {
-        addressPrefix: '10.7.32.0/23'
+        addressPrefix: '10.7.65.0/24'
       }
     }
   }
