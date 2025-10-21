@@ -210,6 +210,26 @@ param parEnableAppConfigPrivateEndpoints bool = false
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
 
+param cleanStorageAccountName string
+@secure()
+@description('The key for the storage account where the blob connection string will be stored.')
+param cleanStorageAccountKey string
+
+param stagingStorageAccountName string
+@secure()
+@description('The key for the storage account where the blob connection string will be stored.')
+param stagingStorageAccountKey string
+
+param quarantineStorageAccountName string
+@secure()
+@description('The key for the storage account where the blob connection string will be stored.')
+param quarantineStorageAccountKey string
+
+param parApplicationServiceApplicationId string
+
+@description('Client ID of the managed identity to be used for the Document Upload Function App')
+param processDocuUploadManagedIdentityClientId string
+
 @description('Microsoft Defender for Storage configuration')
 param parDefenderForStorageConfig object = {
   enabled: false
@@ -358,6 +378,13 @@ param parRtsAuthApiBaseUrl string = ''
 // ------------------
 
 var sqlServerNamePrefix = 'rspsqlserver'
+
+
+var documentStorageAccounts object = {
+  cleanStorageAccountName: cleanStorageAccountName
+  stagingStorageAccountName: stagingStorageAccountName
+  quarantineStorageAccountName: quarantineStorageAccountName
+}
 
 // DRY helper function for storage encryption configuration
 func createStorageEncryptionConfig(config storageEncryptionConfig, keyVaultId string) object =>
@@ -543,6 +570,9 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       rtsApiBaseUrl: parRtsApiBaseUrl
       rtsAuthApiBaseUrl: parRtsAuthApiBaseUrl
       createSecretsWithPlaceholders: parCreateKVSecretsWithPlaceholders
+      documentStorageAccounts: documentStorageAccounts
+      parApplicationServiceApplicationId: parApplicationServiceApplicationId
+      processDocuUploadManagedIdentityClientId: processDocuUploadManagedIdentityClientId
     }
   }
 ]

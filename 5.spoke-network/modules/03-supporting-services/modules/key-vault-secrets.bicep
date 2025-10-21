@@ -47,6 +47,18 @@ var storageSecrets = [
     name: 'documentBlobStorageAccountKey'
     value: 'placeholder-document-storage-key-to-be-updated-manually'
   }
+  {
+    name: 'stagingStorageAccountKey'
+    value: 'placeholder-staging-storage-key-to-be-updated-manually'
+  }
+  {
+    name: 'quarantineStorageAccountKey'
+    value: 'placeholder-quarantine-storage-key-to-be-updated-manually'
+  }
+  {
+    name: 'cleanStorageAccountKey'
+    value: 'placeholder-clean-storage-key-to-be-updated-manually'
+  }
 ]
 
 // ------------------
