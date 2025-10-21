@@ -33,3 +33,6 @@ param environment = 'dev'
 param logAnalyticsWorkspaceId = ''
 param enableHarpDeployment = true
 param harpSyncResourceGroupName = 'harpSyncRG'
+
+// App Configuration Parameters
+param enableAppConfigPrivateEndpoints = true
