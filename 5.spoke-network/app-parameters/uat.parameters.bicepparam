@@ -51,7 +51,7 @@ param parOverrideSubscriptionLevelSettings = true
 
 param parSkipExistingRoleAssignments = true
 
-param parCreateKVSecretsWithPlaceholders = true
+param parCreateKVSecretsWithPlaceholders = false
 
 // Storage configuration for all storage account types 
 param parStorageConfig = {
@@ -155,7 +155,7 @@ param parSpokeNetworks = [
     rgStorage: 'rg-rsp-storage-spoke-uat-uks'
     deployWebAppSlot: false
     IDGENV: 'test'
-    appInsightsConnectionString: 'InstrumentationKey=225c2ec1-bb7d-4c33-9d5f-cb89c117f2d6;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=3dc21d1c-0655-44cc-8ad3-cb4eab8c8c67'
+    appInsightsConnectionString: 'InstrumentationKey=58f85e46-e52f-45cd-835e-a850068cbe46;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=888acb96-8b54-4078-b449-09c98201da06'
   }
 ]
 
@@ -191,3 +191,14 @@ param parRtsApiBaseUrl = ''
 
 
 param parRtsAuthApiBaseUrl = ''
+
+param parCleanStorageAccountKey = ''
+param parStagingStorageAccountKey = ''
+param parQuarantineStorageAccountKey = ''
+param parCleanStorageAccountName = ''
+param parStagingStorageAccountName = ''
+param parQuarantineStorageAccountName = ''
+
+
+param parApplicationServiceApplicationId = '' 
+param processDocuUploadManagedIdentityClientId =  ''

@@ -141,6 +141,9 @@ param parAdminLogin string = ''
 @description('SQL Admin Password')
 param parSqlAdminPhrase string
 
+@description('Enable or disable SQL Server password authentication (default: true)')
+param parEnableSqlAdminLogin bool = true
+
 @description('Iras Service Container image tag.')
 param parIrasContainerImageTag string
 
@@ -210,20 +213,20 @@ param parEnableAppConfigPrivateEndpoints bool = false
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
 
-param cleanStorageAccountName string
+param parCleanStorageAccountName string
 @secure()
 @description('The key for the storage account where the blob connection string will be stored.')
-param cleanStorageAccountKey string
+param parCleanStorageAccountKey string
 
-param stagingStorageAccountName string
+param parStagingStorageAccountName string
 @secure()
 @description('The key for the storage account where the blob connection string will be stored.')
-param stagingStorageAccountKey string
+param parStagingStorageAccountKey string
 
-param quarantineStorageAccountName string
+param parQuarantineStorageAccountName string
 @secure()
 @description('The key for the storage account where the blob connection string will be stored.')
-param quarantineStorageAccountKey string
+param parQuarantineStorageAccountKey string
 
 param parApplicationServiceApplicationId string
 
@@ -381,9 +384,12 @@ var sqlServerNamePrefix = 'rspsqlserver'
 
 
 var documentStorageAccounts object = {
-  cleanStorageAccountName: cleanStorageAccountName
-  stagingStorageAccountName: stagingStorageAccountName
-  quarantineStorageAccountName: quarantineStorageAccountName
+  cleanStorageAccountName: parCleanStorageAccountName
+  cleanStorageAccountKey: parCleanStorageAccountKey
+  stagingStorageAccountName: parStagingStorageAccountName
+  stagingStorageAccountKey: parStagingStorageAccountKey
+  quarantineStorageAccountName: parQuarantineStorageAccountName
+  quarantineStorageAccountKey: parQuarantineStorageAccountKey
 }
 
 // DRY helper function for storage encryption configuration
@@ -666,6 +672,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       enableSqlServerAuditing: true
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       sqlDatabaseSkuConfig: parSkuConfig.sqlDatabase
+      enableSqlAdminLogin: parEnableSqlAdminLogin
     }
   }
 ]
@@ -968,6 +975,25 @@ module appConfigUpdate 'modules/11-app-config-update/deploy.app-config-update.bi
       frontDoor
       supportingServices
       webApp
+    ]
+  }
+]
+
+// Application Insights Dashboards
+module dashboards '../shared/bicep/portal-dashboard/deploy-dashboards.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('dashboards-${deployment().name}-deployment', 64)
+    params: {
+      irasPortalAppInsightsId: webApp[i].outputs.appInsightsResourceId
+      irasServicesAppInsightsId: containerAppsEnvironment[i].outputs.applicationInsightsResourceId
+      environment: parSpokeNetworks[i].parEnvironment
+      location: location
+      tags: tags
+    }
+    dependsOn: [
+      webApp
+      containerAppsEnvironment
     ]
   }
 ]

@@ -305,17 +305,17 @@ var keyValues = [
   }
   {
     name: 'AppSettings:DocumentStorage:StagingBlobConnectionString$processDocumentScan'
-    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.stagingStorageAccountName};AccountKey=@Microsoft.KeyVault(SecretUri=${keyVaultSecretUris.stagingStorageAccountKeySecretUri});EndpointSuffix=${az.environment().suffixes.storage};'
+    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.stagingStorageAccountName};AccountKey=${documentStorageAccounts.stagingStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
   {
     name: 'AppSettings:DocumentStorage:QuarantineBlobConnectionString$processDocumentScan' 
-    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.quarantineStorageAccountName};AccountKey=@Microsoft.KeyVault(SecretUri=${keyVaultSecretUris.quarantineStorageAccountKeySecretUri});EndpointSuffix=${az.environment().suffixes.storage};'
+    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.quarantineStorageAccountName};AccountKey=${documentStorageAccounts.quarantineStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
   {
     name: 'AppSettings:DocumentStorage:CleanBlobConnectionString$processDocumentScan' 
-    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=@Microsoft.KeyVault(SecretUri=${keyVaultSecretUris.cleanStorageAccountKeySecretUri});EndpointSuffix=${az.environment().suffixes.storage};'
+    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=${documentStorageAccounts.cleanStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
 ]

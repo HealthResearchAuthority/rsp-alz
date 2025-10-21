@@ -49,7 +49,7 @@ param parOverrideSubscriptionLevelSettings = true
 
 param parSkipExistingRoleAssignments = true
 
-param parCreateKVSecretsWithPlaceholders = true
+param parCreateKVSecretsWithPlaceholders = false
 
 // Storage configuration for all storage account types 
 param parStorageConfig = {
@@ -191,3 +191,14 @@ param parRtsApiBaseUrl = ''
 
 
 param parRtsAuthApiBaseUrl = ''
+
+param parCleanStorageAccountKey = ''
+param parStagingStorageAccountKey = ''
+param parQuarantineStorageAccountKey = ''
+param parCleanStorageAccountName = ''
+param parStagingStorageAccountName = ''
+param parQuarantineStorageAccountName = ''
+
+
+param parApplicationServiceApplicationId = '' 
+param processDocuUploadManagedIdentityClientId =  ''

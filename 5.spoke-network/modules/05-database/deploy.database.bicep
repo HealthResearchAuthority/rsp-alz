@@ -9,6 +9,9 @@ param adminLogin string = ''
 @secure()
 param adminPassword string
 
+@description('Enable or disable SQL Server auditing (default: true)')
+param enableSqlAdminLogin bool = true
+
 param databases array = []
 
 @description('The location where the resources will be created.')
@@ -101,8 +104,8 @@ resource SQL_Server 'Microsoft.Sql/servers@2024-05-01-preview' = {
     }
   }
   properties: {
-    administratorLogin: adminLogin
-    administratorLoginPassword: adminPassword
+    administratorLogin: enableSqlAdminLogin ? adminLogin : null
+    administratorLoginPassword: enableSqlAdminLogin ? adminPassword : null
     publicNetworkAccess: 'Disabled'
     primaryUserAssignedIdentityId: sqlServerUserAssignedIdentity.id
   }
