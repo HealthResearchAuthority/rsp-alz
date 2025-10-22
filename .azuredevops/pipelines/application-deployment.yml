@@ -113,7 +113,10 @@ stages:
                               parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
-                              parPortalUrl=$(portalUrl)
+                              parPortalUrl=$(portalUrl) parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                              parStagingStorageAccountKey=$(stagingStorageAccountKey) parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                              parCleanStorageAccountName=$(parCleanStorageAccountName) \
+                              parStagingStorageAccountName=$(parStagingStorageAccountName) parQuarantineStorageAccountName=$(parQuarantineStorageAccountName)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -156,7 +159,10 @@ stages:
                               parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
-                              parPortalUrl=$(portalUrl)
+                              parPortalUrl=$(portalUrl) parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                              parStagingStorageAccountKey=$(stagingStorageAccountKey) parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                              parCleanStorageAccountName=$(parCleanStorageAccountName) \
+                              parStagingStorageAccountName=$(parStagingStorageAccountName) parQuarantineStorageAccountName=$(parQuarantineStorageAccountName)
 
 
   - stage: ManualDeployment
@@ -240,7 +246,10 @@ stages:
                               parLogoutUrl=$(logoutUrl) parGoogleTagId=$(googleTagId) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
-                              parPortalUrl=$(portalUrl)
+                              parPortalUrl=$(portalUrl) parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                              parStagingStorageAccountKey=$(stagingStorageAccountKey) parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                              parCleanStorageAccountName=$(parCleanStorageAccountName) \ 
+                              parStagingStorageAccountName=$(parStagingStorageAccountName) parQuarantineStorageAccountName=$(parQuarantineStorageAccountName)
 
       - deployment: deploy
         displayName: 'Deploy Applications'
@@ -295,7 +304,10 @@ stages:
                                     parLogoutUrl=$(logoutUrl) \
                                     parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                                     parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
-                                    parPortalUrl=$(portalUrl) \
+                                    parPortalUrl=$(portalUrl) parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                                    parStagingStorageAccountKey=$(stagingStorageAccountKey) parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                                    parCleanStorageAccountName=$(parCleanStorageAccountName) \
+                                    parStagingStorageAccountName=$(parStagingStorageAccountName) parQuarantineStorageAccountName=$(parQuarantineStorageAccountName) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')

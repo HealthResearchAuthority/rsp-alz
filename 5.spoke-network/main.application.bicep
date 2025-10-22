@@ -213,20 +213,20 @@ param parEnableAppConfigPrivateEndpoints bool = false
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
 
-param cleanStorageAccountName string
+param parCleanStorageAccountName string
 @secure()
 @description('The key for the storage account where the blob connection string will be stored.')
-param cleanStorageAccountKey string
+param parCleanStorageAccountKey string
 
-param stagingStorageAccountName string
+param parStagingStorageAccountName string
 @secure()
 @description('The key for the storage account where the blob connection string will be stored.')
-param stagingStorageAccountKey string
+param parStagingStorageAccountKey string
 
-param quarantineStorageAccountName string
+param parQuarantineStorageAccountName string
 @secure()
 @description('The key for the storage account where the blob connection string will be stored.')
-param quarantineStorageAccountKey string
+param parQuarantineStorageAccountKey string
 
 param parApplicationServiceApplicationId string
 
@@ -384,9 +384,12 @@ var sqlServerNamePrefix = 'rspsqlserver'
 
 
 var documentStorageAccounts object = {
-  cleanStorageAccountName: cleanStorageAccountName
-  stagingStorageAccountName: stagingStorageAccountName
-  quarantineStorageAccountName: quarantineStorageAccountName
+  cleanStorageAccountName: parCleanStorageAccountName
+  cleanStorageAccountKey: parCleanStorageAccountKey
+  stagingStorageAccountName: parStagingStorageAccountName
+  stagingStorageAccountKey: parStagingStorageAccountKey
+  quarantineStorageAccountName: parQuarantineStorageAccountName
+  quarantineStorageAccountKey: parQuarantineStorageAccountKey
 }
 
 // DRY helper function for storage encryption configuration
