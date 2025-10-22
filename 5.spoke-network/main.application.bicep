@@ -382,8 +382,7 @@ param parRtsAuthApiBaseUrl string = ''
 
 var sqlServerNamePrefix = 'rspsqlserver'
 
-
-var documentStorageAccounts object = {
+var documentStorageAccounts = {
   cleanStorageAccountName: parCleanStorageAccountName
   cleanStorageAccountKey: parCleanStorageAccountKey
   stagingStorageAccountName: parStagingStorageAccountName

@@ -243,6 +243,9 @@ module appConfiguration './modules/app-configuration.bicep' = {
       rtsApiClientIdSecretUri: keyVaultSecrets.outputs.rtsApiClientIdSecretUri
       rtsApiClientSecretSecretUri: keyVaultSecrets.outputs.rtsApiClientSecretSecretUri
       documentBlobStorageAccountKeySecretUri: keyVaultSecrets.outputs.documentBlobStorageAccountKeySecretUri
+      stagingStorageAccountKeySecretUri: keyVaultSecrets.outputs.stagingStorageAccountKeySecretUri
+      quarantineStorageAccountKeySecretUri: keyVaultSecrets.outputs.quarantineStorageAccountKeySecretUri
+      cleanStorageAccountKeySecretUri: keyVaultSecrets.outputs.cleanStorageAccountKeySecretUri
     }
     documentStorageAccounts: documentStorageAccounts
   }

@@ -132,3 +132,12 @@ output rtsApiClientSecretSecretUri string = '${keyVault.properties.vaultUri}secr
 
 @description('Key Vault URI for documentBlobStorageAccountKey secret.')
 output documentBlobStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/documentBlobStorageAccountKey'
+
+@description('Key Vault URI for stagingStorageAccountKey secret.')
+output stagingStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/stagingStorageAccountKey'
+
+@description('Key Vault URI for quarantineStorageAccountKey secret.')
+output quarantineStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/quarantineStorageAccountKey'
+
+@description('Key Vault URI for cleanStorageAccountKey secret.')
+output cleanStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/cleanStorageAccountKey'
