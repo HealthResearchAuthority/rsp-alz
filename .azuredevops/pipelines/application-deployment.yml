@@ -113,15 +113,16 @@ stages:
                               parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
-                              parPortalUrl=$(portalUrl) \
-                              parCleanStorageAccountName=$(cleanStorageAccountName) \
-                              parCleanStorageAccountKey=$(cleanStorageAccountKey) \
-                              parStagingStorageAccountName=$(stagingStorageAccountName) \
-                              parStagingStorageAccountKey=$(stagingStorageAccountKey) \
-                              parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
-                              parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
-                              parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
-                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
+                              parPortalUrl=$(portalUrl)
+                              # TODO: Uncomment after Key Vault secrets sync to variable groups
+                              # parCleanStorageAccountName=$(cleanStorageAccountName) \
+                              # parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                              # parStagingStorageAccountName=$(stagingStorageAccountName) \
+                              # parStagingStorageAccountKey=$(stagingStorageAccountKey) \
+                              # parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
+                              # parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                              # parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                              # processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -164,15 +165,16 @@ stages:
                               parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
-                              parPortalUrl=$(portalUrl) \
-                              parCleanStorageAccountName=$(cleanStorageAccountName) \
-                              parCleanStorageAccountKey=$(cleanStorageAccountKey) \
-                              parStagingStorageAccountName=$(stagingStorageAccountName) \
-                              parStagingStorageAccountKey=$(stagingStorageAccountKey) \
-                              parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
-                              parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
-                              parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
-                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
+                              parPortalUrl=$(portalUrl)
+                              # TODO: Uncomment after Key Vault secrets sync to variable groups
+                              # parCleanStorageAccountName=$(cleanStorageAccountName) \
+                              # parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                              # parStagingStorageAccountName=$(stagingStorageAccountName) \
+                              # parStagingStorageAccountKey=$(stagingStorageAccountKey) \
+                              # parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
+                              # parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                              # parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                              # processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
 
 
   - stage: ManualDeployment
@@ -259,15 +261,16 @@ stages:
                               parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
-                              parPortalUrl=$(portalUrl) \
-                              parCleanStorageAccountName=$(cleanStorageAccountName) \
-                              parCleanStorageAccountKey=$(cleanStorageAccountKey) \
-                              parStagingStorageAccountName=$(stagingStorageAccountName) \
-                              parStagingStorageAccountKey=$(stagingStorageAccountKey) \
-                              parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
-                              parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
-                              parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
-                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
+                              parPortalUrl=$(portalUrl)
+                              # TODO: Uncomment after Key Vault secrets sync to variable groups
+                              # parCleanStorageAccountName=$(cleanStorageAccountName) \
+                              # parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                              # parStagingStorageAccountName=$(stagingStorageAccountName) \
+                              # parStagingStorageAccountKey=$(stagingStorageAccountKey) \
+                              # parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
+                              # parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                              # parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                              # processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
 
       - deployment: deploy
         displayName: 'Deploy Applications'
@@ -323,15 +326,16 @@ stages:
                                     parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                                     parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
                                     parPortalUrl=$(portalUrl) \
-                                    parCleanStorageAccountName=$(cleanStorageAccountName) \
-                                    parCleanStorageAccountKey=$(cleanStorageAccountKey) \
-                                    parStagingStorageAccountName=$(stagingStorageAccountName) \
-                                    parStagingStorageAccountKey=$(stagingStorageAccountKey) \
-                                    parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
-                                    parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
-                                    parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
-                                    processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
+                                    # TODO: Uncomment after Key Vault secrets sync to variable groups
+                                    # parCleanStorageAccountName=$(cleanStorageAccountName) \
+                                    # parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                                    # parStagingStorageAccountName=$(stagingStorageAccountName) \
+                                    # parStagingStorageAccountKey=$(stagingStorageAccountKey) \
+                                    # parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
+                                    # parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                                    # parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                                    # processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
                       echo "##vso[task.setvariable variable=appResourceGroupName;isoutput=true]$appResourceGroup"
