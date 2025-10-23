@@ -213,6 +213,26 @@ param parEnableAppConfigPrivateEndpoints bool = false
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
 
+param parCleanStorageAccountName string
+@secure()
+@description('The key for the storage account where the blob connection string will be stored.')
+param parCleanStorageAccountKey string
+
+param parStagingStorageAccountName string
+@secure()
+@description('The key for the storage account where the blob connection string will be stored.')
+param parStagingStorageAccountKey string
+
+param parQuarantineStorageAccountName string
+@secure()
+@description('The key for the storage account where the blob connection string will be stored.')
+param parQuarantineStorageAccountKey string
+
+param parApplicationServiceApplicationId string
+
+@description('Client ID of the managed identity to be used for the Document Upload Function App')
+param processDocuUploadManagedIdentityClientId string
+
 @description('Microsoft Defender for Storage configuration')
 param parDefenderForStorageConfig object = {
   enabled: false
@@ -361,6 +381,15 @@ param parRtsAuthApiBaseUrl string = ''
 // ------------------
 
 var sqlServerNamePrefix = 'rspsqlserver'
+
+var documentStorageAccounts = {
+  cleanStorageAccountName: parCleanStorageAccountName
+  cleanStorageAccountKey: parCleanStorageAccountKey
+  stagingStorageAccountName: parStagingStorageAccountName
+  stagingStorageAccountKey: parStagingStorageAccountKey
+  quarantineStorageAccountName: parQuarantineStorageAccountName
+  quarantineStorageAccountKey: parQuarantineStorageAccountKey
+}
 
 // DRY helper function for storage encryption configuration
 func createStorageEncryptionConfig(config storageEncryptionConfig, keyVaultId string) object =>
@@ -546,6 +575,9 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       rtsApiBaseUrl: parRtsApiBaseUrl
       rtsAuthApiBaseUrl: parRtsAuthApiBaseUrl
       createSecretsWithPlaceholders: parCreateKVSecretsWithPlaceholders
+      documentStorageAccounts: documentStorageAccounts
+      parApplicationServiceApplicationId: parApplicationServiceApplicationId
+      processDocuUploadManagedIdentityClientId: processDocuUploadManagedIdentityClientId
     }
   }
 ]

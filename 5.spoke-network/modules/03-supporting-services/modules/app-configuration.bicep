@@ -100,6 +100,16 @@ param rtsAuthApiBaseUrl string
 @description('Key Vault secret URIs for OneLogin integration')
 param keyVaultSecretUris object
 
+@description('Identity Client ID for the managed identity that will be used by the Process Document Upload function to access Application Service API')
+param processDocuUploadManagedIdentityClientId string
+
+@description('Application ID of the Application Service in Azure AD')
+param parApplicationServiceApplicationId string
+
+
+@description('Key Vault secret URIs for OneLogin integration')
+param documentStorageAccounts object
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -278,9 +288,34 @@ var keyValues = [
     value: rtsAuthApiBaseUrl
     contentType: null
   }
-   {
+  {
     name: 'AppSettings:PortalUrl'
     value: portalUrl
+    contentType: null
+  }
+  {
+    name: 'AppSettings:ManagedIdentityClientID$processDocumentScan' // Managed Identity Client ID for the process document scan function
+    value: processDocuUploadManagedIdentityClientId
+    contentType: null
+  }
+  {
+    name: 'AppSettings:ApplicationServiceApplicationId$processDocumentScan' 
+    value: parApplicationServiceApplicationId
+    contentType: null
+  }
+  {
+    name: 'AppSettings:DocumentStorage:StagingBlobConnectionString$processDocumentScan'
+    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.stagingStorageAccountName};AccountKey=${documentStorageAccounts.stagingStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
+    contentType: null
+  }
+  {
+    name: 'AppSettings:DocumentStorage:QuarantineBlobConnectionString$processDocumentScan' 
+    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.quarantineStorageAccountName};AccountKey=${documentStorageAccounts.quarantineStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
+    contentType: null
+  }
+  {
+    name: 'AppSettings:DocumentStorage:CleanBlobConnectionString$processDocumentScan' 
+    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=${documentStorageAccounts.cleanStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
 ]

@@ -47,6 +47,18 @@ var storageSecrets = [
     name: 'documentBlobStorageAccountKey'
     value: 'placeholder-document-storage-key-to-be-updated-manually'
   }
+  {
+    name: 'stagingStorageAccountKey'
+    value: 'placeholder-staging-storage-key-to-be-updated-manually'
+  }
+  {
+    name: 'quarantineStorageAccountKey'
+    value: 'placeholder-quarantine-storage-key-to-be-updated-manually'
+  }
+  {
+    name: 'cleanStorageAccountKey'
+    value: 'placeholder-clean-storage-key-to-be-updated-manually'
+  }
 ]
 
 // ------------------
@@ -120,3 +132,12 @@ output rtsApiClientSecretSecretUri string = '${keyVault.properties.vaultUri}secr
 
 @description('Key Vault URI for documentBlobStorageAccountKey secret.')
 output documentBlobStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/documentBlobStorageAccountKey'
+
+@description('Key Vault URI for stagingStorageAccountKey secret.')
+output stagingStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/stagingStorageAccountKey'
+
+@description('Key Vault URI for quarantineStorageAccountKey secret.')
+output quarantineStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/quarantineStorageAccountKey'
+
+@description('Key Vault URI for cleanStorageAccountKey secret.')
+output cleanStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/cleanStorageAccountKey'
