@@ -114,6 +114,14 @@ stages:
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
                               parPortalUrl=$(portalUrl)
+                              parCleanStorageAccountName=$(cleanStorageAccountName) \
+                              parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                              parStagingStorageAccountName=$(stagingStorageAccountName) \
+                              parStagingStorageAccountKey=$(stagingStorageAccountKey) \
+                              parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
+                              parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                              parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -157,6 +165,14 @@ stages:
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
                               parPortalUrl=$(portalUrl)
+                              parCleanStorageAccountName=$(cleanStorageAccountName) \
+                              parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                              parStagingStorageAccountName=$(stagingStorageAccountName) \
+                              parStagingStorageAccountKey=$(stagingStorageAccountKey) \
+                              parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
+                              parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                              parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
 
 
   - stage: ManualDeployment
@@ -236,11 +252,22 @@ stages:
                               parClientID=$(clientID) parClientSecret=$(clientSecret) \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                               parStorageAccountName=$(documentBlobstorageAccountName) parStorageAccountKey=$(documentBlobstorageAccountKey) \
-                              paramWhitelistIPs=$(parWhitelistIPs) parClarityProjectId=$(clarityProjectId) parCmsUri=$(cmsUri) \
-                              parLogoutUrl=$(logoutUrl) parGoogleTagId=$(googleTagId) \
+                              paramWhitelistIPs=$(parWhitelistIPs) \
+                              parClarityProjectId=$(clarityProjectId) \
+                              parGoogleTagId=$(googleTagId) \
+                              parCmsUri=$(cmsUri) \
+                              parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
                               parPortalUrl=$(portalUrl)
+                              parCleanStorageAccountName=$(cleanStorageAccountName) \
+                              parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                              parStagingStorageAccountName=$(stagingStorageAccountName) \
+                              parStagingStorageAccountKey=$(stagingStorageAccountKey) \
+                              parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
+                              parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                              parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
 
       - deployment: deploy
         displayName: 'Deploy Applications'
@@ -296,6 +323,14 @@ stages:
                                     parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                                     parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
                                     parPortalUrl=$(portalUrl) \
+                                    parCleanStorageAccountName=$(cleanStorageAccountName) \
+                                    parCleanStorageAccountKey=$(cleanStorageAccountKey) \
+                                    parStagingStorageAccountName=$(stagingStorageAccountName) \
+                                    parStagingStorageAccountKey=$(stagingStorageAccountKey) \
+                                    parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
+                                    parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                                    parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                                    processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')

@@ -113,6 +113,15 @@ param rtsApiBaseUrl string
 @description('Base URL for RTS authentication API')
 param rtsAuthApiBaseUrl string
 
+param parApplicationServiceApplicationId string
+
+@description('Client ID of the managed identity to be used for the Document Upload Function App')
+param processDocuUploadManagedIdentityClientId string
+
+param documentStorageAccounts object = {}
+
+
+
 // ------------------
 // Varaibles
 // ------------------
@@ -226,13 +235,19 @@ module appConfiguration './modules/app-configuration.bicep' = {
     apiRequestPageSize: apiRequestPageSize
     rtsApiBaseUrl: rtsApiBaseUrl
     rtsAuthApiBaseUrl: rtsAuthApiBaseUrl
+    parApplicationServiceApplicationId: parApplicationServiceApplicationId
+    processDocuUploadManagedIdentityClientId: processDocuUploadManagedIdentityClientId
     keyVaultSecretUris: {
       oneLoginClientIdSecretUri: keyVaultSecrets.outputs.oneLoginClientIdSecretUri
       oneLoginPrivateKeyPemSecret: keyVaultSecrets.outputs.oneLoginPrivateKeyPemSecret
       rtsApiClientIdSecretUri: keyVaultSecrets.outputs.rtsApiClientIdSecretUri
       rtsApiClientSecretSecretUri: keyVaultSecrets.outputs.rtsApiClientSecretSecretUri
       documentBlobStorageAccountKeySecretUri: keyVaultSecrets.outputs.documentBlobStorageAccountKeySecretUri
+      stagingStorageAccountKeySecretUri: keyVaultSecrets.outputs.stagingStorageAccountKeySecretUri
+      quarantineStorageAccountKeySecretUri: keyVaultSecrets.outputs.quarantineStorageAccountKeySecretUri
+      cleanStorageAccountKeySecretUri: keyVaultSecrets.outputs.cleanStorageAccountKeySecretUri
     }
+    documentStorageAccounts: documentStorageAccounts
   }
 }
 
