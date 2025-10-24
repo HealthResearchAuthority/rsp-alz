@@ -41,7 +41,6 @@ param clientSecret string
 @description('Token issuing authority for Gov UK One Login')
 param oneLoginAuthority string
 
-
 @description('Valid token issuers for Gov UK One Login')
 param oneLoginIssuers array
 
@@ -58,7 +57,6 @@ param useFrontDoor bool
 
 @description('Enable private endpoints for App Configuration')
 param enablePrivateEndpoints bool = false
-
 
 @description('Indicates whether to use One Login for the application')
 param useOneLogin bool
@@ -92,10 +90,8 @@ param apiRequestPageSize int
 @description('Base URL for RTS API')
 param rtsApiBaseUrl string
 
-
 @description('Base URL for RTS authentication API')
 param rtsAuthApiBaseUrl string
-
 
 @description('Key Vault secret URIs for OneLogin integration')
 param keyVaultSecretUris object
@@ -105,7 +101,6 @@ param processDocuUploadManagedIdentityClientId string
 
 @description('Application ID of the Application Service in Azure AD')
 param parApplicationServiceApplicationId string
-
 
 @description('Key Vault secret URIs for OneLogin integration')
 param documentStorageAccounts object
@@ -299,7 +294,7 @@ var keyValues = [
     contentType: null
   }
   {
-    name: 'AppSettings:ApplicationServiceApplicationId$processDocumentScan' 
+    name: 'AppSettings:ApplicationServiceApplicationId$processDocumentScan'
     value: parApplicationServiceApplicationId
     contentType: null
   }
@@ -309,13 +304,23 @@ var keyValues = [
     contentType: null
   }
   {
-    name: 'AppSettings:DocumentStorage:QuarantineBlobConnectionString$processDocumentScan' 
+    name: 'AppSettings:DocumentStorage:QuarantineBlobConnectionString$processDocumentScan'
     value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.quarantineStorageAccountName};AccountKey=${documentStorageAccounts.quarantineStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
   {
-    name: 'AppSettings:DocumentStorage:CleanBlobConnectionString$processDocumentScan' 
+    name: 'AppSettings:DocumentStorage:CleanBlobConnectionString$processDocumentScan'
     value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=${documentStorageAccounts.cleanStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
+    contentType: null
+  }
+  {
+    name: 'AppSettings:ProjectRecordValidationFunctionKey'
+    value: '{"uri":"${keyVaultSecretUris.projectRecordValidationFunctionKey}"}'
+    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+  }
+  {
+    name: 'AppSettings:ProjectRecordValidationUri'
+    value: 'https://func-validate-irasid.azurewebsites.net/api'
     contentType: null
   }
 ]
@@ -494,7 +499,6 @@ module appConfigNetwork '../../../../shared/bicep/network/private-networking-spo
     subnetId: spokePrivateEndpointSubnet.id
   }
 }
-
 
 @description('The resource ID of the user assigned managed identity for the App Configuration to be able to read configurations from it.')
 output appConfigurationUserAssignedIdentityId string = appConfigurationUserAssignedIdentity.id
