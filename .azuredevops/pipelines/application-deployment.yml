@@ -338,7 +338,7 @@ stages:
                                     parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
                                     parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
                                     processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
-                                    parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
+                                    parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }} \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
