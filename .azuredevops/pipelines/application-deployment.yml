@@ -23,6 +23,10 @@ parameters:
       - uat
       - pre_prod
       - production
+  - name: create_secrets_with_placeholders
+    displayName: 'Create Key Vault Secrets with Placeholders'
+    type: boolean
+    default: false
 
 stages:
   - stage: PRValidation
@@ -121,7 +125,8 @@ stages:
                               parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
                               parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
                               parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
-                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
+                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                              parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -172,7 +177,8 @@ stages:
                               parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
                               parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
                               parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
-                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
+                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                              parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
 
   - stage: ManualDeployment
@@ -267,7 +273,8 @@ stages:
                               parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
                               parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
                               parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
-                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId)
+                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                              parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
       - deployment: deploy
         displayName: 'Deploy Applications'
@@ -331,6 +338,7 @@ stages:
                                     parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
                                     parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
                                     processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                                    parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }} \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
                       appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
