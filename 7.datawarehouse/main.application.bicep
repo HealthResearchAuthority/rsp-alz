@@ -154,7 +154,7 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
   scope: harpSyncRG
   params: {
     location: location
-    sku: 'B1'
+    sku: 'B3'
     spokeVNetId: '/subscriptions/461016b5-8363-472e-81be-eef6aad08353/resourceGroups/VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D/providers/Microsoft.Network/virtualNetworks/HRADataWarehouseVirtualNetwork'
     spokePrivateEndpointSubnetName: 'snet-privateendpoints'
     functionAppSubnetName: 'snet-functionapps'
