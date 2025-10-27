@@ -56,7 +56,7 @@ module dataModellingNSG '../../shared/bicep/network/nsg.bicep' = {
           protocol: '*'
           sourcePortRange: '*'
           destinationPortRange: '8443'
-          sourceAddressPrefix: '*'
+          sourceAddressPrefix: '10.0.0.0/24'
           destinationAddressPrefix: '*'
           access: 'Allow'
           priority: 110
