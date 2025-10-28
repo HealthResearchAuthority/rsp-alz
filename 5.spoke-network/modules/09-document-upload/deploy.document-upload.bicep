@@ -38,9 +38,6 @@ param enableEventGridIntegration bool = true
 @description('Enable Event Grid subscriptions - set to true only after Function App code is deployed with working webhook endpoint')
 param enableEventGridSubscriptions bool = false
 
-@description('Process scan Function App webhook endpoint URL')
-param processScanWebhookEndpoint string = ''
-
 @description('Blob delete retention policy configuration per storage type')
 param retentionPolicyDays object = {
   staging: 7     // Short retention for staging files
@@ -129,8 +126,6 @@ module stagingStorage 'modules/document-storage.bicep' = {
     overrideSubscriptionLevelSettings: overrideSubscriptionLevelSettings
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     enableEventGridIntegration: enableEventGridIntegration
-    enableEventGridSubscriptions: enableEventGridSubscriptions
-    processScanWebhookEndpoint: processScanWebhookEndpoint
     // Enhanced monitoring
     enableEnhancedMonitoring: false
     enableBlobIndexTags: false
@@ -183,8 +178,6 @@ module quarantineStorage 'modules/document-storage.bicep' = {
     overrideSubscriptionLevelSettings: overrideSubscriptionLevelSettings
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     enableEventGridIntegration: false
-    enableEventGridSubscriptions: false
-    processScanWebhookEndpoint: ''
     // Enhanced monitoring features (RESTORED)
     enableEnhancedMonitoring: true
     enableBlobIndexTags: true
@@ -226,6 +219,7 @@ output stagingStorage object = {
   managedIdentityId: stagingStorage.outputs.managedIdentityId
   managedIdentityPrincipalId: stagingStorage.outputs.managedIdentityPrincipalId
   managedIdentityClientId: stagingStorage.outputs.managedIdentityClientId
+  topicManagedIdentityID: stagingStorage.outputs.topicManagedIdentityID
 }
 
 @description('Clean storage account details for verified safe files.')
