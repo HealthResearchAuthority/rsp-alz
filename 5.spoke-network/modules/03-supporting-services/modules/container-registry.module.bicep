@@ -57,7 +57,8 @@ var spokeResourceGroupName = spokeVNetIdTokens[4]
 var spokeVNetName = spokeVNetIdTokens[8]
 
 var containerRegistryPullRoleGuid='7f951dda-4ed3-4680-a7ca-43fe172d538d'
-var publicAccess = 'Disabled'
+// Enable public access when IP rules are configured, otherwise disable for maximum security
+var publicAccess = !empty(networkRuleSetIpRules) ? 'Enabled' : 'Disabled'
 
 var spokeVNetLinks = [
   {
@@ -92,8 +93,8 @@ module containerRegistry '../../../../shared/bicep/container-registry.bicep' = {
     acrSku: acrTier
     zoneRedundancy: deployZoneRedundantResources ? 'Enabled' : 'Disabled'
     acrAdminUserEnabled: true
-    publicNetworkAccess: publicAccess //Currently we will need this to be open for DevOps to be able to push images to ACR
-    networkRuleBypassOptions: 'AzureServices'
+    publicNetworkAccess: publicAccess // Enabled when IP rules configured, otherwise Disabled
+    networkRuleBypassOptions: 'AzureServices' // Allows Azure DevOps and other Azure services
     diagnosticWorkspaceId: diagnosticWorkspaceId
     userAssignedIdentities: {
       '${containerRegistryUserAssignedIdentity.id}': {}
