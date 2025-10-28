@@ -619,7 +619,6 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true
       enableEventGridSubscriptions: false // Set to true only after Function App code is deployed and webhook endpoint is ready
-      processScanWebhookEndpoint: 'https://${processScanFnApp[i].outputs.appHostName}/api/ProcessScanResultEventTrigger'
       retentionPolicyDays: {
         staging: parStorageConfig.staging.retention.retentionDays
         clean: parStorageConfig.clean.retention.retentionDays
@@ -838,7 +837,7 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
-// Process scan Function App
+// Malware Scan Processing Function App
 module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
@@ -871,6 +870,35 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       databaseserver
       webApp  // Wait for webApp to create DNS zone first
       umbracoCMS
+    ]
+  }
+]
+
+// Event Grid Subscription for Custom Topic (staging only)
+module customTopicEventSubscription '../shared/bicep/event-grid/custom-topic-role-assignment-subscription.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    name: take('stagingEventSubscription-${deployment().name}-${i}', 64)
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    params: {
+      subscriptionName: 'staging-defender-scan-processing'
+      customTopicId: documentUpload[i].outputs.customEventGridTopicId
+      destinationType: 'AzureFunction'
+      eventTypes: [
+        'Microsoft.Security.MalwareScanningResult'
+      ]
+      containerName: parStorageConfig.staging.account.containerName
+      enableAdvancedFiltering: true
+      maxDeliveryAttempts: 3
+      eventTimeToLiveInMinutes: 1440
+      storageAccountName: parStagingStorageAccountName
+      eventGridTopicManagedIdentityPrincipalId: documentUpload[i].outputs.stagingStorage.topicManagedIdentityID
+      functionAppname: processScanFnApp[i].outputs.appName
+      topicRGName: parSpokeNetworks[i].rgStorage
+      functionName: 'MalwareScanEventFunction'
+    }
+    dependsOn: [
+      documentUpload
+      processScanFnApp
     ]
   }
 ]
