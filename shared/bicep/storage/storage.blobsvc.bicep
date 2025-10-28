@@ -17,9 +17,6 @@ param deleteRetentionPolicyDays int = 7
 @description('Optional. Indicates the number of days that the deleted container should be retained. The minimum specified value can be 1 and the maximum value can be 365.')
 param deleteRetentionDays int = 7
 
-@description('Optional. Indicates whether versioning is enabled for blob.')
-param enableVersioning bool = true
-
 @description('Optional. Automatic Snapshot is enabled if set to true.')
 param automaticSnapshotPolicyEnabled bool = false
 
@@ -42,7 +39,6 @@ resource blobServices 'Microsoft.Storage/storageAccounts/blobServices@2021-06-01
       enabled: containerDeleteRetentionPolicy
       days: deleteRetentionDays
     }
-    isVersioningEnabled: enableVersioning
     automaticSnapshotPolicyEnabled: automaticSnapshotPolicyEnabled
   }
 }
