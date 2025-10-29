@@ -1,0 +1,1517 @@
+{
+  "properties": {
+    "lenses": [
+      {
+        "order": 0,
+        "parts": [
+          {
+            "position": {
+              "x": 3,
+              "y": 2,
+              "colSpan": 3,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "__My data__\n\nThis tile lets you put custom content on your dashboard. It supports plain text, __Markdown__, and even limited HTML like images <img width='10' src='https://portal.azure.com/favicon.ico'/> and <a href='https://azure.microsoft.com' target='_blank'>links</a> that open in a new tab.\n",
+                  "title": "Resource Dashboard",
+                  "subtitle": "My subtitle",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              },
+              "partHeader": {
+                "title": "Dashbord Summary",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 6,
+              "y": 2,
+              "colSpan": 6,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where name contains \"dev\"\r\n    or resourceGroup contains \"dev\"\r\n    or tostring(id) contains \"dev\"\r\n    or tostring(properties.managedEnvironmentId) contains \"dev\"\r\n| summarize count() by type\r\n| order by count_ desc\r\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Azure Resource Details",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 12,
+              "y": 2,
+              "colSpan": 6,
+              "rowSpan": 6
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where name contains \"dev\"\r\n    or resourceGroup contains \"dev\"\r\n    or tostring(id) contains \"dev\"\r\n    or tostring(properties.managedEnvironmentId) contains \"dev\"\r\n| summarize count() by type\r\n| order by count_ desc\r\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Azure Resource Summary",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 8,
+              "colSpan": 2,
+              "rowSpan": 8
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "__My data__\n\nThis tile lets you put custom content on your dashboard. It supports plain text, __Markdown__, and even limited HTML like images <img width='10' src='https://portal.azure.com/favicon.ico'/> and <a href='https://azure.microsoft.com' target='_blank'>links</a> that open in a new tab.\n",
+                  "title": "Function Apps",
+                  "subtitle": "My subtitle",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 8,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\n| where type =~ \"microsoft.web/sites\"\n| where kind contains \"functionapp\"\n| where name startswith \"func-\"\n| extend Environment = extract(@\"func-.*-(dev|prod|manualtest|automationtest|uat)$\", 1, tolower(name))\n| extend Environment = iff(isempty(Environment), \"no-env\", Environment)\n| summarize \n    Count = count(),\n    Names = strcat_array(make_list(name), \", \")\n    by Environment\n| order by Count desc",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "filters": {
+                "MsPortalFx_Subscription": {
+                  "model": {
+                    "operator": "equals",
+                    "values": [
+                      "b83b4631-b51b-4961-86a1-295f539c826b"
+                    ]
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "Function Apps Summary",
+                "subtitle": "Azure Resource Graph"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 8,
+              "y": 8,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where type == \"microsoft.web/sites\"\r\n| where kind contains \"functionapp\"\r\n| where name contains \"dev\" or resourceGroup contains \"dev\"\r\n| project name, location, properties.state\r\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Function Apps",
+                "subtitle": "Azure Resource Graph"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 14,
+              "y": 8,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Web/sites/func-processdocupload-dev"
+                          },
+                          "name": "FunctionExecutionCount",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.web/sites",
+                          "metricVisualization": {
+                            "displayName": "Function Execution Count"
+                          }
+                        }
+                      ],
+                      "title": "Sum Function Execution Count for func-processdocupload-dev",
+                      "titleKind": 1,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 86400000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Web/sites/func-processdocupload-dev"
+                          },
+                          "name": "FunctionExecutionCount",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.web/sites",
+                          "metricVisualization": {
+                            "displayName": "Function Execution Count"
+                          }
+                        }
+                      ],
+                      "title": "Function Execution Count for func-processdocupload-dev",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 12,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Web/sites/func-processdocupload-dev"
+                          },
+                          "name": "Http5xx",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.web/sites",
+                          "metricVisualization": {
+                            "displayName": "Http Server Errors"
+                          }
+                        }
+                      ],
+                      "title": "Sum Http Server Errors for func-processdocupload-dev",
+                      "titleKind": 1,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 86400000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Web/sites/func-processdocupload-dev"
+                          },
+                          "name": "Http5xx",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.web/sites",
+                          "metricVisualization": {
+                            "displayName": "Http Server Errors"
+                          }
+                        }
+                      ],
+                      "title": "Http Server Errors for func-processdocupload-dev",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "MsPortalFx_TimeRange": {
+                  "model": {
+                    "format": "local",
+                    "granularity": "auto",
+                    "relative": "1440m"
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 8,
+              "y": 12,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Web/sites/func-rts-data-sync-dev"
+                          },
+                          "name": "Http5xx",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.web/sites",
+                          "metricVisualization": {
+                            "displayName": "Http Server Errors"
+                          }
+                        }
+                      ],
+                      "title": "Sum Http Server Errors for func-rts-data-sync-dev",
+                      "titleKind": 1,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 86400000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Web/sites/func-rts-data-sync-dev"
+                          },
+                          "name": "Http5xx",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.web/sites",
+                          "metricVisualization": {
+                            "displayName": "Http Server Errors"
+                          }
+                        }
+                      ],
+                      "title": "Http Server Errors for func-rts-data-sync-dev",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 14,
+              "y": 12,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Web/sites/func-rts-data-sync-dev"
+                          },
+                          "name": "FunctionExecutionCount",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.web/sites",
+                          "metricVisualization": {
+                            "displayName": "Function Execution Count"
+                          }
+                        }
+                      ],
+                      "title": "Sum Function Execution Count for func-rts-data-sync-dev",
+                      "titleKind": 1,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 86400000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Web/sites/func-rts-data-sync-dev"
+                          },
+                          "name": "FunctionExecutionCount",
+                          "aggregationType": 1,
+                          "namespace": "microsoft.web/sites",
+                          "metricVisualization": {
+                            "displayName": "Function Execution Count"
+                          }
+                        }
+                      ],
+                      "title": "Function Execution Count for func-rts-data-sync-dev",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 16,
+              "colSpan": 2,
+              "rowSpan": 8
+            },
+            "metadata": {
+              "inputs": [],
+              "type": "Extension/HubsExtension/PartType/MarkdownPart",
+              "settings": {
+                "content": {
+                  "content": "__My data__\n\nThis tile lets you put custom content on your dashboard. It supports plain text, __Markdown__, and even limited HTML like images <img width='10' src='https://portal.azure.com/favicon.ico'/> and <a href='https://azure.microsoft.com' target='_blank'>links</a> that open in a new tab.\n",
+                  "title": "Frontdoor Profiles",
+                  "subtitle": "My subtitle",
+                  "markdownSource": 1,
+                  "markdownUri": ""
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 16,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where type == \"microsoft.cdn/profiles\"\r\n| where name contains \"dev\" or resourceGroup contains \"dev\"\r\n| summarize count() by tostring(properties.resourceState)\r\n| order by count_ desc\r\n\r\n\r\n\r\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "chartType",
+                  "value": 2,
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "value": "",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryChartTile",
+              "settings": {},
+              "filters": {
+                "MsPortalFx_Subscription": {
+                  "model": {
+                    "operator": "equals",
+                    "values": [
+                      "b83b4631-b51b-4961-86a1-295f539c826b"
+                    ]
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "Azure Frontdoor",
+                "subtitle": "Azure Resource Graph"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 8,
+              "y": 16,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Cdn/profiles/afd-rsp-applications-dev-uks"
+                          },
+                          "name": "OriginHealthPercentage",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.cdn/profiles",
+                          "metricVisualization": {
+                            "displayName": "Origin Health Percentage"
+                          }
+                        }
+                      ],
+                      "title": "Avg Origin Health Percentage for afd-rsp-applications-dev-uks where OriginGroup = 'og-rsp-applications-dev-uks', 'og-rsp-applications-dev-uks-cms'",
+                      "titleKind": 1,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "filterCollection": {
+                        "filters": [
+                          {
+                            "key": "OriginGroup",
+                            "operator": 0,
+                            "values": [
+                              "og-rsp-applications-dev-uks",
+                              "og-rsp-applications-dev-uks-cms"
+                            ]
+                          }
+                        ]
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 86400000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Cdn/profiles/afd-rsp-applications-dev-uks"
+                          },
+                          "name": "OriginHealthPercentage",
+                          "aggregationType": 4,
+                          "namespace": "microsoft.cdn/profiles",
+                          "metricVisualization": {
+                            "displayName": "Origin Health Percentage"
+                          }
+                        }
+                      ],
+                      "title": "FrontDoor Origin Health",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "OriginGroup": {
+                  "model": {
+                    "operator": "equals",
+                    "values": [
+                      "og-rsp-applications-dev-uks",
+                      "og-rsp-applications-dev-uks-cms"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 14,
+              "y": 16,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Cdn/profiles/afd-rsp-applications-dev-uks"
+                          },
+                          "name": "Percentage5XX",
+                          "aggregationType": 7,
+                          "namespace": "microsoft.cdn/profiles",
+                          "metricVisualization": {
+                            "displayName": "Percentage of 5XX"
+                          }
+                        }
+                      ],
+                      "title": "Count Percentage of 5XX for afd-rsp-applications-dev-uks where Endpoint = 'fd-rsp-applications-dev-uks-cveeakgqdgbqexbz.a03.azurefd.net'",
+                      "titleKind": 1,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "filterCollection": {
+                        "filters": [
+                          {
+                            "key": "Endpoint",
+                            "operator": 0,
+                            "values": [
+                              "fd-rsp-applications-dev-uks-cveeakgqdgbqexbz.a03.azurefd.net"
+                            ]
+                          }
+                        ]
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 86400000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Cdn/profiles/afd-rsp-applications-dev-uks"
+                          },
+                          "name": "Percentage5XX",
+                          "aggregationType": 7,
+                          "namespace": "microsoft.cdn/profiles",
+                          "metricVisualization": {
+                            "displayName": "Percentage of 5XX"
+                          }
+                        }
+                      ],
+                      "title": "FrontDoor 5XX Request Errors",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "Endpoint": {
+                  "model": {
+                    "operator": "equals",
+                    "values": [
+                      "fd-rsp-applications-dev-uks-cveeakgqdgbqexbz.a03.azurefd.net"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 2,
+              "y": 20,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where type == \"microsoft.cdn/profiles/afdendpoints\"\r\n| where name contains \"dev\" or resourceGroup contains \"dev\"\r\n| extend origins = properties.origins\r\n| mv-expand origins\r\n| project\r\n    profile = tostring(split(id, \"/\")[8]),\r\n    endpointName = name,\r\n    endpointHost = tostring(properties.hostName),\r\n    originName = tostring(origins.name),\r\n    originHostName = tostring(origins.properties.hostName),\r\n    enabledState = tostring(origins.properties.enabledState),\r\n    priority = tostring(origins.properties.priority),\r\n    weight = tostring(origins.properties.weight),\r\n    httpPort = tostring(origins.properties.httpPort),\r\n    httpsPort = tostring(origins.properties.httpsPort),\r\n    location,\r\n    resourceGroup\r\n| order by profile, endpointName, originName asc\r\n\r\n\r\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Azure Frontdoor Origins",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 8,
+              "y": 20,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "sharedTimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "options",
+                  "value": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Cdn/profiles/afd-rsp-applications-dev-uks"
+                          },
+                          "name": "RequestCount",
+                          "aggregationType": 7,
+                          "namespace": "microsoft.cdn/profiles",
+                          "metricVisualization": {
+                            "displayName": "Request Count"
+                          }
+                        }
+                      ],
+                      "title": "Count Request Count for afd-rsp-applications-dev-uks where Endpoint = 'fd-rsp-applications-dev-uks-cveeakgqdgbqexbz.a03.azurefd.net'",
+                      "titleKind": 1,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        }
+                      },
+                      "filterCollection": {
+                        "filters": [
+                          {
+                            "key": "Endpoint",
+                            "operator": 0,
+                            "values": [
+                              "fd-rsp-applications-dev-uks-cveeakgqdgbqexbz.a03.azurefd.net"
+                            ]
+                          }
+                        ]
+                      },
+                      "timespan": {
+                        "relative": {
+                          "duration": 86400000
+                        },
+                        "showUTCTime": false,
+                        "grain": 1
+                      }
+                    }
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/MonitorChartPart",
+              "settings": {
+                "content": {
+                  "options": {
+                    "chart": {
+                      "metrics": [
+                        {
+                          "resourceMetadata": {
+                            "id": "/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-applications-spoke-dev-uks/providers/Microsoft.Cdn/profiles/afd-rsp-applications-dev-uks"
+                          },
+                          "name": "RequestCount",
+                          "aggregationType": 7,
+                          "namespace": "microsoft.cdn/profiles",
+                          "metricVisualization": {
+                            "displayName": "Request Count"
+                          }
+                        }
+                      ],
+                      "title": "FrontDoor Requests Count",
+                      "titleKind": 2,
+                      "visualization": {
+                        "chartType": 2,
+                        "legendVisualization": {
+                          "isVisible": true,
+                          "position": 2,
+                          "hideHoverCard": false,
+                          "hideLabelNames": true
+                        },
+                        "axisVisualization": {
+                          "x": {
+                            "isVisible": true,
+                            "axisType": 2
+                          },
+                          "y": {
+                            "isVisible": true,
+                            "axisType": 1
+                          }
+                        },
+                        "disablePinning": true
+                      }
+                    }
+                  }
+                }
+              },
+              "filters": {
+                "Endpoint": {
+                  "model": {
+                    "operator": "equals",
+                    "values": [
+                      "fd-rsp-applications-dev-uks-cveeakgqdgbqexbz.a03.azurefd.net"
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 14,
+              "y": 20,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where type == \"microsoft.cdn/profiles\"\r\n| where name contains \"dev\" or resourceGroup contains \"dev\"\r\n| project name, location, properties.resourceState",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "Azure Frontdoor Summary",
+                "subtitle": "Azure Resource Graph"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 24,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where type == \"microsoft.sql/servers/databases\"\r\n| where name != \"master\"\r\n| where name contains \"dev\"\r\n    or resourceGroup contains \"dev\"\r\n    or tostring(id) contains \"dev\"\r\n| project name, type, location, resourceGroup, properties.status\r\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "SQL Databases",
+                "subtitle": "AzureResourceGraph"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 6,
+              "y": 24,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where type == \"microsoft.app/containerapps\"\r\n| where tostring(properties.managedEnvironmentId) contains \"dev\"\r\n| project name, type, location, resourceGroup, properties.provisioningState",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "filters": {
+                "MsPortalFx_Subscription": {
+                  "model": {
+                    "operator": "equals",
+                    "values": [
+                      "b83b4631-b51b-4961-86a1-295f539c826b"
+                    ]
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "Container Apps",
+                "subtitle": "Azure Resource Graph"
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 12,
+              "y": 24,
+              "colSpan": 8,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "chartType",
+                  "isOptional": true
+                },
+                {
+                  "name": "isShared",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryId",
+                  "isOptional": true
+                },
+                {
+                  "name": "formatResults",
+                  "isOptional": true
+                },
+                {
+                  "name": "partTitle",
+                  "value": "Query 1",
+                  "isOptional": true
+                },
+                {
+                  "name": "query",
+                  "value": "Resources\r\n| where type == \"microsoft.web/sites\"\r\n| where name contains \"dev\" or resourceGroup contains \"dev\"\r\n| project name, location, properties.state, kind",
+                  "isOptional": true
+                },
+                {
+                  "name": "queryScope",
+                  "value": {
+                    "scope": 0,
+                    "values": []
+                  },
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/HubsExtension/PartType/ArgQueryGridTile",
+              "settings": {},
+              "partHeader": {
+                "title": "App Services",
+                "subtitle": "Azure Resource Graph"
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        },
+        "filterLocale": {
+          "value": "en-us"
+        },
+        "filters": {
+          "value": {
+            "MsPortalFx_TimeRange": {
+              "model": {
+                "format": "utc",
+                "granularity": "auto",
+                "relative": "24h"
+              },
+              "displayCache": {
+                "name": "UTC Time",
+                "value": "Past 24 hours"
+              },
+              "filteredPartIds": [
+                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f340",
+                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f2fc",
+                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f31e",
+                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f2d0",
+                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f109",
+                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f0bd",
+                "StartboardPart-MonitorChartPart-9afcd464-d389-4939-88ff-9f415460f0e0"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "iras-resource-dashboard-dev",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "iras-resource-dashboard-dev"
+  },
+  "apiVersion": "2022-12-01-preview"
+}
