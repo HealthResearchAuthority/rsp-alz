@@ -166,7 +166,7 @@ stages:
                     azureSubscription: $(azureServiceConnection)
                     scriptType: bash
                     scriptLocation: inlineScript
-                    # failOnStandardError: true
+                    failOnStandardError: true
                     inlineScript: |
                       az config set bicep.use_binary_from_path=false --only-show-errors
                       output=$(az deployment sub create --name "dw-network-deployment-$(Build.BuildId)" \
