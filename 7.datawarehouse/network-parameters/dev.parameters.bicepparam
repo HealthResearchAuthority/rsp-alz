@@ -25,3 +25,9 @@ param vpnGatewayName = 'HRADataWarehouseVPNGateway'
 param GatewayIp = ''
 
 param bgpPeeringAddress = ''
+
+// VNet peering configuration - comma-separated list of spoke VNet IDs to peer with Datawarehouse
+param paramvnetPeeringsVNetIDs = ''
+
+// Datawarehouse VNet ID - the source VNet for peering and private endpoints
+param datawarehouseVnetID = ''
