@@ -39,6 +39,28 @@ param GatewayIp string
 @description('BGP Peering Address')
 param bgpPeeringAddress string
 
+@description('The location where the resources will be created.')
+param paramvnetPeeringsVNetIDs string
+
+@description('VNet ID under managed devops pool subscription where the VNet peering will be created.')
+param datawarehouseVnetID string
+
+var datawarehouseVNetIdTokens = split(datawarehouseVnetID, '/')
+var datawarehouseSubscriptionId = datawarehouseVNetIdTokens[2]
+var dwNetworkingResourceGroupName = targetRg.name
+var datawarehouseVNetName = datawarehouseVNetIdTokens[8]
+
+var peeringVNetIds = split(paramvnetPeeringsVNetIDs, ',')
+
+// Loop through each VNet ID and extract subscriptionId and resourceGroupName
+var vnetInfoArray = [
+  for vnetId in peeringVNetIds: {
+    subscriptionId: split(vnetId, '/')[2]
+    resourceGroupName: split(vnetId, '/')[4]
+    vnetName: split(vnetId, '/')[8]
+  }
+]
+
 resource targetRg 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: targetRgName
 }
@@ -59,5 +81,17 @@ module dw_network './modules/dw-network.bicep' = {
     remoteVpnGatewayId: remoteVpnGatewayId
     GatewayIp: GatewayIp
     bgpPeeringAddress: bgpPeeringAddress
+  }
+}
+
+@description('Deploy VNet Peering')
+module vnetpeeringmodule 'modules/vnetpeering.bicep' = {
+  name: take('01-vnetPeering-${deployment().name}', 64)
+  scope: subscription(datawarehouseSubscriptionId)
+  params: {
+    vnetPeeringsSpokes: vnetInfoArray
+    datawarehouseSubscriptionId: datawarehouseSubscriptionId
+    dwNetworkingResourceGroupName: dwNetworkingResourceGroupName
+    datawarehouseVNetName: datawarehouseVNetName
   }
 }
