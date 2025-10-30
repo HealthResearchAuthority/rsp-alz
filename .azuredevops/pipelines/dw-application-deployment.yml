@@ -108,7 +108,7 @@ stages:
                     logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                     harpSqlAdminLogin=$(harpSqlAdminLogin) \
                     harpSqlAdminPassword="$(harpSqlAdminPassword)" \
-                    sourcesourceAddressPrefix=$(sourceAddressPrefix)
+                    sourceAddressPrefix=$(sourceAddressPrefix)
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment - Datawarehouse Applications'
@@ -148,7 +148,7 @@ stages:
                     logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                     harpSqlAdminLogin=$(harpSqlAdminLogin) \
                     harpSqlAdminPassword="$(harpSqlAdminPassword)" \
-                    sourcesourceAddressPrefix=$(sourceAddressPrefix)
+                    sourceAddressPrefix=$(sourceAddressPrefix)
       - deployment: deployApplication
         displayName: 'Deploy Datawarehouse Applications'
         pool:
@@ -183,6 +183,6 @@ stages:
                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                           harpSqlAdminLogin=$(harpSqlAdminLogin) \
                           harpSqlAdminPassword="$(harpSqlAdminPassword)") \
-                          sourcesourceAddressPrefix=$(sourceAddressPrefix)
+                          sourceAddressPrefix=$(sourceAddressPrefix)
                       echo $output | jq .
                       echo "##[section]"
