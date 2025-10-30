@@ -66,6 +66,9 @@ param enableHarpDeployment bool = true
 @description('Enable private endpoints for App Configuration')
 param enableAppConfigPrivateEndpoints bool = false
 
+@description('IP address to allow inbound connections from')
+param sourceAddressPrefix string
+
 resource targetRg 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: targetRgName
 }
@@ -91,6 +94,7 @@ module dw_application 'modules/dw-application.bicep' = {
     publicIPAddresses_ERStudioApp_name: publicIPAddresses_ERStudioApp_name
     publicIPAddresses_ERStudioDB_name: publicIPAddresses_ERStudioDB_name
     sqlVirtualMachines_HRA_Data_ERStudioDB_name: sqlVirtualMachines_HRA_Data_ERStudioDB_name
+    sourceAddressPrefix: sourceAddressPrefix
   }
 }
 

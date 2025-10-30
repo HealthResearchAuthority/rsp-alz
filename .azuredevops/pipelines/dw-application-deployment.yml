@@ -82,7 +82,8 @@ stages:
                     adminUsername=$(adminUsername) \
                     logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                     harpSqlAdminLogin=$(harpSqlAdminLogin) \
-                    harpSqlAdminPassword="$(harpSqlAdminPassword)"
+                    harpSqlAdminPassword="$(harpSqlAdminPassword)" \
+                    sourceAddressPrefix=$(sourceAddressPrefix)
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -106,7 +107,8 @@ stages:
                     adminUsername=$(adminUsername) \
                     logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                     harpSqlAdminLogin=$(harpSqlAdminLogin) \
-                    harpSqlAdminPassword="$(harpSqlAdminPassword)"
+                    harpSqlAdminPassword="$(harpSqlAdminPassword)" \
+                    sourcesourceAddressPrefix=$(sourceAddressPrefix)
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment - Datawarehouse Applications'
@@ -145,7 +147,8 @@ stages:
                     adminUsername=$(adminUsername) \
                     logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                     harpSqlAdminLogin=$(harpSqlAdminLogin) \
-                    harpSqlAdminPassword="$(harpSqlAdminPassword)"
+                    harpSqlAdminPassword="$(harpSqlAdminPassword)" \
+                    sourcesourceAddressPrefix=$(sourceAddressPrefix)
       - deployment: deployApplication
         displayName: 'Deploy Datawarehouse Applications'
         pool:
@@ -179,6 +182,7 @@ stages:
                           adminUsername=$(adminUsername) \
                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                           harpSqlAdminLogin=$(harpSqlAdminLogin) \
-                          harpSqlAdminPassword="$(harpSqlAdminPassword)")
+                          harpSqlAdminPassword="$(harpSqlAdminPassword)") \
+                          sourcesourceAddressPrefix=$(sourceAddressPrefix)
                       echo $output | jq .
                       echo "##[section]"

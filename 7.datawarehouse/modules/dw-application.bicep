@@ -37,6 +37,9 @@ param virtualNetworks_HRADataWarehouseVirtualNetwork_name string
 
 @description('DNS hostname for Bastion Host')
 param bastionDnsName string
+
+@description('IP address to allow inbound connections from')
+param sourceAddressPrefix string
 // Parameters end here
 
 resource vnet 'Microsoft.Network/virtualNetworks@2024-05-01' existing = {
@@ -56,7 +59,7 @@ module dataModellingNSG '../../shared/bicep/network/nsg.bicep' = {
           protocol: '*'
           sourcePortRange: '*'
           destinationPortRange: '8443'
-          sourceAddressPrefix: '172.166.199.131'
+          sourceAddressPrefix: sourceAddressPrefix
           destinationAddressPrefix: '*'
           access: 'Allow'
           priority: 110
