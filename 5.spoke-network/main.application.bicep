@@ -76,37 +76,52 @@ type skuConfig = {
     @description('CMS app SKU')
     cmsApp: ('B1' | 'B3'| 'S1' | 'S2' | 'S3' | 'P1V3' | 'P2V3' | 'P3V3' | 'P1V3_AZ' | 'P2V3_AZ' | 'P3V3_AZ' | 'EP1' | 'EP2' | 'EP3' | 'ASE_I1V2_AZ' | 'ASE_I2V2_AZ' | 'ASE_I3V2_AZ' | 'ASE_I1V2' | 'ASE_I2V2' | 'ASE_I3V2')
   }
-  
+
   @description('SQL Database configuration')
   sqlDatabase: {
     @description('Database SKU name')
     name: string
-    
+
     @description('Database tier')
     tier: string
-    
+
     @description('Hardware family')
     family: string
-    
+
     @description('vCore capacity')
     capacity: int
-    
+
     @description('Minimum capacity for serverless')
     minCapacity: int
-    
+
     @description('Storage size')
     storageSize: string
-    
+
     @description('Zone redundancy')
     zoneRedundant: bool
   }
-  
+
+  @description('Container App configuration')
+  containerApp: {
+    @description('CPU cores per container (0.25, 0.5, 0.75, 1.0, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0)')
+    cpu: string
+
+    @description('Memory per container (0.5Gi, 1Gi, 1.5Gi, 2Gi, 2.5Gi, 3Gi, 3.5Gi, 4Gi, 4.5Gi, 5Gi, 5.5Gi, 6Gi, 6.5Gi, 7Gi, 7.5Gi, 8Gi)')
+    memory: string
+
+    @description('Minimum number of replicas')
+    minReplicas: int
+
+    @description('Maximum number of replicas')
+    maxReplicas: int
+  }
+
   @description('Key Vault SKU')
   keyVault: ('standard' | 'premium')
-  
+
   @description('App Configuration SKU')
   appConfiguration: ('standard' | 'free')
-  
+
   @description('Front Door SKU')
   frontDoor: ('Standard_AzureFrontDoor' | 'Premium_AzureFrontDoor')
 }
@@ -123,7 +138,6 @@ param parDevOpsPublicIPAddress string = ''
 
 @description('IP addresses to be whitelisted for users to access CMS Portal')
 param paramWhitelistIPs string
-
 
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
@@ -162,7 +176,6 @@ param parClientSecret string
 
 @description('Token issuing authority for Gov UK One Login')
 param parOneLoginAuthority string
-
 
 @description('Valid token issuers for Gov UK One Login')
 param parOneLoginIssuers array
@@ -321,6 +334,12 @@ param parSkuConfig skuConfig = {
     storageSize: '6GB'
     zoneRedundant: false
   }
+  containerApp: {
+    cpu: '0.5'
+    memory: '1Gi'
+    minReplicas: 1
+    maxReplicas: 10
+  }
   keyVault: 'standard'
   appConfiguration: 'standard'
   frontDoor: 'Premium_AzureFrontDoor'
@@ -371,7 +390,6 @@ param parApiRequestPageSize int = 50
 
 @description('Base URL for RTS API')
 param parRtsApiBaseUrl string = ''
-
 
 @description('Base URL for RTS authentication API')
 param parRtsAuthApiBaseUrl string = ''
@@ -703,6 +721,10 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
         //supportingServices[i].outputs.serviceBusSenderManagedIdentity
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
+      containerCpu: parSkuConfig.containerApp.cpu
+      containerMemory: parSkuConfig.containerApp.memory
+      minReplicas: parSkuConfig.containerApp.minReplicas
+      maxReplicas: parSkuConfig.containerApp.maxReplicas
     }
     dependsOn: [
       databaseserver
@@ -736,6 +758,10 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
         supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
+      containerCpu: parSkuConfig.containerApp.cpu
+      containerMemory: parSkuConfig.containerApp.memory
+      minReplicas: parSkuConfig.containerApp.minReplicas
+      maxReplicas: parSkuConfig.containerApp.maxReplicas
     }
     dependsOn: [
       databaseserver
@@ -770,6 +796,10 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
         supportingServices[i].outputs.containerRegistryUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
+      containerCpu: parSkuConfig.containerApp.cpu
+      containerMemory: parSkuConfig.containerApp.memory
+      minReplicas: parSkuConfig.containerApp.minReplicas
+      maxReplicas: parSkuConfig.containerApp.maxReplicas
     }
     dependsOn: [
       databaseserver
@@ -869,7 +899,7 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     dependsOn: [
       applicationsRG
       databaseserver
-      webApp  // Wait for webApp to create DNS zone first
+      webApp // Wait for webApp to create DNS zone first
       umbracoCMS
     ]
   }
@@ -909,9 +939,6 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     ]
   }
 ]
-
-
-
 
 // Grant process scan function permissions to all document storage accounts. Handled seperately as there was circular dependency.
 module processScanFunctionPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [

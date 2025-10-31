@@ -38,6 +38,18 @@ param sharedservicesRG string
 
 param userAssignedIdentities array
 
+@description('CPU cores allocated to each container instance')
+param containerCpu string
+
+@description('Memory allocated to each container instance')
+param containerMemory string
+
+@description('Minimum number of container replicas')
+param minReplicas int
+
+@description('Maximum number of container replicas')
+param maxReplicas int
+
 // ------------------
 // RESOURCES
 // ------------------
@@ -51,7 +63,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
   name: containerAppName
   location: location
   tags: tags
-  identity:  {
+  identity: {
     type: 'UserAssigned'
     userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
   }
@@ -82,8 +94,8 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
           image: containerImageTag
           name: containerImageName
           resources: {
-            cpu: json('0.5')
-            memory: '1Gi'
+            cpu: json(containerCpu)
+            memory: containerMemory
           }
           env: [
             {
@@ -100,11 +112,11 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
             }
             {
               name: 'AppSettings__AzureAppConfiguration__IdentityClientID'
-              value: appConfigIdentityClientID 
+              value: appConfigIdentityClientID
             }
             {
               name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-              value: appInsightsConnectionString 
+              value: appInsightsConnectionString
             }
           ]
           probes: [
@@ -151,8 +163,8 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
         }
       ]
       scale: {
-        minReplicas: 1
-        maxReplicas: 10
+        minReplicas: minReplicas
+        maxReplicas: maxReplicas
       }
       volumes: []
     }
@@ -161,7 +173,7 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
 
 module containerAppURLConfig '../../../shared/bicep/app-configuration/app-config-key-values.bicep' = {
   scope: resourceGroup(sharedservicesRG)
-  name: take('containerAppURLConfig-${guid(resourceGroup().id)}-${uniqueString(resourceGroup().id)}',64)
+  name: take('containerAppURLConfig-${guid(resourceGroup().id)}-${uniqueString(resourceGroup().id)}', 64)
   params: {
     configStoreName: configStoreName
     webAppURLConfigKey: webAppURLConfigKey

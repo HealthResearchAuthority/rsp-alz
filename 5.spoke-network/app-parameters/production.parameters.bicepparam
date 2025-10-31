@@ -24,7 +24,6 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 30
 
-
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
 param parFrontDoorWafMode = 'Prevention'
@@ -123,6 +122,12 @@ param parSkuConfig = {
     storageSize: '64GB'
     zoneRedundant: true
   }
+  containerApp: {
+    cpu: '4.0'
+    memory: '8Gi'
+    minReplicas: 1
+    maxReplicas: 10
+  }
   keyVault: 'premium'
   appConfiguration: 'standard'
   frontDoor: 'Premium_AzureFrontDoor'
@@ -130,10 +135,10 @@ param parSkuConfig = {
 
 // Network security configuration for production environment
 param parNetworkSecurityConfig = {
-  defaultAction: 'Deny'        
-  bypass: 'AzureServices'      
-  httpsTrafficOnly: true       
-  quarantineBypass: 'None'     
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+  quarantineBypass: 'None'
 }
 
 param parSpokeNetworks = [
@@ -169,7 +174,6 @@ param parAllowedHosts = '*'
 // indicates whether to use Front Door for the production environment
 param parUseFrontDoor = true
 
-@description('Indicates whether to use One Login for the application')
 param useOneLogin = true
 
 param paramWhitelistIPs = ''
