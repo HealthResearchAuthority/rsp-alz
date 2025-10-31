@@ -45,65 +45,53 @@ param eventTimeToLiveInMinutes int = 1440
 @description('Enable advanced filtering for blob events.')
 param enableAdvancedFiltering bool = true
 
-param functionAppId string
+param topicRGName string
 
-// ------------------
-// VARIABLES
-// ------------------
+param functionAppname string
+param functionName string
+param eventGridTopicManagedIdentityPrincipalId string
 
-var subjectFilter = enableAdvancedFiltering && !empty(containerName) ? {
-  subjectBeginsWith: '/blobServices/default/containers/${containerName}/'
-  subjectEndsWith: ''
-  includedEventTypes: eventTypes
-} : {
-  includedEventTypes: eventTypes
-}
-
-var deadLetterConfig = enableDeadLetter && !empty(deadLetterStorageAccountName) ? {
-  endpointType: 'StorageBlob'
-  properties: {
-    resourceId: resourceId('Microsoft.Storage/storageAccounts', deadLetterStorageAccountName)
-    blobContainerName: deadLetterContainerName
-  }
-} : null
 
 // ------------------
 // RESOURCES
 // ------------------
 
-resource customTopic 'Microsoft.EventGrid/topics@2022-06-15' existing = {
-  name: split(customTopicId, '/')[8]
+resource functionApp 'Microsoft.Web/sites@2022-03-01' existing = if(destinationType == 'AzureFunction') {
+  name: functionAppname
 }
 
-resource eventGridSubscription 'Microsoft.EventGrid/topics/eventSubscriptions@2022-06-15' = {
-  parent: customTopic
-  name: subscriptionName
+resource roleAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' =  {
+  name: guid(subscription().id, 'AzureEventGridEventSubscriptionContributorrole', functionAppname)
+  scope: functionApp
   properties: {
-    destination: destinationType == 'AzureFunction' ? {
-      endpointType: 'AzureFunction'
-      properties: {
-        resourceId: functionAppId
-        maxEventsPerBatch: 1
-        preferredBatchSizeInKilobytes: 64
-      }
-    } : {
-      endpointType: 'StorageQueue'
-      properties: {
-        resourceId: resourceId('Microsoft.Storage/storageAccounts', storageAccountName)
-        queueName: queueName
-      }
-    }
-    filter: subjectFilter
-    labels: [
-      'defender-malware-scanning'
-      'storage-security'
-    ]
-    deadLetterDestination: deadLetterConfig
-    retryPolicy: {
-      maxDeliveryAttempts: maxDeliveryAttempts
-      eventTimeToLiveInMinutes: eventTimeToLiveInMinutes
-    }
+    principalId: eventGridTopicManagedIdentityPrincipalId
+    roleDefinitionId: subscriptionResourceId('Microsoft.Authorization/roleDefinitions', '428e0ff0-5e57-4d9c-a221-2c70d0e0a443') // Azure Event Grid EventSubscription Contributor role assignment
+    principalType: 'ServicePrincipal'
   }
+}
+
+module customTopicSubscription './custom-topic-subscription.bicep' = {
+  scope: resourceGroup(topicRGName)
+  name: take('customTopicSubscription-${deployment().name}', 64)
+  params: {
+    subscriptionName: subscriptionName
+    customTopicId: customTopicId
+    destinationType: destinationType
+    storageAccountName: storageAccountName
+    containerName: containerName
+    queueName: queueName
+    eventTypes: eventTypes
+    enableDeadLetter: enableDeadLetter
+    deadLetterStorageAccountName: deadLetterStorageAccountName
+    deadLetterContainerName: deadLetterContainerName
+    maxDeliveryAttempts: maxDeliveryAttempts
+    eventTimeToLiveInMinutes: eventTimeToLiveInMinutes
+    enableAdvancedFiltering: enableAdvancedFiltering
+    functionAppId: '${functionApp.id}/functions/${functionName}'
+  }
+  dependsOn: [
+    roleAssignment
+  ]
 }
 
 // ------------------
@@ -111,13 +99,13 @@ resource eventGridSubscription 'Microsoft.EventGrid/topics/eventSubscriptions@20
 // ------------------
 
 @description('The resource ID of the Event Grid subscription.')
-output eventSubscriptionId string = eventGridSubscription.id
+output eventSubscriptionId string = customTopicSubscription.outputs.eventSubscriptionId
 
 @description('The name of the Event Grid subscription.')
-output eventSubscriptionName string = eventGridSubscription.name
+output eventSubscriptionName string = customTopicSubscription.outputs.eventSubscriptionName
 
 @description('The custom topic being used.')
-output customTopicName string = customTopic.name
+output customTopicName string = customTopicSubscription.outputs.customTopicName
 
 @description('The container being monitored.')
 output monitoredContainer string = containerName

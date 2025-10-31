@@ -26,6 +26,8 @@ param inputSchema string = 'EventGridSchema'
 @description('Local authentication settings for the topic.')
 param disableLocalAuth bool = false
 
+param logAnalyticsWorkspaceId string
+
 // ------------------
 // RESOURCES
 // ------------------
@@ -43,6 +45,67 @@ resource customEventGridTopic 'Microsoft.EventGrid/topics@2022-06-15' = {
     type: 'SystemAssigned'
   } : null
 }
+
+
+resource diagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${topicName}-diagnostics'
+  scope: customEventGridTopic
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        category: 'PublishSuccessEvents'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 30
+        }
+      }
+      {
+        category: 'PublishFailureEvents'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 30
+        }
+      }
+      {
+        category: 'DeliverySuccessEvents'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 30
+        }
+      }
+      {
+        category: 'DeliveryFailureEvents'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 30
+        }
+      }
+      
+{
+        category: 'DroppedEvents'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 30
+        }
+      }
+      {
+        category: 'DeadLetterEvents'
+        enabled: true
+        retentionPolicy: {
+          enabled: true
+          days: 30
+        }
+      }
+    ]
+  }
+}
+
 
 // ------------------
 // OUTPUTS
