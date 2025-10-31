@@ -952,6 +952,7 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
       webAppResourceId: webApp[i].outputs.webAppResourceId
       enablePrivateLink: parEnableFrontDoorPrivateLink
       frontDoorSku: parSkuConfig.frontDoor
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     }
     dependsOn: [
       webApp
