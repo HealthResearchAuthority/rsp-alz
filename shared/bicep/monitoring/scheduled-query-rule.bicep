@@ -30,7 +30,7 @@ param actionGroupIds array
 param query string
 
 @description('Log Analytics workspace resource IDs to query')
-param dataSourceIds array
+param dataSourceIds string
 
 @description('How often the query is evaluated (in minutes)')
 param evaluationFrequencyInMinutes int = 5
@@ -90,7 +90,7 @@ resource scheduledQueryRule 'Microsoft.Insights/scheduledQueryRules@2023-03-15-p
     severity: severity
     evaluationFrequency: 'PT${evaluationFrequencyInMinutes}M'
     windowSize: 'PT${windowSizeInMinutes}M'
-    scopes: dataSourceIds
+    scopes: [dataSourceIds]
     criteria: {
       allOf: [
         {
