@@ -110,9 +110,9 @@ param parStorageConfig = {
 // SKU configuration for all resource types - Production environment (high performance & availability)
 param parSkuConfig = {
   appServicePlan: {
-    webApp: 'P1V3'
+    webApp: 'P2V3'
     functionApp: 'P1V3'
-    cmsApp: 'P1V3'
+    cmsApp: 'P2V3'
   }
   sqlDatabase: {
     name: 'GP_Gen5'
