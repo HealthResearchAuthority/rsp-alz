@@ -40,12 +40,16 @@ var defaultTags = union(tags, {
   Purpose: 'Activity Log Monitoring'
 })
 
+var deploySecurity = enableSecurityAlerts && contains(actionGroups, 'security') && !empty(actionGroups.security)
+var deployPolicy = enablePolicyAlerts && contains(actionGroups, 'policy') && !empty(actionGroups.policy)
+var deployAdmin = enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin)
+
 // ------------------
 // SECURITY ALERT RULES
 // ------------------
 
 // Security operations alert
-module securityOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.bicep' = if (enableSecurityAlerts && contains(actionGroups, 'security') && !empty(actionGroups.security)) {
+module securityOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.bicep' = if (deploySecurity) {
   name: 'deploy-security-operations-alerts'
   params: {
     alertRuleName: alertRuleNames.security.securityOperations
@@ -69,7 +73,7 @@ module securityOperationsAlerts '../../shared/bicep/monitoring/activity-log-aler
 // ------------------
 
 // Policy assignment operations alert
-module policyOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.bicep' = if (enablePolicyAlerts && contains(actionGroups, 'policy') && !empty(actionGroups.policy)) {
+module policyOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.bicep' = if (deployPolicy) {
   name: 'deploy-policy-operations-alerts'
   params: {
     alertRuleName: alertRuleNames.policy.policyOperations
@@ -91,7 +95,7 @@ module policyOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.
 // ------------------
 
 // Administrative operations alert
-module adminOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.bicep' = if (enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin)) {
+module adminOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.bicep' = if (deployAdmin) {
   name: 'deploy-admin-operations-alerts'
   params: {
     alertRuleName: alertRuleNames.admin.adminOperations
@@ -123,12 +127,12 @@ module adminOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.b
 @description('Alert rule resource IDs')
 output alertRuleIds object = {
   security: {
-    securityOperations: enableSecurityAlerts && contains(actionGroups, 'security') && !empty(actionGroups.security) ? securityOperationsAlerts.outputs.activityLogAlertId : ''
+    securityOperations: deploySecurity ? resourceId('Microsoft.Insights/activityLogAlerts', alertRuleNames.security.securityOperations) : ''
   }
   policy: {
-    policyOperations: enablePolicyAlerts && contains(actionGroups, 'policy') && !empty(actionGroups.policy) ? policyOperationsAlerts.outputs.activityLogAlertId : ''
+    policyOperations: deployPolicy ? resourceId('Microsoft.Insights/activityLogAlerts', alertRuleNames.policy.policyOperations) : ''
   }
   admin: {
-    adminOperations: enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin) ? adminOperationsAlerts.outputs.activityLogAlertId : ''
+    adminOperations: deployAdmin ? resourceId('Microsoft.Insights/activityLogAlerts', alertRuleNames.admin.adminOperations) : ''
   }
 }

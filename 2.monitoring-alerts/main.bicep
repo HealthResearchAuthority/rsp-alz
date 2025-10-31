@@ -44,6 +44,76 @@ param alertSeverityLevels array = [0, 1, 2]
 @description('Tags to apply to all resources')
 param tags object = {}
 
+@description('Resource IDs of Log Analytics workspaces for app alerts')
+param logAnalyticsWorkspaceIds array = []
+
+@description('Enable routing to the webhook action group for app alerts')
+param enableWebhookAg bool = true
+
+@description('Enable routing to the Teams action group for app alerts')
+param enableTeamsAg bool = true
+
+@description('Webhook recipients for app alerts (placeholder by default)')
+param appWebhookRecipients array = [
+  {
+    name: 'App Alerts Webhook'
+    serviceUri: 'https://example.com/webhook'
+    useCommonAlertSchema: true
+  }
+]
+
+@description('Teams channel email recipients for app alerts (placeholder by default)')
+param appTeamsEmailRecipients array = [
+  {
+    name: 'App Alerts Teams'
+    address: 'app-alerts@example.onmicrosoft.com'
+    useCommonAlertSchema: true
+  }
+]
+
+// Per-alert toggles and routing for application alerts
+@description('Enable App Service Down alert')
+param enableAppServiceDownAlert bool = true
+@description('Route App Service Down to webhook')
+param routeAppServiceDownToWebhook bool = true
+@description('Route App Service Down to Teams')
+param routeAppServiceDownToTeams bool = true
+
+@description('Enable Identity Provider alert')
+param enableIdentityProviderAlert bool = true
+@description('Route Identity Provider alert to webhook')
+param routeIdentityProviderFailuresToWebhook bool = true
+@description('Route Identity Provider alert to Teams')
+param routeIdentityProviderFailuresToTeams bool = true
+
+@description('Enable Database Connection Failures alert')
+param enableDbConnectionFailuresAlert bool = true
+@description('Route Database Connection Failures to webhook')
+param routeDbConnectionFailuresToWebhook bool = true
+@description('Route Database Connection Failures to Teams')
+param routeDbConnectionFailuresToTeams bool = true
+
+@description('Enable App Service High Error Rate alert')
+param enableHighErrorRateAlert bool = true
+@description('Route App Service High Error Rate to webhook')
+param routeHighErrorRateAlertToWebhook bool = true
+@description('Route App Service High Error Rate to Teams')
+param routeHighErrorRateAlertToTeams bool = true
+
+@description('Enable Container Apps Failures alert')
+param enableContainerAppsFailuresAlert bool = true
+@description('Route Container Apps Failures to webhook')
+param routeContainerAppsFailuresToWebhook bool = true
+@description('Route Container Apps Failures to Teams')
+param routeContainerAppsFailuresToTeams bool = true
+
+@description('Enable Function App Failures alert')
+param enableFuncAppFailuresAlert bool = true
+@description('Route Function App Failures to webhook')
+param routeFuncAppFailuresToWebhook bool = true
+@description('Route Function App Failures to Teams')
+param routeFuncAppFailuresToTeams bool = true
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -53,6 +123,11 @@ var actionGroupNames = {
   security: '${namingPrefix}-security-alerts'
   policy: '${namingPrefix}-policy-alerts'
   admin: '${namingPrefix}-admin-alerts'
+}
+
+var appActionGroupNames = {
+  webhook: '${namingPrefix}-app-alerts-webhook'
+  teams: '${namingPrefix}-app-alerts-teams'
 }
 
 var alertRuleNames = {
@@ -105,6 +180,54 @@ module alertRules 'modules/alert-rules.bicep' = {
     enableAdminAlerts: enableAdminAlerts
     alertSeverityLevels: alertSeverityLevels
     tags: tags
+  }
+}
+
+// App Alerts - Action Groups (Webhook + Teams)
+module appActionGroups 'modules/app-action-groups.bicep' = {
+  name: 'deploy-app-action-groups'
+  scope: monitoringResourceGroup
+  params: {
+    actionGroupNames: appActionGroupNames
+    webhookRecipients: appWebhookRecipients
+    teamsEmailRecipients: appTeamsEmailRecipients
+    enableWebhookAg: enableWebhookAg
+    enableTeamsAg: enableTeamsAg
+    environment: environment
+    tags: tags
+  }
+}
+
+// App Alerts - Scheduled Query Rules
+module appScheduledQueryAlerts 'modules/app-scheduled-query-alerts.bicep' = if (!empty(logAnalyticsWorkspaceIds)) {
+  name: 'deploy-app-scheduled-query-alerts'
+  scope: monitoringResourceGroup
+  params: {
+    workspaceIds: logAnalyticsWorkspaceIds
+    environment: environment
+    namingPrefix: namingPrefix
+    actionGroups: appActionGroups.outputs.actionGroups
+    enableWebhookAg: enableWebhookAg
+    enableTeamsAg: enableTeamsAg
+    tags: tags
+    enableAppServiceDownAlert: enableAppServiceDownAlert
+    routeAppServiceDownToWebhook: routeAppServiceDownToWebhook
+    routeAppServiceDownToTeams: routeAppServiceDownToTeams
+    enableIdentityProviderAlert: enableIdentityProviderAlert
+    routeIdentityProviderFailuresToWebhook: routeIdentityProviderFailuresToWebhook
+    routeIdentityProviderFailuresToTeams: routeIdentityProviderFailuresToTeams
+    enableDbConnectionFailuresAlert: enableDbConnectionFailuresAlert
+    routeDbConnectionFailuresToWebhook: routeDbConnectionFailuresToWebhook
+    routeDbConnectionFailuresToTeams: routeDbConnectionFailuresToTeams
+    enableHighErrorRateAlert: enableHighErrorRateAlert
+    routeHighErrorRateAlertToWebhook: routeHighErrorRateAlertToWebhook
+    routeHighErrorRateAlertToTeams: routeHighErrorRateAlertToTeams
+    enableContainerAppsFailuresAlert: enableContainerAppsFailuresAlert
+    routeContainerAppsFailuresToWebhook: routeContainerAppsFailuresToWebhook
+    routeContainerAppsFailuresToTeams: routeContainerAppsFailuresToTeams
+    enableFuncAppFailuresAlert: enableFuncAppFailuresAlert
+    routeFuncAppFailuresToWebhook: routeFuncAppFailuresToWebhook
+    routeFuncAppFailuresToTeams: routeFuncAppFailuresToTeams
   }
 }
 
