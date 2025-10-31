@@ -294,7 +294,7 @@ AppExceptions
 '''
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 60
-    windowSizeInMinutes: 43200
+    windowSizeInMinutes: 5
     operator: 'GreaterThan'
     threshold: 0
     numberOfEvaluationPeriods: 1
