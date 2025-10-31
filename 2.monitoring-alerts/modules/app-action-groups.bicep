@@ -1,8 +1,5 @@
 targetScope = 'resourceGroup'
 
-metadata name = 'App Alerts - Action Groups'
-metadata description = 'Deploys Action Groups for application alerts: Webhook and Teams Email'
-
 // ------------------
 // PARAMETERS
 // ------------------
@@ -54,7 +51,7 @@ module webhookActionGroup '../../shared/bicep/monitoring/action-group.bicep' = i
     shortName: 'AppWebhook'
     emailRecipients: []
     webhookRecipients: webhookRecipients
-    enabled: true
+    enabled: enableWebhookAg
     tags: defaultTags
   }
 }
@@ -66,7 +63,7 @@ module teamsActionGroup '../../shared/bicep/monitoring/action-group.bicep' = if 
     actionGroupName: actionGroupNames.teams
     shortName: 'AppTeams'
     emailRecipients: teamsEmailRecipients
-    enabled: true
+    enabled: enableTeamsAg
     tags: defaultTags
   }
 }

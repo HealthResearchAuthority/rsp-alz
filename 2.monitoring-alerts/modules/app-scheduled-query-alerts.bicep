@@ -1,14 +1,11 @@
 targetScope = 'resourceGroup'
 
-metadata name = 'App Alerts - Scheduled Query Alerts'
-metadata description = 'Deploys KQL-based scheduled query alerts for applications'
-
 // ------------------
 // PARAMETERS
 // ------------------
 
-@description('Resource IDs of Log Analytics workspaces to query')
-param workspaceIds array
+@description('Resource IDs of Log Analytics workspace to query')
+param logAnalyticsWorkspaceId string
 
 @description('Environment name')
 param environment string
@@ -28,48 +25,48 @@ param enableTeamsAg bool = true
 @description('Tags to apply to all resources')
 param tags object = {}
 
-// Per-alert enable and routing params
+
 @description('Enable App Service Down alert')
 param enableAppServiceDownAlert bool = true
-@description('Route App Service Down to webhook')
-param routeAppServiceDownToWebhook bool = true
-@description('Route App Service Down to Teams')
-param routeAppServiceDownToTeams bool = true
+@description('Send App Service Down to webhook')
+param sendAppServiceDownToWebhook bool = true
+@description('Send App Service Down to Teams')
+param sendAppServiceDownToTeams bool = true
 
 @description('Enable Identity Provider alert')
 param enableIdentityProviderAlert bool = true
-@description('Route Identity Provider alert to webhook')
-param routeIdentityProviderFailuresToWebhook bool = true
-@description('Route Identity Provider alert to Teams')
-param routeIdentityProviderFailuresToTeams bool = true
+@description('Send Identity Provider alert to webhook')
+param sendIdentityProviderFailuresToWebhook bool = true
+@description('Send Identity Provider alert to Teams')
+param sendIdentityProviderFailuresToTeams bool = true
 
 @description('Enable Database Connection Failures alert')
 param enableDbConnectionFailuresAlert bool = true
-@description('Route Database Connection Failures to webhook')
-param routeDbConnectionFailuresToWebhook bool = true
-@description('Route Database Connection Failures to Teams')
-param routeDbConnectionFailuresToTeams bool = true
+@description('Send Database Connection Failures to webhook')
+param sendDbConnectionFailuresToWebhook bool = true
+@description('Send Database Connection Failures to Teams')
+param sendDbConnectionFailuresToTeams bool = true
 
 @description('Enable App Service High Error Rate alert')
 param enableHighErrorRateAlert bool = true
-@description('Route App Service High Error Rate to webhook')
-param routeHighErrorRateAlertToWebhook bool = true
-@description('Route App Service High Error Rate to Teams')
-param routeHighErrorRateAlertToTeams bool = true
+@description('Send App Service High Error Rate to webhook')
+param sendHighErrorRateAlertToWebhook bool = true
+@description('Send App Service High Error Rate to Teams')
+param sendHighErrorRateAlertToTeams bool = true
 
 @description('Enable Container Apps Failures alert')
 param enableContainerAppsFailuresAlert bool = true
-@description('Route Container Apps Failures to webhook')
-param routeContainerAppsFailuresToWebhook bool = true
-@description('Route Container Apps Failures to Teams')
-param routeContainerAppsFailuresToTeams bool = true
+@description('Send Container Apps Failures to webhook')
+param sendContainerAppsFailuresToWebhook bool = true
+@description('Send Container Apps Failures to Teams')
+param sendContainerAppsFailuresToTeams bool = true
 
 @description('Enable Function App Failures alert')
 param enableFuncAppFailuresAlert bool = true
-@description('Route Function App Failures to webhook')
-param routeFuncAppFailuresToWebhook bool = true
-@description('Route Function App Failures to Teams')
-param routeFuncAppFailuresToTeams bool = true
+@description('Send Function App Failures to webhook')
+param sendFuncAppFailuresToWebhook bool = true
+@description('Send Function App Failures to Teams')
+param sendFuncAppFailuresToTeams bool = true
 
 // ------------------
 // VARIABLES
@@ -102,11 +99,11 @@ module alert1 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
     ruleName: ruleName1
     displayName: 'P1: App Service Unavailable'
     ruleDescription: 'Detects 500s on IRAS/CMS portal endpoints over 5m with threshold >= 10'
-    enabled: true
+    enabled: enableAppServiceDownAlert
     severity: 0
     actionGroupIds: concat(
-      enableWebhookAg && routeAppServiceDownToWebhook && !empty(webhookId) ? [webhookId] : [],
-      enableTeamsAg && routeAppServiceDownToTeams && !empty(teamsId) ? [teamsId] : []
+      enableWebhookAg && sendAppServiceDownToWebhook && !empty(webhookId) ? [webhookId] : [],
+      enableTeamsAg && sendAppServiceDownToTeams && !empty(teamsId) ? [teamsId] : []
     )
     query: '''
 let timeWindow = 5m;
@@ -120,7 +117,7 @@ AppRequests
 | where TotalErrors >= errorThreshold
 | project AlertTitle = strcat("P1: App Service Unavailable - ", AppRoleName), Severity = "P1-Critical", FirstOccurrence, LastOccurrence, AppServiceName = AppRoleName, OperationName, ResultCode, TotalErrors, UniqueInstances, SampleUrls
 '''
-    dataSourceIds: workspaceIds
+    dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 60
     windowSizeInMinutes: 10080
     operator: 'GreaterThan'
@@ -138,11 +135,11 @@ module alert2 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
     ruleName: ruleName2
     displayName: 'P1: One Login Unavailable'
     ruleDescription: 'Detects One Login dependency failures over 5m with threshold >= 10'
-    enabled: true
+    enabled: enableIdentityProviderAlert
     severity: 0
     actionGroupIds: concat(
-      enableWebhookAg && routeIdentityProviderFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
-      enableTeamsAg && routeIdentityProviderFailuresToTeams && !empty(teamsId) ? [teamsId] : []
+      enableWebhookAg && sendIdentityProviderFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
+      enableTeamsAg && sendIdentityProviderFailuresToTeams && !empty(teamsId) ? [teamsId] : []
     )
     query: '''
 let timeWindow = 5m;
@@ -156,7 +153,7 @@ AppDependencies
 | where TotalErrors >= errorThreshold
 | project AlertTitle = strcat("P1: Service Unavailable - One Login"), Severity = "P1-Critical", FirstOccurrence, LastOccurrence, AppServiceName = AppRoleName, OperationName, ResultCode, TotalErrors, UniqueInstances, SampleUrls
 '''
-    dataSourceIds: workspaceIds
+    dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
@@ -174,11 +171,11 @@ module alert3 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
     ruleName: ruleName3
     displayName: 'P1: Database Unavailable'
     ruleDescription: 'Detects failed SQL dependencies over 5m with threshold >= 10'
-    enabled: true
+    enabled: enableDbConnectionFailuresAlert
     severity: 0
     actionGroupIds: concat(
-      enableWebhookAg && routeDbConnectionFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
-      enableTeamsAg && routeDbConnectionFailuresToTeams && !empty(teamsId) ? [teamsId] : []
+      enableWebhookAg && sendDbConnectionFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
+      enableTeamsAg && sendDbConnectionFailuresToTeams && !empty(teamsId) ? [teamsId] : []
     )
     query: '''
 let timeWindow = 5m;
@@ -193,7 +190,7 @@ AppDependencies
 | where TotalErrors >= errorThreshold
 | project AlertTitle = strcat("P1: Database Unavailable - ", AppRoleInstance), Severity = "P1-Critical", FirstOccurrence, LastOccurrence, AppServiceName = AppRoleInstance, OperationName, Target, TotalErrors, UniqueInstances, Exception
 '''
-    dataSourceIds: workspaceIds
+    dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
@@ -211,11 +208,11 @@ module alert4 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
     ruleName: ruleName4
     displayName: 'P2: High App Service Error Rate'
     ruleDescription: 'Detects high 500 error rate over 5minutes with threshold > 50'
-    enabled: true
+    enabled: enableAppServiceDownAlert
     severity: 1
     actionGroupIds: concat(
-      enableWebhookAg && routeHighErrorRateAlertToWebhook && !empty(webhookId) ? [webhookId] : [],
-      enableTeamsAg && routeHighErrorRateAlertToTeams && !empty(teamsId) ? [teamsId] : []
+      enableWebhookAg && sendHighErrorRateAlertToWebhook && !empty(webhookId) ? [webhookId] : [],
+      enableTeamsAg && sendHighErrorRateAlertToTeams && !empty(teamsId) ? [teamsId] : []
     )
     query: '''
 let timeWindow = 5m;
@@ -227,7 +224,7 @@ AppRequests
 | where TotalFailures > errorThreshold
 | project AlertTitle = strcat("P2: High Error Rate - ", AppRoleName), Severity = "P2-High", FirstAlertTime, AppServiceName = AppRoleName, OperationName, TotalFailures, AffectedInstances = UniqueInstances, ErrorCodes = UniqueErrorCodes
 '''
-    dataSourceIds: workspaceIds
+    dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 60
     windowSizeInMinutes: 43200
     operator: 'GreaterThan'
@@ -245,11 +242,11 @@ module alert5 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
     ruleName: ruleName5
     displayName: 'P2: Container App API Failures'
     ruleDescription: 'Detects container app API 500 failures over 5m with threshold > 50'
-    enabled: true
+    enabled: enableContainerAppsFailuresAlert
     severity: 1
     actionGroupIds: concat(
-      enableWebhookAg && routeContainerAppsFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
-      enableTeamsAg && routeContainerAppsFailuresToTeams && !empty(teamsId) ? [teamsId] : []
+      enableWebhookAg && sendContainerAppsFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
+      enableTeamsAg && sendContainerAppsFailuresToTeams && !empty(teamsId) ? [teamsId] : []
     )
     query: '''
 let timeWindow = 5;
@@ -261,7 +258,7 @@ AppRequests
 | where TotalFailures > errorThreshold
 | project AlertTitle = strcat("P2: Container App API Failures - ", AppRoleName), Severity = "P2-High", FirstAlertTime, ContainerAppName = AppRoleName, OperationName, TotalFailures, AffectedInstances = UniqueInstances, ErrorCodes = UniqueErrorCodes
 '''
-    dataSourceIds: workspaceIds
+    dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 60
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
@@ -279,11 +276,11 @@ module alert6 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
     ruleName: ruleName6
     displayName: 'P1: Function App Failures'
     ruleDescription: 'Detects unhandled exceptions in function apps over 5minutes'
-    enabled: true
+    enabled: enableFuncAppFailuresAlert
     severity: 1
     actionGroupIds: concat(
-      enableWebhookAg && routeFuncAppFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
-      enableTeamsAg && routeFuncAppFailuresToTeams && !empty(teamsId) ? [teamsId] : []
+      enableWebhookAg && sendFuncAppFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
+      enableTeamsAg && sendFuncAppFailuresToTeams && !empty(teamsId) ? [teamsId] : []
     )
     query: '''
 let timeWindow = 5m;
@@ -295,9 +292,9 @@ AppExceptions
 | extend ExceptionMessage = tostring(Details[1]['message'])
 | project TimeGenerated, ExceptionMessage, ExceptionType, SeverityLevel, InnermostType, InnermostMessage, Details, AppRoleName
 '''
-    dataSourceIds: workspaceIds
+    dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 60
-    windowSizeInMinutes: 43200
+    windowSizeInMinutes: 5
     operator: 'GreaterThan'
     threshold: 0
     numberOfEvaluationPeriods: 1
