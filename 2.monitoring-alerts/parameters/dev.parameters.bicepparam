@@ -61,8 +61,5 @@ param logAnalyticsWorkspaceId = ''
 
 param tags = {
   Environment: 'Development'
-  // Owner: 'Platform Team'
-  // CostCenter: 'IT Operations'
-  // Project: 'Azure Landing Zone'
   Purpose: 'Monitoring and Alerting'
 }

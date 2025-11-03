@@ -118,8 +118,8 @@ AppRequests
 | project AlertTitle = strcat("P1: App Service Unavailable - ", AppRoleName), Severity = "P1-Critical", FirstOccurrence, LastOccurrence, AppServiceName = AppRoleName, OperationName, ResultCode, TotalErrors, UniqueInstances, SampleUrls
 '''
     dataSourceIds: logAnalyticsWorkspaceId 
-    evaluationFrequencyInMinutes: 60
-    windowSizeInMinutes: 10080
+    evaluationFrequencyInMinutes: 5
+    windowSizeInMinutes: 5
     operator: 'GreaterThan'
     threshold: 0
     numberOfEvaluationPeriods: 1
@@ -215,7 +215,7 @@ module alert4 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
       enableTeamsAg && sendHighErrorRateAlertToTeams && !empty(teamsId) ? [teamsId] : []
     )
     query: '''
-let timeWindow = 5m;
+let timeWindow = 10m;
 let errorThreshold = 50;
 AppRequests
 | where ResultCode in (500)
@@ -224,7 +224,7 @@ AppRequests
 | where TotalFailures > errorThreshold
 | project AlertTitle = strcat("P2: High Error Rate - ", AppRoleName), Severity = "P2-High", FirstAlertTime, AppServiceName = AppRoleName, OperationName, TotalFailures, AffectedInstances = UniqueInstances, ErrorCodes = UniqueErrorCodes
 '''
-    dataSourceIds: logAnalyticsWorkspaceId 
+    dataSourceIds: logAnalyticsWorkspaceId
     evaluationFrequencyInMinutes: 10
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
@@ -249,7 +249,7 @@ module alert5 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
       enableTeamsAg && sendContainerAppsFailuresToTeams && !empty(teamsId) ? [teamsId] : []
     )
     query: '''
-let timeWindow = 5;
+let timeWindow = 10m;
 let errorThreshold = 50;
 AppRequests
 | where ResultCode in (500)
@@ -259,7 +259,7 @@ AppRequests
 | project AlertTitle = strcat("P2: Container App API Failures - ", AppRoleName), Severity = "P2-High", FirstAlertTime, ContainerAppName = AppRoleName, OperationName, TotalFailures, AffectedInstances = UniqueInstances, ErrorCodes = UniqueErrorCodes
 '''
     dataSourceIds: logAnalyticsWorkspaceId 
-    evaluationFrequencyInMinutes: 60
+    evaluationFrequencyInMinutes: 10
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
     threshold: 0
