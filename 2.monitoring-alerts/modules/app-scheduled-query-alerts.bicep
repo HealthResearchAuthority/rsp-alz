@@ -17,10 +17,10 @@ param namingPrefix string
 param actionGroups object
 
 @description('Enable routing to the webhook action group globally')
-param enableWebhookAg bool = true
+param enableWebhookAg bool
 
 @description('Enable routing to the Teams action group globally')
-param enableTeamsAg bool = true
+param enableTeamsAg bool
 
 @description('Tags to apply to all resources')
 param tags object = {}
@@ -225,11 +225,11 @@ AppRequests
 | project AlertTitle = strcat("P2: High Error Rate - ", AppRoleName), Severity = "P2-High", FirstAlertTime, AppServiceName = AppRoleName, OperationName, TotalFailures, AffectedInstances = UniqueInstances, ErrorCodes = UniqueErrorCodes
 '''
     dataSourceIds: logAnalyticsWorkspaceId 
-    evaluationFrequencyInMinutes: 60
-    windowSizeInMinutes: 43200
+    evaluationFrequencyInMinutes: 10
+    windowSizeInMinutes: 5
     operator: 'GreaterThan'
     threshold: 0
-    numberOfEvaluationPeriods: 1
+    numberOfEvaluationPeriods: 3
     minFailingPeriodsToAlert: 1
     tags: defaultTags
   }
@@ -290,10 +290,10 @@ AppExceptions
 | where AppRoleName has "func-"
 | where InnermostMessage has "Unhandled Exception"
 | extend ExceptionMessage = tostring(Details[1]['message'])
-| project TimeGenerated, ExceptionMessage, ExceptionType, SeverityLevel, InnermostType, InnermostMessage, Details, AppRoleName
+| project AlertTitle = strcat("P1: Function App Execution Failure - ", AppRoleName), Severity = "P1-Critical", TimeGenerated, AppRoleName, InnermostMessage, ResultCode, Details
 '''
     dataSourceIds: logAnalyticsWorkspaceId 
-    evaluationFrequencyInMinutes: 60
+    evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
     threshold: 0

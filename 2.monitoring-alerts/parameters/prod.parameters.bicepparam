@@ -5,9 +5,9 @@ using '../main.bicep'
 // ------------------
 
 param location = 'uksouth'
-param environment = 'manualtest'
+param environment = 'prod'
 param organizationPrefix = 'hra'
-param monitoringResourceGroupName = 'rg-hra-monitoring-manualtest'
+param monitoringResourceGroupName = 'rg-hra-monitoring-prod'
 
 
 // ------------------
@@ -61,6 +61,6 @@ param logAnalyticsWorkspaceId = ''
 // ------------------
 
 param tags = {
-  Environment: 'Manual Test'
+  Environment: 'Prod'
   Purpose: 'Monitoring and Alerting'
 }
