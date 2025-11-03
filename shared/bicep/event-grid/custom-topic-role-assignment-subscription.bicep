@@ -13,14 +13,8 @@ param customTopicId string
 @allowed(['webhook', 'storagequeue', 'AzureFunction'])
 param destinationType string = 'webhook'
 
-@description('Storage account name for queue destination (required if destinationType is storagequeue).')
-param storageAccountName string = ''
-
 @description('Container name to monitor for blob events.')
 param containerName string = ''
-
-@description('Queue name for storage queue destination')
-param queueName string = 'defender-malware-scan-queue'
 
 @description('Event types to subscribe to.')
 param eventTypes array = [
@@ -76,10 +70,7 @@ module customTopicSubscription './custom-topic-subscription.bicep' = {
   params: {
     subscriptionName: subscriptionName
     customTopicId: customTopicId
-    destinationType: destinationType
-    storageAccountName: storageAccountName
     containerName: containerName
-    queueName: queueName
     eventTypes: eventTypes
     enableDeadLetter: enableDeadLetter
     deadLetterStorageAccountName: deadLetterStorageAccountName
@@ -89,6 +80,7 @@ module customTopicSubscription './custom-topic-subscription.bicep' = {
     enableAdvancedFiltering: enableAdvancedFiltering
     functionAppId: '${functionApp.id}/functions/${functionName}'
     functionAppname: functionAppname
+    appRGName: resourceGroup().name
   }
   dependsOn: [
     roleAssignment

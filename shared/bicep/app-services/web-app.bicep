@@ -134,6 +134,8 @@ param hostNameSslStates array = []
 @description('Optional, default is false. If true, then a private endpoint must be assigned to the web app')
 param hasPrivateLink bool = false
 
+param eventGridServiceTagRestriction bool = false
+
 @description('Optional. Site redundancy mode.')
 @allowed([
   'ActiveActive'
@@ -172,6 +174,16 @@ var webapp_dns_name = '.azurewebsites.net'
 // Dependencies //
 // ============ //
 
+// NEW VARIABLE FOR EVENT GRID RULE
+var eventGridRule = {
+  ipAddress: 'AzureEventGrid' // Service Tag value
+  action: 'Allow'
+  tag: 'ServiceTag'
+  priority: 100 // Set a high priority to ensure it's evaluated early
+  name: 'Allow-AzureEventGrid-Traffic'
+  description: 'Allow inbound traffic from the Azure Event Grid service for delivery.'
+}
+
 var siteConfigConfigurationMap  = {
   windowsNet9 : {
     metadata :[
@@ -188,6 +200,9 @@ var siteConfigConfigurationMap  = {
     use32BitWorkerProcess: false    
   }
 }
+
+// COMBINED LIST OF IP RESTRICTIONS
+var combinedIpRestrictions = eventGridServiceTagRestriction ? concat(networkRuleSetIpRules, [eventGridRule]) : networkRuleSetIpRules
 
 resource app 'Microsoft.Web/sites@2022-09-01' = {
   name: name
@@ -223,11 +238,12 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
   }
 }
 
-resource webConfig 'Microsoft.Web/sites/config@2022-09-01' = if (!empty(networkRuleSetIpRules)) {
+resource webConfig 'Microsoft.Web/sites/config@2022-09-01' = if (!empty(networkRuleSetIpRules) || eventGridServiceTagRestriction) {
   parent: app
   name: 'web'
   properties: {
-    ipSecurityRestrictions: networkRuleSetIpRules
+    // UPDATED: Use the combined array of IP restrictions
+    ipSecurityRestrictions: combinedIpRestrictions
   }
 }
 

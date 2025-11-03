@@ -846,6 +846,7 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       appName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
       location: location
       tags: tags
+      eventGridServiceTagRestriction: true
       sku: parSkuConfig.appServicePlan.functionApp
       appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
       webAppBaseOs: 'Windows'
@@ -890,7 +891,6 @@ module customTopicEventSubscription '../shared/bicep/event-grid/custom-topic-rol
       enableAdvancedFiltering: true
       maxDeliveryAttempts: 3
       eventTimeToLiveInMinutes: 1440
-      storageAccountName: parStagingStorageAccountName
       eventGridTopicManagedIdentityPrincipalId: documentUpload[i].outputs.stagingStorage.topicManagedIdentityID
       functionAppname: processScanFnApp[i].outputs.appName
       topicRGName: parSpokeNetworks[i].rgStorage

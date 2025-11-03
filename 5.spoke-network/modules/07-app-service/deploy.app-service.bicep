@@ -54,6 +54,7 @@ param deploySlot bool
 
 param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
+param eventGridServiceTagRestriction bool = false
 
 
 var slotName = 'staging'
@@ -109,6 +110,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
     kind: (webAppBaseOs =~ 'linux') ? 'app,linux' : 'app'
     name:  appName
     location: location
+    eventGridServiceTagRestriction: eventGridServiceTagRestriction
     serverFarmResourceId: appSvcPlan.outputs.resourceId
     diagnosticWorkspaceId: logAnalyticsWsId   
     virtualNetworkSubnetId: subnetIdForVnetInjection
@@ -185,7 +187,7 @@ module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networki
 }
 
 module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && deployAppPrivateEndPoint == true) {
-  name:take('rtsfnStorageFilePrivateNetwork-${deployment().name}', 64)
+  name:take('fnStorageFilePrivateNetwork-${storageAccountName}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
     location: location
