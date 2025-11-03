@@ -70,11 +70,6 @@ param location string = resourceGroup().location
 // VARIABLES
 // ------------------
 
-var actionGroups = [for actionGroupId in actionGroupIds: {
-  actionGroupId: actionGroupId
-  webhookProperties: {}
-}]
-
 // ------------------
 // RESOURCES
 // ------------------
@@ -106,8 +101,7 @@ resource scheduledQueryRule 'Microsoft.Insights/scheduledQueryRules@2023-03-15-p
       ]
     }
     actions: {
-      actionGroups: actionGroups
-
+      actionGroups: actionGroupIds
     }
     autoMitigate: autoMitigateInMinutes > 0 ? true : false
     checkWorkspaceAlertsStorageConfigured: checkWorkspaceAlertsStorageConfigured
