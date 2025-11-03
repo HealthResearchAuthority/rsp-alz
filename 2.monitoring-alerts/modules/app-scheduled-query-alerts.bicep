@@ -208,7 +208,7 @@ module alert4 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
     ruleName: ruleName4
     displayName: 'P2: High App Service Error Rate'
     ruleDescription: 'Detects high 500 error rate over 5minutes with threshold > 50'
-    enabled: enableAppServiceDownAlert
+    enabled: enableHighErrorRateAlert
     severity: 1
     actionGroupIds: concat(
       enableWebhookAg && sendHighErrorRateAlertToWebhook && !empty(webhookId) ? [webhookId] : [],
@@ -229,7 +229,7 @@ AppRequests
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
     threshold: 0
-    numberOfEvaluationPeriods: 3
+    numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
     tags: defaultTags
   }
@@ -259,7 +259,7 @@ AppRequests
 | project AlertTitle = strcat("P2: Container App API Failures - ", AppRoleName), Severity = "P2-High", FirstAlertTime, ContainerAppName = AppRoleName, OperationName, TotalFailures, AffectedInstances = UniqueInstances, ErrorCodes = UniqueErrorCodes
 '''
     dataSourceIds: logAnalyticsWorkspaceId 
-    evaluationFrequencyInMinutes: 10
+    evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
     threshold: 0
@@ -290,7 +290,7 @@ AppExceptions
 | where AppRoleName has "func-"
 | where InnermostMessage has "Unhandled Exception"
 | extend ExceptionMessage = tostring(Details[1]['message'])
-| project AlertTitle = strcat("P1: Function App Execution Failure - ", AppRoleName), Severity = "P1-Critical", TimeGenerated, AppRoleName, InnermostMessage, ResultCode, Details
+| project AlertTitle = strcat("P1: Function App Execution Failure - ", AppRoleName), Severity = "P1-Critical", TimeGenerated, AppRoleName, InnermostMessage, Details
 '''
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
