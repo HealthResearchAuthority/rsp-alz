@@ -124,6 +124,12 @@ param parSkuConfig = {
     storageSize: '6GB'
     zoneRedundant: false
   }
+  containerApp: {
+    cpu: '0.5'
+    memory: '1Gi'
+    minReplicas: 1
+    maxReplicas: 5
+  }
   keyVault: 'standard'
   appConfiguration: 'standard'
   frontDoor: 'Premium_AzureFrontDoor'
