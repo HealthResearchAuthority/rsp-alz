@@ -226,7 +226,7 @@ AppRequests
 '''
     dataSourceIds: logAnalyticsWorkspaceId
     evaluationFrequencyInMinutes: 10
-    windowSizeInMinutes: 5
+    windowSizeInMinutes: 10
     operator: 'GreaterThan'
     threshold: 0
     numberOfEvaluationPeriods: 1
