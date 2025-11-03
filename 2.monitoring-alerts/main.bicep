@@ -239,9 +239,6 @@ module appScheduledQueryAlerts 'modules/app-scheduled-query-alerts.bicep' = if (
 // OUTPUTS
 // ------------------
 
-@description('Resource group name for monitoring resources')
-output monitoringResourceGroupName string = monitoringResourceGroup.name
-
 @description('Action group resource IDs')
 output actionGroupIds object = actionGroups.outputs.actionGroups
 
