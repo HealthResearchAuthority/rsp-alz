@@ -1024,3 +1024,23 @@ module dashboards '../shared/bicep/portal-dashboard/deploy-dashboards.bicep' = [
     ]
   }
 ]
+
+// Resource Dashboard
+module resourceDashboard '../shared/bicep/portal-dashboard/deploy-resource-dashboard.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('resource-dashboard-${deployment().name}-deployment', 64)
+    params: {
+      environment: parSpokeNetworks[i].parEnvironment
+      subscriptionId: parSpokeNetworks[i].subscriptionId
+      resourceGroupName: parSpokeNetworks[i].rgapplications
+      location: location
+      tags: tags
+    }
+    dependsOn: [
+      webApp
+      containerAppsEnvironment
+      // frontDoor
+    ]
+  }
+]
