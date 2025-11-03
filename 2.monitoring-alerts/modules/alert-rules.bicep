@@ -86,6 +86,7 @@ module policyOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.
       'Microsoft.Authorization/policyAssignments/write'
       'Microsoft.Authorization/policyAssignments/delete'
     ]
+    level: contains(alertSeverityLevels, 0) ? 'Critical' : contains(alertSeverityLevels, 1) ? 'Error' : 'Warning'
     tags: defaultTags
   }
 }
@@ -116,6 +117,7 @@ module adminOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.b
       'Microsoft.ClassicNetwork/networkSecurityGroups/securityRules/write'
       'Microsoft.ClassicNetwork/networkSecurityGroups/securityRules/delete'
     ]
+    level: contains(alertSeverityLevels, 0) ? 'Critical' : contains(alertSeverityLevels, 1) ? 'Error' : 'Warning'
     tags: defaultTags
   }
 }
