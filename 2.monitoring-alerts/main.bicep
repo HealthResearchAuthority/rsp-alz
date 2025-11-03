@@ -45,31 +45,17 @@ param alertSeverityLevels array = [0, 1, 2]
 param tags object = {}
 
 @description('Resource IDs of Log Analytics workspaces for app alerts')
-param logAnalyticsWorkspaceIds array = []
+param logAnalyticsWorkspaceId string
 
 @description('Enable routing to the webhook action group for app alerts')
-param enableWebhookAg bool = true
+param enableWebhookAg bool
 
 @description('Enable routing to the Teams action group for app alerts')
-param enableTeamsAg bool = true
+param enableTeamsAg bool
 
-@description('Webhook recipients for app alerts (placeholder by default)')
-param appWebhookRecipients array = [
-  {
-    name: 'App Alerts Webhook'
-    serviceUri: 'https://example.com/webhook'
-    useCommonAlertSchema: true
-  }
-]
+param webhookUrl string
 
-@description('Teams channel email recipients for app alerts (placeholder by default)')
-param appTeamsEmailRecipients array = [
-  {
-    name: 'App Alerts Teams'
-    address: 'app-alerts@example.onmicrosoft.com'
-    useCommonAlertSchema: true
-  }
-]
+param teamsChannelEmailAddress string
 
 // Per-alert toggles and routing for application alerts
 @description('Enable App Service Down alert')
@@ -142,6 +128,24 @@ var alertRuleNames = {
   }
 }
 
+@description('Webhook recipients for app alerts')
+var appWebhookRecipients = [
+  {
+    name: 'App Alerts Webhook'
+    serviceUri: webhookUrl
+    useCommonAlertSchema: true
+  }
+]
+
+@description('Teams channel email recipients for app alerts')
+var appTeamsEmailRecipients = [
+  {
+    name: 'App Alerts Teams'
+    address: teamsChannelEmailAddress
+    useCommonAlertSchema: true
+  }
+]
+
 // ------------------
 // RESOURCES
 // ------------------
@@ -199,11 +203,11 @@ module appActionGroups 'modules/app-action-groups.bicep' = {
 }
 
 // App Alerts - Scheduled Query Rules
-module appScheduledQueryAlerts 'modules/app-scheduled-query-alerts.bicep' = if (!empty(logAnalyticsWorkspaceIds)) {
+module appScheduledQueryAlerts 'modules/app-scheduled-query-alerts.bicep' = if (!empty(logAnalyticsWorkspaceId)) {
   name: 'deploy-app-scheduled-query-alerts'
   scope: monitoringResourceGroup
   params: {
-    workspaceIds: logAnalyticsWorkspaceIds
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     environment: environment
     namingPrefix: namingPrefix
     actionGroups: appActionGroups.outputs.actionGroups
@@ -211,32 +215,29 @@ module appScheduledQueryAlerts 'modules/app-scheduled-query-alerts.bicep' = if (
     enableTeamsAg: enableTeamsAg
     tags: tags
     enableAppServiceDownAlert: enableAppServiceDownAlert
-    routeAppServiceDownToWebhook: routeAppServiceDownToWebhook
-    routeAppServiceDownToTeams: routeAppServiceDownToTeams
+    sendAppServiceDownToWebhook: routeAppServiceDownToWebhook
+    sendAppServiceDownToTeams: routeAppServiceDownToTeams
     enableIdentityProviderAlert: enableIdentityProviderAlert
-    routeIdentityProviderFailuresToWebhook: routeIdentityProviderFailuresToWebhook
-    routeIdentityProviderFailuresToTeams: routeIdentityProviderFailuresToTeams
+    sendIdentityProviderFailuresToWebhook: routeIdentityProviderFailuresToWebhook
+    sendIdentityProviderFailuresToTeams: routeIdentityProviderFailuresToTeams
     enableDbConnectionFailuresAlert: enableDbConnectionFailuresAlert
-    routeDbConnectionFailuresToWebhook: routeDbConnectionFailuresToWebhook
-    routeDbConnectionFailuresToTeams: routeDbConnectionFailuresToTeams
+    sendDbConnectionFailuresToWebhook: routeDbConnectionFailuresToWebhook
+    sendDbConnectionFailuresToTeams: routeDbConnectionFailuresToTeams
     enableHighErrorRateAlert: enableHighErrorRateAlert
-    routeHighErrorRateAlertToWebhook: routeHighErrorRateAlertToWebhook
-    routeHighErrorRateAlertToTeams: routeHighErrorRateAlertToTeams
+    sendHighErrorRateAlertToWebhook: routeHighErrorRateAlertToWebhook
+    sendHighErrorRateAlertToTeams: routeHighErrorRateAlertToTeams
     enableContainerAppsFailuresAlert: enableContainerAppsFailuresAlert
-    routeContainerAppsFailuresToWebhook: routeContainerAppsFailuresToWebhook
-    routeContainerAppsFailuresToTeams: routeContainerAppsFailuresToTeams
+    sendContainerAppsFailuresToWebhook: routeContainerAppsFailuresToWebhook
+    sendContainerAppsFailuresToTeams: routeContainerAppsFailuresToTeams
     enableFuncAppFailuresAlert: enableFuncAppFailuresAlert
-    routeFuncAppFailuresToWebhook: routeFuncAppFailuresToWebhook
-    routeFuncAppFailuresToTeams: routeFuncAppFailuresToTeams
+    sendFuncAppFailuresToWebhook: routeFuncAppFailuresToWebhook
+    sendFuncAppFailuresToTeams: routeFuncAppFailuresToTeams
   }
 }
 
 // ------------------
 // OUTPUTS
 // ------------------
-
-@description('Resource group name for monitoring resources')
-output monitoringResourceGroupName string = monitoringResourceGroup.name
 
 @description('Action group resource IDs')
 output actionGroupIds object = actionGroups.outputs.actionGroups
