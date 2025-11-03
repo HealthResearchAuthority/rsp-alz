@@ -105,18 +105,18 @@ module alert1 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
       enableWebhookAg && sendAppServiceDownToWebhook && !empty(webhookId) ? [webhookId] : [],
       enableTeamsAg && sendAppServiceDownToTeams && !empty(teamsId) ? [teamsId] : []
     )
-    query: '''
+    query: format('''
 let timeWindow = 5m;
 let errorThreshold = 10;
 AppRequests
 | where TimeGenerated > ago(timeWindow)
 | where ResultCode == "500"
 | where Name in ("GET /", "GET Application/Welcome", "GET /application/welcome")
-| where AppRoleName in ("irasportal-${environment}")
+| where AppRoleName in ("irasportal-{0}")
 | summarize FirstOccurrence = min(TimeGenerated), LastOccurrence = max(TimeGenerated), TotalErrors = sum(ItemCount), UniqueInstances = dcount(AppRoleName), SampleUrls = make_set(Url, 3) by AppRoleName, OperationName, ResultCode, _ResourceId
 | where TotalErrors >= errorThreshold
 | project AlertTitle = strcat("P1: App Service Unavailable - ", AppRoleName), Severity = "P1-Critical", FirstOccurrence, LastOccurrence, AppServiceName = AppRoleName, OperationName, ResultCode, TotalErrors, UniqueInstances, SampleUrls
-'''
+''', environment)
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
@@ -141,18 +141,18 @@ module alert2 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
       enableWebhookAg && sendIdentityProviderFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
       enableTeamsAg && sendIdentityProviderFailuresToTeams && !empty(teamsId) ? [teamsId] : []
     )
-    query: '''
+    query: format('''
 let timeWindow = 5m;
 let errorThreshold = 10;
 AppDependencies
 | where TimeGenerated > ago(timeWindow)
 | where Target == "oidc.integration.account.gov.uk"
-| where AppRoleName in ("irasportal-manualtest")
+| where AppRoleName in ("irasportal-{0}")
 | where ResultCode in ("Canceled") or ResultCode startswith "5"
 | summarize FirstOccurrence = min(TimeGenerated), LastOccurrence = max(TimeGenerated), TotalErrors = sum(ItemCount), UniqueInstances = dcount(Data), SampleUrls = make_set(Data, 3) by Target, AppRoleName, OperationName, ResultCode
 | where TotalErrors >= errorThreshold
 | project AlertTitle = strcat("P1: Service Unavailable - One Login"), Severity = "P1-Critical", FirstOccurrence, LastOccurrence, AppServiceName = AppRoleName, OperationName, ResultCode, TotalErrors, UniqueInstances, SampleUrls
-'''
+''', environment)
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
@@ -177,19 +177,19 @@ module alert3 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
       enableWebhookAg && sendDbConnectionFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
       enableTeamsAg && sendDbConnectionFailuresToTeams && !empty(teamsId) ? [teamsId] : []
     )
-    query: '''
+    query: format('''
 let timeWindow = 5m;
 let errorThreshold = 10;
 AppDependencies
 | where TimeGenerated > ago(timeWindow)
 | where DependencyType in ("SQL")
 | where Success in (false)
-| where Target has "rspsqlserver${environment}"
+| where Target has "rspsqlserver{0}"
 | extend Exception = tostring(todynamic(Properties).Exception)
 | summarize FirstOccurrence = min(TimeGenerated), LastOccurrence = max(TimeGenerated), TotalErrors = sum(ItemCount), UniqueInstances = dcount(AppRoleInstance) by AppRoleInstance, OperationName, Exception, Target
 | where TotalErrors >= errorThreshold
 | project AlertTitle = strcat("P1: Database Unavailable - ", AppRoleInstance), Severity = "P1-Critical", FirstOccurrence, LastOccurrence, AppServiceName = AppRoleInstance, OperationName, Target, TotalErrors, UniqueInstances, Exception
-'''
+''', environment)
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
@@ -214,16 +214,16 @@ module alert4 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
       enableWebhookAg && sendHighErrorRateAlertToWebhook && !empty(webhookId) ? [webhookId] : [],
       enableTeamsAg && sendHighErrorRateAlertToTeams && !empty(teamsId) ? [teamsId] : []
     )
-    query: '''
+    query: format('''
 let timeWindow = 10m;
 let errorThreshold = 50;
 AppRequests
 | where ResultCode in (500)
-| where AppRoleName has "${environment}"
+| where AppRoleName has "{0}"
 | summarize FirstAlertTime = min(TimeGenerated), TotalFailures = sum(ItemCount), UniqueErrorCodes = make_set(ResultCode), UniqueInstances = make_set(AppRoleInstance) by AppRoleName, OperationName
 | where TotalFailures > errorThreshold
 | project AlertTitle = strcat("P2: High Error Rate - ", AppRoleName), Severity = "P2-High", FirstAlertTime, AppServiceName = AppRoleName, OperationName, TotalFailures, AffectedInstances = UniqueInstances, ErrorCodes = UniqueErrorCodes
-'''
+''', environment)
     dataSourceIds: logAnalyticsWorkspaceId
     evaluationFrequencyInMinutes: 10
     windowSizeInMinutes: 5
@@ -282,16 +282,16 @@ module alert6 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
       enableWebhookAg && sendFuncAppFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
       enableTeamsAg && sendFuncAppFailuresToTeams && !empty(teamsId) ? [teamsId] : []
     )
-    query: '''
+    query: format('''
 let timeWindow = 5m;
 let errorThreshold = 50;
 AppExceptions
-| where AppRoleName has_any ("${environment}")
+| where AppRoleName has_any ("{0}")
 | where AppRoleName has "func-"
 | where InnermostMessage has "Unhandled Exception"
 | extend ExceptionMessage = tostring(Details[1]['message'])
 | project AlertTitle = strcat("P1: Function App Execution Failure - ", AppRoleName), Severity = "P1-Critical", TimeGenerated, AppRoleName, InnermostMessage, Details
-'''
+''', environment)
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
