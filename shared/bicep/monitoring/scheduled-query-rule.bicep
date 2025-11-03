@@ -17,7 +17,7 @@ param displayName string
 param ruleDescription string
 
 @description('Enable or disable the scheduled query rule')
-param enabled bool = true
+param enabled bool
 
 @description('Severity of the alert (0=Critical, 1=Error, 2=Warning, 3=Informational, 4=Verbose)')
 @allowed([0, 1, 2, 3, 4])
@@ -107,6 +107,7 @@ resource scheduledQueryRule 'Microsoft.Insights/scheduledQueryRules@2023-03-15-p
     }
     actions: {
       actionGroups: actionGroups
+
     }
     autoMitigate: autoMitigateInMinutes > 0 ? true : false
     checkWorkspaceAlertsStorageConfigured: checkWorkspaceAlertsStorageConfigured

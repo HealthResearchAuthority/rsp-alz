@@ -54,7 +54,7 @@ module securityOperationsAlerts '../../shared/bicep/monitoring/activity-log-aler
   params: {
     alertRuleName: alertRuleNames.security.securityOperations
     alertDescription: 'Alert on security policy and solution operations'
-    enabled: true
+    enabled: false
     actionGroupIds: [actionGroups.security.id]
     scopes: [subscriptionScope]
     category: 'Administrative'
@@ -78,7 +78,7 @@ module policyOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.
   params: {
     alertRuleName: alertRuleNames.policy.policyOperations
     alertDescription: 'Alert on policy assignment operations'
-    enabled: true
+    enabled: false
     actionGroupIds: [actionGroups.policy.id]
     scopes: [subscriptionScope]
     category: 'Administrative'
@@ -100,7 +100,7 @@ module adminOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.b
   params: {
     alertRuleName: alertRuleNames.admin.adminOperations
     alertDescription: 'Alert on SQL firewall rules and NSG operations'
-    enabled: true
+    enabled: false
     actionGroupIds: [actionGroups.admin.id]
     scopes: [subscriptionScope]
     category: 'Administrative'
