@@ -54,6 +54,9 @@ param minFailingPeriodsToAlert int = 1
 @description('Auto-resolve the alert after specified time (in minutes). 0 means no auto-resolve')
 param autoMitigateInMinutes int = 0
 
+@description('Mute notifications for this many minutes after an alert fires (throttling)')
+param muteActionsDurationInMinutes int = 0
+
 @description('Check workspace linked storage account for query')
 param checkWorkspaceAlertsStorageConfigured bool = false
 
@@ -104,6 +107,7 @@ resource scheduledQueryRule 'Microsoft.Insights/scheduledQueryRules@2023-03-15-p
       actionGroups: actionGroupIds
     }
     autoMitigate: autoMitigateInMinutes > 0 ? true : false
+    muteActionsDuration: 'PT${muteActionsDurationInMinutes}M'
     checkWorkspaceAlertsStorageConfigured: checkWorkspaceAlertsStorageConfigured
     skipQueryValidation: skipQueryValidation
   }

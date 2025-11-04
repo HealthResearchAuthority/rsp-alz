@@ -300,6 +300,8 @@ AppExceptions
     threshold: 0
     numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
+    autoMitigateInMinutes: 5
+    muteActionsDurationInMinutes: 60
     tags: defaultTags
   }
 }
