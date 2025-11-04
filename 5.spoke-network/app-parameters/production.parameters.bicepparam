@@ -24,7 +24,6 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 30
 
-
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
 param parFrontDoorWafMode = 'Prevention'
@@ -110,9 +109,9 @@ param parStorageConfig = {
 // SKU configuration for all resource types - Production environment (high performance & availability)
 param parSkuConfig = {
   appServicePlan: {
-    webApp: 'P1V3'
+    webApp: 'P2V3'
     functionApp: 'P1V3'
-    cmsApp: 'P1V3'
+    cmsApp: 'P2V3'
   }
   sqlDatabase: {
     name: 'GP_Gen5'
@@ -123,6 +122,12 @@ param parSkuConfig = {
     storageSize: '64GB'
     zoneRedundant: true
   }
+  containerApp: {
+    cpu: '4.0'
+    memory: '8Gi'
+    minReplicas: 1
+    maxReplicas: 10
+  }
   keyVault: 'premium'
   appConfiguration: 'standard'
   frontDoor: 'Premium_AzureFrontDoor'
@@ -130,10 +135,10 @@ param parSkuConfig = {
 
 // Network security configuration for production environment
 param parNetworkSecurityConfig = {
-  defaultAction: 'Deny'        
-  bypass: 'AzureServices'      
-  httpsTrafficOnly: true       
-  quarantineBypass: 'None'     
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+  quarantineBypass: 'None'
 }
 
 param parSpokeNetworks = [
@@ -169,7 +174,6 @@ param parAllowedHosts = '*'
 // indicates whether to use Front Door for the production environment
 param parUseFrontDoor = true
 
-@description('Indicates whether to use One Login for the application')
 param useOneLogin = true
 
 param paramWhitelistIPs = ''
@@ -189,3 +193,13 @@ param parApiRequestPageSize = 100
 param parRtsApiBaseUrl = ''
 
 param parRtsAuthApiBaseUrl = ''
+
+param parCleanStorageAccountKey = ''
+param parStagingStorageAccountKey = ''
+param parQuarantineStorageAccountKey = ''
+param parCleanStorageAccountName = ''
+param parStagingStorageAccountName = ''
+param parQuarantineStorageAccountName = ''
+
+param parApplicationServiceApplicationId = ''
+param processDocuUploadManagedIdentityClientId = ''
