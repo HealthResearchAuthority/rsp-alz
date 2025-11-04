@@ -55,7 +55,7 @@ param minFailingPeriodsToAlert int = 1
 param autoMitigateInMinutes int = 0
 
 @description('Mute notifications for this many minutes after an alert fires (throttling)')
-param muteActionsDurationInMinutes int = 0
+param muteActionsDurationInMinutes int = 5
 
 @description('Check workspace linked storage account for query')
 param checkWorkspaceAlertsStorageConfigured bool = false

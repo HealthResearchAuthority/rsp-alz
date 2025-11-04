@@ -285,7 +285,6 @@ module alert6 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
     )
     query: format('''
 let timeWindow = 5m;
-let errorThreshold = 50;
 AppExceptions
 | where AppRoleName has_any ("{0}")
 | where AppRoleName has "func-"
@@ -300,7 +299,6 @@ AppExceptions
     threshold: 0
     numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
-    autoMitigateInMinutes: 5
     muteActionsDurationInMinutes: 60
     tags: defaultTags
   }
