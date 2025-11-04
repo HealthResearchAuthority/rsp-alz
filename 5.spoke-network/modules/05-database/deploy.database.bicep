@@ -157,6 +157,7 @@ resource sqldatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [fo
     createMode: 'Default'
     minCapacity: sqlDatabaseSkuConfig.minCapacity
     zoneRedundant: sqlDatabaseSkuConfig.zoneRedundant
+    requestedBackupStorageRedundancy: 'Local'
   }
 }]
 
