@@ -51,6 +51,10 @@ param userAssignedIdentities object = {}
 @description('Optional. Resource ID of the app insight to leverage for this resource.')
 param appInsightId string = ''
 
+param eventGridServiceTagRestriction bool = false
+@description('Optional. The IP ACL rules. Note, requires the \'acrSku\' to be \'Premium\'.')
+param networkRuleSetIpRules array = []
+
 @description('Required. Type of site to deploy.')
 @allowed([
   'functionapp' // function app windows os
@@ -125,6 +129,18 @@ var contentShareSettings = empty(contentShareName) ? [] : [
   }
 ]
 
+// NEW VARIABLE FOR EVENT GRID RULE
+var eventGridRule = {
+  ipAddress: 'AzureEventGrid' // Service Tag value
+  action: 'Allow'
+  tag: 'ServiceTag'
+  priority: 100 // Set a high priority to ensure it's evaluated early
+  name: 'Allow-AzureEventGrid-Traffic'
+  description: 'Allow Azure Event Grid inbound.'
+}
+
+var combinedIpRestrictions = eventGridServiceTagRestriction ? concat(networkRuleSetIpRules, [eventGridRule]) : networkRuleSetIpRules
+
 resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   name: functionAppName
   location: location
@@ -132,7 +148,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
   identity: userAssignedIdentities
   properties: {
     httpsOnly: true
-    publicNetworkAccess: hasPrivateEndpoint ? 'Disabled' : 'Enabled'
+    publicNetworkAccess: hasPrivateEndpoint && !eventGridServiceTagRestriction ? 'Disabled' : 'Enabled'
     serverFarmId: serverFarmResourceId
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     siteConfig: {
@@ -142,6 +158,15 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     }
   }
   tags: tags
+}
+
+resource webConfig 'Microsoft.Web/sites/config@2022-09-01' = if (!empty(networkRuleSetIpRules) || eventGridServiceTagRestriction) {
+  parent: functionApp
+  name: 'web'
+  properties: {
+    // UPDATED: Use the combined array of IP restrictions
+    ipSecurityRestrictions: combinedIpRestrictions
+  }
 }
 
 output functionAppName string = functionApp.name

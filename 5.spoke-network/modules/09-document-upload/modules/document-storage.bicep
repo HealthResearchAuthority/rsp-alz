@@ -275,7 +275,7 @@ module customEventGridTopic '../../../../shared/bicep/event-grid/custom-event-gr
     location: location
     tags: tags
     enableSystemAssignedIdentity: true
-    publicNetworkAccess: 'Disabled'
+    publicNetworkAccess: 'Enabled'
     inputSchema: 'EventGridSchema'
     disableLocalAuth: false
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId

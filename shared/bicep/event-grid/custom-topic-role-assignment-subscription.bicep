@@ -36,9 +36,6 @@ param maxDeliveryAttempts int = 3
 @description('Event time to live in minutes.')
 param eventTimeToLiveInMinutes int = 1440
 
-@description('Enable advanced filtering for blob events.')
-param enableAdvancedFiltering bool = true
-
 param topicRGName string
 
 param functionAppname string
@@ -77,10 +74,8 @@ module customTopicSubscription './custom-topic-subscription.bicep' = {
     deadLetterContainerName: deadLetterContainerName
     maxDeliveryAttempts: maxDeliveryAttempts
     eventTimeToLiveInMinutes: eventTimeToLiveInMinutes
-    enableAdvancedFiltering: enableAdvancedFiltering
     functionAppId: '${functionApp.id}/functions/${functionName}'
-    functionAppname: functionAppname
-    appRGName: resourceGroup().name
+    destinationType: destinationType
   }
   dependsOn: [
     roleAssignment

@@ -106,7 +106,7 @@ resource diagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-pre
   }
 }
 
-module privateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = {
+module privateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = if(publicNetworkAccess == 'Disabled') {
   name: '${topicName}PrivateEndpoint'
   scope: resourceGroup(spokeSubscriptionId, networkingResourceGroup)
   params: {

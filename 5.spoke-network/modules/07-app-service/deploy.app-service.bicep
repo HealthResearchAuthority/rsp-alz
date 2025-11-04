@@ -110,7 +110,6 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
     kind: (webAppBaseOs =~ 'linux') ? 'app,linux' : 'app'
     name:  appName
     location: location
-    eventGridServiceTagRestriction: eventGridServiceTagRestriction
     serverFarmResourceId: appSvcPlan.outputs.resourceId
     diagnosticWorkspaceId: logAnalyticsWsId   
     virtualNetworkSubnetId: subnetIdForVnetInjection
@@ -227,6 +226,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     contentShareName: contentShareName
     hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
+    eventGridServiceTagRestriction: eventGridServiceTagRestriction
   }
   dependsOn: [
     fnstorage

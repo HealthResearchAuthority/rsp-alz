@@ -918,7 +918,6 @@ module customTopicEventSubscription '../shared/bicep/event-grid/custom-topic-rol
         'Microsoft.Security.MalwareScanningResult'
       ]
       containerName: parStorageConfig.staging.account.containerName
-      enableAdvancedFiltering: true
       maxDeliveryAttempts: 3
       eventTimeToLiveInMinutes: 1440
       eventGridTopicManagedIdentityPrincipalId: documentUpload[i].outputs.stagingStorage.topicManagedIdentityID
