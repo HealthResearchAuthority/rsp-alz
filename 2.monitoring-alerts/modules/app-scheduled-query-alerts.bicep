@@ -248,16 +248,17 @@ module alert5 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
       enableWebhookAg && sendContainerAppsFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
       enableTeamsAg && sendContainerAppsFailuresToTeams && !empty(teamsId) ? [teamsId] : []
     )
-    query: '''
+    query: format('''
 let timeWindow = 10m;
 let errorThreshold = 50;
 AppRequests
 | where ResultCode in (500)
 | where Url has "azurecontainerapps.io"
+| where AppRoleName has "{0}"
 | summarize FirstAlertTime = min(TimeGenerated), TotalFailures = sum(ItemCount), UniqueErrorCodes = make_set(ResultCode), UniqueInstances = make_set(AppRoleInstance) by AppRoleName, OperationName
 | where TotalFailures > errorThreshold
 | project AlertTitle = strcat("P2: Container App API Failures - ", AppRoleName), Severity = "P2-High", FirstAlertTime, ContainerAppName = AppRoleName, OperationName, TotalFailures, AffectedInstances = UniqueInstances, ErrorCodes = UniqueErrorCodes
-'''
+''', environment)
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
