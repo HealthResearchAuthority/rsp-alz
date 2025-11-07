@@ -5,9 +5,9 @@ using '../main.bicep'
 // ------------------
 
 param location = 'uksouth'
-param environment = 'dev'
+param environment = 'prod'
 param organizationPrefix = 'hra'
-param monitoringResourceGroupName = 'rg-hra-monitoring-dev'
+param monitoringResourceGroupName = 'rg-hra-monitoring-prod'
 
 
 // ------------------
@@ -55,11 +55,12 @@ param teamsChannelEmailAddress = ''
 param webhookUrl = ''
 param logAnalyticsWorkspaceId = ''
 
+
 // ------------------
 // TAGS
 // ------------------
 
 param tags = {
-  Environment: 'Development'
+  Environment: 'Prod'
   Purpose: 'Monitoring and Alerting'
 }
