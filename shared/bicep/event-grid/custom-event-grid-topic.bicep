@@ -26,9 +26,46 @@ param inputSchema string = 'EventGridSchema'
 @description('Local authentication settings for the topic.')
 param disableLocalAuth bool = false
 
+param logAnalyticsWorkspaceId string
+
+@description('The resource ID of the spoke VNet.')
+param spokeVNetId string
+
+@description('The name of the private endpoint subnet in the spoke VNet.')
+param spokePrivateEndpointSubnetName string
+
+@description('The name of the networking resource group.')
+param networkingResourceGroup string
+
+@description('The environment name (e.g., dev, prod).')
+param environment string
+
 // ------------------
 // RESOURCES
 // ------------------
+
+var spokeVNetIdTokens = split(spokeVNetId, '/')
+var spokeSubscriptionId = spokeVNetIdTokens[2]
+var spokeResourceGroupName = spokeVNetIdTokens[4]
+var spokeVNetName = spokeVNetIdTokens[8]
+
+var spokeVNetLinks = [
+  {
+    vnetName: spokeVNetName
+    vnetId: vnetSpoke.id
+    registrationEnabled: false
+  }
+]
+
+resource vnetSpoke 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
+  scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
+  name: spokeVNetName
+}
+
+resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
+  parent: vnetSpoke
+  name: spokePrivateEndpointSubnetName
+}
 
 resource customEventGridTopic 'Microsoft.EventGrid/topics@2022-06-15' = {
   name: topicName
@@ -43,6 +80,45 @@ resource customEventGridTopic 'Microsoft.EventGrid/topics@2022-06-15' = {
     type: 'SystemAssigned'
   } : null
 }
+
+
+resource diagnosticSetting 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
+  name: '${topicName}-diagnostics'
+  scope: customEventGridTopic
+  properties: {
+    workspaceId: logAnalyticsWorkspaceId
+    logs: [
+      {
+        category: 'DeliveryFailures'
+        enabled: true
+      }
+      {
+        category: 'PublishFailures'
+        enabled: true
+      }
+    ]
+    metrics: [
+      {
+        category: 'AllMetrics'
+        enabled: true
+      }
+    ]
+  }
+}
+
+module privateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = if(publicNetworkAccess == 'Disabled') {
+  name: '${topicName}PrivateEndpoint'
+  scope: resourceGroup(spokeSubscriptionId, networkingResourceGroup)
+  params: {
+    azServicePrivateDnsZoneName: 'privatelink.eventgrid.azure.net'
+    azServiceId: customEventGridTopic.id
+    privateEndpointName: 'pep-${topicName}-${environment}'
+    privateEndpointSubResourceName: 'topic'
+    virtualNetworkLinks: spokeVNetLinks
+    subnetId: spokePrivateEndpointSubnet.id
+  }
+}
+
 
 // ------------------
 // OUTPUTS
