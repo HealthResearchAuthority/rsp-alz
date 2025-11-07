@@ -17,7 +17,7 @@ param displayName string
 param ruleDescription string
 
 @description('Enable or disable the scheduled query rule')
-param enabled bool = true
+param enabled bool
 
 @description('Severity of the alert (0=Critical, 1=Error, 2=Warning, 3=Informational, 4=Verbose)')
 @allowed([0, 1, 2, 3, 4])
@@ -30,7 +30,7 @@ param actionGroupIds array
 param query string
 
 @description('Log Analytics workspace resource IDs to query')
-param dataSourceIds array
+param dataSourceIds string
 
 @description('How often the query is evaluated (in minutes)')
 param evaluationFrequencyInMinutes int = 5
@@ -54,6 +54,9 @@ param minFailingPeriodsToAlert int = 1
 @description('Auto-resolve the alert after specified time (in minutes). 0 means no auto-resolve')
 param autoMitigateInMinutes int = 0
 
+@description('Mute notifications for this many minutes after an alert fires (throttling)')
+param muteActionsDurationInMinutes int = 10
+
 @description('Check workspace linked storage account for query')
 param checkWorkspaceAlertsStorageConfigured bool = false
 
@@ -65,15 +68,6 @@ param tags object = {}
 
 @description('Location for the scheduled query rule')
 param location string = resourceGroup().location
-
-// ------------------
-// VARIABLES
-// ------------------
-
-var actionGroups = [for actionGroupId in actionGroupIds: {
-  actionGroupId: actionGroupId
-  webhookProperties: {}
-}]
 
 // ------------------
 // RESOURCES
@@ -90,7 +84,7 @@ resource scheduledQueryRule 'Microsoft.Insights/scheduledQueryRules@2023-03-15-p
     severity: severity
     evaluationFrequency: 'PT${evaluationFrequencyInMinutes}M'
     windowSize: 'PT${windowSizeInMinutes}M'
-    scopes: dataSourceIds
+    scopes: [dataSourceIds]
     criteria: {
       allOf: [
         {
@@ -106,9 +100,10 @@ resource scheduledQueryRule 'Microsoft.Insights/scheduledQueryRules@2023-03-15-p
       ]
     }
     actions: {
-      actionGroups: actionGroups
+      actionGroups: actionGroupIds
     }
     autoMitigate: autoMitigateInMinutes > 0 ? true : false
+    muteActionsDuration: 'PT${muteActionsDurationInMinutes}M'
     checkWorkspaceAlertsStorageConfigured: checkWorkspaceAlertsStorageConfigured
     skipQueryValidation: skipQueryValidation
   }
