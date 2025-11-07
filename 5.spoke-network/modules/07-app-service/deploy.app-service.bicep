@@ -54,6 +54,7 @@ param deploySlot bool
 
 param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
+param eventGridServiceTagRestriction bool = false
 
 
 var slotName = 'staging'
@@ -185,7 +186,7 @@ module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networki
 }
 
 module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && deployAppPrivateEndPoint == true) {
-  name:take('rtsfnStorageFilePrivateNetwork-${deployment().name}', 64)
+  name:take('fnStorageFilePrivateNetwork-${storageAccountName}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
     location: location
@@ -225,6 +226,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     contentShareName: contentShareName
     hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
+    eventGridServiceTagRestriction: eventGridServiceTagRestriction
   }
   dependsOn: [
     fnstorage
@@ -258,6 +260,7 @@ module appServicePrivateEndpoint '../../../shared/bicep/network/private-networki
   }
 }
 
+output appName string = appName
 output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: fnApp!.outputs.defaultHostName
 output webAppResourceId string = (kind == 'app') ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
 output systemAssignedPrincipalId string = (kind == 'app') ? webApp!.outputs.systemAssignedPrincipalId : fnApp!.outputs.systemAssignedPrincipalId

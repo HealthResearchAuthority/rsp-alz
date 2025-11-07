@@ -1,4 +1,3 @@
-targetScope = 'resourceGroup'
 
 // ------------------
 // PARAMETERS
@@ -11,7 +10,7 @@ param subscriptionName string
 param customTopicId string
 
 @description('Destination type for Event Grid subscription')
-@allowed(['webhook', 'storagequeue'])
+@allowed(['webhook', 'storagequeue', 'AzureFunction'])
 param destinationType string = 'webhook'
 
 @description('Storage account name for queue destination (required if destinationType is storagequeue).')
@@ -37,30 +36,17 @@ param deadLetterStorageAccountName string = ''
 @description('Container name for dead letter events.')
 param deadLetterContainerName string = 'event-grid-dead-letters'
 
-@description('Webhook endpoint URL for malware scanning notifications.')
-@secure()
-param webhookEndpointUrl string = ''
-
 @description('Maximum delivery attempts for events.')
 param maxDeliveryAttempts int = 3
 
 @description('Event time to live in minutes.')
 param eventTimeToLiveInMinutes int = 1440
 
-@description('Enable advanced filtering for blob events.')
-param enableAdvancedFiltering bool = true
+param functionAppId string
 
 // ------------------
 // VARIABLES
 // ------------------
-
-var subjectFilter = enableAdvancedFiltering && !empty(containerName) ? {
-  subjectBeginsWith: '/blobServices/default/containers/${containerName}/'
-  subjectEndsWith: ''
-  includedEventTypes: eventTypes
-} : {
-  includedEventTypes: eventTypes
-}
 
 var deadLetterConfig = enableDeadLetter && !empty(deadLetterStorageAccountName) ? {
   endpointType: 'StorageBlob'
@@ -82,10 +68,10 @@ resource eventGridSubscription 'Microsoft.EventGrid/topics/eventSubscriptions@20
   parent: customTopic
   name: subscriptionName
   properties: {
-    destination: destinationType == 'webhook' ? {
-      endpointType: 'WebHook'
+    destination: destinationType == 'AzureFunction' ? {
+      endpointType: 'AzureFunction'
       properties: {
-        endpointUrl: webhookEndpointUrl
+        resourceId: functionAppId
         maxEventsPerBatch: 1
         preferredBatchSizeInKilobytes: 64
       }
@@ -96,7 +82,10 @@ resource eventGridSubscription 'Microsoft.EventGrid/topics/eventSubscriptions@20
         queueName: queueName
       }
     }
-    filter: subjectFilter
+    filter: {
+      includedEventTypes: eventTypes
+      isSubjectCaseSensitive: false
+    }
     labels: [
       'defender-malware-scanning'
       'storage-security'
