@@ -68,7 +68,7 @@ module functionAppEndpoint '../../../shared/bicep/network/private-networking-spo
 // ------------------
 
 @description('Private endpoint resource ID')
-output privateEndpointId string = resourceId(networkingResourceGroup, 'Microsoft.Network/privateEndpoints', privateEndpointName)
+output privateEndpointId string = resourceId(subscription().subscriptionId, networkingResourceGroup, 'Microsoft.Network/privateEndpoints', privateEndpointName)
 
 @description('Private endpoint name')
 output privateEndpointName string = privateEndpointName
