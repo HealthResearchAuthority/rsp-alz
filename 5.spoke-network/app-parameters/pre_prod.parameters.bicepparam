@@ -22,13 +22,13 @@ param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
 
 param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
-param parSqlAuditRetentionDays = 15
+param parSqlAuditRetentionDays = 30
 
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
-param parFrontDoorWafMode = 'Detection'
+param parFrontDoorWafMode = 'Prevention'
 param parEnableFrontDoorRateLimiting = true
-param parFrontDoorRateLimitThreshold = 1000
+param parFrontDoorRateLimitThreshold = 2000
 param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
@@ -40,9 +40,9 @@ param parFrontDoorCustomDomains = []
 
 param parDefenderForStorageConfig = {
   enabled: true
-  enableMalwareScanning: false
+  enableMalwareScanning: true
   enableSensitiveDataDiscovery: true
-  enforce: false
+  enforce: true
 }
 
 param parOverrideSubscriptionLevelSettings = true
@@ -55,7 +55,7 @@ param parCreateKVSecretsWithPlaceholders = false
 param parStorageConfig = {
   clean: {
     account: {
-      sku: 'Standard_LRS'
+      sku: 'Standard_ZRS'
       accessTier: 'Hot'
       containerName: 'clean'
     }
@@ -67,7 +67,7 @@ param parStorageConfig = {
     }
     retention: {
       enabled: false
-      retentionDays: 7
+      retentionDays: 0
     }
   }
   staging: {
@@ -84,12 +84,12 @@ param parStorageConfig = {
     }
     retention: {
       enabled: true
-      retentionDays: 15
+      retentionDays: 30
     }
   }
   quarantine: {
     account: {
-      sku: 'Standard_LRS'
+      sku: 'Standard_ZRS'
       accessTier: 'Cool'
       containerName: 'quarantine'
     }
@@ -101,28 +101,34 @@ param parStorageConfig = {
     }
     retention: {
       enabled: true
-      retentionDays: 30
+      retentionDays: 60
     }
   }
 }
 
-// SKU configuration for all resource types - Pre-Production environment
+// SKU configuration for all resource types - Pre-Production environment (matching production)
 param parSkuConfig = {
   appServicePlan: {
-    webApp: 'B3'
-    functionApp: 'B3'
-    cmsApp: 'B3'
+    webApp: 'P2V3'
+    functionApp: 'P1V3'
+    cmsApp: 'P2V3'
   }
   sqlDatabase: {
-    name: 'GP_S_Gen5'
+    name: 'GP_Gen5'
     tier: 'GeneralPurpose'
     family: 'Gen5'
-    capacity: 6
+    capacity: 8
     minCapacity: 4
-    storageSize: '6GB'
-    zoneRedundant: false
+    storageSize: '64GB'
+    zoneRedundant: true
   }
-  keyVault: 'standard'
+  containerApp: {
+    cpu: '4.0'
+    memory: '8Gi'
+    minReplicas: 1
+    maxReplicas: 10
+  }
+  keyVault: 'premium'
   appConfiguration: 'standard'
   frontDoor: 'Premium_AzureFrontDoor'
 }
@@ -168,7 +174,6 @@ param parAllowedHosts = '*'
 // indicates whether to use Front Door for the pre-production environment
 param parUseFrontDoor = true
 
-@description('Indicates whether to use One Login for the application')
 param useOneLogin = true
 
 param paramWhitelistIPs = ''
@@ -181,9 +186,9 @@ param parPortalUrl = ''
 
 param parGoogleTagId = ''
 
-param parApiRequestMaxConcurrency = 8
+param parApiRequestMaxConcurrency = 10
 
-param parApiRequestPageSize = 50
+param parApiRequestPageSize = 100
 
 param parRtsApiBaseUrl = ''
 
@@ -196,6 +201,5 @@ param parCleanStorageAccountName = ''
 param parStagingStorageAccountName = ''
 param parQuarantineStorageAccountName = ''
 
-
-param parApplicationServiceApplicationId = '' 
-param processDocuUploadManagedIdentityClientId =  ''
+param parApplicationServiceApplicationId = ''
+param processDocuUploadManagedIdentityClientId = ''
