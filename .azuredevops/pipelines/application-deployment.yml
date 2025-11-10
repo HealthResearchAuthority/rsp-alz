@@ -124,8 +124,9 @@ stages:
                               parStagingStorageAccountKey=$(stagingStorageAccountKey) \
                               parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
                               parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
-                              parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                              parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                              parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
       - job: preview
@@ -176,7 +177,8 @@ stages:
                               parStagingStorageAccountKey=$(stagingStorageAccountKey) \
                               parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
                               parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
-                              parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                              parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
+                              parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
@@ -272,7 +274,8 @@ stages:
                               parStagingStorageAccountKey=$(stagingStorageAccountKey) \
                               parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
                               parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
-                              parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                              parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
+                              parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
@@ -336,7 +339,8 @@ stages:
                                     parStagingStorageAccountKey=$(stagingStorageAccountKey) \
                                     parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
                                     parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
-                                    parApplicationServiceApplicationId=$(applicationServiceApplicationId) \
+                                    parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
+                                    parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                                     processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                                     parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }} \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
