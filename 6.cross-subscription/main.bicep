@@ -55,6 +55,9 @@ param devboxVNetName string = ''
 @description('The DevBox private endpoint subnet name')
 param devboxPrivateEndpointSubnetName string = ''
 
+@description('Resource ID of the DW Function App (func-validate-irasid)')
+param dwFunctionAppId string = ''
+
 var managementVNetIdTokens = split(manageddevopspoolVnetID, '/')
 var managementSubscriptionId = managementVNetIdTokens[2]
 var managementResourceGroupName = managementVNetIdTokens[4]
@@ -120,6 +123,20 @@ module devboxStorageEndpoints 'modules/devbox-storage-endpoints/devbox-storage-e
   }
 }
 
+@description('Deploy Data Warehouse Function App private endpoints to all application subscriptions')
+module dwFunctionEndpoints 'modules/dw-function-endpoints/dw-function-endpoints.bicep' = if (!empty(dwFunctionAppId)) {
+  name: take('dwFunctionEndpoints-${deployment().name}', 64)
+  params: {
+    dwFunctionAppId: dwFunctionAppId
+  }
+}
+
 output serviceIDs array = [for serviceId in allserviceIDs: {
   serviceId: serviceId
 }]
+
+@description('DW Function App private endpoint IDs created')
+output dwFunctionPrivateEndpointIds array = !empty(dwFunctionAppId) ? dwFunctionEndpoints!.outputs.privateEndpointIds : []
+
+@description('DW Function App private endpoint names created')
+output dwFunctionPrivateEndpointNames array = !empty(dwFunctionAppId) ? dwFunctionEndpoints!.outputs.privateEndpointNames : []
