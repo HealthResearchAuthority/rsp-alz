@@ -10,14 +10,14 @@ param actionGroupNames object
 @description('Recipients for the webhook action group')
 param webhookRecipients array = []
 
-@description('Recipients for the Teams email action group')
-param teamsEmailRecipients array = []
+@description('Logic App resource IDs to receive alerts (callback URL will be derived)')
+param logicAppResourceIds array = []
 
 @description('Enable or disable the webhook action group')
 param enableWebhookAg bool = true
 
-@description('Enable or disable the Teams email action group')
-param enableTeamsAg bool = true
+@description('Enable or disable the Logic App action group')
+param enableLogicAppAg bool = true
 
 @description('Environment name')
 param environment string
@@ -35,9 +35,8 @@ var defaultTags = union(tags, {
 })
 
 var deployWebhookActionGroup = enableWebhookAg && !empty(webhookRecipients)
-var deployTeamsActionGroup = enableTeamsAg && !empty(teamsEmailRecipients)
 var webhookAgName = actionGroupNames.webhook
-var teamsAgName = actionGroupNames.teams
+var logicAppAgName = actionGroupNames.logicapp
 
 // ------------------
 // RESOURCES
@@ -56,14 +55,19 @@ module webhookActionGroup '../../shared/bicep/monitoring/action-group.bicep' = i
   }
 }
 
-// Teams Email Action Group
-module teamsActionGroup '../../shared/bicep/monitoring/action-group.bicep' = if (deployTeamsActionGroup) {
-  name: 'deploy-app-teams-action-group'
+// Logic App Action Group (derive callbackUrl from resourceId)
+module logicAppActionGroup '../../shared/bicep/monitoring/action-group.bicep' = if (enableLogicAppAg && !empty(logicAppResourceIds)) {
+  name: 'deploy-app-logicapp-action-group'
   params: {
-    actionGroupName: actionGroupNames.teams
-    shortName: 'AppTeams'
-    emailRecipients: teamsEmailRecipients
-    enabled: enableTeamsAg
+    actionGroupName: logicAppAgName
+    shortName: 'AppLogic'
+    logicAppRecipients: [for (rid, i) in logicAppResourceIds: {
+      name: 'LogicApp_${i}'
+      resourceId: rid
+      callbackUrl: listCallbackUrl('${rid}/triggers/manual', '2016-06-01').value
+      useCommonAlertSchema: true
+    }]
+    enabled: enableLogicAppAg
     tags: defaultTags
   }
 }
@@ -78,8 +82,8 @@ output actionGroups object = {
     id: resourceId('Microsoft.Insights/actionGroups', webhookAgName)
     name: webhookAgName
   } : {}
-  teams: deployTeamsActionGroup ? {
-    id: resourceId('Microsoft.Insights/actionGroups', teamsAgName)
-    name: teamsAgName
+  logicapp: enableLogicAppAg && !empty(logicAppResourceIds) ? {
+    id: resourceId('Microsoft.Insights/actionGroups', logicAppAgName)
+    name: logicAppAgName
   } : {}
 }
