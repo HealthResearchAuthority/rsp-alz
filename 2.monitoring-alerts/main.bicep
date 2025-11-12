@@ -102,11 +102,10 @@ param routeFuncAppFailuresToWebhook bool = true
 param routeFuncAppFailuresToLogicApp bool = true
 
 @description('Enable combined All Errors alert (Exceptions + Request failures)')
-param enableAllErrorsAlert bool = false
+param enableAllErrorsAlert bool
 @description('Route All Errors alert to Logic App')
 param routeAllErrorsToLogicApp bool = true
-@description('Optional target resource to filter All Errors alert (_ResourceId)')
-param allErrorsTargetResourceId string = ''
+
 @description('All Errors alert severity (0=Critical,1=Error,2=Warning,3=Info,4=Verbose)')
 @allowed([0,1,2,3,4])
 param allErrorsSeverity int = 1
@@ -264,13 +263,13 @@ module allErrorsAlert 'modules/app-all-errors-alert.bicep' = if (enableAllErrors
     enabled: true
     severity: allErrorsSeverity
     workspaceId: logAnalyticsWorkspaceId
+    environment: environment
     actionGroupIds: concat(
       enableLogicAppAg && routeAllErrorsToLogicApp && contains(appActionGroups.outputs.actionGroups, 'logicapp') && !empty(appActionGroups.outputs.actionGroups.logicapp) ? [appActionGroups.outputs.actionGroups.logicapp.id] : []
     )
     evaluationFrequencyInMinutes: allErrorsEvaluationFrequencyInMinutes
     windowSizeInMinutes: allErrorsWindowSizeInMinutes
     muteActionsDurationInMinutes: allErrorsMuteInMinutes
-    targetResourceId: allErrorsTargetResourceId
     tags: tags
   }
 }
