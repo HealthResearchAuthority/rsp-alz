@@ -29,12 +29,54 @@ resource logicApp 'Microsoft.Logic/workflows@2019-05-01' = {
     definition: {
       '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
       contentVersion: '1.0.0.0'
-      parameters: {}
-      triggers: {}
-      actions: {}
+      parameters: {
+        '$connections': {
+          defaultValue: {}
+          type: 'Object'
+        }
+      }
+      triggers: {
+          When_an_HTTP_request_is_received: {
+          type: 'Request'
+          kind: 'Http'
+        }
+      }
+      actions: {
+        Post_message_in_a_chat_or_channel: {
+          runAfter: {}
+          type: 'ApiConnection'
+          inputs: {
+            host: {
+              connection: {
+                name: '@parameters(\'$connections\')[\'teams\'][\'connectionId\']'
+              }
+            }
+            method: 'post'
+            body: {
+              recipient: {
+                groupId: '489c85b8-47a9-4a63-83d1-3516c96d581a'
+                channelId: '19:fe6b0d23ff984adc94deaeeb89d95688@thread.tacv2'
+              }
+              messageBody: '<p class="editor-paragraph"><i><b><strong class="editor-text-bold editor-text-italic">Azure Monitor Alert</strong></b></i><br><br>@{concat(\'🚨 \', triggerBody()?[\'data\']?[\'alertContext\']?[\'condition\']?[\'allOf\']?[0]?[\'dimensions\']?[0]?[\'value\'], \'<br><br>\', \'<strong>Severity:</strong> \', triggerBody()?[\'data\']?[\'essentials\']?[\'severity\'], \'<br><br>\', \'<strong>Fired At:</strong> \', triggerBody()?[\'data\']?[\'essentials\']?[\'firedDateTime\'], \'<br><br>\', \'<strong>Description:</strong> \', triggerBody()?[\'data\']?[\'essentials\']?[\'description\'], \'<br><br>\', \'---\', \'<br><br>\', \'<strong>AffectedService:</strong> \', triggerBody()?[\'data\']?[\'alertContext\']?[\'condition\']?[\'allOf\']?[0]?[\'dimensions\']?[3]?[\'value\'], \'<br><br>\', \'<strong>Message:</strong> \', triggerBody()?[\'data\']?[\'alertContext\']?[\'condition\']?[\'allOf\']?[0]?[\'dimensions\']?[2]?[\'value\'], \'<br><br>\', \'<strong>🔗 Link to Search Results:</strong> <a href="\', triggerBody()?[\'data\']?[\'alertContext\']?[\'condition\']?[\'allOf\']?[0]?[\'linkToFilteredSearchResultsUI\'], \'">Click here to view</a>\')}</p>'
+            }
+            path: '/beta/teams/conversation/message/poster/Flow bot/location/@{encodeURIComponent(\'Channel\')}'
+          }
+        }
+      }
       outputs: {}
-}
-    parameters: {}
+    }
+    parameters: {
+      '$connections': {
+        type: 'Object'
+        value: {
+          teams: {
+            id: '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/providers/Microsoft.Web/locations/uksouth/managedApis/teams'
+            connectionId: '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-hra-monitoring-dev/providers/Microsoft.Web/connections/teams'
+            connectionName: 'teams'
+          }
+        }
+      }
+    }
   }
 }
 
