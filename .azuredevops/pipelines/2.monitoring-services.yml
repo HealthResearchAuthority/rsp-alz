@@ -9,6 +9,7 @@ pr:
     include:
       - '2.monitoring-alerts/main.bicep'
       - '2.monitoring-alerts/parameters/**'
+      - '2.monitoring-alerts/modules/**'
 
 
 parameters:
