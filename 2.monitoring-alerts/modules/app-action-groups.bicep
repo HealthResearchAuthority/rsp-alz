@@ -64,7 +64,7 @@ module logicAppActionGroup '../../shared/bicep/monitoring/action-group.bicep' = 
     logicAppRecipients: [for (rid, i) in logicAppResourceIds: {
       name: 'LogicApp_${i}'
       resourceId: rid
-      callbackUrl: listCallbackUrl('${rid}/triggers/manual', '2016-06-01').value
+      callbackUrl: listCallbackUrl('${rid}/triggers/When_an_HTTP_request_is_received', '2016-06-01').value
       useCommonAlertSchema: true
     }]
     enabled: enableLogicAppAg
