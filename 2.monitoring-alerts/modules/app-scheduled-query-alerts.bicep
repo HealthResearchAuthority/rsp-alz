@@ -234,7 +234,7 @@ AppRequests
     threshold: 20
     numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
-    metricMeasureColumn: 'TotalErrors'
+    metricMeasureColumn: 'TotalFailures'
     timeAggregation: 'Total'
     resourceIdColumn: '_ResourceId'
     tags: defaultTags
@@ -272,7 +272,7 @@ AppRequests
     threshold: 0
     numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
-    metricMeasureColumn: 'TotalErrors'
+    metricMeasureColumn: 'TotalFailures'
     timeAggregation: 'Total'
     resourceIdColumn: '_ResourceId'
     tags: defaultTags
