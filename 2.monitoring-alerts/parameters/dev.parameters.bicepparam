@@ -53,6 +53,7 @@ param enableWebhookAg = true
 param enableLogicAppAg = true
 param webhookUrl = ''
 param logAnalyticsWorkspaceId = ''
+param enableAllErrorsAlert = true
 
 // ------------------
 // TAGS
