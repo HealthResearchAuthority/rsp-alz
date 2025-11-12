@@ -148,9 +148,9 @@ AppDependencies
 | where Target == "oidc.integration.account.gov.uk"
 | where AppRoleName in ("irasportal-{0}")
 | where ResultCode in ("Canceled") or ResultCode startswith "5"
-| summarize FirstOccurrence = min(TimeGenerated), LastOccurrence = max(TimeGenerated), TotalErrors = sum(ItemCount), UniqueInstances = dcount(Data), SampleUrls = make_set(Data, 3) by Target, AppRoleName, OperationName, ResultCode
+| summarize FirstOccurrence = min(TimeGenerated), LastOccurrence = max(TimeGenerated), TotalErrors = sum(ItemCount), UniqueInstances = dcount(Data), SampleUrls = make_set(Data, 3) by Target, AppRoleName, OperationName, ResultCode, _ResourceId
 | where TotalErrors >= errorThreshold
-| project AlertTitle = strcat("P1: Service Unavailable - One Login"), Severity = "P1-Critical", FirstOccurrence, LastOccurrence, AppServiceName = AppRoleName, Detail = OperationName, ResultCode, TotalErrors, UniqueInstances, SampleUrls
+| project AlertTitle = strcat("P1: Service Unavailable - One Login"), Severity = "P1-Critical", FirstOccurrence, LastOccurrence, AffectedService = AppRoleName, Detail = OperationName, ResultCode, TotalErrors, UniqueInstances, SampleUrls, _ResourceId
 ''', environment)
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
@@ -228,7 +228,7 @@ AppRequests
 | project AlertTitle = strcat("High Error Rate - ", AppRoleName), Severity = "P2-High", FirstAlertTime, AffectedService = AppRoleName, Detail = OperationName, TotalFailures, _ResourceId
 ''', environment)
     dataSourceIds: logAnalyticsWorkspaceId
-    evaluationFrequencyInMinutes: 10
+    evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 15
     operator: 'GreaterThan'
     threshold: 20
@@ -309,6 +309,7 @@ AppExceptions
     numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
     resourceIdColumn: '_ResourceId'
+    muteActionsDurationInMinutes: 30
     tags: defaultTags
   }
 }

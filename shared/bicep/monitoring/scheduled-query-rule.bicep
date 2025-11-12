@@ -61,10 +61,10 @@ param numberOfEvaluationPeriods int = 1
 param minFailingPeriodsToAlert int = 1
 
 @description('Auto-mitigate the alert or not')
-param autoMitigate bool = true
+param autoMitigate bool = false
 
 @description('Mute notifications for this many minutes after an alert fires (throttling)')
-param muteActionsDurationInMinutes int = 10
+param muteActionsDurationInMinutes int = 5
 
 @description('Aggregation type. Relevant and required only for rules of the kind LogAlert.')
 @allowed(['Average', 'Count', 'Total', 'Maximum', 'Minimum'])
