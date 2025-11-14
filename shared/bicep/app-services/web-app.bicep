@@ -265,7 +265,7 @@ module app_slots 'web-app.slots.bicep' = [for (slot, index) in slots: {
     diagnosticWorkspaceId: diagnosticWorkspaceId
     diagnosticLogCategoriesToEnable: slot.?diagnosticLogCategoriesToEnable ? slot.diagnosticLogCategoriesToEnable : diagnosticLogCategoriesToEnable
     diagnosticMetricsToEnable: slot.?diagnosticMetricsToEnable ? slot.diagnosticMetricsToEnable : diagnosticMetricsToEnable
-    appSettingsKeyValuePairs: slot.appSettingsKeyValuePairs ? slot.appSettingsKeyValuePairs : appSettingsKeyValuePairs
+    appSettingsKeyValuePairs: slot.?appSettingsKeyValuePairs ? slot.appSettingsKeyValuePairs : appSettingsKeyValuePairs
     tags: tags
     containerSize: slot.?containerSize ? slot.containerSize : -1
     customDomainVerificationId: slot.?customDomainVerificationId ? slot.customDomainVerificationId : ''
