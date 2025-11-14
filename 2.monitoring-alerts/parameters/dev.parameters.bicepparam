@@ -49,14 +49,17 @@ param adminEmailRecipients = [
   }
 ]
 
+param enableWebhookAg = true
+param enableLogicAppAg = true
+param webhookUrl = ''
+param logAnalyticsWorkspaceId = ''
+param enableAllErrorsAlert = true
+
 // ------------------
 // TAGS
 // ------------------
 
 param tags = {
   Environment: 'Development'
-  // Owner: 'Platform Team'
-  // CostCenter: 'IT Operations'
-  // Project: 'Azure Landing Zone'
   Purpose: 'Monitoring and Alerting'
 }

@@ -15,7 +15,7 @@ param alertRuleName string
 param alertDescription string
 
 @description('Enable or disable the alert rule')
-param enabled bool = true
+param enabled bool
 
 
 @description('Array of action group resource IDs to notify')
