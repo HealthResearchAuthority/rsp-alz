@@ -63,17 +63,17 @@ stages:
               scriptLocation: inlineScript
               inlineScript: |
                 az config set bicep.use_binary_from_path=false --only-show-errors
-                az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) storageSubscriptionId="$(storageSubscriptionId)" devboxSubscriptionId="$(devboxSubscriptionId)"
+                az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) paramserviceIdspreprod=$(serviceIdspreprod) paramserviceIdsprod=$(serviceIdsprod) paramserviceIdsdw=$(serviceIdsDW) storageSubscriptionId="$(storageSubscriptionId)" devboxSubscriptionId="$(devboxSubscriptionId)" dwFunctionAppId=$(dwFunctionAppId)
 
       - job: preview
         displayName: 'Preview Cross Subscription Deployments'
-        pool: 
+        pool:
           vmImage: 'ubuntu-latest'
         dependsOn: [setup, lint, validate]
         condition: succeeded()
         steps:
-          - task: AzureCLI@2 
-            inputs: 
+          - task: AzureCLI@2
+            inputs:
               azureSubscription: $(azureServiceConnection)
               scriptType: bash
               scriptLocation: inlineScript
@@ -86,9 +86,11 @@ stages:
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                         paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
-                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) \
+                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) paramserviceIdspreprod=$(serviceIdspreprod) paramserviceIdsprod=$(serviceIdsprod) \
+                        paramserviceIdsdw=$(serviceIdsDW) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
-                        devboxSubscriptionId="$(devboxSubscriptionId)"
+                        devboxSubscriptionId="$(devboxSubscriptionId)" \
+                        dwFunctionAppId=$(dwFunctionAppId)
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment for Cross Subscription'
@@ -107,13 +109,13 @@ stages:
             displayName: 'Install Bicep CLI'
       - job: FinalWhatIf
         displayName: 'Run What-If before Deployment'
-        pool: 
+        pool:
           vmImage: 'ubuntu-latest'
         dependsOn: [setup]
         steps:
           - task: AzureCLI@2
-            displayName: 'Final What-If' 
-            inputs: 
+            displayName: 'Final What-If'
+            inputs:
               azureSubscription: $(azureServiceConnection)
               scriptType: bash
               scriptLocation: inlineScript
@@ -126,9 +128,11 @@ stages:
                   --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                         manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                         paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
-                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) \
+                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) paramserviceIdspreprod=$(serviceIdspreprod) paramserviceIdsprod=$(serviceIdsprod) \
+                        paramserviceIdsdw=$(serviceIdsDW) \
                         storageSubscriptionId="$(storageSubscriptionId)" \
-                        devboxSubscriptionId="$(devboxSubscriptionId)"
+                        devboxSubscriptionId="$(devboxSubscriptionId)" \
+                        dwFunctionAppId=$(dwFunctionAppId)
 
       - deployment: deploy
         displayName: 'Deploy Cross Subscription'
@@ -152,7 +156,7 @@ stages:
                 - task: AzureCLI@2
                   displayName: 'Deploy Cross Subscription'
                   name: deploy
-                  inputs: 
+                  inputs:
                     azureSubscription: $(azureServiceConnection)
                     scriptType: bash
                     scriptLocation: inlineScript
@@ -167,9 +171,13 @@ stages:
                         --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
                               manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
                               paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
+                              paramserviceIdsdw=$(serviceIdsDW) \
                               paramserviceIdsmanual=$(serviceIdsmanual) \
                               paramserviceIdsuat=$(serviceIdsuat) \
+                              paramserviceIdspreprod=$(serviceIdspreprod) \
+                              paramserviceIdsprod=$(serviceIdsprod) \
                               storageSubscriptionId="$(storageSubscriptionId)" \
-                              devboxSubscriptionId="$(devboxSubscriptionId)")
+                              devboxSubscriptionId="$(devboxSubscriptionId)" \
+                              dwFunctionAppId=$(dwFunctionAppId))
                       echo "Full Bicep Deployment Output:"
                       echo $output | jq .

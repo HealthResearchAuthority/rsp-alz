@@ -11,6 +11,9 @@ param paramvnetPeeringsVNetIDs string
 param paramserviceIdsdev string
 
 @description('The IDs of the Azure service to be used for the private endpoint.')
+param paramserviceIdsdw string
+
+@description('The IDs of the Azure service to be used for the private endpoint.')
 param paramserviceIdsauto string
 
 @description('The IDs of the Azure service to be used for the private endpoint.')
@@ -18,6 +21,12 @@ param paramserviceIdsmanual string
 
 @description('The IDs of the Azure service to be used for the private endpoint.')
 param paramserviceIdsuat string
+
+@description('The IDs of the Azure service to be used for the private endpoint.')
+param paramserviceIdspreprod string
+
+@description('The IDs of the Azure service to be used for the private endpoint.')
+param paramserviceIdsprod string
 
 @description('VNet ID under managed devops pool subscription where the VNet peering will be created.')
 param manageddevopspoolVnetID string
@@ -46,6 +55,9 @@ param devboxVNetName string = ''
 @description('The DevBox private endpoint subnet name')
 param devboxPrivateEndpointSubnetName string = ''
 
+@description('Resource ID of the DW Function App (func-validate-irasid)')
+param dwFunctionAppId string = ''
+
 var managementVNetIdTokens = split(manageddevopspoolVnetID, '/')
 var managementSubscriptionId = managementVNetIdTokens[2]
 var managementResourceGroupName = managementVNetIdTokens[4]
@@ -63,11 +75,14 @@ var vnetInfoArray = [
 ]
 
 var pepServiceIDArraydev = split(paramserviceIdsdev, ',')
+var pepServiceIDArraydw = split(paramserviceIdsdw, ',')
 var pepServiceIDArrayauto = split(paramserviceIdsauto, ',')
 var pepServiceIDArraymanual = split(paramserviceIdsmanual, ',')
 var pepServiceIDArrayuat = split(paramserviceIdsuat, ',')
+var pepServiceIDArraypreprod = split(paramserviceIdspreprod, ',')
+var pepServiceIDArrayprod = split(paramserviceIdsprod, ',')
 
-var allserviceIDs = union(pepServiceIDArraydev, pepServiceIDArrayauto, pepServiceIDArraymanual, pepServiceIDArrayuat)
+var allserviceIDs = union(pepServiceIDArraydev, pepServiceIDArraydw, pepServiceIDArrayauto, pepServiceIDArraymanual, pepServiceIDArrayuat, pepServiceIDArraypreprod, pepServiceIDArrayprod)
 
 @description('Deploy VNet Peering')
 module vnetpeeringmodule 'modules/vnetpeering/vnetpeering.bicep' = {
@@ -108,6 +123,20 @@ module devboxStorageEndpoints 'modules/devbox-storage-endpoints/devbox-storage-e
   }
 }
 
+@description('Deploy Data Warehouse Function App private endpoints to all application subscriptions')
+module dwFunctionEndpoints 'modules/dw-function-endpoints/dw-function-endpoints.bicep' = if (!empty(dwFunctionAppId)) {
+  name: take('dwFunctionEndpoints-${deployment().name}', 64)
+  params: {
+    dwFunctionAppId: dwFunctionAppId
+  }
+}
+
 output serviceIDs array = [for serviceId in allserviceIDs: {
   serviceId: serviceId
 }]
+
+@description('DW Function App private endpoint IDs created')
+output dwFunctionPrivateEndpointIds array = !empty(dwFunctionAppId) ? dwFunctionEndpoints!.outputs.privateEndpointIds : []
+
+@description('DW Function App private endpoint names created')
+output dwFunctionPrivateEndpointNames array = !empty(dwFunctionAppId) ? dwFunctionEndpoints!.outputs.privateEndpointNames : []

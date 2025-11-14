@@ -56,12 +56,6 @@ param logAnalyticsWorkspaceId string = ''
 @description('Enable Event Grid integration for scan result processing')
 param enableEventGridIntegration bool = false
 
-@description('Enable Event Grid subscriptions - set to true only after Function App code is deployed')
-param enableEventGridSubscriptions bool = false
-
-@description('Process scan Function App webhook endpoint URL')
-param processScanWebhookEndpoint string = ''
-
 @description('Enable enhanced monitoring and forensic features')
 param enableEnhancedMonitoring bool = false
 
@@ -284,24 +278,11 @@ module customEventGridTopic '../../../../shared/bicep/event-grid/custom-event-gr
     publicNetworkAccess: 'Enabled'
     inputSchema: 'EventGridSchema'
     disableLocalAuth: false
-  }
-}
-
-// Event Grid Subscription for Custom Topic (staging only)
-module customTopicEventSubscription '../../../../shared/bicep/event-grid/custom-topic-subscription.bicep' = if (enableEventGridIntegration && enableEventGridSubscriptions && !empty(processScanWebhookEndpoint)) {
-  name: '${storageType}EventSubscription'
-  params: {
-    subscriptionName: '${storageType}-defender-scan-processing'
-    customTopicId: customEventGridTopic!.outputs.topicId
-    destinationType: 'webhook'
-    webhookEndpointUrl: processScanWebhookEndpoint
-    eventTypes: [
-      'Microsoft.Security.MalwareScanningResult'
-    ]
-    containerName: storageConfig.containerName
-    enableAdvancedFiltering: true
-    maxDeliveryAttempts: 3
-    eventTimeToLiveInMinutes: 1440
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    spokeVNetId: spokeVNetId
+    spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
+    networkingResourceGroup: networkingResourceGroup
+    environment: environment
   }
 }
 
@@ -378,3 +359,5 @@ output enhancedMonitoringEnabled bool = enableEnhancedMonitoring
 
 @description('Indicates whether blob index tags are enabled.')
 output blobIndexTagsEnabled bool = enableBlobIndexTags
+
+output topicManagedIdentityID string = enableEventGridIntegration ? customEventGridTopic!.outputs.topicPrincipalId : ''

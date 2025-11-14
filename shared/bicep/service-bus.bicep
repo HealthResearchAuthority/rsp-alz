@@ -95,9 +95,6 @@ var metrics = [for category in metricCategories: {
   }
 }]
 
-var serviceBusEndpoint = '${namespace.id}/AuthorizationRules/RootManageSharedAccessKey'
-var serviceBusConnectionString = listKeys(serviceBusEndpoint, namespace.apiVersion).primaryConnectionString
-
 // Resources
 resource namespace 'Microsoft.ServiceBus/namespaces@2022-10-01-preview' = {
   name: name
@@ -180,7 +177,6 @@ resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
 // Outputs
 output id string = namespace.id
 output name string = namespace.name
-output connectionString string = serviceBusConnectionString
 output queues array = [for (queueName, i) in queueNames: {
   name: name
   id: queue[i].id

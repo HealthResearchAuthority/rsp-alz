@@ -49,7 +49,7 @@ param parOverrideSubscriptionLevelSettings = true
 
 param parSkipExistingRoleAssignments = true
 
-param parCreateKVSecretsWithPlaceholders = true
+param parCreateKVSecretsWithPlaceholders = false
 
 // Storage configuration for all storage account types 
 param parStorageConfig = {
@@ -122,6 +122,12 @@ param parSkuConfig = {
     storageSize: '6GB'
     zoneRedundant: false
   }
+  containerApp: {
+    cpu: '0.5'
+    memory: '1Gi'
+    minReplicas: 1
+    maxReplicas: 5
+  }
   keyVault: 'standard'
   appConfiguration: 'standard'
   frontDoor: 'Premium_AzureFrontDoor'
@@ -191,3 +197,14 @@ param parRtsApiBaseUrl = ''
 
 
 param parRtsAuthApiBaseUrl = ''
+
+param parCleanStorageAccountKey = ''
+param parStagingStorageAccountKey = ''
+param parQuarantineStorageAccountKey = ''
+param parCleanStorageAccountName = ''
+param parStagingStorageAccountName = ''
+param parQuarantineStorageAccountName = ''
+
+
+param parApplicationServiceApplicationId = '' 
+param processDocuUploadManagedIdentityClientId =  ''

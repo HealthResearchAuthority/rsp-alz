@@ -53,7 +53,6 @@ param clientSecret string
 @description('Token issuing authority for Gov UK One Login')
 param oneLoginAuthority string
 
-
 @description('Valid token issuers for Gov UK One Login')
 param oneLoginIssuers array
 
@@ -71,7 +70,7 @@ param useFrontDoor bool
 @description('Enable Key Vault private endpoints')
 param enableKeyVaultPrivateEndpoints bool = false
 
-@description('Enable App Configuration private endpoints')  
+@description('Enable App Configuration private endpoints')
 param enableAppConfigPrivateEndpoints bool = false
 
 @description('IP addresses to be whitelisted for users to access Key Vault')
@@ -109,9 +108,15 @@ param apiRequestPageSize int
 @description('Base URL for RTS API')
 param rtsApiBaseUrl string
 
-
 @description('Base URL for RTS authentication API')
 param rtsAuthApiBaseUrl string
+
+param parApplicationServiceApplicationId string
+
+@description('Client ID of the managed identity to be used for the Document Upload Function App')
+param processDocuUploadManagedIdentityClientId string
+
+param documentStorageAccounts object = {}
 
 // ------------------
 // Varaibles
@@ -119,16 +124,17 @@ param rtsAuthApiBaseUrl string
 
 var keyVaultPrivateDnsZoneName = 'privatelink.vaultcore.azure.net'
 
-
 var varWhitelistIPs = filter(split(paramWhitelistIPs, ','), ip => !empty(ip))
 var devOpsIPRule = {
   action: 'Allow'
   value: '${devOpsPublicIPAddress}/32'
 }
-var whitelistIPRules = [for ip in varWhitelistIPs: {
-  action: 'Allow'
-  value: contains(ip, '/') ? ip : '${ip}/32' // '${ip}/32'
-}]
+var whitelistIPRules = [
+  for ip in varWhitelistIPs: {
+    action: 'Allow'
+    value: contains(ip, '/') ? ip : '${ip}/32' // '${ip}/32'
+  }
+]
 var allAllowedIPs = !empty(devOpsPublicIPAddress) ? concat([devOpsIPRule], whitelistIPRules) : whitelistIPRules
 
 // ------------------
@@ -151,12 +157,7 @@ module containerRegistry './modules/container-registry.module.bicep' = {
     diagnosticWorkspaceId: logAnalyticsWorkspaceId
     deployZoneRedundantResources: deployZoneRedundantResources
     //managementVNetId: '/subscriptions/8747cd7f-1a06-4fe4-9dbb-24f612b9dd5a/resourceGroups/rg-hra-manageddevopspool/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-devopspool'
-    networkRuleSetIpRules: [
-      // {
-      //   action: 'Allow'
-      //   value: '${devOpsPublicIPAddress}/32'  // Specific IP or CIDR block to allow
-      // }
-    ]
+    networkRuleSetIpRules: allAllowedIPs // DevOps IP + whitelist IPs
   }
 }
 
@@ -226,13 +227,20 @@ module appConfiguration './modules/app-configuration.bicep' = {
     apiRequestPageSize: apiRequestPageSize
     rtsApiBaseUrl: rtsApiBaseUrl
     rtsAuthApiBaseUrl: rtsAuthApiBaseUrl
+    parApplicationServiceApplicationId: parApplicationServiceApplicationId
+    processDocuUploadManagedIdentityClientId: processDocuUploadManagedIdentityClientId
     keyVaultSecretUris: {
       oneLoginClientIdSecretUri: keyVaultSecrets.outputs.oneLoginClientIdSecretUri
       oneLoginPrivateKeyPemSecret: keyVaultSecrets.outputs.oneLoginPrivateKeyPemSecret
       rtsApiClientIdSecretUri: keyVaultSecrets.outputs.rtsApiClientIdSecretUri
       rtsApiClientSecretSecretUri: keyVaultSecrets.outputs.rtsApiClientSecretSecretUri
       documentBlobStorageAccountKeySecretUri: keyVaultSecrets.outputs.documentBlobStorageAccountKeySecretUri
+      stagingStorageAccountKeySecretUri: keyVaultSecrets.outputs.stagingStorageAccountKeySecretUri
+      quarantineStorageAccountKeySecretUri: keyVaultSecrets.outputs.quarantineStorageAccountKeySecretUri
+      cleanStorageAccountKeySecretUri: keyVaultSecrets.outputs.cleanStorageAccountKeySecretUri
+      projectRecordValidationFunctionKey: keyVaultSecrets.outputs.projectRecordValidationFunctionKey
     }
+    documentStorageAccounts: documentStorageAccounts
   }
 }
 

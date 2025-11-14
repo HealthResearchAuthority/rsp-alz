@@ -1,13 +1,28 @@
 using '../main.application.bicep'
 
+param parLogoutUrl = ''
+
 param logAnalyticsWorkspaceId = ''
 
 param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
 
-param parSqlAuditRetentionDays = 15
+param parIrasContainerImageTag = 'rsp-irasservice:latest'
 
+param parUserServiceContainerImageTag = 'rsp-usermanagementservice:latest'
+
+param parRtsContainerImageTag = 'rsp-rtsservice:latest'
+
+param parClientID = ''
+
+param parClientSecret = ''
+
+param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
+
+param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
+
+param parSqlAuditRetentionDays = 30
 
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
@@ -17,9 +32,9 @@ param parFrontDoorRateLimitThreshold = 2000
 param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
-param parEnableFrontDoorPrivateLink = false
+param parEnableFrontDoorPrivateLink = true
 param parEnableFunctionAppPrivateEndpoints = true
-param parEnableKeyVaultPrivateEndpoints = false
+param parEnableKeyVaultPrivateEndpoints = true
 param parEnableAppConfigPrivateEndpoints = false
 param parFrontDoorCustomDomains = []
 
@@ -32,61 +47,61 @@ param parDefenderForStorageConfig = {
 
 param parOverrideSubscriptionLevelSettings = true
 
-param parSkipExistingRoleAssignments = false
+param parSkipExistingRoleAssignments = true
 
-param parCreateKVSecretsWithPlaceholders = true
+param parCreateKVSecretsWithPlaceholders = false
 
-// Storage configuration for all storage account types 
+// Storage configuration for all storage account types
 param parStorageConfig = {
   clean: {
     account: {
-      sku: 'Standard_GRS'      
+      sku: 'Standard_ZRS'
       accessTier: 'Hot'
       containerName: 'clean'
     }
     encryption: {
-      enabled: true                          
-      keyName: 'key-clean-storage-prod'      
-      enableInfrastructureEncryption: true  
-      keyRotationEnabled: true              
+      enabled: true
+      keyName: 'key-clean-storage-prod'
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true
     }
     retention: {
-      enabled: false                        
-      retentionDays: 0                      
+      enabled: false
+      retentionDays: 0
     }
   }
   staging: {
     account: {
-      sku: 'Standard_GRS'      
+      sku: 'Standard_LRS'
       accessTier: 'Hot'
       containerName: 'staging'
     }
     encryption: {
-      enabled: true                          
-      keyName: 'key-staging-storage-prod'    
-      enableInfrastructureEncryption: true  
-      keyRotationEnabled: true              
+      enabled: true
+      keyName: 'key-staging-storage-prod'
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true
     }
     retention: {
-      enabled: true                         
-      retentionDays: 90                     
+      enabled: true
+      retentionDays: 30
     }
   }
   quarantine: {
     account: {
-      sku: 'Standard_GRS'      
-      accessTier: 'Cool'       
+      sku: 'Standard_ZRS'
+      accessTier: 'Cool'
       containerName: 'quarantine'
     }
     encryption: {
-      enabled: true                          
-      keyName: 'key-quarantine-storage-prod' 
-      enableInfrastructureEncryption: true  
-      keyRotationEnabled: true              
+      enabled: true
+      keyName: 'key-quarantine-storage-prod'
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true
     }
     retention: {
-      enabled: true                         
-      retentionDays: 90                    
+      enabled: true
+      retentionDays: 60
     }
   }
 }
@@ -94,18 +109,24 @@ param parStorageConfig = {
 // SKU configuration for all resource types - Production environment (high performance & availability)
 param parSkuConfig = {
   appServicePlan: {
-    webApp: 'P2V3_AZ'
-    functionApp: 'P1V3_AZ'
-    cmsApp: 'P1V3_AZ'
+    webApp: 'P2V3'
+    functionApp: 'P1V3'
+    cmsApp: 'P2V3'
   }
   sqlDatabase: {
-    name: 'BC_Gen5'
-    tier: 'BusinessCritical'
+    name: 'GP_Gen5'
+    tier: 'GeneralPurpose'
     family: 'Gen5'
-    capacity: 16
-    minCapacity: 8
-    storageSize: '250GB'
+    capacity: 8
+    minCapacity: 4
+    storageSize: '64GB'
     zoneRedundant: true
+  }
+  containerApp: {
+    cpu: '4.0'
+    memory: '8Gi'
+    minReplicas: 1
+    maxReplicas: 10
   }
   keyVault: 'premium'
   appConfiguration: 'standard'
@@ -114,10 +135,10 @@ param parSkuConfig = {
 
 // Network security configuration for production environment
 param parNetworkSecurityConfig = {
-  defaultAction: 'Deny'        
-  bypass: 'AzureServices'      
-  httpsTrafficOnly: true       
-  quarantineBypass: 'None'     
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+  quarantineBypass: 'None'
 }
 
 param parSpokeNetworks = [
@@ -125,7 +146,7 @@ param parSpokeNetworks = [
     subscriptionId: 'd27a0dcc-453d-4bfa-9c3d-1447c6ea0119'
     parEnvironment: 'prod'
     workloadName: 'container-app'
-    zoneRedundancy: false
+    zoneRedundancy: true
     ddosProtectionEnabled: 'Enabled'
     containerRegistryTier: 'Premium'
     deploy: false
@@ -137,5 +158,48 @@ param parSpokeNetworks = [
     rgSharedServices: 'rg-rsp-sharedservices-spoke-prod-uks'
     rgStorage: 'rg-rsp-storage-spoke-prod-uks'
     deployWebAppSlot: false
+    IDGENV: 'production'
+    appInsightsConnectionString: ''
   }
 ]
+
+param parStorageAccountName = 'strrspstg'
+param parStorageAccountKey = ''
+
+// Allowed hosts for the production environment to be used when the Web App is behind Front Door
+// NOTE: This value is used for initial deployment. When Front Door is enabled,
+// the app-config-update module will automatically update this with dynamic URLs
+param parAllowedHosts = '*'
+
+// indicates whether to use Front Door for the production environment
+param parUseFrontDoor = true
+
+param useOneLogin = true
+
+param paramWhitelistIPs = ''
+
+param parClarityProjectId = ''
+
+param parCmsUri = ''
+
+param parPortalUrl = ''
+
+param parGoogleTagId = ''
+
+param parApiRequestMaxConcurrency = 10
+
+param parApiRequestPageSize = 100
+
+param parRtsApiBaseUrl = ''
+
+param parRtsAuthApiBaseUrl = ''
+
+param parCleanStorageAccountKey = ''
+param parStagingStorageAccountKey = ''
+param parQuarantineStorageAccountKey = ''
+param parCleanStorageAccountName = ''
+param parStagingStorageAccountName = ''
+param parQuarantineStorageAccountName = ''
+
+param parApplicationServiceApplicationId = ''
+param processDocuUploadManagedIdentityClientId = ''

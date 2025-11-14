@@ -47,6 +47,25 @@ var storageSecrets = [
     name: 'documentBlobStorageAccountKey'
     value: 'placeholder-document-storage-key-to-be-updated-manually'
   }
+  {
+    name: 'stagingStorageAccountKey'
+    value: 'placeholder-staging-storage-key-to-be-updated-manually'
+  }
+  {
+    name: 'quarantineStorageAccountKey'
+    value: 'placeholder-quarantine-storage-key-to-be-updated-manually'
+  }
+  {
+    name: 'cleanStorageAccountKey'
+    value: 'placeholder-clean-storage-key-to-be-updated-manually'
+  }
+]
+
+var validationFunctionSecrets = [
+  {
+    name: 'projectRecordValidationFunctionKey'
+    value: 'placeholder-project-record-validation-function-key-to-be-updated-manually'
+  }
 ]
 
 // ------------------
@@ -93,6 +112,18 @@ resource storageSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' =
   }
 ]
 
+resource validationFunctionSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = [
+  for secret in validationFunctionSecrets: if (createSecretsWithPlaceholders) {
+    parent: keyVault
+    name: secret.name
+    tags: tags
+    properties: {
+      value: secret.value
+      contentType: 'text/plain'
+    }
+  }
+]
+
 // ------------------
 //    OUTPUTS
 // ------------------
@@ -120,3 +151,15 @@ output rtsApiClientSecretSecretUri string = '${keyVault.properties.vaultUri}secr
 
 @description('Key Vault URI for documentBlobStorageAccountKey secret.')
 output documentBlobStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/documentBlobStorageAccountKey'
+
+@description('Key Vault URI for stagingStorageAccountKey secret.')
+output stagingStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/stagingStorageAccountKey'
+
+@description('Key Vault URI for quarantineStorageAccountKey secret.')
+output quarantineStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/quarantineStorageAccountKey'
+
+@description('Key Vault URI for cleanStorageAccountKey secret.')
+output cleanStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/cleanStorageAccountKey'
+
+@description('Key Vault URI for projectRecordValidationFunctionKey secret.')
+output projectRecordValidationFunctionKey string = '${keyVault.properties.vaultUri}secrets/projectRecordValidationFunctionKey'
