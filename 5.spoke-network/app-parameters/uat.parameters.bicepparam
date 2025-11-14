@@ -111,7 +111,7 @@ param parStorageConfig = {
 // SKU configuration for all resource types - UAT environment (balanced performance/cost)
 param parSkuConfig = {
   appServicePlan: {
-    webApp: 'S1'
+    webApp: 'B3'
     functionApp: 'B3'
     cmsApp: 'B3'
   }
@@ -159,7 +159,7 @@ param parSpokeNetworks = [
     rgapplications: 'rg-rsp-applications-spoke-uat-uks'
     rgSharedServices: 'rg-rsp-sharedservices-spoke-uat-uks'
     rgStorage: 'rg-rsp-storage-spoke-uat-uks'
-    deployWebAppSlot: true
+    deployWebAppSlot: false
     IDGENV: 'test'
     appInsightsConnectionString: 'InstrumentationKey=58f85e46-e52f-45cd-835e-a850068cbe46;IngestionEndpoint=https://uksouth-1.in.applicationinsights.azure.com/;LiveEndpoint=https://uksouth.livediagnostics.monitor.azure.com/;ApplicationId=888acb96-8b54-4078-b449-09c98201da06'
   }
