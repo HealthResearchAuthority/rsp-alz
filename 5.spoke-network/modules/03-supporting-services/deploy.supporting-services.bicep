@@ -111,10 +111,12 @@ param rtsApiBaseUrl string
 @description('Base URL for RTS authentication API')
 param rtsAuthApiBaseUrl string
 
-param parApplicationServiceApplicationId string
+param parMicrosoftEntraAudience string
 
 @description('Client ID of the managed identity to be used for the Document Upload Function App')
 param processDocuUploadManagedIdentityClientId string
+
+param parMicrosoftEntraAuthority string
 
 param documentStorageAccounts object = {}
 
@@ -227,7 +229,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     apiRequestPageSize: apiRequestPageSize
     rtsApiBaseUrl: rtsApiBaseUrl
     rtsAuthApiBaseUrl: rtsAuthApiBaseUrl
-    parApplicationServiceApplicationId: parApplicationServiceApplicationId
+    parMicrosoftEntraAudience: parMicrosoftEntraAudience
     processDocuUploadManagedIdentityClientId: processDocuUploadManagedIdentityClientId
     keyVaultSecretUris: {
       oneLoginClientIdSecretUri: keyVaultSecrets.outputs.oneLoginClientIdSecretUri
@@ -241,6 +243,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
       projectRecordValidationFunctionKey: keyVaultSecrets.outputs.projectRecordValidationFunctionKey
     }
     documentStorageAccounts: documentStorageAccounts
+    parMicrosoftEntraAuthority: parMicrosoftEntraAuthority
   }
 }
 
