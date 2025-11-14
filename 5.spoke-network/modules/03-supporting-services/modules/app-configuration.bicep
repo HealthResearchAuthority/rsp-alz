@@ -100,7 +100,9 @@ param keyVaultSecretUris object
 param processDocuUploadManagedIdentityClientId string
 
 @description('Application ID of the Application Service in Azure AD')
-param parApplicationServiceApplicationId string
+param parMicrosoftEntraAudience string
+
+param parMicrosoftEntraAuthority string
 
 @description('Key Vault secret URIs for OneLogin integration')
 param documentStorageAccounts object
@@ -289,27 +291,32 @@ var keyValues = [
     contentType: null
   }
   {
-    name: 'AppSettings:ManagedIdentityClientID$processDocumentScan' // Managed Identity Client ID for the process document scan function
+    name: 'AppSettings:ManagedIdentityClientID' // Managed Identity Client ID for the process document scan function
     value: processDocuUploadManagedIdentityClientId
     contentType: null
   }
   {
-    name: 'AppSettings:ApplicationServiceApplicationId$processDocumentScan'
-    value: parApplicationServiceApplicationId
+    name: 'AppSettings:MicrosoftEntra:Audience'
+    value: parMicrosoftEntraAudience
     contentType: null
   }
   {
-    name: 'AppSettings:DocumentStorage:StagingBlobConnectionString$processDocumentScan'
+    name: 'AppSettings:MicrosoftEntra:Authority'
+    value: parMicrosoftEntraAuthority
+    contentType: null
+  }
+  {
+    name: 'AppSettings:DocumentStorage:StagingBlobConnectionString'
     value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.stagingStorageAccountName};AccountKey=${documentStorageAccounts.stagingStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
   {
-    name: 'AppSettings:DocumentStorage:QuarantineBlobConnectionString$processDocumentScan'
+    name: 'AppSettings:DocumentStorage:QuarantineBlobConnectionString'
     value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.quarantineStorageAccountName};AccountKey=${documentStorageAccounts.quarantineStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
   {
-    name: 'AppSettings:DocumentStorage:CleanBlobConnectionString$processDocumentScan'
+    name: 'AppSettings:DocumentStorage:CleanBlobConnectionString'
     value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=${documentStorageAccounts.cleanStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
