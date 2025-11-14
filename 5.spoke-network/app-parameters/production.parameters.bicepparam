@@ -18,9 +18,9 @@ param parClientID = ''
 
 param parClientSecret = ''
 
-param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
+param parOneLoginAuthority = 'https://oidc.account.gov.uk'
 
-param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
+param parOneLoginIssuers = ['https://oidc.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 30
 
