@@ -157,7 +157,7 @@ param parSpokeNetworks = [
     rgapplications: 'rg-rsp-applications-spoke-preprod-uks'
     rgSharedServices: 'rg-rsp-sharedservices-spoke-preprod-uks'
     rgStorage: 'rg-rsp-storage-spoke-preprod-uks'
-    deployWebAppSlot: false
+    deployWebAppSlot: true
     IDGENV: 'integration'
     appInsightsConnectionString: ''
   }
@@ -201,5 +201,6 @@ param parCleanStorageAccountName = ''
 param parStagingStorageAccountName = ''
 param parQuarantineStorageAccountName = ''
 
-param parApplicationServiceApplicationId = ''
+param parMicrosoftEntraAuthority = ''
+param parMicrosoftEntraAudience = ''
 param processDocuUploadManagedIdentityClientId = ''
