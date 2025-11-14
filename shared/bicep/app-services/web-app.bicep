@@ -250,33 +250,33 @@ module app_slots 'web-app.slots.bicep' = [for (slot, index) in slots: {
     location: location
     kind: kind
     serverFarmResourceId: serverFarmResourceId
-    httpsOnly: slot.?httpsOnly ? slot.httpsOnly : httpsOnly
+    httpsOnly: slot.?httpsOnly ?? httpsOnly
     appServiceEnvironmentId: !empty(appServiceEnvironmentId) ? appServiceEnvironmentId : ''
-    clientAffinityEnabled: slot.?clientAffinityEnabled ? slot.clientAffinityEnabled : clientAffinityEnabled
-    systemAssignedIdentity: slot.?systemAssignedIdentity ? slot.systemAssignedIdentity : systemAssignedIdentity
-    userAssignedIdentities: slot.?userAssignedIdentities ? slot.userAssignedIdentities : userAssignedIdentities
-    keyVaultAccessIdentityResourceId: slot.?keyVaultAccessIdentityResourceId ? slot.keyVaultAccessIdentityResourceId : keyVaultAccessIdentityResourceId
-    storageAccountRequired: slot.?storageAccountRequired ? slot.storageAccountRequired : storageAccountRequired
-    virtualNetworkSubnetId: slot.?virtualNetworkSubnetId ? slot.virtualNetworkSubnetId : virtualNetworkSubnetId
-    siteConfig: slot.?siteConfig ? slot.siteConfig : siteConfigConfigurationMap[operatingSystem]
-    storageAccountId: slot.?storageAccountId ? slot.storageAccountId : storageAccountId
-    appInsightId: slot.?appInsightId ? slot.appInsightId : appInsightId
-    setAzureWebJobsDashboard: slot.?setAzureWebJobsDashboard ? slot.setAzureWebJobsDashboard : setAzureWebJobsDashboard
+    clientAffinityEnabled: slot.?clientAffinityEnabled ?? clientAffinityEnabled
+    systemAssignedIdentity: slot.?systemAssignedIdentity ?? systemAssignedIdentity
+    userAssignedIdentities: slot.?userAssignedIdentities ?? userAssignedIdentities
+    keyVaultAccessIdentityResourceId: slot.?keyVaultAccessIdentityResourceId ?? keyVaultAccessIdentityResourceId
+    storageAccountRequired: slot.?storageAccountRequired ?? storageAccountRequired
+    virtualNetworkSubnetId: slot.?virtualNetworkSubnetId ?? virtualNetworkSubnetId
+    siteConfig: slot.?siteConfig ?? siteConfigConfigurationMap[operatingSystem]
+    storageAccountId: slot.?storageAccountId ?? storageAccountId
+    appInsightId: slot.?appInsightId ?? appInsightId
+    setAzureWebJobsDashboard: slot.?setAzureWebJobsDashboard ?? setAzureWebJobsDashboard
     diagnosticWorkspaceId: diagnosticWorkspaceId
-    diagnosticLogCategoriesToEnable: slot.?diagnosticLogCategoriesToEnable ? slot.diagnosticLogCategoriesToEnable : diagnosticLogCategoriesToEnable
-    diagnosticMetricsToEnable: slot.?diagnosticMetricsToEnable ? slot.diagnosticMetricsToEnable : diagnosticMetricsToEnable
-    appSettingsKeyValuePairs: slot.?appSettingsKeyValuePairs ? slot.appSettingsKeyValuePairs : appSettingsKeyValuePairs
+    diagnosticLogCategoriesToEnable: slot.?diagnosticLogCategoriesToEnable ?? diagnosticLogCategoriesToEnable
+    diagnosticMetricsToEnable: slot.?diagnosticMetricsToEnable ?? diagnosticMetricsToEnable
+    appSettingsKeyValuePairs: slot.?appSettingsKeyValuePairs ?? appSettingsKeyValuePairs
     tags: tags
-    containerSize: slot.?containerSize ? slot.containerSize : -1
-    customDomainVerificationId: slot.?customDomainVerificationId ? slot.customDomainVerificationId : ''
-    dailyMemoryTimeQuota: slot.?dailyMemoryTimeQuota ? slot.dailyMemoryTimeQuota : -1
-    enabled: slot.?enabled ? slot.enabled : true
-    hostNameSslStates: slot.?hostNameSslStates ? slot.hostNameSslStates : []
-    publicNetworkAccess: slot.?publicNetworkAccess ? slot.publicNetworkAccess : ''
-    redundancyMode: slot.?redundancyMode ? slot.redundancyMode : 'None'
-    vnetContentShareEnabled: slot.?vnetContentShareEnabled ? slot.vnetContentShareEnabled : false
-    vnetImagePullEnabled: slot.?vnetImagePullEnabled ? slot.vnetImagePullEnabled : false
-    vnetRouteAllEnabled: slot.?vnetRouteAllEnabled ? slot.vnetRouteAllEnabled : false
+    containerSize: slot.?containerSize ?? -1
+    customDomainVerificationId: slot.?customDomainVerificationId ?? ''
+    dailyMemoryTimeQuota: slot.?dailyMemoryTimeQuota ?? -1
+    enabled: slot.?enabled ?? true
+    hostNameSslStates: slot.?hostNameSslStates ?? []
+    publicNetworkAccess: slot.?publicNetworkAccess ?? ''
+    redundancyMode: slot.?redundancyMode ?? 'None'
+    vnetContentShareEnabled: slot.?vnetContentShareEnabled ?? false
+    vnetImagePullEnabled: slot.?vnetImagePullEnabled ?? false
+    vnetRouteAllEnabled: slot.?vnetRouteAllEnabled ?? false
   }
 }]
 
