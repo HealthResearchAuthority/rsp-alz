@@ -231,11 +231,6 @@ var keyValues = [
     contentType: null
   }
   {
-    name: 'AppSettings:Azure:DocumentStorage:Blob:ConnectionString$portal'
-    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${storageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
-    contentType: null
-  }
-  {
     name: 'AppSettings:ClarityProjectId$portal'
     value: clarityProjectId
     contentType: null
