@@ -157,7 +157,7 @@ param parSpokeNetworks = [
     rgapplications: 'rg-rsp-applications-spoke-prod-uks'
     rgSharedServices: 'rg-rsp-sharedservices-spoke-prod-uks'
     rgStorage: 'rg-rsp-storage-spoke-prod-uks'
-    deployWebAppSlot: false
+    deployWebAppSlot: true
     IDGENV: 'production'
     appInsightsConnectionString: ''
   }
