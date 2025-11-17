@@ -44,11 +44,6 @@ param oneLoginAuthority string
 @description('Valid token issuers for Gov UK One Login')
 param oneLoginIssuers array
 
-param storageAccountName string
-@secure()
-@description('The key for the storage account where the blob connection string will be stored.')
-param storageAccountKey string
-
 @description('Allowed hosts for the application to be used when the Web App is behind Front Door')
 param allowedHosts string
 

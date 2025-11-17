@@ -213,8 +213,6 @@ module appConfiguration './modules/app-configuration.bicep' = {
     clientSecret: clientSecret
     oneLoginAuthority: oneLoginAuthority
     oneLoginIssuers: oneLoginIssuers
-    storageAccountName: storageAccountName
-    storageAccountKey: storageAccountKey
     allowedHosts: allowedHosts
     useFrontDoor: useFrontDoor
     enablePrivateEndpoints: enableAppConfigPrivateEndpoints
