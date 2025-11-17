@@ -63,8 +63,11 @@ param minFailingPeriodsToAlert int = 1
 @description('Auto-mitigate the alert or not')
 param autoMitigate bool = false
 
+@description('Flag to mute Alert Actions')
+param muteAlertRuleAction bool = false
+
 @description('Mute notifications for this many minutes after an alert fires (throttling)')
-param muteActionsDurationInMinutes int = 5
+param muteActionsDurationInMinutes int = 30
 
 @description('Aggregation type. Relevant and required only for rules of the kind LogAlert.')
 @allowed(['Average', 'Count', 'Total', 'Maximum', 'Minimum'])
@@ -151,7 +154,7 @@ resource scheduledQueryRule 'Microsoft.Insights/scheduledQueryRules@2023-03-15-p
       actionGroups: actionGroupIds
     }
     autoMitigate: autoMitigate
-    muteActionsDuration: 'PT${muteActionsDurationInMinutes}M'
+    muteActionsDuration: muteAlertRuleAction ? 'PT${muteActionsDurationInMinutes}M' : null
     checkWorkspaceAlertsStorageConfigured: checkWorkspaceAlertsStorageConfigured
     skipQueryValidation: skipQueryValidation
   }

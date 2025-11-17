@@ -309,7 +309,8 @@ AppExceptions
     numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
     resourceIdColumn: '_ResourceId'
-    muteActionsDurationInMinutes: 30
+    muteAlertRuleAction: false
+    autoMitigate: true
     tags: defaultTags
   }
 }

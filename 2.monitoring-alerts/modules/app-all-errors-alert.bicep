@@ -32,7 +32,7 @@ param evaluationFrequencyInMinutes int = 5
 param windowSizeInMinutes int = 5
 
 @description('Throttle duplicate notifications for this many minutes')
-param muteActionsDurationInMinutes int = 30
+param muteActionsDurationInMinutes int = 10
 
 @description('Tags to apply')
 param tags object = {}
@@ -75,7 +75,7 @@ module rule '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = {
     evaluationFrequencyInMinutes: evaluationFrequencyInMinutes
     windowSizeInMinutes: windowSizeInMinutes
     operator: 'GreaterThan'
-    threshold: 1
+    threshold: 0
     numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
     muteActionsDurationInMinutes: muteActionsDurationInMinutes
