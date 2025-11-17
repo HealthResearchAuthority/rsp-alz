@@ -163,9 +163,6 @@ param parSpokeNetworks = [
   }
 ]
 
-param parStorageAccountName = 'strspstagngdev'
-param parStorageAccountKey = ''
-
 param parClarityProjectId = ''
 param parGoogleTagId = ''
 param parCmsUri = ''
