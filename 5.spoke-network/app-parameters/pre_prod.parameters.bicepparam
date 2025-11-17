@@ -203,4 +203,5 @@ param parQuarantineStorageAccountName = ''
 
 param parMicrosoftEntraAuthority = ''
 param parMicrosoftEntraAudience = ''
+
 param processDocuUploadManagedIdentityClientId = ''
