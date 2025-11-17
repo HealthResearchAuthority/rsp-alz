@@ -206,5 +206,6 @@ param parStagingStorageAccountName = ''
 param parQuarantineStorageAccountName = ''
 
 
-param parApplicationServiceApplicationId = '' 
+param parMicrosoftEntraAuthority = ''
+param parMicrosoftEntraAudience = ''
 param processDocuUploadManagedIdentityClientId =  ''
