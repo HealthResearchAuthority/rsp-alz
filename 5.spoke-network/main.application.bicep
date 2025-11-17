@@ -241,7 +241,9 @@ param parQuarantineStorageAccountName string
 @description('The key for the storage account where the blob connection string will be stored.')
 param parQuarantineStorageAccountKey string
 
-param parApplicationServiceApplicationId string
+param parMicrosoftEntraAudience string
+
+param parMicrosoftEntraAuthority string
 
 @description('Client ID of the managed identity to be used for the Document Upload Function App')
 param processDocuUploadManagedIdentityClientId string
@@ -594,8 +596,9 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       rtsAuthApiBaseUrl: parRtsAuthApiBaseUrl
       createSecretsWithPlaceholders: parCreateKVSecretsWithPlaceholders
       documentStorageAccounts: documentStorageAccounts
-      parApplicationServiceApplicationId: parApplicationServiceApplicationId
+      parMicrosoftEntraAudience: parMicrosoftEntraAudience
       processDocuUploadManagedIdentityClientId: processDocuUploadManagedIdentityClientId
+      parMicrosoftEntraAuthority: parMicrosoftEntraAuthority
     }
   }
 ]
