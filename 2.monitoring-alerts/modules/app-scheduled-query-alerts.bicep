@@ -68,6 +68,13 @@ param sendFuncAppFailuresToWebhook bool = true
 @description('Send Function App Failures to Logic App')
 param sendFuncAppFailuresToLogicApp bool = true
 
+@description('Enable Frontdoor Probe Failures alert')
+param enableFrontDoorAlert bool = true
+@description('Send Frontdoor Probe Failures to webhook')
+param sendFrontDoorAlertsToWebhook bool = true
+@description('Send Frontdoor Probe Failures to Logic App')
+param sendFrontDoorAlertsToLogicApp bool = true
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -87,6 +94,7 @@ var ruleName3 = '${namingPrefix}-db-connection-failures'
 var ruleName4 = '${namingPrefix}-appservice-high-error-rate'
 var ruleName5 = '${namingPrefix}-container-apps-failures'
 var ruleName6 = '${namingPrefix}-function-app-failures'
+var ruleName7 = '${namingPrefix}-frontdoor-origin-healthprobe-failures'
 
 // ------------------
 // RESOURCES
@@ -97,8 +105,8 @@ module alert1 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-appservice-down'
   params: {
     ruleName: ruleName1
-    displayName: 'P1: App Service Unavailable'
-    ruleDescription: 'Detects 500s on IRAS/CMS portal endpoints over 5m with threshold >= 4'
+    displayName: '${environment} - App Service Unavailable'
+    ruleDescription: 'Detects 5xx errors on IRAS portal endpoints over 5 minutes'
     enabled: enableAppServiceDownAlert
     severity: 0
     actionGroupIds: concat(
@@ -113,7 +121,7 @@ AppRequests
 | where Name in ("GET /", "GET Application/Welcome", "GET /application/welcome")
 | where AppRoleName in ("irasportal-{0}")
 | summarize UniqueInstances = dcount(AppRoleName) by AppRoleName, OperationName, ResultCode, _ResourceId
-| project AlertTitle = strcat("App Service Unavailable - ", AppRoleName), Severity = "P1-Critical", AffectedService = AppRoleName, Detail = OperationName, _ResourceId
+| project AlertTitle = strcat("App Service Unavailable - ", AppRoleName), Severity = "P1", AffectedService = AppRoleName, Detail = OperationName, _ResourceId
 ''', environment)
     dataSourceIds: logAnalyticsWorkspaceId
     evaluationFrequencyInMinutes: 5
@@ -132,8 +140,8 @@ module alert2 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-identity-provider'
   params: {
     ruleName: ruleName2
-    displayName: 'P1: One Login Unavailable'
-    ruleDescription: 'Detects One Login dependency failures over 5m with threshold >= 10'
+    displayName: '${environment} - One Login Unavailable'
+    ruleDescription: 'Detects One Login dependency failures over 5 minutes'
     enabled: enableIdentityProviderAlert
     severity: 0
     actionGroupIds: concat(
@@ -150,13 +158,13 @@ AppDependencies
 | where ResultCode in ("Canceled") or ResultCode startswith "5"
 | summarize FirstOccurrence = min(TimeGenerated), LastOccurrence = max(TimeGenerated), TotalErrors = sum(ItemCount), UniqueInstances = dcount(Data), SampleUrls = make_set(Data, 3) by Target, AppRoleName, OperationName, ResultCode, _ResourceId
 | where TotalErrors >= errorThreshold
-| project AlertTitle = strcat("P1: Service Unavailable - One Login"), Severity = "P1-Critical", FirstOccurrence, LastOccurrence, AffectedService = AppRoleName, Detail = OperationName, ResultCode, TotalErrors, UniqueInstances, SampleUrls, _ResourceId
+| project AlertTitle = strcat("Service Unavailable - One Login"), Severity = "P1", FirstOccurrence, LastOccurrence, AffectedService = AppRoleName, Detail = OperationName, ResultCode, TotalErrors, UniqueInstances, SampleUrls, _ResourceId
 ''', environment)
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
-    threshold: 0
+    threshold: 4
     numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
     resourceIdColumn: '_ResourceId'
@@ -169,8 +177,8 @@ module alert3 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-db-connection-failures'
   params: {
     ruleName: ruleName3
-    displayName: 'P1: Database Unavailable'
-    ruleDescription: 'Detects failed SQL dependencies over 5m with threshold >= 10'
+    displayName: '${environment} - Database Unavailable'
+    ruleDescription: 'Detects failed SQL dependencies over 5 minutes'
     enabled: enableDbConnectionFailuresAlert
     severity: 0
     actionGroupIds: concat(
@@ -179,7 +187,7 @@ module alert3 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
     )
     query: format('''
 let timeWindow = 5m;
-let errorThreshold = 10;
+let errorThreshold = 5;
 AppDependencies
 | where TimeGenerated > ago(timeWindow)
 | where DependencyType in ("SQL")
@@ -188,13 +196,13 @@ AppDependencies
 | extend Exception = tostring(todynamic(Properties).Exception)
 | summarize FirstOccurrence = min(TimeGenerated), LastOccurrence = max(TimeGenerated), TotalErrors = sum(ItemCount), UniqueInstances = dcount(AppRoleInstance) by AppRoleInstance, OperationName, Exception, Target, _ResourceId
 | where TotalErrors >= errorThreshold
-| project AlertTitle = strcat("Database Unavailable - ", AppRoleInstance), Severity = "P1-Critical", FirstOccurrence, LastOccurrence, AffectedService = AppRoleInstance, OperationName, Target, TotalErrors, UniqueInstances, Detail = Exception, _ResourceId
+| project AlertTitle = strcat("Database Unavailable - ", AppRoleInstance), Severity = "P1", FirstOccurrence, LastOccurrence, AffectedService = AppRoleInstance, OperationName, Target, TotalErrors, UniqueInstances, Detail = Exception, _ResourceId
 ''', environment)
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
-    threshold: 0
+    threshold: 4
     numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
     metricMeasureColumn: 'TotalErrors'
@@ -209,8 +217,8 @@ module alert4 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-appservice-high-error-rate'
   params: {
     ruleName: ruleName4
-    displayName: 'P2: High App Service Error Rate'
-    ruleDescription: 'Detects high 500 error rate over 5minutes with threshold > 20'
+    displayName: '${environment} - High App Service Error Rate'
+    ruleDescription: 'Detects high 5xx error rates over 5 minutes'
     enabled: enableHighErrorRateAlert
     severity: 1
     actionGroupIds: concat(
@@ -225,7 +233,7 @@ AppRequests
 | where AppRoleName has "{0}"
 | summarize FirstAlertTime = min(TimeGenerated), TotalFailures = sum(ItemCount) by AppRoleName, OperationName, _ResourceId
 | where TotalFailures > errorThreshold
-| project AlertTitle = strcat("High Error Rate - ", AppRoleName), Severity = "P2-High", FirstAlertTime, AffectedService = AppRoleName, Detail = OperationName, TotalFailures, _ResourceId
+| project AlertTitle = strcat("High Error Rate - ", AppRoleName), Severity = "P2", FirstAlertTime, AffectedService = AppRoleName, Detail = OperationName, TotalFailures, _ResourceId
 ''', environment)
     dataSourceIds: logAnalyticsWorkspaceId
     evaluationFrequencyInMinutes: 5
@@ -246,8 +254,8 @@ module alert5 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-container-apps-failures'
   params: {
     ruleName: ruleName5
-    displayName: 'P2: Container App API Failures'
-    ruleDescription: 'Detects container app API 500 failures over 5m with threshold > 50'
+    displayName: '${environment} - Container App API Failures'
+    ruleDescription: 'Detects container app API 5xx failures over 5 minutes'
     enabled: enableContainerAppsFailuresAlert
     severity: 1
     actionGroupIds: concat(
@@ -256,20 +264,20 @@ module alert5 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
     )
     query: format('''
 let timeWindow = 10m;
-let errorThreshold = 50;
+let errorThreshold = 20;
 AppRequests
 | where ResultCode in (500)
 | where Url has "azurecontainerapps.io"
 | where AppRoleName has "{0}"
 | summarize FirstAlertTime = min(TimeGenerated), TotalFailures = sum(ItemCount), UniqueErrorCodes = make_set(ResultCode), UniqueInstances = make_set(AppRoleInstance) by AppRoleName, OperationName, _ResourceId
 | where TotalFailures > errorThreshold
-| project AlertTitle = strcat("Container App API Failures - ", AppRoleName), Severity = "P2-High", FirstAlertTime, AffectedService = AppRoleName, Detail = OperationName, TotalFailures, AffectedInstances = UniqueInstances, ErrorCodes = UniqueErrorCodes, _ResourceId
+| project AlertTitle = strcat("Container App API Failures - ", AppRoleName), Severity = "P2", FirstAlertTime, AffectedService = AppRoleName, Detail = OperationName, TotalFailures, AffectedInstances = UniqueInstances, ErrorCodes = UniqueErrorCodes, _ResourceId
 ''', environment)
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
-    threshold: 0
+    threshold: 20
     numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
     metricMeasureColumn: 'TotalFailures'
@@ -284,10 +292,10 @@ module alert6 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-function-app-failures'
   params: {
     ruleName: ruleName6
-    displayName: 'P1: Function App Failures'
-    ruleDescription: 'Detects unhandled exceptions in function apps over 5minutes'
+    displayName: '${environment} - Function App Failures'
+    ruleDescription: 'Detects unhandled exceptions in function apps over 5 minutes'
     enabled: enableFuncAppFailuresAlert
-    severity: 1
+    severity: 0
     actionGroupIds: concat(
       enableWebhookAg && sendFuncAppFailuresToWebhook && !empty(webhookId) ? [webhookId] : [],
       enableLogicAppAg && sendFuncAppFailuresToLogicApp && !empty(logicAppAgId) ? [logicAppAgId] : []
@@ -299,13 +307,59 @@ AppExceptions
 | where AppRoleName has "func-"
 | where InnermostMessage has "Unhandled Exception"
 | extend ExceptionMessage = tostring(Details[1]['message'])
-| project AlertTitle = strcat("Function App Execution Failure - ", AppRoleName), Severity = "P1-Critical", TimeGenerated, AffectedService = AppRoleName, Detail = InnermostMessage, Details, _ResourceId
+| project AlertTitle = strcat("Function App Execution Failure - ", AppRoleName), Severity = "P1", TimeGenerated, AffectedService = AppRoleName, Detail = InnermostMessage, Details, _ResourceId
 ''', environment)
     dataSourceIds: logAnalyticsWorkspaceId 
     evaluationFrequencyInMinutes: 5
     windowSizeInMinutes: 5
     operator: 'GreaterThan'
     threshold: 0
+    numberOfEvaluationPeriods: 1
+    minFailingPeriodsToAlert: 1
+    resourceIdColumn: '_ResourceId'
+    muteAlertRuleAction: false
+    autoMitigate: true
+    tags: defaultTags
+  }
+}
+
+// 7. Frontdoor HealthProbe Failures
+module alert7 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (enableFrontDoorAlert) {
+  name: 'sq-frontdoor-healthprobe-failures'
+  params: {
+    ruleName: ruleName7
+    displayName: '${environment} - Frontdoor Health Probe Failures'
+    ruleDescription: 'Detects health issues with Azure frontdoor origin'
+    enabled: enableFrontDoorAlert
+    severity: 0
+    actionGroupIds: concat(
+      enableWebhookAg && sendFrontDoorAlertsToWebhook && !empty(webhookId) ? [webhookId] : [],
+      enableLogicAppAg && sendFrontDoorAlertsToLogicApp && !empty(logicAppAgId) ? [logicAppAgId] : []
+    )
+    query: format('''
+let timeWindow = 5m;
+let environment = "{0}";
+let envUpper = toupper(environment);
+AzureDiagnostics
+| where TimeGenerated > ago(timeWindow)
+| where ResourceProvider == "MICROSOFT.CDN"
+| where Category == "FrontDoorHealthProbeLog"
+| where Resource == strcat("AFD-RSP-APPLICATIONS-", envUpper, "-UKS")
+| where httpStatusCode_d != 301
+| project
+    TimeGenerated,
+    AlertTitle = strcat("Front Door Health Probe Failed - ", Resource),
+    Severity = "P1",
+    HttpStatusCode = httpStatusCode_d,
+    AffectedService = Resource,
+    Detail = originName_s,
+    _ResourceId
+''', environment)
+    dataSourceIds: logAnalyticsWorkspaceId 
+    evaluationFrequencyInMinutes: 5
+    windowSizeInMinutes: 5
+    operator: 'GreaterThan'
+    threshold: 4
     numberOfEvaluationPeriods: 1
     minFailingPeriodsToAlert: 1
     resourceIdColumn: '_ResourceId'

@@ -58,49 +58,6 @@ param webhookUrl string
 @description('Logic App resource IDs to receive alerts')
 param logicAppResourceIds array = []
 
-// Per-alert toggles and routing for application alerts
-@description('Enable App Service Down alert')
-param enableAppServiceDownAlert bool = true
-@description('Route App Service Down to webhook')
-param routeAppServiceDownToWebhook bool = true
-@description('Route App Service Down to Logic App')
-param routeAppServiceDownToLogicApp bool = true
-
-@description('Enable Identity Provider alert')
-param enableIdentityProviderAlert bool = true
-@description('Route Identity Provider alert to webhook')
-param routeIdentityProviderFailuresToWebhook bool = true
-@description('Route Identity Provider alert to Logic App')
-param routeIdentityProviderFailuresToLogicApp bool = true
-
-@description('Enable Database Connection Failures alert')
-param enableDbConnectionFailuresAlert bool = true
-@description('Route Database Connection Failures to webhook')
-param routeDbConnectionFailuresToWebhook bool = true
-@description('Route Database Connection Failures to Logic App')
-param routeDbConnectionFailuresToLogicApp bool = true
-
-@description('Enable App Service High Error Rate alert')
-param enableHighErrorRateAlert bool = true
-@description('Route App Service High Error Rate to webhook')
-param routeHighErrorRateAlertToWebhook bool = true
-@description('Route App Service High Error Rate to Logic App')
-param routeHighErrorRateAlertToLogicApp bool = true
-
-@description('Enable Container Apps Failures alert')
-param enableContainerAppsFailuresAlert bool = true
-@description('Route Container Apps Failures to webhook')
-param routeContainerAppsFailuresToWebhook bool = true
-@description('Route Container Apps Failures to Logic App')
-param routeContainerAppsFailuresToLogicApp bool = true
-
-@description('Enable Function App Failures alert')
-param enableFuncAppFailuresAlert bool = true
-@description('Route Function App Failures to webhook')
-param routeFuncAppFailuresToWebhook bool = true
-@description('Route Function App Failures to Logic App')
-param routeFuncAppFailuresToLogicApp bool = true
-
 @description('Enable combined All Errors alert (Exceptions + Request failures)')
 param enableAllErrorsAlert bool
 @description('Route All Errors alert to Logic App')
@@ -114,6 +71,18 @@ param allErrorsEvaluationFrequencyInMinutes int = 5
 param allErrorsWindowSizeInMinutes int = 5
 @description('All Errors alert mute duration in minutes')
 param allErrorsMuteInMinutes int = 60
+
+@description('Teams Group ID')
+param teamsGroupId string
+
+@description('Teams Channel Id')
+param teamsChannelId string
+
+@description('Teams API resource ID')
+param teamsApiConnectionId string
+
+@description('Teams Connection ID')
+param teamsConnectionId string
 
 // ------------------
 // VARIABLES
@@ -202,6 +171,10 @@ module teamsLogicApp 'modules/logic-app-teams-alerts.bicep' = {
   params: {
     environment: environment
     organizationPrefix: organizationPrefix
+    teamsGroupId: teamsGroupId
+    teamsChannelId: teamsChannelId
+    teamsApiConnectionId: teamsApiConnectionId
+    teamsConnectionId: teamsConnectionId
     tags: tags
   }
 }
@@ -233,24 +206,6 @@ module appScheduledQueryAlerts 'modules/app-scheduled-query-alerts.bicep' = if (
     enableWebhookAg: enableWebhookAg
     enableLogicAppAg: enableLogicAppAg
     tags: tags
-    enableAppServiceDownAlert: enableAppServiceDownAlert
-    sendAppServiceDownToWebhook: routeAppServiceDownToWebhook
-    sendAppServiceDownToLogicApp: routeAppServiceDownToLogicApp
-    enableIdentityProviderAlert: enableIdentityProviderAlert
-    sendIdentityProviderFailuresToWebhook: routeIdentityProviderFailuresToWebhook
-    sendIdentityProviderFailuresToLogicApp: routeIdentityProviderFailuresToLogicApp
-    enableDbConnectionFailuresAlert: enableDbConnectionFailuresAlert
-    sendDbConnectionFailuresToWebhook: routeDbConnectionFailuresToWebhook
-    sendDbConnectionFailuresToLogicApp: routeDbConnectionFailuresToLogicApp
-    enableHighErrorRateAlert: enableHighErrorRateAlert
-    sendHighErrorRateAlertToWebhook: routeHighErrorRateAlertToWebhook
-    sendHighErrorRateAlertToLogicApp: routeHighErrorRateAlertToLogicApp
-    enableContainerAppsFailuresAlert: enableContainerAppsFailuresAlert
-    sendContainerAppsFailuresToWebhook: routeContainerAppsFailuresToWebhook
-    sendContainerAppsFailuresToLogicApp: routeContainerAppsFailuresToLogicApp
-    enableFuncAppFailuresAlert: enableFuncAppFailuresAlert
-    sendFuncAppFailuresToWebhook: routeFuncAppFailuresToWebhook
-    sendFuncAppFailuresToLogicApp: routeFuncAppFailuresToLogicApp
   }
 }
 

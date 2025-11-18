@@ -83,6 +83,10 @@ stages:
                 az deployment sub validate --name "Monitoring-$(Build.BuildId)" --location $(location) --template-file ./2.monitoring-alerts/main.bicep  \
                   --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam \
                   webhookUrl=$(webhookUrl) \
+                  teamsGroupId=$(teamsGroupId) \
+                  teamsChannelId=$(teamsChannelId) \
+                  teamsApiConnectionId=$(teamsApiConnectionId) \
+                  teamsConnectionId=$(teamsConnectionId) \
                   logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
       - job: preview
@@ -102,6 +106,10 @@ stages:
                 az deployment sub what-if --location $(location) --template-file ./2.monitoring-alerts/main.bicep \
                   --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam \
                   webhookUrl=$(webhookUrl) \
+                  teamsGroupId=$(teamsGroupId) \
+                  teamsChannelId=$(teamsChannelId) \
+                  teamsApiConnectionId=$(teamsApiConnectionId) \
+                  teamsConnectionId=$(teamsConnectionId) \
                   logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
 
@@ -137,6 +145,10 @@ stages:
                 az deployment sub what-if --location $(location) --template-file ./2.monitoring-alerts/main.bicep \
                   --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam \
                   webhookUrl=$(webhookUrl) \
+                  teamsGroupId=$(teamsGroupId) \
+                  teamsChannelId=$(teamsChannelId) \
+                  teamsApiConnectionId=$(teamsApiConnectionId) \
+                  teamsConnectionId=$(teamsConnectionId) \
                   logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
       - deployment: deploy
@@ -166,6 +178,10 @@ stages:
                       output=$(az stack sub create --name "monitoring-deployment-stack" --location $(location) --template-file ./2.monitoring-alerts/main.bicep  \
                         --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam \
                         webhookUrl=$(webhookUrl) \
+                        teamsGroupId=$(teamsGroupId) \
+                        teamsChannelId=$(teamsChannelId) \
+                        teamsApiConnectionId=$(teamsApiConnectionId) \
+                        teamsConnectionId=$(teamsConnectionId) \
                         logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                         --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
