@@ -26,6 +26,9 @@ parameters:
       - pre_prod
       - production
 
+variables:
+  - group: ${{ parameters.env }}-monitoring
+
 stages:
   - stage: PRValidation
     displayName: 'PR Validation Monitoring Deployment'
