@@ -355,12 +355,6 @@ param parNetworkSecurityConfig object = {
   quarantineBypass: 'None'
 }
 
-@description('Storage account name for storing blob connection strings')
-param parStorageAccountName string
-@secure()
-@description('The key for the storage account where the blob connection string will be stored.')
-param parStorageAccountKey string
-
 @description('Allowed hosts for the application to be used when the Web App is behind Front Door')
 param parAllowedHosts string
 
@@ -575,8 +569,6 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       devOpsPublicIPAddress: parDevOpsPublicIPAddress
       oneLoginAuthority: parOneLoginAuthority
       oneLoginIssuers: parOneLoginIssuers
-      storageAccountName: parStorageAccountName
-      storageAccountKey: parStorageAccountKey
       allowedHosts: parAllowedHosts
       useFrontDoor: parUseFrontDoor
       enableKeyVaultPrivateEndpoints: parEnableKeyVaultPrivateEndpoints
