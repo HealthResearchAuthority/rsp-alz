@@ -49,11 +49,11 @@ param adminEmailRecipients = [
   }
 ]
 
-param enableTeamsAg = true
 param enableWebhookAg = true
-param teamsChannelEmailAddress = ''
+param enableLogicAppAg = true
 param webhookUrl = ''
 param logAnalyticsWorkspaceId = ''
+param enableAllErrorsAlert = true
 
 
 // ------------------
