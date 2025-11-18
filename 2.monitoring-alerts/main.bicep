@@ -115,6 +115,18 @@ param allErrorsWindowSizeInMinutes int = 5
 @description('All Errors alert mute duration in minutes')
 param allErrorsMuteInMinutes int = 60
 
+@description('Teams Group ID')
+param teamsGroupId string
+
+@description('Teams Channel Id')
+param teamsChannelId string
+
+@description('Teams API resource ID')
+param teamsApiConnectionId string
+
+@description('Teams Connection ID')
+param teamsConnectionId string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -202,6 +214,10 @@ module teamsLogicApp 'modules/logic-app-teams-alerts.bicep' = {
   params: {
     environment: environment
     organizationPrefix: organizationPrefix
+    teamsGroupId: teamsGroupId
+    teamsChannelId: teamsChannelId
+    teamsApiConnectionId: teamsApiConnectionId
+    teamsConnectionId: teamsConnectionId
     tags: tags
   }
 }
