@@ -135,6 +135,21 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
   }
 }
 
+module funcUAI '../../../shared/bicep/managed-identity.bicep' = if(kind == 'functionapp') {
+  name: take('mi-${appName}', 64)
+  params: {
+    name: 'id-${appName}'
+    location: location
+    tags: tags
+  }
+}
+
+// Safe variables to avoid conditional module output warnings
+var funcUaiId = resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'id-${appName}')
+var funcUaiClientId = kind == 'functionapp' ? reference(funcUaiId, '2023-01-31', 'Full').properties.clientId : ''
+var funcUaiPrincipalId = kind == 'functionapp' ? reference(funcUaiId, '2023-01-31', 'Full').properties.principalId : ''
+var storageAccountId = resourceId('Microsoft.Storage/storageAccounts', storageAccountResourceName)
+
 module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'functionapp') {
   name: take('fnAppStoragePrivateNetwork-${deployment().name}', 64)
   params: {
@@ -143,6 +158,7 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     supportsHttpsTrafficOnly: true
+    allowSharedKeyAccess: false
     tags: {}
     networkAcls: networkAcls 
   }
@@ -208,6 +224,51 @@ module storageFilesPrivateNetwork '../../../shared/bicep/network/private-network
   ]
 }
 
+// Role assignments for Function App managed identity on storage account
+module assignBlobContributor '../../../shared/bicep/role-assignments/role-assignment.bicep' = if(kind == 'functionapp') {
+  name: take('ra-${appName}-blob', 64)
+  params: {
+    name: take('ra-${appName}-blob', 64)
+    resourceId: storageAccountId
+    roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe' // Storage Blob Data Contributor
+    principalId: funcUaiPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module assignQueueContributor '../../../shared/bicep/role-assignments/role-assignment.bicep' = if(kind == 'functionapp') {
+  name: take('ra-${appName}-queue', 64)
+  params: {
+    name: take('ra-${appName}-queue', 64)
+    resourceId: storageAccountId
+    roleDefinitionId: '974c5e8b-45b9-4653-ba55-5f855dd0fb88' // Storage Queue Data Contributor
+    principalId: funcUaiPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module assignFileSmbContributor '../../../shared/bicep/role-assignments/role-assignment.bicep' = if(kind == 'functionapp') {
+  name: take('ra-${appName}-filesmb', 64)
+  params: {
+    name: take('ra-${appName}-filesmb', 64)
+    resourceId: storageAccountId
+    roleDefinitionId: '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb' // Storage File Data SMB Share Contributor
+    principalId: funcUaiPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+module assignFileSmbElevated '../../../shared/bicep/role-assignments/role-assignment.bicep' = if(kind == 'functionapp') {
+  name: take('ra-${appName}-filesmb-elev', 64)
+  params: {
+    name: take('ra-${appName}-filesmb-elev', 64)
+    resourceId: storageAccountId
+    roleDefinitionId: 'a7264617-510b-434b-a828-9731dc254ea7' // Storage File Data SMB Share Elevated Contributor
+    principalId: funcUaiPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
 module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind == 'functionapp') {
   name: take('${appName}-webApp-Deployment', 64)
   params: {
@@ -220,16 +281,58 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     appInsightId: appInsights.outputs.appInsResourceId
     userAssignedIdentities:  {
       type: 'UserAssigned'
-      userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
+      userAssignedIdentities: reduce(union(userAssignedIdentities, [funcUaiId]), {}, (result, id) => union(result, { '${id}': {} }))
     }
     storageAccountName: storageAccountName
     contentShareName: contentShareName
     hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     eventGridServiceTagRestriction: eventGridServiceTagRestriction
+    appSettings: [
+      {
+        name: 'AzureWebJobsStorage__credential'
+        value: 'managedidentity'
+      }
+      {
+        name: 'AzureWebJobsStorage__accountName'
+        value: storageAccountResourceName
+      }
+      {
+        name: 'AzureWebJobsStorage__blobServiceUri'
+        value: 'https://${storageAccountResourceName}.blob.${environment().suffixes.storage}'
+      }
+      {
+        name: 'AzureWebJobsStorage__queueServiceUri'
+        value: 'https://${storageAccountResourceName}.queue.${environment().suffixes.storage}'
+      }
+      {
+        name: 'AzureWebJobsStorage__tableServiceUri'
+        value: 'https://${storageAccountResourceName}.table.${environment().suffixes.storage}'
+      }
+      {
+        name: 'AzureWebJobsStorage__clientId'
+        value: funcUaiClientId
+      }
+      {
+        name: 'WEBSITE_CONTENTAZUREFILEAUTH_TYPE'
+        value: 'ManagedIdentity'
+      }
+      {
+        name: 'WEBSITE_CONTENTAZUREFILEACCOUNTNAME'
+        value: storageAccountResourceName
+      }
+      {
+        name: 'WEBSITE_CONTENTAZUREFILECLIENTID'
+        value: funcUaiClientId
+      }
+    ]
   }
   dependsOn: [
     fnstorage
+    assignBlobContributor
+    assignQueueContributor
+    assignFileSmbContributor
+    assignFileSmbElevated
   ]
 }
 
