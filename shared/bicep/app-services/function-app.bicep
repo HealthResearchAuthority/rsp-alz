@@ -59,7 +59,7 @@ param networkRuleSetIpRules array = []
 @allowed([
   'functionapp' // function app windows os
   'functionapp,linux' // function app linux os
-  // 'functionapp,workflowapp' // logic app workflow
+  'functionapp,workflowapp' // logic app workflow
   // 'functionapp,workflowapp,linux' // logic app docker container
   'app' // normal web app
   'app,linux' // normal web app linux OS

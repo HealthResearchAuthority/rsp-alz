@@ -900,6 +900,49 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
+// Daily CSV export Logic App (Standard, WS1)
+module dailyCsvLogicApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('dailyCsvLogicApp-${deployment().name}-deployment', 64)
+    params: {
+      location: location
+      tags: tags
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      appServicePlanName: 'asp-rsp-la-csvexport-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'la-csv-export-${parSpokeNetworks[i].parEnvironment}'
+      sku: 'WS1'
+      webAppBaseOs: 'Windows'
+      kind: 'logicapp'
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      storageAccountName: 'stlacsv${parSpokeNetworks[i].parEnvironment}'
+      deploySlot: false
+      userAssignedIdentities: [
+        databaseserver[i].outputs.outputsqlServerUAIID
+      ]
+      deployAppPrivateEndPoint: true
+      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIID
+      eventGridServiceTagRestriction: false
+      scheduleTimeZone: 'GMT Standard Time'
+      scheduleTime: '08:00'
+      envPrefix: '${parSpokeNetworks[i].parEnvironment}-'
+      sqlQuery: 'SELECT\n    pr.Id AS [ProjectRecordID],\n    pr.IrasId AS [IrasID], \n    pr.[Status] AS [ProjectRecordStatus],\n    pr.CreatedDate AS [ProjectRecordCreatedDate],\n    pm.CreatedDate AS [ProjectModificationCreatedDate],\n    pm.[Status] AS [ProjectModificationStatus],\n    pm.ModificationIdentifier AS [ProjectModificationIdentifier],\n    pra.QuestionId AS [ProjectRecordQuestionID],\n    pra.Section AS [ProjectRecordQuestionSection],\n    pra.Response AS [ProjectRecordsResponse],\n    pra.SelectedOptions AS [ProjectRecordSelectedOptions],\n    pm.ReviewType as [ModificationReviewType]\n    \n\nFROM ProjectRecords AS pr\nLEFT JOIN ProjectRecordAnswers AS pra\n    ON pr.Id = pra.ProjectRecordId\nLEFT JOIN ProjectModifications AS pm \n    ON pr.Id = pm.ProjectRecordId\nWHERE pra.QuestionId IN (\'IQA0002\', \'IQA0789\', \'IQA0004\', \'IQA0005\', \'IQA0032\')\n  AND pr.IrasId IS NOT NULL;'
+      sharePointSiteUrl: 'https://healthresearchauthority.sharepoint.com/sites/Future-IRAS'
+      sharePointFolderPath: '/Data Reporting/Tactical Report'
+    }
+    dependsOn: [
+      databaseserver
+      umbracoCMS
+      processScanFnApp
+      rtsfnApp
+      applicationsRG
+    ]
+  }
+]
+
 // Event Grid Subscription for Custom Topic (staging only)
 module customTopicEventSubscription '../shared/bicep/event-grid/custom-topic-role-assignment-subscription.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
