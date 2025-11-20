@@ -31,6 +31,9 @@ param useOneLogin bool
 @description('Optional. Whether to create Key Vault secrets with placeholder values. Set to false to skip secret creation after initial deployment.')
 param createSecretsWithPlaceholders bool = false
 
+@description('Environment name (e.g., dev, uat, prod)')
+param environment string
+
 @description('Optional, default value is true. If true, any resources that support AZ will be deployed in all three AZ. However if the selected region is not supporting AZ, this parameter needs to be set to false.')
 param containerRegistryTier string = ''
 
@@ -224,6 +227,8 @@ module appConfiguration './modules/app-configuration.bicep' = {
     rtsAuthApiBaseUrl: rtsAuthApiBaseUrl
     parMicrosoftEntraAudience: parMicrosoftEntraAudience
     processDocuUploadManagedIdentityClientId: processDocuUploadManagedIdentityClientId
+    irasPortalFunctionCallerIdentityClientId: irasPortalFunctionCallerIdentity.outputs.clientId
+    environment: environment
     keyVaultSecretUris: {
       oneLoginClientIdSecretUri: keyVaultSecrets.outputs.oneLoginClientIdSecretUri
       oneLoginPrivateKeyPemSecret: keyVaultSecrets.outputs.oneLoginPrivateKeyPemSecret
@@ -233,7 +238,8 @@ module appConfiguration './modules/app-configuration.bicep' = {
       stagingStorageAccountKeySecretUri: keyVaultSecrets.outputs.stagingStorageAccountKeySecretUri
       quarantineStorageAccountKeySecretUri: keyVaultSecrets.outputs.quarantineStorageAccountKeySecretUri
       cleanStorageAccountKeySecretUri: keyVaultSecrets.outputs.cleanStorageAccountKeySecretUri
-      projectRecordValidationFunctionKey: keyVaultSecrets.outputs.projectRecordValidationFunctionKey
+      // NOTE: Removed - moved to managed identity authentication with Easy Auth
+      // projectRecordValidationFunctionKey: keyVaultSecrets.outputs.projectRecordValidationFunctionKey
     }
     documentStorageAccounts: documentStorageAccounts
     parMicrosoftEntraAuthority: parMicrosoftEntraAuthority
@@ -257,6 +263,16 @@ module processScanFunctionIdentity '../../../shared/bicep/managed-identity.bicep
   name: 'processScanFunctionIdentity-${uniqueString(resourceGroup().id)}'
   params: {
     name: 'id-func-processscan-${resourceGroup().location}'
+    location: location
+    tags: tags
+  }
+}
+
+@description('User-assigned managed identity for IRAS Portal to call func-validate-irasid.')
+module irasPortalFunctionCallerIdentity '../../../shared/bicep/managed-identity.bicep' = {
+  name: 'irasPortalFunctionCallerIdentity-${uniqueString(resourceGroup().id)}'
+  params: {
+    name: 'id-irasportal-${resourceGroup().location}'
     location: location
     tags: tags
   }
@@ -314,6 +330,15 @@ output processScanFunctionUserAssignedIdentityId string = processScanFunctionIde
 
 @description('The principal ID of the user-assigned managed identity for the Process Scan Function App.')
 output processScanFunctionUserAssignedIdentityPrincipalId string = processScanFunctionIdentity.outputs.principalId
+
+@description('The resource ID of the user-assigned managed identity for IRAS Portal to call func-validate-irasid.')
+output irasPortalFunctionCallerIdentityId string = irasPortalFunctionCallerIdentity.outputs.id
+
+@description('The principal ID of the user-assigned managed identity for IRAS Portal to call func-validate-irasid.')
+output irasPortalFunctionCallerIdentityPrincipalId string = irasPortalFunctionCallerIdentity.outputs.principalId
+
+@description('The client ID of the user-assigned managed identity for IRAS Portal to call func-validate-irasid.')
+output irasPortalFunctionCallerIdentityClientId string = irasPortalFunctionCallerIdentity.outputs.clientId
 
 // output serviceBusReceiverManagedIdentityID string = serviceBus.outputs.serviceBusReceiverManagedIdentityId
 // output serviceBusSenderManagedIdentity string = serviceBus.outputs.serviceBusSenderManagedIdentityId

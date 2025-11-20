@@ -69,6 +69,12 @@ param enableAppConfigPrivateEndpoints bool = false
 @description('IP address to allow inbound connections from')
 param sourceAddressPrefix string
 
+@description('Optional. Entra ID app registration client ID for func-validate-irasid authentication. Leave empty to disable Easy Auth.')
+param validateIrasIdAuthClientId string = ''
+
+@description('Optional. Entra ID app registration application ID URI for func-validate-irasid. Leave empty to disable Easy Auth.')
+param validateIrasIdAuthAppIdUri string = ''
+
 resource targetRg 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: targetRgName
 }
@@ -169,6 +175,8 @@ module harpSyncFunctions 'modules/azure-functions.bicep' = if (enableHarpDeploym
       !empty(harpAppConfiguration.?outputs.?appConfigurationUserAssignedIdentityId ?? '') ? [harpAppConfiguration.?outputs.?appConfigurationUserAssignedIdentityId] : []
     ) : []
     environment: environment
+    validateIrasIdAuthClientId: validateIrasIdAuthClientId
+    validateIrasIdAuthAppIdUri: validateIrasIdAuthAppIdUri
     tags: {
       Environment: environment
       Purpose: 'HARP Data Sync'

@@ -31,6 +31,12 @@ param userAssignedIdentities array = []
 @description('Environment name (dev, prod)')
 param environment string = 'dev'
 
+@description('Optional. Entra ID app registration client ID for func-validate-irasid authentication. Leave empty to disable Easy Auth.')
+param validateIrasIdAuthClientId string = ''
+
+@description('Optional. Entra ID app registration application ID URI for func-validate-irasid. Leave empty to disable Easy Auth.')
+param validateIrasIdAuthAppIdUri string = ''
+
 @description('Defines the name, tier, size, family and capacity of the App Service Plan. Plans ending to _AZ, are deploying at least three instances in three Availability Zones. EP* is only for functions')
 @allowed([ 'B1','B3','S1', 'S2', 'S3', 'P1V3', 'P2V3', 'P3V3', 'P1V3_AZ', 'P2V3_AZ', 'P3V3_AZ', 'EP1', 'EP2', 'EP3', 'ASE_I1V2_AZ', 'ASE_I2V2_AZ', 'ASE_I3V2_AZ', 'ASE_I1V2', 'ASE_I2V2', 'ASE_I3V2' ])
 param sku string
@@ -236,6 +242,50 @@ module functionAppPrivateEndpoints '../../shared/bicep/network/private-endpoint.
     storageFilePrivateEndpoints
   ]
 }]
+
+// ------------------
+// EASY AUTH CONFIGURATION
+// ------------------
+
+@description('Configure Easy Auth (Entra ID authentication) for func-validate-irasid')
+resource validateIrasIdAuth 'Microsoft.Web/sites/config@2022-09-01' = if (!empty(validateIrasIdAuthClientId) && !empty(validateIrasIdAuthAppIdUri)) {
+  name: 'func-validate-irasid/authsettingsV2'
+  properties: {
+    platform: {
+      enabled: true
+    }
+    globalValidation: {
+      requireAuthentication: true
+      unauthenticatedClientAction: 'Return401'
+    }
+    identityProviders: {
+      azureActiveDirectory: {
+        enabled: true
+        isAutoProvisioned: false
+        registration: {
+          openIdIssuer: 'https://sts.windows.net/${tenant().tenantId}/'
+          clientId: validateIrasIdAuthClientId
+        }
+        validation: {
+          allowedAudiences: [
+            validateIrasIdAuthAppIdUri
+            validateIrasIdAuthClientId
+            'api://func-validate-irasid-${environment}'
+          ]
+        }
+      }
+    }
+    login: {
+      tokenStore: {
+        enabled: true
+      }
+    }
+  }
+  dependsOn: [
+    functionAppsDeployment
+    functionAppPrivateEndpoints
+  ]
+}
 
 // Outputs
 output functionAppNames array = [for (funcApp, index) in functionApps: {

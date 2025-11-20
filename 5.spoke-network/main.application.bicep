@@ -591,6 +591,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       parMicrosoftEntraAudience: parMicrosoftEntraAudience
       processDocuUploadManagedIdentityClientId: processDocuUploadManagedIdentityClientId
       parMicrosoftEntraAuthority: parMicrosoftEntraAuthority
+      environment: parSpokeNetworks[i].parEnvironment
     }
   }
 ]
@@ -824,6 +825,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
       deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        supportingServices[i].outputs.irasPortalFunctionCallerIdentityId
       ]
       //paramWhitelistIPs: ''
     }
