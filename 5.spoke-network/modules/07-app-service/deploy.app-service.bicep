@@ -56,25 +56,6 @@ param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
 param eventGridServiceTagRestriction bool = false
 
-// Logic App workflow-specific parameters (only used when kind == 'logicapp')
-@description('SQL query to execute (Logic App only)')
-param sqlQuery string = ''
-
-@description('SharePoint site URL (Logic App only)')
-param sharePointSiteUrl string = ''
-
-@description('SharePoint folder path (Logic App only)')
-param sharePointFolderPath string = ''
-
-@description('Time zone for schedule. Example: GMT Standard Time (Logic App only)')
-param scheduleTimeZone string = 'GMT Standard Time'
-
-@description('Daily schedule time (HH:mm, 24h) (Logic App only)')
-param scheduleTime string = '08:00'
-
-@description('Optional filename/environment prefix for CSV output, e.g. "dev-" (Logic App only)')
-param envPrefix string = ''
-
 
 var slotName = 'staging'
 
@@ -252,6 +233,29 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
   ]
 }
 
+module lgApp '../../../shared/bicep/app-services/logic-app.bicep' = if(kind == 'logicapp') {
+  name: take('${appName}-logicApp-Deployment', 64)
+  params: {
+    kind: 'functionapp,workflowapp'
+    logicAppName:  appName
+    location: location
+    serverFarmResourceId: appSvcPlan.outputs.resourceId
+    //diagnosticWorkspaceId: logAnalyticsWsId
+    virtualNetworkSubnetId: subnetIdForVnetInjection
+    userAssignedIdentities:  {
+      type: 'UserAssigned'
+      userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
+    }
+    storageAccountName: storageAccountName
+    contentShareName: contentShareName
+    hasPrivateEndpoint: deployAppPrivateEndPoint
+    sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
+  }
+  dependsOn: [
+    fnstorage
+  ]
+}
+
 resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
   name: spokeVNetName
@@ -279,113 +283,34 @@ module appServicePrivateEndpoint '../../../shared/bicep/network/private-networki
   }
 }
 
-// Logic App workflow resource (only for logicapp kind)
-// IMPORTANT: This workflow references connections by name ('sql' and 'sharepointonline').
-// Connections are NOT created or deleted by this deployment - they are separate resources.
-// Connections created in the portal will persist across deployments and will NOT be overwritten.
-resource workflow 'Microsoft.Web/sites/workflows@2022-09-01' = if(kind == 'logicapp' && !empty(sqlQuery)) {
-  name: '${appName}/daily-csv-export'
-  properties: {
-    stateType: 'Stateful'
-    definition: {
-      '$schema': 'https://schema.management.azure.com/providers/Microsoft.Logic/schemas/2016-06-01/workflowdefinition.json#'
-      contentVersion: '1.0.0.0'
-      triggers: {
-        Recurrence: {
-          type: 'Recurrence'
-          recurrence: {
-            interval: 1
-            frequency: 'Day'
-            timeZone: scheduleTimeZone
-            schedule: {
-              hours: [int(split(scheduleTime, ':')[0])]
-              minutes: [int(split(scheduleTime, ':')[1])]
-            }
-          }
-        }
+module logicappServicePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = if(deployAppPrivateEndPoint && kind == 'logicapp') {
+  name: take('logicappServicePrivateEndpoint-${deployment().name}', 64)
+  scope: resourceGroup(privateEndpointRG)
+  params: {
+    location: location
+    azServicePrivateDnsZoneName: 'privatelink.azurewebsites.net'
+    azServiceId: lgApp!.outputs.logicAppId
+    privateEndpointName: take('pep-${lgApp!.outputs.logicAppName}', 64)
+    privateEndpointSubResourceName: 'sites'
+    virtualNetworkLinks: [
+      {
+        vnetName: spokeVNetName
+        vnetId: vnetSpoke.id
+        registrationEnabled: false
       }
-      actions: {
-        Execute_query: {
-          type: 'ServiceProvider'
-          inputs: {
-            parameters: {
-              query: sqlQuery
-            }
-            serviceProviderConfiguration: {
-              connectionName: 'sql'
-              operationId: 'executeQuery'
-              serviceProviderId: '/serviceProviders/sql'
-            }
-          }
-          runAfter: {}
-        }
-        Create_CSV_table: {
-          type: 'Table'
-          inputs: {
-            from: '@first(body(\'Execute_query\'))'
-            format: 'CSV'
-          }
-          runAfter: {
-            Execute_query: ['SUCCEEDED']
-          }
-        }
-        Initialize_variables: {
-          type: 'InitializeVariable'
-          inputs: {
-            variables: [
-              {
-                name: 'FileName'
-                type: 'string'
-                value: '@{concat(\'${envPrefix}Tactical_Report_\', formatDateTime(utcNow(), \'dd-MM-yyyy\'), \'.csv\')}'
-              }
-            ]
-          }
-          runAfter: {
-            Create_CSV_table: ['SUCCEEDED']
-          }
-        }
-        Create_file: {
-          type: 'ApiConnection'
-          inputs: {
-            host: {
-              connection: {
-                referenceName: 'sharepointonline'
-              }
-            }
-            method: 'post'
-            body: '@body(\'Create_CSV_table\')'
-            path: '/datasets/@{encodeURIComponent(encodeURIComponent(\'${sharePointSiteUrl}\'))}/files'
-            queries: {
-              folderPath: sharePointFolderPath
-              name: '@variables(\'FileName\')'
-              queryParametersSingleEncoded: true
-            }
-          }
-          runAfter: {
-            Initialize_variables: ['SUCCEEDED']
-          }
-          runtimeConfiguration: {
-            contentTransfer: {
-              transferMode: 'Chunked'
-            }
-          }
-        }
-      }
-      outputs: {}
-    }
+    ]
+    subnetId: subnetPrivateEndpointSubnetId
+    //vnetSpokeResourceId: spokeVNetId
   }
-  dependsOn: [
-    fnApp
-  ]
 }
 
 output appName string = appName
-output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: fnApp!.outputs.defaultHostName
+output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: kind == 'logicapp' ? lgApp!.outputs.defaultHostName : fnApp!.outputs.defaultHostName
 output webAppResourceId string = (kind == 'app') ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
 output systemAssignedPrincipalId string = (kind == 'app') ? webApp!.outputs.systemAssignedPrincipalId : fnApp!.outputs.systemAssignedPrincipalId
 output appInsightsResourceId string = appInsights.outputs.appInsResourceId
-output logicAppName string = kind == 'logicapp' ? fnApp!.outputs.functionAppName : ''
-output logicAppId string = kind == 'logicapp' ? fnApp!.outputs.functionAppId : ''
+output logicAppName string = kind == 'logicapp' ? lgApp!.outputs.logicAppName : ''
+output logicAppId string = kind == 'logicapp' ? lgApp!.outputs.logicAppId : ''
 
 
 

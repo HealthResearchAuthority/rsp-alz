@@ -925,19 +925,11 @@ module dailyCsvLogicApp 'modules/07-app-service/deploy.app-service.bicep' = [
       ]
       deployAppPrivateEndPoint: true
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIID
-      eventGridServiceTagRestriction: false
-      scheduleTimeZone: 'GMT Standard Time'
-      scheduleTime: '08:00'
-      envPrefix: '${parSpokeNetworks[i].parEnvironment}-'
-      sqlQuery: 'SELECT\n    pr.Id AS [ProjectRecordID],\n    pr.IrasId AS [IrasID], \n    pr.[Status] AS [ProjectRecordStatus],\n    pr.CreatedDate AS [ProjectRecordCreatedDate],\n    pm.CreatedDate AS [ProjectModificationCreatedDate],\n    pm.[Status] AS [ProjectModificationStatus],\n    pm.ModificationIdentifier AS [ProjectModificationIdentifier],\n    pra.QuestionId AS [ProjectRecordQuestionID],\n    pra.Section AS [ProjectRecordQuestionSection],\n    pra.Response AS [ProjectRecordsResponse],\n    pra.SelectedOptions AS [ProjectRecordSelectedOptions],\n    pm.ReviewType as [ModificationReviewType]\n    \n\nFROM ProjectRecords AS pr\nLEFT JOIN ProjectRecordAnswers AS pra\n    ON pr.Id = pra.ProjectRecordId\nLEFT JOIN ProjectModifications AS pm \n    ON pr.Id = pm.ProjectRecordId\nWHERE pra.QuestionId IN (\'IQA0002\', \'IQA0789\', \'IQA0004\', \'IQA0005\', \'IQA0032\')\n  AND pr.IrasId IS NOT NULL;'
-      sharePointSiteUrl: 'https://healthresearchauthority.sharepoint.com/sites/Future-IRAS'
-      sharePointFolderPath: '/Data Reporting/Tactical Report'
     }
     dependsOn: [
       databaseserver
       umbracoCMS
-      processScanFnApp
-      rtsfnApp
+      webApp
       applicationsRG
     ]
   }

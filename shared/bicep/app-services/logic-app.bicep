@@ -1,0 +1,140 @@
+@description('Required. Name of your Logic App.')
+param logicAppName string
+
+@description('Optional. Location for all resources.')
+param location string
+
+@description('Optional. Tags of the resource.')
+param tags object = {}
+
+@description('Optional. Additional app settings.')
+param appSettings array = []
+
+@description('Required. The resource ID of the app service plan to use for the site.')
+param serverFarmResourceId string
+
+@description('Optional, default is false. If true, then a private endpoint must be assigned to the function app')
+param hasPrivateEndpoint bool = false
+
+@description('Client ID of the managed identity to be used for the SQL DB connection string.')
+param sqlDBManagedIdentityClientId string = ''
+
+@maxLength(24)
+@description('Conditional. The name of the parent Storage Account. Required if the template is used in a standalone deployment.')
+param storageAccountName string
+
+@description('Optional. Name of the Azure Files share used for logic content.')
+param contentShareName string = ''
+
+@description('Optional. Runtime for Logic App.')
+@allowed([
+  'node'
+  'dotnet'
+  'java'
+  'dotnet-isolated'
+])
+param runtime string = 'dotnet-isolated' // e.g., 'dotnet', 'node', 'python', etc.
+
+@description('Optional. Runtime Version for LogicApp.')
+param runtimeVersion string = '~4'
+
+@description('Optional. Dotnet framework version.')
+param dotnetVersion string = '9.0'
+
+
+// @description('Optional. Resource ID of log analytics workspace.')
+// param diagnosticWorkspaceId string = ''
+
+@description('Optional. The ID(s) to assign to the resource.')
+param userAssignedIdentities object = {}
+
+@description('Required. Type of site to deploy.')
+@allowed([
+  'functionapp' // function app windows os
+  'functionapp,linux' // function app linux os
+  'functionapp,workflowapp' // logic app workflow
+  // 'functionapp,workflowapp,linux' // logic app docker container
+  'app' // normal web app
+  'app,linux' // normal web app linux OS
+  'app,linux,container' //web app for containers - linux
+])
+param kind string
+
+@description('Optional. Azure Resource Manager ID of the Virtual network and subnet to be joined by Regional VNET Integration. This must be of the form /subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}.')
+param virtualNetworkSubnetId string = ''
+
+resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
+  name: storageAccountName
+}
+
+var defaultSettings = [
+  {
+    name: 'APP_KIND'
+    value: 'workflowApp'
+  }
+  {
+    name: 'AzureWebJobsStorage'
+    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${listKeys(storageAccount.id, '2022-09-01').keys[0].value};EndpointSuffix=core.windows.net'
+  }
+  {
+    name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
+    value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${listKeys(storageAccount.id, '2022-09-01').keys[0].value};EndpointSuffix=core.windows.net'
+  }
+  {
+    name: 'FUNCTIONS_EXTENSION_VERSION'
+    value: runtimeVersion
+  }
+  {
+    name: 'FUNCTIONS_WORKER_RUNTIME'
+    value: runtime
+  }
+  {
+    name: 'AZURE_CLIENT_ID'
+    value: sqlDBManagedIdentityClientId
+  }
+  {
+    name: 'LOGIC_APPS_POWERSHELL_VERSION'
+    value: '7.4'
+  }
+  {
+    name: 'FUNCTIONS_INPROC_NET8_ENABLED'
+    value: '1'
+  }
+  {
+    name: 'WEBSITE_NODE_DEFAULT_VERSION'
+    value: '~20'
+  }
+]
+
+
+var contentShareSettings = empty(contentShareName) ? [] : [
+  {
+    name: 'WEBSITE_CONTENTSHARE'
+    value: contentShareName
+  }
+]
+
+
+resource logicApp 'Microsoft.Web/sites@2024-04-01' = {
+  name: logicAppName
+  location: location
+  kind: kind
+  identity: userAssignedIdentities
+  properties: {
+    httpsOnly: true
+    publicNetworkAccess: hasPrivateEndpoint ? 'Disabled' : 'Enabled'
+    serverFarmId: serverFarmResourceId
+    virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
+    siteConfig: {
+      netFrameworkVersion: dotnetVersion
+      appSettings: concat(defaultSettings, contentShareSettings, appSettings)
+      alwaysOn: false
+    }
+  }
+  tags: tags
+}
+
+output logicAppName string = logicApp.name
+output logicAppId string = logicApp.id
+output defaultHostName string = logicApp.properties.defaultHostName
+output systemAssignedPrincipalId string = logicApp.identity.?principalId ?? ''
