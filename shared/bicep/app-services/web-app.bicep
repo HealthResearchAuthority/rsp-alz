@@ -32,7 +32,7 @@ param serverFarmResourceId string
 param httpsOnly bool = true
 
 @description('Optional. If client affinity is enabled.')
-param clientAffinityEnabled bool = true
+param clientAffinityEnabled bool = false 
 
 @description('Optional. The resource ID of the app service environment to use for this resource.')
 param appServiceEnvironmentId string = ''
@@ -218,8 +218,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     hostNameSslStates: hostNameSslStates
     hyperV: false
     redundancyMode: redundancyMode
-    publicNetworkAccess: 'Enabled' //hasPrivateLink ? 'Disabled' : 'Enabled'
-    
+    publicNetworkAccess: hasPrivateLink ? 'Disabled' : 'Enabled'
   }
 }
 

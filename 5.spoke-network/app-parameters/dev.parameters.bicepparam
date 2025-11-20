@@ -177,7 +177,6 @@ param parAllowedHosts = '*'
 // indicates whether to use Front Door for the dev environment
 param parUseFrontDoor = true
 
-@description('Indicates whether to use One Login for the application')
 param useOneLogin = true
 param paramWhitelistIPs = ''
 

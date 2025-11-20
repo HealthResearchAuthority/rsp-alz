@@ -30,7 +30,7 @@ param serverFarmResourceId string = ''
 param httpsOnly bool = true
 
 @description('Optional. If client affinity is enabled.')
-param clientAffinityEnabled bool = true
+param clientAffinityEnabled bool = false
 
 @description('Optional. The resource ID of the app service environment to use for this resource.')
 param appServiceEnvironmentId string = ''

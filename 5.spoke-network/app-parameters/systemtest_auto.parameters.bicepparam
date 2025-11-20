@@ -171,7 +171,6 @@ param parAllowedHosts = 'fd-rsp-applications-automationtest-uks-e7f6hkg3c5edhxex
 // indicates whether to use Front Door for the systemtest_auto environment
 param parUseFrontDoor = true
 
-@description('Indicates whether to use One Login for the application')
 param useOneLogin = true
 
 param paramWhitelistIPs =  ''
