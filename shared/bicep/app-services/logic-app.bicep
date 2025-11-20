@@ -33,7 +33,7 @@ param contentShareName string = ''
   'java'
   'dotnet-isolated'
 ])
-param runtime string = 'dotnet' // e.g., 'dotnet', 'node', 'python', etc.
+param runtime string = 'node' // e.g., 'dotnet', 'node', 'python', etc.
 
 @description('Optional. Runtime Version for LogicApp.')
 param runtimeVersion string = '~4'
