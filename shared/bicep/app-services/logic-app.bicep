@@ -104,6 +104,14 @@ var defaultSettings = [
     name: 'WEBSITE_NODE_DEFAULT_VERSION'
     value: '~20'
   }
+  {
+    name: 'AzureFunctionsJobHost__extensionBundle__id'
+    value: 'Microsoft.Azure.Functions.ExtensionBundle.Workflow'
+  }
+  {
+    name: 'AzureFunctionsJobHost__extensionBundle__version'
+    value: '[1.*, 2.0.0)'
+  }
 ]
 
 
