@@ -913,7 +913,7 @@ module dailyCsvLogicApp 'modules/07-app-service/deploy.app-service.bicep' = [
       appName: 'la-csv-export-${parSpokeNetworks[i].parEnvironment}'
       sku: 'WS1'
       webAppBaseOs: 'Windows'
-      kind: 'logicapp'
+      kind: 'functionapp,workflowapp'
       privateEndpointRG: parSpokeNetworks[i].rgNetworking
       spokeVNetId: existingVnet[i].id
       subnetPrivateEndpointSubnetId: pepSubnet[i].id

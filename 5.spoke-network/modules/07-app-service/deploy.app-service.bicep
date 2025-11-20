@@ -43,8 +43,8 @@ param subnetIdForVnetInjection string
 @maxLength(24)
 param storageAccountName string = ''
 
-@description('Webapp, functionapp, or logicapp')
-@allowed(['functionapp','app','logicapp'])
+@description('Webapp, functionapp, or functionapp,workflowapp')
+@allowed(['functionapp','app','functionapp,workflowapp'])
 param kind string
 
 @description('Client ID of the managed identity to be used for the SQL DB connection string. For Function App Only')
@@ -60,7 +60,7 @@ param eventGridServiceTagRestriction bool = false
 var slotName = 'staging'
 
 var varWhitelistIPs = filter(split(paramWhitelistIPs, ','), ip => !empty(trim(ip)))
-var contentShareName = (kind == 'functionapp' || kind == 'logicapp') ? take(replace(toLower('${appName}-content'), '_', '-'), 63) : ''
+var contentShareName = (kind == 'functionapp' || kind == 'functionapp,workflowapp') ? take(replace(toLower('${appName}-content'), '_', '-'), 63) : ''
 var storageAccountSanitized = toLower(replace(storageAccountName, '-', ''))
 var storageAccountResourceName = length(storageAccountSanitized) > 24 ? substring(storageAccountSanitized, 0, 24) : storageAccountSanitized
 
@@ -135,7 +135,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
   }
 }
 
-module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'functionapp' || kind == 'logicapp') {
+module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'functionapp' || kind == 'functionapp,workflowapp') {
   name: take('fnAppStoragePrivateNetwork-${deployment().name}', 64)
   params: {
     name: storageAccountName
@@ -148,14 +148,14 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
   }
 }
 
-resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = if(kind == 'functionapp' || kind == 'logicapp') {
+resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = if(kind == 'functionapp' || kind == 'functionapp,workflowapp') {
   name: '${storageAccountResourceName}/default'
   dependsOn: [
     fnstorage
   ]
 }
 
-resource storageContentShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = if((kind == 'functionapp' || kind == 'logicapp') && !empty(contentShareName)) {
+resource storageContentShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = if((kind == 'functionapp' || kind == 'functionapp,workflowapp') && !empty(contentShareName)) {
   parent: storageFileService
   name: contentShareName
   properties: {
@@ -164,7 +164,7 @@ resource storageContentShare 'Microsoft.Storage/storageAccounts/fileServices/sha
   }
 }
 
-module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if((kind == 'functionapp' || kind == 'logicapp') && deployAppPrivateEndPoint == true) {
+module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if((kind == 'functionapp' || kind == 'functionapp,workflowapp') && deployAppPrivateEndPoint == true) {
   name:take('rtsfnStorageBlobPrivateNetwork-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
@@ -185,7 +185,7 @@ module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networki
   }
 }
 
-module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if((kind == 'functionapp' || kind == 'logicapp') && deployAppPrivateEndPoint == true) {
+module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if((kind == 'functionapp' || kind == 'functionapp,workflowapp') && deployAppPrivateEndPoint == true) {
   name:take('fnStorageFilePrivateNetwork-${storageAccountName}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
@@ -208,10 +208,10 @@ module storageFilesPrivateNetwork '../../../shared/bicep/network/private-network
   ]
 }
 
-module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind == 'functionapp' || kind == 'logicapp') {
+module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind == 'functionapp') {
   name: take('${appName}-webApp-Deployment', 64)
   params: {
-    kind: kind == 'logicapp' ? 'functionapp,workflowapp' : 'functionapp'
+    kind: 'functionapp'
     functionAppName:  appName
     location: location
     serverFarmResourceId: appSvcPlan.outputs.resourceId
@@ -233,7 +233,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
   ]
 }
 
-module lgApp '../../../shared/bicep/app-services/logic-app.bicep' = if(kind == 'logicapp') {
+module lgApp '../../../shared/bicep/app-services/logic-app.bicep' = if(kind == 'functionapp,workflowapp') {
   name: take('${appName}-logicApp-Deployment', 64)
   params: {
     kind: 'functionapp,workflowapp'
@@ -283,7 +283,7 @@ module appServicePrivateEndpoint '../../../shared/bicep/network/private-networki
   }
 }
 
-module logicappServicePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = if(deployAppPrivateEndPoint && kind == 'logicapp') {
+module logicappServicePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = if(deployAppPrivateEndPoint && kind == 'functionapp,workflowapp') {
   name: take('logicappServicePrivateEndpoint-${deployment().name}', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
@@ -305,12 +305,12 @@ module logicappServicePrivateEndpoint '../../../shared/bicep/network/private-net
 }
 
 output appName string = appName
-output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: kind == 'logicapp' ? lgApp!.outputs.defaultHostName : fnApp!.outputs.defaultHostName
+output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: kind == 'functionapp,workflowapp' ? lgApp!.outputs.defaultHostName : fnApp!.outputs.defaultHostName
 output webAppResourceId string = (kind == 'app') ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
 output systemAssignedPrincipalId string = (kind == 'app') ? webApp!.outputs.systemAssignedPrincipalId : fnApp!.outputs.systemAssignedPrincipalId
 output appInsightsResourceId string = appInsights.outputs.appInsResourceId
-output logicAppName string = kind == 'logicapp' ? lgApp!.outputs.logicAppName : ''
-output logicAppId string = kind == 'logicapp' ? lgApp!.outputs.logicAppId : ''
+output logicAppName string = kind == 'functionapp,workflowapp' ? lgApp!.outputs.logicAppName : ''
+output logicAppId string = kind == 'functionapp,workflowapp' ? lgApp!.outputs.logicAppId : ''
 
 
 
