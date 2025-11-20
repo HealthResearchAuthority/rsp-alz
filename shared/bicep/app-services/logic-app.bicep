@@ -33,13 +33,13 @@ param contentShareName string = ''
   'java'
   'dotnet-isolated'
 ])
-param runtime string = 'dotnet-isolated' // e.g., 'dotnet', 'node', 'python', etc.
+param runtime string = 'dotnet' // e.g., 'dotnet', 'node', 'python', etc.
 
 @description('Optional. Runtime Version for LogicApp.')
 param runtimeVersion string = '~4'
 
 @description('Optional. Dotnet framework version.')
-param dotnetVersion string = '9.0'
+param dotnetVersion string = '8.0'
 
 
 // @description('Optional. Resource ID of log analytics workspace.')
@@ -47,6 +47,9 @@ param dotnetVersion string = '9.0'
 
 @description('Optional. The ID(s) to assign to the resource.')
 param userAssignedIdentities object = {}
+
+@description('Optional. Resource ID of the app insight to leverage for this resource.')
+param appInsightId string = ''
 
 @description('Required. Type of site to deploy.')
 @allowed([
@@ -67,10 +70,19 @@ resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' existing 
   name: storageAccountName
 }
 
+resource fnAppAppInsights 'microsoft.insights/components@2020-02-02' existing = if (!empty(appInsightId)) {
+  name: last(split(appInsightId, '/'))!
+  scope: resourceGroup(split(appInsightId, '/')[2], split(appInsightId, '/')[4])
+}
+
 var defaultSettings = [
   {
     name: 'APP_KIND'
     value: 'workflowApp'
+  }
+  {
+    name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+    value: fnAppAppInsights!.properties.InstrumentationKey
   }
   {
     name: 'AzureWebJobsStorage'
@@ -111,6 +123,14 @@ var defaultSettings = [
   {
     name: 'AzureFunctionsJobHost__extensionBundle__version'
     value: '[1.*, 2.0.0)'
+  }
+  {
+    name: 'WEBSITE_CONTENTOVERVNET'
+    value: '1'
+  }
+  {
+    name: 'WEBSITE_VNET_ROUTE_ALL' 
+    value: '1'
   }
 ]
 

@@ -900,41 +900,6 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
-// Daily CSV export Logic App (Standard, WS1)
-module dailyCsvLogicApp 'modules/07-app-service/deploy.app-service.bicep' = [
-  for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
-    name: take('dailyCsvLogicApp-${deployment().name}-deployment', 64)
-    params: {
-      location: location
-      tags: tags
-      logAnalyticsWsId: logAnalyticsWorkspaceId
-      appServicePlanName: 'asp-rsp-la-csvexport-${parSpokeNetworks[i].parEnvironment}-uks'
-      appName: 'la-csv-export-${parSpokeNetworks[i].parEnvironment}'
-      sku: 'WS1'
-      webAppBaseOs: 'Windows'
-      kind: 'functionapp,workflowapp'
-      privateEndpointRG: parSpokeNetworks[i].rgNetworking
-      spokeVNetId: existingVnet[i].id
-      subnetPrivateEndpointSubnetId: pepSubnet[i].id
-      subnetIdForVnetInjection: webAppSubnet[i].id
-      storageAccountName: 'stlacsv${parSpokeNetworks[i].parEnvironment}'
-      deploySlot: false
-      userAssignedIdentities: [
-        databaseserver[i].outputs.outputsqlServerUAIID
-      ]
-      deployAppPrivateEndPoint: true
-      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIID
-    }
-    dependsOn: [
-      databaseserver
-      umbracoCMS
-      webApp
-      applicationsRG
-    ]
-  }
-]
-
 // Event Grid Subscription for Custom Topic (staging only)
 module customTopicEventSubscription '../shared/bicep/event-grid/custom-topic-role-assignment-subscription.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -993,6 +958,43 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       umbracoCMS
       processScanFnApp
       documentUpload
+    ]
+  }
+]
+
+// Daily CSV export Logic App (Standard, WS1)
+module dailyCsvLogicApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('dailyCsvLogicApp-${deployment().name}-deployment', 64)
+    params: {
+      location: location
+      tags: tags
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      appServicePlanName: 'asp-rsp-la-csvexport-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'la-csv-export-${parSpokeNetworks[i].parEnvironment}'
+      sku: 'WS1'
+      webAppBaseOs: 'Windows'
+      kind: 'functionapp,workflowapp'
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      storageAccountName: 'stlacsv${parSpokeNetworks[i].parEnvironment}'
+      deploySlot: false
+      userAssignedIdentities: [
+        databaseserver[i].outputs.outputsqlServerUAIID
+      ]
+      deployAppPrivateEndPoint: true
+      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIID
+    }
+    dependsOn: [
+      databaseserver
+      umbracoCMS
+      webApp
+      applicationsRG
+      rtsfnApp
+      processScanFnApp
     ]
   }
 ]
