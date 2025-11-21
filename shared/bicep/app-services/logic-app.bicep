@@ -114,11 +114,11 @@ var defaultSettings = [
   }
   {
     name: 'WEBSITE_NODE_DEFAULT_VERSION'
-    value: '~20'
+    value: '~22'
   }
   {
     name: 'AzureFunctionsJobHost__extensionBundle__id'
-    value: 'Microsoft.Azure.Functions.ExtensionBundle.Workflow'
+    value: 'Microsoft.Azure.Functions.ExtensionBundle.Workflows'
   }
   {
     name: 'AzureFunctionsJobHost__extensionBundle__version'
