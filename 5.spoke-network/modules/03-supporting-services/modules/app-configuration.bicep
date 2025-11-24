@@ -323,7 +323,7 @@ var keyValues = [
   }
   {
     name: 'AppSettings:ProjectRecordValidationScope'
-    value: 'api://func-validate-irasid-${environment}/.default'
+    value: 'api://func-validate-irasid/.default'
     contentType: null
   }
   {
