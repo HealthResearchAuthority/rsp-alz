@@ -171,7 +171,6 @@ param parAllowedHosts = 'fd-rsp-applications-manualtest-uks-a9ducvbchybpasgn.a01
 // indicates whether to use Front Door for the systemtest_manual environment
 param parUseFrontDoor = true
 
-@description('Indicates whether to use One Login for the application')
 param useOneLogin = true
 
 param paramWhitelistIPs = ''

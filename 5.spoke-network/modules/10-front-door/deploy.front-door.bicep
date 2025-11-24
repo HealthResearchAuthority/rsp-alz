@@ -58,6 +58,9 @@ param enablePrivateLink bool = false
 @description('Front Door SKU')
 param frontDoorSku string = 'Premium_AzureFrontDoor'
 
+@description('Optional. Resource ID of the diagnostic log analytics workspace.')
+param logAnalyticsWorkspaceId string = ''
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -119,6 +122,7 @@ module frontDoorProfile '../../../shared/bicep/front-door/front-door-profile.bic
     skuName: frontDoorSku
     identityType: 'SystemAssigned'
     originResponseTimeoutSeconds: 60
+    diagnosticWorkspaceId: logAnalyticsWorkspaceId
   }
 }
 
