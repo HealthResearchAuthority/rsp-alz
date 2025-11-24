@@ -31,6 +31,9 @@ param enablePrivateEndpoints bool = false
 @description('HARP Database name')
 param harpDatabaseName string = 'harpprojectdata'
 
+@description('SQL query for retrieving HARP project records')
+param harpProjectRecordsQuery string = ''
+
 // ------------------
 //    VARIABLES
 // ------------------
@@ -44,6 +47,11 @@ var keyValues = [
   {
     name: 'ConnectionStrings:HarpProjectDataConnectionString'
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=${harpDatabaseName};Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+    contentType: null
+  }
+  {
+    name: 'HarpQueries:GetProjectRecordsQuery'
+    value: harpProjectRecordsQuery
     contentType: null
   }
 ]

@@ -75,6 +75,9 @@ param validateIrasIdAuthClientId string = ''
 @description('Optional. Entra ID app registration application ID URI for func-validate-irasid. Leave empty to disable Easy Auth.')
 param validateIrasIdAuthAppIdUri string = ''
 
+@description('SQL query for retrieving HARP project records')
+param harpProjectRecordsQuery string = ''
+
 resource targetRg 'Microsoft.Resources/resourceGroups@2022-09-01' existing = {
   name: targetRgName
 }
@@ -152,6 +155,7 @@ module harpAppConfiguration 'modules/app-configuration.bicep' = if (enableHarpDe
     spokePrivateEndpointSubnetName: 'snet-privateendpoints'
     enablePrivateEndpoints: enableAppConfigPrivateEndpoints
     harpDatabaseName: 'harpprojectdata'
+    harpProjectRecordsQuery: harpProjectRecordsQuery
     tags: {
       Environment: environment
       Purpose: 'HARP Data Sync'
