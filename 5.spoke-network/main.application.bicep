@@ -211,8 +211,11 @@ param parFrontDoorCacheDuration string = 'P1D'
 @description('Enable Front Door HTTPS redirect')
 param parEnableFrontDoorHttpsRedirect bool = true
 
-@description('Enable Front Door Private Link to origin')
-param parEnableFrontDoorPrivateLink bool = false
+@description('Enable Front Door Private Link to IRAS Portal')
+param parEnableFrontDoorPrivateLinkForIRAS bool = false
+
+@description('Enable Front Door Private Link to CMS Portal')
+param parEnableFrontDoorPrivateLinkForCMS bool = false
 
 @description('Enable Function Apps Private Endpoints')
 param parEnableFunctionAppPrivateEndpoints bool = false
@@ -821,7 +824,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'app'
-      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink
+      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLinkForIRAS
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       ]
@@ -848,12 +851,13 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'app'
-      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink
+      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLinkForCMS
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       paramWhitelistIPs: paramWhitelistIPs
+      allowPublicAccessOverride: true
     }
     dependsOn: [
       databaseserver
@@ -999,7 +1003,7 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
       enableHttpsRedirect: parEnableFrontDoorHttpsRedirect
       enableManagedTls: true
       webAppResourceId: webApp[i].outputs.webAppResourceId
-      enablePrivateLink: parEnableFrontDoorPrivateLink
+      enablePrivateLink: parEnableFrontDoorPrivateLinkForIRAS
       frontDoorSku: parSkuConfig.frontDoor
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     }
