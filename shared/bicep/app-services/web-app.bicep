@@ -134,6 +134,9 @@ param hostNameSslStates array = []
 @description('Optional, default is false. If true, then a private endpoint must be assigned to the web app')
 param hasPrivateLink bool = false
 
+@description('Optional. Override to allow public access even when private endpoint exists (for hybrid access scenarios with IP restrictions)')
+param allowPublicAccessOverride bool = false
+
 @description('Optional. Site redundancy mode.')
 @allowed([
   'ActiveActive'
@@ -218,7 +221,7 @@ resource app 'Microsoft.Web/sites@2022-09-01' = {
     hostNameSslStates: hostNameSslStates
     hyperV: false
     redundancyMode: redundancyMode
-    publicNetworkAccess: hasPrivateLink ? 'Disabled' : 'Enabled'
+    publicNetworkAccess: (hasPrivateLink && !allowPublicAccessOverride) ? 'Disabled' : 'Enabled'
   }
 }
 
