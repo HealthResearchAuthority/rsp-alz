@@ -48,6 +48,9 @@ param dotnetVersion string = '8.0'
 @description('Optional. The ID(s) to assign to the resource.')
 param userAssignedIdentities object = {}
 
+@description('Optional. Enables system assigned managed identity on the resource.')
+param systemAssignedIdentity bool = true
+
 @description('Optional. Resource ID of the app insight to leverage for this resource.')
 param appInsightId string = ''
 
@@ -142,12 +145,19 @@ var contentShareSettings = empty(contentShareName) ? [] : [
   }
 ]
 
+// Build identity object - support both system and user-assigned
+var identityObject = systemAssignedIdentity && !empty(userAssignedIdentities.userAssignedIdentities) ? {
+  type: 'SystemAssigned,UserAssigned'
+  userAssignedIdentities: userAssignedIdentities.userAssignedIdentities
+} : systemAssignedIdentity ? {
+  type: 'SystemAssigned'
+} : userAssignedIdentities
 
 resource logicApp 'Microsoft.Web/sites@2024-04-01' = {
   name: logicAppName
   location: location
   kind: kind
-  identity: userAssignedIdentities
+  identity: identityObject
   properties: {
     httpsOnly: true
     publicNetworkAccess: hasPrivateEndpoint ? 'Disabled' : 'Enabled'
