@@ -56,6 +56,9 @@ param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
 param eventGridServiceTagRestriction bool = false
 
+@description('Override to allow public access even when private endpoint exists')
+param allowPublicAccessOverride bool = false
+
 
 var slotName = 'staging'
 
@@ -116,6 +119,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
     appInsightId: appInsights.outputs.appInsResourceId
     operatingSystem:  (webAppBaseOs =~ 'linux') ? 'linuxNet9' : 'windowsNet9'
     hasPrivateLink: deployAppPrivateEndPoint
+    allowPublicAccessOverride: allowPublicAccessOverride
     systemAssignedIdentity: false
     userAssignedIdentities:  {
       type: 'UserAssigned'
