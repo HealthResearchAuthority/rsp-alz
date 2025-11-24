@@ -40,7 +40,5 @@ param harpSyncResourceGroupName = 'harpSyncRG'
 param enableAppConfigPrivateEndpoints = true
 
 // Easy Auth Parameters for func-validate-irasid
-// TODO: Update these values after running the app registration script
-// Run: .\scripts\create-validate-irasid-app-registration.ps1 -Environment dev
-param validateIrasIdAuthClientId = '' // App registration client ID from Entra ID
-param validateIrasIdAuthAppIdUri = 'api://func-validate-irasid-dev' // Application ID URI
+param validateIrasIdAuthClientId = 'aee3da6b-19a5-4c42-bdd1-bbed7b5d67d3' // App registration client ID from Entra ID
+param validateIrasIdAuthAppIdUri = 'api://aee3da6b-19a5-4c42-bdd1-bbed7b5d67d3' // Application ID URI
