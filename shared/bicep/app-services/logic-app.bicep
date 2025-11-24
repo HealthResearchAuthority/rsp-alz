@@ -1,5 +1,5 @@
-@description('Required. Name of your Function App.')
-param functionAppName string
+@description('Required. Name of your Logic App.')
+param logicAppName string
 
 @description('Optional. Location for all resources.')
 param location string
@@ -23,23 +23,23 @@ param sqlDBManagedIdentityClientId string = ''
 @description('Conditional. The name of the parent Storage Account. Required if the template is used in a standalone deployment.')
 param storageAccountName string
 
-@description('Optional. Name of the Azure Files share used for function content.')
+@description('Optional. Name of the Azure Files share used for logic content.')
 param contentShareName string = ''
 
-@description('Optional. Runtime for Function App.')
+@description('Optional. Runtime for Logic App.')
 @allowed([
   'node'
   'dotnet'
   'java'
   'dotnet-isolated'
 ])
-param runtime string = 'dotnet-isolated' // e.g., 'dotnet', 'node', 'python', etc.
+param runtime string = 'dotnet' // e.g., 'dotnet', 'node', 'python', etc.
 
-@description('Optional. Runtime Version for Function App.')
+@description('Optional. Runtime Version for LogicApp.')
 param runtimeVersion string = '~4'
 
 @description('Optional. Dotnet framework version.')
-param dotnetVersion string = '9.0'
+param dotnetVersion string = '8.0'
 
 
 // @description('Optional. Resource ID of log analytics workspace.')
@@ -48,12 +48,11 @@ param dotnetVersion string = '9.0'
 @description('Optional. The ID(s) to assign to the resource.')
 param userAssignedIdentities object = {}
 
+@description('Optional. Enables system assigned managed identity on the resource.')
+param systemAssignedIdentity bool = true
+
 @description('Optional. Resource ID of the app insight to leverage for this resource.')
 param appInsightId string = ''
-
-param eventGridServiceTagRestriction bool = false
-@description('Optional. The IP ACL rules. Note, requires the \'acrSku\' to be \'Premium\'.')
-param networkRuleSetIpRules array = []
 
 @description('Required. Type of site to deploy.')
 @allowed([
@@ -81,6 +80,14 @@ resource fnAppAppInsights 'microsoft.insights/components@2020-02-02' existing = 
 
 var defaultSettings = [
   {
+    name: 'APP_KIND'
+    value: 'workflowApp'
+  }
+  {
+    name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
+    value: fnAppAppInsights!.properties.InstrumentationKey
+  }
+  {
     name: 'AzureWebJobsStorage'
     value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${listKeys(storageAccount.id, '2022-09-01').keys[0].value};EndpointSuffix=core.windows.net'
   }
@@ -97,17 +104,29 @@ var defaultSettings = [
     value: runtime
   }
   {
-    name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-    value: fnAppAppInsights!.properties.InstrumentationKey
-  }
-  {
     name: 'AZURE_CLIENT_ID'
     value: sqlDBManagedIdentityClientId
   }
-]
-
-// Additional settings for private endpoint scenarios
-var privateEndpointSettings = hasPrivateEndpoint ? [
+  {
+    name: 'LOGIC_APPS_POWERSHELL_VERSION'
+    value: '7.4'
+  }
+  {
+    name: 'FUNCTIONS_INPROC_NET8_ENABLED'
+    value: '1'
+  }
+  {
+    name: 'WEBSITE_NODE_DEFAULT_VERSION'
+    value: '~22'
+  }
+  {
+    name: 'AzureFunctionsJobHost__extensionBundle__id'
+    value: 'Microsoft.Azure.Functions.ExtensionBundle.Workflows'
+  }
+  {
+    name: 'AzureFunctionsJobHost__extensionBundle__version'
+    value: '[1.*, 2.0.0)'
+  }
   {
     name: 'WEBSITE_CONTENTOVERVNET'
     value: '1'
@@ -116,11 +135,8 @@ var privateEndpointSettings = hasPrivateEndpoint ? [
     name: 'WEBSITE_VNET_ROUTE_ALL' 
     value: '1'
   }
-  {
-    name: 'WEBSITE_WEBDEPLOY_USE_SCM'
-    value: 'true'
-  }
-] : []
+]
+
 
 var contentShareSettings = empty(contentShareName) ? [] : [
   {
@@ -129,48 +145,34 @@ var contentShareSettings = empty(contentShareName) ? [] : [
   }
 ]
 
-// NEW VARIABLE FOR EVENT GRID RULE
-var eventGridRule = {
-  ipAddress: 'AzureEventGrid' // Service Tag value
-  action: 'Allow'
-  tag: 'ServiceTag'
-  priority: 100 // Set a high priority to ensure it's evaluated early
-  name: 'Allow-AzureEventGrid-Traffic'
-  description: 'Allow Azure Event Grid inbound.'
-}
+// Build identity object - support both system and user-assigned
+var identityObject = systemAssignedIdentity && !empty(userAssignedIdentities.userAssignedIdentities) ? {
+  type: 'SystemAssigned,UserAssigned'
+  userAssignedIdentities: userAssignedIdentities.userAssignedIdentities
+} : systemAssignedIdentity ? {
+  type: 'SystemAssigned'
+} : userAssignedIdentities
 
-var combinedIpRestrictions = eventGridServiceTagRestriction ? concat(networkRuleSetIpRules, [eventGridRule]) : networkRuleSetIpRules
-
-resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
-  name: functionAppName
+resource logicApp 'Microsoft.Web/sites@2024-04-01' = {
+  name: logicAppName
   location: location
   kind: kind
-  identity: userAssignedIdentities
+  identity: identityObject
   properties: {
     httpsOnly: true
-    publicNetworkAccess: hasPrivateEndpoint && !eventGridServiceTagRestriction ? 'Disabled' : 'Enabled'
+    publicNetworkAccess: hasPrivateEndpoint ? 'Disabled' : 'Enabled'
     serverFarmId: serverFarmResourceId
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     siteConfig: {
       netFrameworkVersion: dotnetVersion
-      appSettings: concat(defaultSettings, privateEndpointSettings, contentShareSettings, appSettings)
-      alwaysOn: true
+      appSettings: concat(defaultSettings, contentShareSettings, appSettings)
+      alwaysOn: false
     }
   }
   tags: tags
 }
 
-resource webConfig 'Microsoft.Web/sites/config@2022-09-01' = if (!empty(networkRuleSetIpRules) || eventGridServiceTagRestriction) {
-  parent: functionApp
-  name: 'web'
-  properties: {
-    // UPDATED: Use the combined array of IP restrictions
-    ipSecurityRestrictions: combinedIpRestrictions
-  }
-}
-
-output functionAppName string = functionApp.name
-output functionAppId string = functionApp.id
-output defaultHostName string = functionApp.properties.defaultHostName
-output systemAssignedPrincipalId string = functionApp.identity.?principalId ?? ''
-
+output logicAppName string = logicApp.name
+output logicAppId string = logicApp.id
+output defaultHostName string = logicApp.properties.defaultHostName
+output systemAssignedPrincipalId string = logicApp.identity.?principalId ?? ''
