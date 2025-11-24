@@ -228,7 +228,6 @@ module appConfiguration './modules/app-configuration.bicep' = {
     parMicrosoftEntraAudience: parMicrosoftEntraAudience
     processDocuUploadManagedIdentityClientId: processDocuUploadManagedIdentityClientId
     irasPortalFunctionCallerIdentityClientId: irasPortalFunctionCallerIdentity.outputs.clientId
-    environment: environment
     keyVaultSecretUris: {
       oneLoginClientIdSecretUri: keyVaultSecrets.outputs.oneLoginClientIdSecretUri
       oneLoginPrivateKeyPemSecret: keyVaultSecrets.outputs.oneLoginPrivateKeyPemSecret

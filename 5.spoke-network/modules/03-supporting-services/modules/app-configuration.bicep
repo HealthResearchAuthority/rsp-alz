@@ -97,9 +97,6 @@ param processDocuUploadManagedIdentityClientId string
 @description('Identity Client ID for the managed identity that will be used by IRAS Portal to call func-validate-irasid')
 param irasPortalFunctionCallerIdentityClientId string
 
-@description('Environment name (e.g., dev, uat, prod) for constructing environment-specific URIs')
-param environment string
-
 @description('Application ID of the Application Service in Azure AD')
 param parMicrosoftEntraAudience string
 
