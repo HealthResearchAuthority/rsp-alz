@@ -83,7 +83,8 @@ stages:
                     logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                     harpSqlAdminLogin=$(harpSqlAdminLogin) \
                     harpSqlAdminPassword="$(harpSqlAdminPassword)" \
-                    sourceAddressPrefix=$(sourceAddressPrefix)
+                    sourceAddressPrefix=$(sourceAddressPrefix) \
+                    harpProjectRecordsQuery="$(harpProjectRecordsQuery)"
 
       - job: preview
         displayName: 'Preview Application Deployment'
@@ -108,7 +109,8 @@ stages:
                     logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                     harpSqlAdminLogin=$(harpSqlAdminLogin) \
                     harpSqlAdminPassword="$(harpSqlAdminPassword)" \
-                    sourceAddressPrefix=$(sourceAddressPrefix)
+                    sourceAddressPrefix=$(sourceAddressPrefix) \
+                    harpProjectRecordsQuery="$(harpProjectRecordsQuery)"
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment - Datawarehouse Applications'
@@ -148,7 +150,8 @@ stages:
                     logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                     harpSqlAdminLogin=$(harpSqlAdminLogin) \
                     harpSqlAdminPassword="$(harpSqlAdminPassword)" \
-                    sourceAddressPrefix=$(sourceAddressPrefix)
+                    sourceAddressPrefix=$(sourceAddressPrefix) \
+                    harpProjectRecordsQuery="$(harpProjectRecordsQuery)"
       - deployment: deployApplication
         displayName: 'Deploy Datawarehouse Applications'
         pool:
@@ -182,7 +185,8 @@ stages:
                           adminUsername=$(adminUsername) \
                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                           harpSqlAdminLogin=$(harpSqlAdminLogin) \
-                          harpSqlAdminPassword="$(harpSqlAdminPassword)") \
-                          sourceAddressPrefix=$(sourceAddressPrefix)
+                          harpSqlAdminPassword="$(harpSqlAdminPassword)" \
+                          sourceAddressPrefix=$(sourceAddressPrefix) \
+                          harpProjectRecordsQuery="$(harpProjectRecordsQuery)")
                       echo $output | jq .
                       echo "##[section]"
