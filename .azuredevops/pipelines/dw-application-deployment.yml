@@ -182,7 +182,7 @@ stages:
                           adminUsername=$(adminUsername) \
                           logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                           harpSqlAdminLogin=$(harpSqlAdminLogin) \
-                          harpSqlAdminPassword="$(harpSqlAdminPassword)") \
-                          sourceAddressPrefix=$(sourceAddressPrefix)
+                          harpSqlAdminPassword="$(harpSqlAdminPassword)" \
+                          sourceAddressPrefix=$(sourceAddressPrefix))
                       echo $output | jq .
                       echo "##[section]"

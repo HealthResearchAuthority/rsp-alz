@@ -272,7 +272,7 @@ module processScanFunctionIdentity '../../../shared/bicep/managed-identity.bicep
 module irasPortalFunctionCallerIdentity '../../../shared/bicep/managed-identity.bicep' = {
   name: 'irasPortalFunctionCallerIdentity-${uniqueString(resourceGroup().id)}'
   params: {
-    name: 'id-irasportal-${resourceGroup().location}'
+    name: 'id-irasportal-${environment}-${resourceGroup().location}'
     location: location
     tags: tags
   }
