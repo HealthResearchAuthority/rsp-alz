@@ -105,7 +105,7 @@ module alert1 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-appservice-down'
   params: {
     ruleName: ruleName1
-    displayName: '${environment} - App Service Unavailable'
+    displayName: 'App Service Unavailable - ${environment}'
     ruleDescription: 'Detects 5xx errors on IRAS portal endpoints over 5 minutes'
     enabled: enableAppServiceDownAlert
     severity: 0
@@ -140,7 +140,7 @@ module alert2 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-identity-provider'
   params: {
     ruleName: ruleName2
-    displayName: '${environment} - One Login Unavailable'
+    displayName: 'One Login Unavailable - ${environment}'
     ruleDescription: 'Detects One Login dependency failures over 5 minutes'
     enabled: enableIdentityProviderAlert
     severity: 0
@@ -177,7 +177,7 @@ module alert3 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-db-connection-failures'
   params: {
     ruleName: ruleName3
-    displayName: '${environment} - Database Unavailable'
+    displayName: 'Database Unavailable - ${environment}'
     ruleDescription: 'Detects failed SQL dependencies over 5 minutes'
     enabled: enableDbConnectionFailuresAlert
     severity: 0
@@ -217,7 +217,7 @@ module alert4 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-appservice-high-error-rate'
   params: {
     ruleName: ruleName4
-    displayName: '${environment} - High App Service Error Rate'
+    displayName: 'High App Service Error Rate - ${environment}'
     ruleDescription: 'Detects high 5xx error rates over 5 minutes'
     enabled: enableHighErrorRateAlert
     severity: 1
@@ -254,7 +254,7 @@ module alert5 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-container-apps-failures'
   params: {
     ruleName: ruleName5
-    displayName: '${environment} - Container App API Failures'
+    displayName: 'Container App API Failures - ${environment}'
     ruleDescription: 'Detects container app API 5xx failures over 5 minutes'
     enabled: enableContainerAppsFailuresAlert
     severity: 1
@@ -292,7 +292,7 @@ module alert6 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-function-app-failures'
   params: {
     ruleName: ruleName6
-    displayName: '${environment} - Function App Failures'
+    displayName: 'Function App Failures - ${environment}'
     ruleDescription: 'Detects unhandled exceptions in function apps over 5 minutes'
     enabled: enableFuncAppFailuresAlert
     severity: 0
@@ -328,7 +328,7 @@ module alert7 '../../shared/bicep/monitoring/scheduled-query-rule.bicep' = if (e
   name: 'sq-frontdoor-healthprobe-failures'
   params: {
     ruleName: ruleName7
-    displayName: '${environment} - Frontdoor Health Probe Failures'
+    displayName: 'Frontdoor Health Probe Failures - ${environment}'
     ruleDescription: 'Detects health issues with Azure frontdoor origin'
     enabled: enableFrontDoorAlert
     severity: 0
@@ -381,4 +381,5 @@ output alertRuleIds object = {
   alert4: enableHighErrorRateAlert ? resourceId('Microsoft.Insights/scheduledQueryRules', ruleName4) : ''
   alert5: enableContainerAppsFailuresAlert ? resourceId('Microsoft.Insights/scheduledQueryRules', ruleName5) : ''
   alert6: enableFuncAppFailuresAlert? resourceId('Microsoft.Insights/scheduledQueryRules', ruleName6) : ''
+  alert7: enableFrontDoorAlert? resourceId('Microsoft.Insights/scheduledQueryRules', ruleName7) : ''
 }
