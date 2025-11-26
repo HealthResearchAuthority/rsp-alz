@@ -48,6 +48,22 @@ var privateEndpointSubnetPrefix = '172.18.3.0/26'
 var functionAppSubnetPrefix = '172.18.4.0/26'
 var remoteDbSubnetPrefix = '10.10.1.0/24'
 var devboxSubnetPrefix = '10.0.0.0/24'
+var manualtestSubnetPrefix = '10.3.128.0/18'
+var automationtestSubnetPrefix = '10.1.48.0/22'
+var uatSubnetPrefix = '10.5.128.0/18'
+var preprodSubnetPrefeix = '10.6.128.0/18'
+var prodSubnetPrefix = '10.7.128.0/18'
+
+var allLocalAddressRanges = concat([
+  functionAppSubnetPrefix
+  devboxSubnetPrefix
+  dataSubnetPrefix
+  manualtestSubnetPrefix
+  automationtestSubnetPrefix
+  uatSubnetPrefix
+  preprodSubnetPrefeix
+  prodSubnetPrefix
+])
 
 module functionAppsNSG '../../shared/bicep/network/nsg.bicep' = {
   name: 'functionapps-nsg'
@@ -209,25 +225,7 @@ resource connection 'Microsoft.Network/connections@2024-05-01' = {
     connectionMode: 'Default'
     trafficSelectorPolicies: [
       {
-        localAddressRanges: [
-          functionAppSubnetPrefix
-        ]
-        remoteAddressRanges: [
-          remoteDbSubnetPrefix
-        ]
-      }
-      {
-        localAddressRanges: [
-          devboxSubnetPrefix
-        ]
-        remoteAddressRanges: [
-          remoteDbSubnetPrefix
-        ]
-      }
-      {
-        localAddressRanges: [
-          dataSubnetPrefix
-        ]
+        localAddressRanges: allLocalAddressRanges
         remoteAddressRanges: [
           remoteDbSubnetPrefix
         ]
