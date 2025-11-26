@@ -54,7 +54,7 @@ var uatSubnetPrefix = '10.5.128.0/18'
 var preprodSubnetPrefeix = '10.6.128.0/18'
 var prodSubnetPrefix = '10.7.128.0/18'
 
-var allLocalAddressRanges = concat([
+var allLocalAddressRanges = [
   functionAppSubnetPrefix
   devboxSubnetPrefix
   dataSubnetPrefix
@@ -63,7 +63,7 @@ var allLocalAddressRanges = concat([
   uatSubnetPrefix
   preprodSubnetPrefeix
   prodSubnetPrefix
-])
+]
 
 module functionAppsNSG '../../shared/bicep/network/nsg.bicep' = {
   name: 'functionapps-nsg'
@@ -223,14 +223,14 @@ resource connection 'Microsoft.Network/connections@2024-05-01' = {
     enablePrivateLinkFastPath: false
     dpdTimeoutSeconds: 45
     connectionMode: 'Default'
-    trafficSelectorPolicies: [
-      {
-        localAddressRanges: allLocalAddressRanges
-        remoteAddressRanges: [
-          remoteDbSubnetPrefix
-        ]
-      }
+    trafficSelectorPolicies: [for localAddressRange in allLocalAddressRanges : {
+      localAddressRanges: [
+        localAddressRange
     ]
+      remoteAddressRanges: [
+        remoteDbSubnetPrefix
+      ]
+    }]
   }
 }
 
