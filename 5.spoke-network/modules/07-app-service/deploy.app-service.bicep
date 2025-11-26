@@ -59,6 +59,10 @@ param eventGridServiceTagRestriction bool = false
 @description('Override to allow public access even when private endpoint exists')
 param allowPublicAccessOverride bool = false
 
+param appConfigEndpoint string = ''
+@secure()
+param appConfigIdentityClientID string = ''
+
 
 var slotName = 'staging'
 
@@ -231,6 +235,8 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     eventGridServiceTagRestriction: eventGridServiceTagRestriction
+    appConfigEndpoint: appConfigEndpoint
+    appConfigIdentityClientID: appConfigIdentityClientID
   }
   dependsOn: [
     fnstorage

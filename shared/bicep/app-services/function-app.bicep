@@ -26,6 +26,10 @@ param storageAccountName string
 @description('Optional. Name of the Azure Files share used for function content.')
 param contentShareName string = ''
 
+param appConfigEndpoint string = ''
+@secure()
+param appConfigIdentityClientID string = ''
+
 @description('Optional. Runtime for Function App.')
 @allowed([
   'node'
@@ -103,6 +107,22 @@ var defaultSettings = [
   {
     name: 'AZURE_CLIENT_ID'
     value: sqlDBManagedIdentityClientId
+  }
+  {
+    name: 'AppSettings__AzureAppConfiguration__Endpoint'
+    value: appConfigEndpoint
+  }
+  {
+    name: 'AppSettings__AzureAppConfiguration__ManagedIdentityClientId'
+    value: appConfigIdentityClientID
+  }
+  {
+    name: 'WEBSITE_RUN_FROM_PACKAGE'
+    value: 1
+  }
+  {
+    name: 'WEBSITE_ENABLE_SYNC_UPDATE_SITE' // Prevents race conditions
+    value: 'true'
   }
 ]
 

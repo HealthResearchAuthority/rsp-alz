@@ -894,6 +894,8 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
         supportingServices[i].outputs.processScanFunctionUserAssignedIdentityId
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+      appConfigEndpoint: supportingServices[i].outputs.appConfigURL
+      appConfigIdentityClientID: supportingServices[i].outputs.appConfigIdentityClientID
     }
     dependsOn: [
       applicationsRG
