@@ -109,6 +109,18 @@ module wafPolicy '../../../shared/bicep/front-door/waf-policy.bicep' = if (enabl
     enableRateLimiting: enableRateLimiting
     rateLimitThreshold: rateLimitThreshold
     customRules: []
+    ruleGroupOverrides: [
+      {
+        ruleGroupName: 'General'
+        rules: [
+          {
+            ruleId: '200003'
+            enabledState: 'Disabled'
+            action: 'AnomalyScoring'
+          }
+        ]
+      }
+    ]
   }
 }
 
