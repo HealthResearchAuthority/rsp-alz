@@ -18,3 +18,4 @@ param parEnableFrontDoorHttpsRedirect = true
 param parEnableFrontDoorPrivateLinkForIRAS = false
 param parEnableFrontDoorPrivateLinkForCMS = true
 param parFrontDoorCustomDomains = []
+param parEnableFrontDoorIPWhitelisting = false
