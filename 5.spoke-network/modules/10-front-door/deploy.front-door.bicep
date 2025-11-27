@@ -37,6 +37,9 @@ param rateLimitThreshold int = 1000
 @description('Optional. Custom domains for the Front Door.')
 param customDomains array = []
 
+@description('Optional. IP addresses to be whitelisted for access.')
+param paramWhitelistIPs string = ''
+
 @description('Optional. Enable caching.')
 param enableCaching bool = true
 
@@ -91,6 +94,10 @@ var cachingConfig = {
   cacheDuration: cacheDuration
 }
 
+// Parse and normalize whitelist IPs
+var varWhitelistIPs = filter(split(paramWhitelistIPs, ','), ip => !empty(trim(ip)))
+var normalizedWhitelistIPs = [for ip in varWhitelistIPs: contains(trim(ip), '/') ? trim(ip) : '${trim(ip)}/32']
+
 // ------------------
 // RESOURCES
 // ------------------
@@ -108,7 +115,22 @@ module wafPolicy '../../../shared/bicep/front-door/waf-policy.bicep' = if (enabl
     enableManagedRules: true
     enableRateLimiting: enableRateLimiting
     rateLimitThreshold: rateLimitThreshold
-    customRules: []
+    customRules: !empty(varWhitelistIPs) ? [
+      {
+        name: 'BlockNonWhitelistedIPs'
+        priority: 100
+        ruleType: 'MatchRule'
+        action: 'Block'
+        matchConditions: [
+          {
+            matchVariable: 'SocketAddr'
+            operator: 'IPMatch'
+            negateCondition: true
+            matchValue: normalizedWhitelistIPs
+          }
+        ]
+      }
+    ] : []
   }
 }
 

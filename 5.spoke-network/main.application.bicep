@@ -1043,6 +1043,7 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
       enablePrivateLink: parEnableFrontDoorPrivateLinkForIRAS
       frontDoorSku: parSkuConfig.frontDoor
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      paramWhitelistIPs: paramWhitelistIPs
     }
     dependsOn: [
       webApp
