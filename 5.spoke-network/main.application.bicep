@@ -393,6 +393,9 @@ param parRtsApiBaseUrl string = ''
 @description('Base URL for RTS authentication API')
 param parRtsAuthApiBaseUrl string = ''
 
+@description('SQL query for retrieving HARP project records')
+param harpProjectRecordsQuery string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -594,6 +597,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       parMicrosoftEntraAudience: parMicrosoftEntraAudience
       processDocuUploadManagedIdentityClientId: processDocuUploadManagedIdentityClientId
       parMicrosoftEntraAuthority: parMicrosoftEntraAuthority
+      harpProjectRecordsQuery: harpProjectRecordsQuery
     }
   }
 ]
@@ -676,7 +680,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
       adminLogin: parAdminLogin
       adminPassword: parSqlAdminPhrase
-      databases: ['applicationservice', 'identityservice', 'rtsservice', 'cmsservice']
+      databases: ['applicationservice', 'identityservice', 'rtsservice', 'cmsservice', 'harpprojectdata']
       spokePrivateEndpointSubnetName: pepSubnet[i].name // spoke[i].outputs.spokePrivateEndpointsSubnetName
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       sqlServerUAIName: storageServicesNaming[i].outputs.resourcesNames.sqlServerUserAssignedIdentity
@@ -962,6 +966,79 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       umbracoCMS
       processScanFnApp
       documentUpload
+    ]
+  }
+]
+
+module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('validateirasidfnApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: parSkuConfig.appServicePlan.functionApp
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: 'asp-rsp-fnvalidateirasid-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'func-validate-irasid-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Linux'
+      subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
+      kind: 'functionapp'
+      storageAccountName: 'strvalidateirasid${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        databaseserver[i].outputs.outputsqlServerUAIID
+      ]
+      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+    }
+    dependsOn: [
+      webApp
+      umbracoCMS
+      processScanFnApp
+      documentUpload
+      databaseserver
+    ]
+  }
+]
+
+module harpdatasyncfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('harpdatasyncfnApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: parSkuConfig.appServicePlan.functionApp
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: 'asp-rsp-fnharpdatasync-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'func-harp-data-sync-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Linux'
+      subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
+      kind: 'functionapp'
+      storageAccountName: 'strharpdatasync${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        databaseserver[i].outputs.outputsqlServerUAIID
+      ]
+      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+    }
+    dependsOn: [
+      webApp
+      umbracoCMS
+      processScanFnApp
+      documentUpload
+      databaseserver
+      validateirasidfnApp
     ]
   }
 ]

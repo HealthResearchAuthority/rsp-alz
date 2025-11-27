@@ -102,6 +102,9 @@ param parMicrosoftEntraAuthority string
 @description('Key Vault secret URIs for OneLogin integration')
 param documentStorageAccounts object
 
+@description('SQL query for retrieving HARP project records')
+param harpProjectRecordsQuery string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -158,6 +161,16 @@ var keyValues = [
   {
     name: 'ConnectionStrings:cmsPortalDatabaseConnection'
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=cmsservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+    contentType: null
+  }
+  {
+    name: 'ConnectionStrings:HarpProjectDataConnectionString' // Harp database conn string
+    value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=harpprojectdata;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+    contentType: null
+  }
+  {
+    name: 'HarpQueries:GetProjectRecordsQuery' // Harp Project Query
+    value: harpProjectRecordsQuery
     contentType: null
   }
   {
