@@ -139,6 +139,9 @@ param parDevOpsPublicIPAddress string = ''
 @description('IP addresses to be whitelisted for users to access CMS Portal')
 param paramWhitelistIPs string
 
+@description('Enable IP whitelisting for Front Door (typically enabled for dev/test environments only)')
+param parEnableFrontDoorIPWhitelisting bool = false
+
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
@@ -1043,6 +1046,7 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
       enablePrivateLink: parEnableFrontDoorPrivateLinkForIRAS
       frontDoorSku: parSkuConfig.frontDoor
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      paramWhitelistIPs: parEnableFrontDoorIPWhitelisting ? paramWhitelistIPs : ''
     }
     dependsOn: [
       webApp
