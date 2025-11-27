@@ -48,6 +48,7 @@ var privateEndpointSubnetPrefix = '172.18.3.0/26'
 var functionAppSubnetPrefix = '172.18.4.0/26'
 var remoteDbSubnetPrefix = '10.10.1.0/24'
 var devboxSubnetPrefix = '10.0.0.0/24'
+var devSubnetPrefix = '10.1.8.0/22'
 var manualtestSubnetPrefix = '10.3.128.0/18'
 var automationtestSubnetPrefix = '10.1.48.0/22'
 var uatSubnetPrefix = '10.5.128.0/18'
@@ -58,6 +59,7 @@ var allLocalAddressRanges = [
   functionAppSubnetPrefix
   devboxSubnetPrefix
   dataSubnetPrefix
+  devSubnetPrefix
   manualtestSubnetPrefix
   automationtestSubnetPrefix
   uatSubnetPrefix
