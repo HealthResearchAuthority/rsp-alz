@@ -999,6 +999,7 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     dependsOn: [
       webApp
       umbracoCMS
+      rtsfnApp // dependencies such as this is to avoid private dns zone conflict
       processScanFnApp
       documentUpload
       databaseserver
@@ -1036,6 +1037,7 @@ module harpdatasyncfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       webApp
       umbracoCMS
       processScanFnApp
+      rtsfnApp // dependencies such as this is to avoid private dns zone conflict
       documentUpload
       databaseserver
       validateirasidfnApp
