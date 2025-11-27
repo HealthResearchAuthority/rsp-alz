@@ -1034,11 +1034,6 @@ module harpdatasyncfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
     }
     dependsOn: [
-      webApp
-      umbracoCMS
-      processScanFnApp
-      rtsfnApp // dependencies such as this is to avoid private dns zone conflict
-      documentUpload
       databaseserver
       validateirasidfnApp
     ]
@@ -1073,11 +1068,8 @@ module dailyCsvLogicApp 'modules/07-app-service/deploy.app-service.bicep' = [
     }
     dependsOn: [
       databaseserver
-      umbracoCMS
-      webApp
-      applicationsRG
-      rtsfnApp
       processScanFnApp
+      harpdatasyncfnApp
     ]
   }
 ]
