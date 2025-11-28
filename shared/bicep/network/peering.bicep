@@ -10,13 +10,22 @@ param remoteRgName string
 @description('The id of the subscription of the remote virtual netowrk')
 param remoteSubscriptionId string
 
+@description('Allow traffic pass through VPN Gateway')
+param allowGatewayTransit bool = false
+
+@description('Allow traffic to be received from remote peered network')
+param allowForwardedTraffic bool = false
+
+@description('Allow the use of the remote peered VPN Gateway')
+param useRemoteGateways bool = false
+
 resource vnetPeering 'Microsoft.Network/virtualNetworks/virtualNetworkPeerings@2021-08-01' = {
   name: '${localVnetName}/peerTo-${remoteVnetName}'
   properties: {
     allowVirtualNetworkAccess: true
-    allowGatewayTransit: false
-    allowForwardedTraffic: false
-    useRemoteGateways: false
+    allowGatewayTransit: allowGatewayTransit
+    allowForwardedTraffic: allowForwardedTraffic
+    useRemoteGateways: useRemoteGateways
     remoteVirtualNetwork: {
       id: resourceId(remoteSubscriptionId, remoteRgName, 'Microsoft.Network/virtualNetworks', remoteVnetName)
     }

@@ -15,6 +15,8 @@ module vnetPeeringsAtoB '../../shared/bicep/network/peering.bicep' = [for (peeri
     remoteVnetName: peering.vnetName
     remoteRgName: peering.resourceGroupName
     remoteSubscriptionId: peering.subscriptionId
+    allowGatewayTransit: true
+    allowForwardedTraffic: true
   }
 }]
 
@@ -27,5 +29,7 @@ module vnetPeeringsBtoA '../../shared/bicep/network/peering.bicep' = [for (peeri
     remoteVnetName: datawarehouseVNetName
     remoteRgName: dwNetworkingResourceGroupName
     remoteSubscriptionId: datawarehouseSubscriptionId
+    allowForwardedTraffic: true
+    useRemoteGateways: true
   }
 }]
