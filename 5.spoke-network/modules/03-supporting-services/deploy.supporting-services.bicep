@@ -115,6 +115,9 @@ param parMicrosoftEntraAuthority string
 
 param documentStorageAccounts object = {}
 
+@description('SQL query for retrieving HARP project records')
+param harpProjectRecordsQuery string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -237,6 +240,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     }
     documentStorageAccounts: documentStorageAccounts
     parMicrosoftEntraAuthority: parMicrosoftEntraAuthority
+    harpProjectRecordsQuery: harpProjectRecordsQuery
   }
 }
 

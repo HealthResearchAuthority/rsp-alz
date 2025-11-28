@@ -203,3 +203,4 @@ param parMicrosoftEntraAuthority = ''
 param parMicrosoftEntraAudience = ''
 
 param processDocuUploadManagedIdentityClientId = ''
+param harpProjectRecordsQuery = ''
