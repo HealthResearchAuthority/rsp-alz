@@ -34,7 +34,8 @@ param parFrontDoorRateLimitThreshold = 1000
 param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
-param parEnableFrontDoorPrivateLink = true
+param parEnableFrontDoorPrivateLinkForIRAS = true
+param parEnableFrontDoorPrivateLinkForCMS = true
 param parEnableFunctionAppPrivateEndpoints = true
 param parEnableKeyVaultPrivateEndpoints = true
 param parEnableAppConfigPrivateEndpoints = false
@@ -173,7 +174,6 @@ param parAllowedHosts = '*'
 // indicates whether to use Front Door for the UAT environment
 param parUseFrontDoor = true
 
-@description('Indicates whether to use One Login for the application')
 param useOneLogin = true
 
 param paramWhitelistIPs = ''

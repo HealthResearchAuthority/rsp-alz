@@ -58,6 +58,9 @@ param enablePrivateLink bool = false
 @description('Front Door SKU')
 param frontDoorSku string = 'Premium_AzureFrontDoor'
 
+@description('Optional. Resource ID of the diagnostic log analytics workspace.')
+param logAnalyticsWorkspaceId string = ''
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -106,6 +109,48 @@ module wafPolicy '../../../shared/bicep/front-door/waf-policy.bicep' = if (enabl
     enableRateLimiting: enableRateLimiting
     rateLimitThreshold: rateLimitThreshold
     customRules: []
+    ruleGroupOverrides: [
+      {
+        ruleGroupName: 'General'
+        rules: [
+          {
+            ruleId: '200002'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+          {
+            ruleId: '200003'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+        ]
+      }
+      {
+        ruleGroupName: 'SQLI'
+        rules: [
+          {
+            ruleId: '942100'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+          {
+            ruleId: '942410'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+        ]
+      }
+      {
+        ruleGroupName: 'MS-ThreatIntel-SQLI'
+        rules: [
+          {
+            ruleId: '99031003'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+        ]
+      }
+    ]
   }
 }
 
@@ -119,6 +164,7 @@ module frontDoorProfile '../../../shared/bicep/front-door/front-door-profile.bic
     skuName: frontDoorSku
     identityType: 'SystemAssigned'
     originResponseTimeoutSeconds: 60
+    diagnosticWorkspaceId: logAnalyticsWorkspaceId
   }
 }
 

@@ -211,8 +211,11 @@ param parFrontDoorCacheDuration string = 'P1D'
 @description('Enable Front Door HTTPS redirect')
 param parEnableFrontDoorHttpsRedirect bool = true
 
-@description('Enable Front Door Private Link to origin')
-param parEnableFrontDoorPrivateLink bool = false
+@description('Enable Front Door Private Link to IRAS Portal')
+param parEnableFrontDoorPrivateLinkForIRAS bool = false
+
+@description('Enable Front Door Private Link to CMS Portal')
+param parEnableFrontDoorPrivateLinkForCMS bool = false
 
 @description('Enable Function Apps Private Endpoints')
 param parEnableFunctionAppPrivateEndpoints bool = false
@@ -821,7 +824,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'app'
-      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink
+      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLinkForIRAS
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
       ]
@@ -848,12 +851,13 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'app'
-      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLink
+      deployAppPrivateEndPoint: parEnableFrontDoorPrivateLinkForCMS
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       paramWhitelistIPs: paramWhitelistIPs
+      allowPublicAccessOverride: true
     }
     dependsOn: [
       databaseserver
@@ -962,6 +966,43 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
+// Daily CSV export Logic App (Standard, WS1)
+module dailyCsvLogicApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('dailyCsvLogicApp-${deployment().name}-deployment', 64)
+    params: {
+      location: location
+      tags: tags
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      appServicePlanName: 'asp-rsp-la-csvexport-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'la-csv-export-${parSpokeNetworks[i].parEnvironment}'
+      sku: 'WS1'
+      webAppBaseOs: 'Windows'
+      kind: 'functionapp,workflowapp'
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      storageAccountName: 'stlacsv${parSpokeNetworks[i].parEnvironment}'
+      deploySlot: false
+      userAssignedIdentities: [
+        databaseserver[i].outputs.outputsqlServerUAIID
+      ]
+      deployAppPrivateEndPoint: true
+      sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIID
+    }
+    dependsOn: [
+      databaseserver
+      umbracoCMS
+      webApp
+      applicationsRG
+      rtsfnApp
+      processScanFnApp
+    ]
+  }
+]
+
 // Grant process scan function permissions to all document storage accounts. Handled seperately as there was circular dependency.
 module processScanFunctionPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -999,8 +1040,9 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
       enableHttpsRedirect: parEnableFrontDoorHttpsRedirect
       enableManagedTls: true
       webAppResourceId: webApp[i].outputs.webAppResourceId
-      enablePrivateLink: parEnableFrontDoorPrivateLink
+      enablePrivateLink: parEnableFrontDoorPrivateLinkForIRAS
       frontDoorSku: parSkuConfig.frontDoor
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     }
     dependsOn: [
       webApp

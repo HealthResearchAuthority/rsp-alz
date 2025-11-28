@@ -32,7 +32,8 @@ param parFrontDoorRateLimitThreshold = 1000
 param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
-param parEnableFrontDoorPrivateLink = true
+param parEnableFrontDoorPrivateLinkForIRAS = true
+param parEnableFrontDoorPrivateLinkForCMS = true
 param parEnableFunctionAppPrivateEndpoints = true
 param parEnableKeyVaultPrivateEndpoints = true
 param parEnableAppConfigPrivateEndpoints = false
@@ -171,7 +172,6 @@ param parAllowedHosts = 'fd-rsp-applications-automationtest-uks-e7f6hkg3c5edhxex
 // indicates whether to use Front Door for the systemtest_auto environment
 param parUseFrontDoor = true
 
-@description('Indicates whether to use One Login for the application')
 param useOneLogin = true
 
 param paramWhitelistIPs =  ''

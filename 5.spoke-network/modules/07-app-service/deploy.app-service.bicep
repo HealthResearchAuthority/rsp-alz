@@ -8,8 +8,8 @@ param appServicePlanName string
 @maxLength(60)
 param appName string 
 
-@description('Optional S1 is default. Defines the name, tier, size, family and capacity of the App Service Plan. Plans ending to _AZ, are deploying at least three instances in three Availability Zones. EP* is only for functions')
-@allowed([ 'B1','B3','S1', 'S2', 'S3', 'P1V3', 'P2V3', 'P3V3', 'P1V3_AZ', 'P2V3_AZ', 'P3V3_AZ', 'EP1', 'EP2', 'EP3', 'ASE_I1V2_AZ', 'ASE_I2V2_AZ', 'ASE_I3V2_AZ', 'ASE_I1V2', 'ASE_I2V2', 'ASE_I3V2' ])
+@description('Optional S1 is default. Defines the name, tier, size, family and capacity of the App Service Plan. Plans ending to _AZ, are deploying at least three instances in three Availability Zones. EP* is only for functions. WS1 is for Logic Apps Standard.')
+@allowed([ 'B1','B3','S1', 'S2', 'S3', 'P1V3', 'P2V3', 'P3V3', 'P1V3_AZ', 'P2V3_AZ', 'P3V3_AZ', 'EP1', 'EP2', 'EP3', 'ASE_I1V2_AZ', 'ASE_I2V2_AZ', 'ASE_I3V2_AZ', 'ASE_I1V2', 'ASE_I2V2', 'ASE_I3V2', 'WS1' ])
 param sku string
 
 @description('Optional. Location for all resources.')
@@ -39,12 +39,12 @@ param logAnalyticsWsId string
 @description('The subnet ID that is dedicated to Web Server, for Vnet Injection of the web app. If deployAseV3=true then this is the subnet dedicated to the ASE v3')
 param subnetIdForVnetInjection string
 
-@description('Name of the storage account if deploying Function App')
+@description('Name of the storage account if deploying Function App or Logic App')
 @maxLength(24)
 param storageAccountName string = ''
 
-@description('Webapp or functionapp')
-@allowed(['functionapp','app'])
+@description('Webapp, functionapp, or functionapp,workflowapp')
+@allowed(['functionapp','app','functionapp,workflowapp'])
 param kind string
 
 @description('Client ID of the managed identity to be used for the SQL DB connection string. For Function App Only')
@@ -56,11 +56,14 @@ param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
 param eventGridServiceTagRestriction bool = false
 
+@description('Override to allow public access even when private endpoint exists')
+param allowPublicAccessOverride bool = false
+
 
 var slotName = 'staging'
 
 var varWhitelistIPs = filter(split(paramWhitelistIPs, ','), ip => !empty(trim(ip)))
-var contentShareName = kind == 'functionapp' ? take(replace(toLower('${appName}-content'), '_', '-'), 63) : ''
+var contentShareName = (kind == 'functionapp' || kind == 'functionapp,workflowapp') ? take(replace(toLower('${appName}-content'), '_', '-'), 63) : ''
 var storageAccountSanitized = toLower(replace(storageAccountName, '-', ''))
 var storageAccountResourceName = length(storageAccountSanitized) > 24 ? substring(storageAccountSanitized, 0, 24) : storageAccountSanitized
 
@@ -116,6 +119,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
     appInsightId: appInsights.outputs.appInsResourceId
     operatingSystem:  (webAppBaseOs =~ 'linux') ? 'linuxNet9' : 'windowsNet9'
     hasPrivateLink: deployAppPrivateEndPoint
+    allowPublicAccessOverride: allowPublicAccessOverride
     systemAssignedIdentity: false
     userAssignedIdentities:  {
       type: 'UserAssigned'
@@ -135,7 +139,7 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
   }
 }
 
-module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'functionapp') {
+module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'functionapp' || kind == 'functionapp,workflowapp') {
   name: take('fnAppStoragePrivateNetwork-${deployment().name}', 64)
   params: {
     name: storageAccountName
@@ -148,14 +152,14 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
   }
 }
 
-resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = if(kind == 'functionapp') {
+resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = if(kind == 'functionapp' || kind == 'functionapp,workflowapp') {
   name: '${storageAccountResourceName}/default'
   dependsOn: [
     fnstorage
   ]
 }
 
-resource storageContentShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = if(kind == 'functionapp' && !empty(contentShareName)) {
+resource storageContentShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = if((kind == 'functionapp' || kind == 'functionapp,workflowapp') && !empty(contentShareName)) {
   parent: storageFileService
   name: contentShareName
   properties: {
@@ -164,8 +168,8 @@ resource storageContentShare 'Microsoft.Storage/storageAccounts/fileServices/sha
   }
 }
 
-module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && deployAppPrivateEndPoint == true) {
-  name:take('rtsfnStorageBlobPrivateNetwork-${deployment().name}', 64)
+module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if((kind == 'functionapp' || kind == 'functionapp,workflowapp') && deployAppPrivateEndPoint == true) {
+  name: take('pep-${appName}-blob', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
     location: location
@@ -185,8 +189,8 @@ module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networki
   }
 }
 
-module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if(kind == 'functionapp' && deployAppPrivateEndPoint == true) {
-  name:take('fnStorageFilePrivateNetwork-${storageAccountName}', 64)
+module storageFilesPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if((kind == 'functionapp' || kind == 'functionapp,workflowapp') && deployAppPrivateEndPoint == true) {
+  name: take('pep-${appName}-file', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
     location: location
@@ -233,14 +237,37 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
   ]
 }
 
+module lgApp '../../../shared/bicep/app-services/logic-app.bicep' = if(kind == 'functionapp,workflowapp') {
+  name: take('${appName}-logicApp-Deployment', 64)
+  params: {
+    kind: 'functionapp,workflowapp'
+    logicAppName:  appName
+    location: location
+    serverFarmResourceId: appSvcPlan.outputs.resourceId
+    appInsightId: appInsights.outputs.appInsResourceId
+    virtualNetworkSubnetId: subnetIdForVnetInjection
+    userAssignedIdentities:  {
+      type: 'UserAssigned'
+      userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
+    }
+    storageAccountName: storageAccountName
+    contentShareName: contentShareName
+    hasPrivateEndpoint: deployAppPrivateEndPoint
+    sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
+  }
+  dependsOn: [
+    fnstorage
+  ]
+}
+
 resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
   scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
   name: spokeVNetName
 }
 
-// Private endpoint for App Service/Function App using existing private-networking-spoke module
-module appServicePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = if(deployAppPrivateEndPoint) {
-  name: take('appServicePrivateEndpoint-${deployment().name}', 64)
+// Private endpoint for App Service/Function App/Logic App using existing private-networking-spoke module
+module appServicePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = if(deployAppPrivateEndPoint && (kind == 'app' || kind == 'functionapp')) {
+  name: take('pep-${appName}-sites', 64)
   scope: resourceGroup(privateEndpointRG)
   params: {
     location: location
@@ -260,11 +287,37 @@ module appServicePrivateEndpoint '../../../shared/bicep/network/private-networki
   }
 }
 
+module logicappServicePrivateEndpoint '../../../shared/bicep/network/private-networking-spoke.bicep' = if(deployAppPrivateEndPoint && kind == 'functionapp,workflowapp') {
+  name: take('pep-${appName}-logic', 64)
+  scope: resourceGroup(privateEndpointRG)
+  params: {
+    location: location
+    azServicePrivateDnsZoneName: 'privatelink.azurewebsites.net'
+    azServiceId: lgApp!.outputs.logicAppId
+    privateEndpointName: take('pep-${lgApp!.outputs.logicAppName}', 64)
+    privateEndpointSubResourceName: 'sites'
+    virtualNetworkLinks: [
+      {
+        vnetName: spokeVNetName
+        vnetId: vnetSpoke.id
+        registrationEnabled: false
+      }
+    ]
+    subnetId: subnetPrivateEndpointSubnetId
+    //vnetSpokeResourceId: spokeVNetId
+  }
+  dependsOn: [
+    storageFilesPrivateNetwork
+  ]
+}
+
 output appName string = appName
-output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: fnApp!.outputs.defaultHostName
-output webAppResourceId string = (kind == 'app') ? webApp!.outputs.resourceId : fnApp!.outputs.functionAppId
-output systemAssignedPrincipalId string = (kind == 'app') ? webApp!.outputs.systemAssignedPrincipalId : fnApp!.outputs.systemAssignedPrincipalId
+output appHostName string = (kind == 'app') ? webApp!.outputs.defaultHostname: kind == 'functionapp,workflowapp' ? lgApp!.outputs.defaultHostName : fnApp!.outputs.defaultHostName
+output webAppResourceId string = (kind == 'app') ? webApp!.outputs.resourceId : kind == 'functionapp,workflowapp' ? lgApp!.outputs.logicAppId : fnApp!.outputs.functionAppId
+output systemAssignedPrincipalId string = (kind == 'app') ? webApp!.outputs.systemAssignedPrincipalId : kind == 'functionapp,workflowapp' ? lgApp!.outputs.systemAssignedPrincipalId : fnApp!.outputs.systemAssignedPrincipalId
 output appInsightsResourceId string = appInsights.outputs.appInsResourceId
+output logicAppName string = kind == 'functionapp,workflowapp' ? lgApp!.outputs.logicAppName : ''
+output logicAppId string = kind == 'functionapp,workflowapp' ? lgApp!.outputs.logicAppId : ''
 
 
 

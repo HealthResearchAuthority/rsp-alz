@@ -33,6 +33,52 @@ param identityType string = 'SystemAssigned'
 @description('Optional. The user assigned identities for the Front Door profile.')
 param userAssignedIdentities object = {}
 
+@description('Optional. The name of the diagnostic setting, if deployed.')
+param diagnosticSettingsName string = '${name}-diagnosticSettings'
+
+@description('Optional. Resource ID of the diagnostic log analytics workspace.')
+param diagnosticWorkspaceId string = ''
+
+@description('Optional. The name of logs that will be streamed. "allLogs" includes all possible logs for the resource.')
+@allowed([
+  'allLogs'
+  'FrontDoorAccessLog'
+  'FrontDoorHealthProbeLog'
+  'FrontDoorWebApplicationFirewallLog'
+])
+param diagnosticLogCategoriesToEnable array = [
+  'allLogs'
+]
+
+@description('Optional. The name of metrics that will be streamed.')
+@allowed([
+  'AllMetrics'
+])
+param diagnosticMetricsToEnable array = [
+  'AllMetrics'
+]
+
+// ------------------
+// VARIABLES
+// ------------------
+
+var diagnosticsLogsSpecified = [for category in filter(diagnosticLogCategoriesToEnable, item => item != 'allLogs'): {
+  category: category
+  enabled: true
+}]
+
+var diagnosticsLogs = contains(diagnosticLogCategoriesToEnable, 'allLogs') ? [
+  {
+    categoryGroup: 'allLogs'
+    enabled: true
+  }
+] : diagnosticsLogsSpecified
+
+var diagnosticsMetrics = [for metric in diagnosticMetricsToEnable: {
+  category: metric
+  enabled: true
+}]
+
 // ------------------
 // RESOURCES
 // ------------------
@@ -50,6 +96,16 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2023-05-01' = {
   }
   properties: {
     originResponseTimeoutSeconds: originResponseTimeoutSeconds
+  }
+}
+
+resource frontDoorProfile_diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(diagnosticWorkspaceId)) {
+  name: diagnosticSettingsName
+  scope: frontDoorProfile
+  properties: {
+    workspaceId: diagnosticWorkspaceId
+    logs: diagnosticsLogs
+    metrics: diagnosticsMetrics
   }
 }
 
