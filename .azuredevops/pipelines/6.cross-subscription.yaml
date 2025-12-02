@@ -1,4 +1,4 @@
-# This workflow will deploy the LZA in ADO
+# This workflow will deploy cross-subscription resources
 name: 6.cross-subscription-lza-deployment
 
 trigger: none
@@ -10,8 +10,20 @@ pr:
     include:
       - '6.cross-subscription/**'
 
-variables:
-  - group: 'CrossSubscription'  # Variable group with parameters for cross subscription connect to Keyvault
+parameters:
+  - name: env
+    displayName: Environment
+    type: string
+    default: dev
+    values:
+      - dev
+      - systemtest_manual
+      - systemtest_auto
+      - systemtest_int
+      - uat
+      - pre_prod
+      - production
+      - dw
 
 stages:
   - stage: PRValidation
@@ -28,13 +40,15 @@ stages:
               az bicep install
               az bicep version
             displayName: 'Install Bicep CLI'
+
       - job: lint
         displayName: 'Lint Cross Subscription Templates'
-        pool: 
+        pool:
           vmImage: 'ubuntu-latest'
         dependsOn: [setup]
         steps:
           - bash: az bicep build --file ./6.cross-subscription/main.bicep
+            displayName: 'Build Bicep Template'
 
       - job: SAST
         displayName: 'SAST Analysis'
@@ -51,19 +65,39 @@ stages:
 
       - job: validate
         displayName: 'Validate Cross Subscription Deployment'
-        pool: 
+        pool:
           vmImage: 'ubuntu-latest'
         dependsOn: [setup, lint, SAST]
         condition: succeeded()
+        variables:
+          - group: CrossSubscription-${{ parameters.env }}
         steps:
           - task: AzureCLI@2
+            displayName: 'Validate Bicep Template'
             inputs:
               azureSubscription: $(azureServiceConnection)
               scriptType: bash
               scriptLocation: inlineScript
               inlineScript: |
                 az config set bicep.use_binary_from_path=false --only-show-errors
-                az deployment mg validate --name "ACA-$(Build.BuildId)" --location $(location) --management-group-id $(management-group-id) --template-file ./6.cross-subscription/main.bicep --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) manageddevopspoolVnetID=$(manageddevopspoolVnetID) paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) paramserviceIdspreprod=$(serviceIdspreprod) paramserviceIdsprod=$(serviceIdsprod) paramserviceIdsdw=$(serviceIdsDW) storageSubscriptionId="$(storageSubscriptionId)" devboxSubscriptionId="$(devboxSubscriptionId)" dwFunctionAppId=$(dwFunctionAppId)
+                az deployment mg validate \
+                  --name "CrossSubscription-$(Build.BuildId)" \
+                  --location $(location) \
+                  --management-group-id $(management-group-id) \
+                  --template-file ./6.cross-subscription/main.bicep \
+                  --parameters ./6.cross-subscription/main.parameters.bicepparam \
+                              paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
+                              manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
+                              paramserviceIds=$(paramserviceIds) \
+                              environment='${{ parameters.env }}' \
+                              enableDevBoxStorageEndpoints=$(enableDevBoxStorageEndpoints) \
+                              storageSubscriptionId="$(storageSubscriptionId)" \
+                              storageResourceGroupName="$(storageResourceGroupName)" \
+                              devboxSubscriptionId="$(devboxSubscriptionId)" \
+                              devboxResourceGroupName="$(devboxResourceGroupName)" \
+                              devboxVNetName="$(devboxVNetName)" \
+                              devboxPrivateEndpointSubnetName="$(devboxPrivateEndpointSubnetName)" \
+                              dwFunctionAppId=$(dwFunctionAppId)
 
       - job: preview
         displayName: 'Preview Cross Subscription Deployments'
@@ -71,8 +105,11 @@ stages:
           vmImage: 'ubuntu-latest'
         dependsOn: [setup, lint, validate]
         condition: succeeded()
+        variables:
+          - group: CrossSubscription-${{ parameters.env }}
         steps:
           - task: AzureCLI@2
+            displayName: 'What-If Analysis'
             inputs:
               azureSubscription: $(azureServiceConnection)
               scriptType: bash
@@ -83,14 +120,19 @@ stages:
                   --location $(location) \
                   --template-file ./6.cross-subscription/main.bicep \
                   --management-group-id $(management-group-id) \
-                  --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
-                        manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                        paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
-                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) paramserviceIdspreprod=$(serviceIdspreprod) paramserviceIdsprod=$(serviceIdsprod) \
-                        paramserviceIdsdw=$(serviceIdsDW) \
-                        storageSubscriptionId="$(storageSubscriptionId)" \
-                        devboxSubscriptionId="$(devboxSubscriptionId)" \
-                        dwFunctionAppId=$(dwFunctionAppId)
+                  --parameters ./6.cross-subscription/main.parameters.bicepparam \
+                              paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
+                              manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
+                              paramserviceIds=$(paramserviceIds) \
+                              environment='${{ parameters.env }}' \
+                              enableDevBoxStorageEndpoints=$(enableDevBoxStorageEndpoints) \
+                              storageSubscriptionId="$(storageSubscriptionId)" \
+                              storageResourceGroupName="$(storageResourceGroupName)" \
+                              devboxSubscriptionId="$(devboxSubscriptionId)" \
+                              devboxResourceGroupName="$(devboxResourceGroupName)" \
+                              devboxVNetName="$(devboxVNetName)" \
+                              devboxPrivateEndpointSubnetName="$(devboxPrivateEndpointSubnetName)" \
+                              dwFunctionAppId=$(dwFunctionAppId)
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment for Cross Subscription'
@@ -107,11 +149,14 @@ stages:
               az bicep install
               az bicep version
             displayName: 'Install Bicep CLI'
+
       - job: FinalWhatIf
         displayName: 'Run What-If before Deployment'
         pool:
           vmImage: 'ubuntu-latest'
         dependsOn: [setup]
+        variables:
+          - group: CrossSubscription-${{ parameters.env }}
         steps:
           - task: AzureCLI@2
             displayName: 'Final What-If'
@@ -125,25 +170,29 @@ stages:
                   --location $(location) \
                   --template-file ./6.cross-subscription/main.bicep \
                   --management-group-id $(management-group-id) \
-                  --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
-                        manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                        paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
-                        paramserviceIdsmanual=$(serviceIdsmanual) paramserviceIdsuat=$(serviceIdsuat) paramserviceIdspreprod=$(serviceIdspreprod) paramserviceIdsprod=$(serviceIdsprod) \
-                        paramserviceIdsdw=$(serviceIdsDW) \
-                        storageSubscriptionId="$(storageSubscriptionId)" \
-                        devboxSubscriptionId="$(devboxSubscriptionId)" \
-                        dwFunctionAppId=$(dwFunctionAppId)
+                  --parameters ./6.cross-subscription/main.parameters.bicepparam \
+                              paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
+                              manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
+                              paramserviceIds=$(paramserviceIds) \
+                              environment='${{ parameters.env }}' \
+                              enableDevBoxStorageEndpoints=$(enableDevBoxStorageEndpoints) \
+                              storageSubscriptionId="$(storageSubscriptionId)" \
+                              storageResourceGroupName="$(storageResourceGroupName)" \
+                              devboxSubscriptionId="$(devboxSubscriptionId)" \
+                              devboxResourceGroupName="$(devboxResourceGroupName)" \
+                              devboxVNetName="$(devboxVNetName)" \
+                              devboxPrivateEndpointSubnetName="$(devboxPrivateEndpointSubnetName)" \
+                              dwFunctionAppId=$(dwFunctionAppId)
 
       - deployment: deploy
         displayName: 'Deploy Cross Subscription'
-        pool: 
+        pool:
           vmImage: 'ubuntu-latest'
         dependsOn: [setup, FinalWhatIf]
         condition: succeeded()
-        variables:
-          - name: devOpsPublicIP
-            value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
         environment: 'alz-bicep-deployment'
+        variables:
+          - group: CrossSubscription-${{ parameters.env }}
         strategy:
           runOnce:
             deploy:
@@ -164,20 +213,22 @@ stages:
                     inlineScript: |
                       az config set bicep.use_binary_from_path=false --only-show-errors
                       output=$(az deployment mg create \
-                        --name "core-services-$(Build.BuildId)" \
+                        --name "cross-subscription-$(Build.BuildId)" \
                         --location $(location) \
                         --management-group-id $(management-group-id) \
                         --template-file ./6.cross-subscription/main.bicep \
-                        --parameters paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
-                              manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                              paramserviceIdsdev=$(serviceIdsdev) paramserviceIdsauto=$(serviceIdsauto) \
-                              paramserviceIdsdw=$(serviceIdsDW) \
-                              paramserviceIdsmanual=$(serviceIdsmanual) \
-                              paramserviceIdsuat=$(serviceIdsuat) \
-                              paramserviceIdspreprod=$(serviceIdspreprod) \
-                              paramserviceIdsprod=$(serviceIdsprod) \
-                              storageSubscriptionId="$(storageSubscriptionId)" \
-                              devboxSubscriptionId="$(devboxSubscriptionId)" \
-                              dwFunctionAppId=$(dwFunctionAppId))
+                        --parameters ./6.cross-subscription/main.parameters.bicepparam \
+                                    paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
+                                    manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
+                                    paramserviceIds=$(paramserviceIds) \
+                                    environment='${{ parameters.env }}' \
+                                    enableDevBoxStorageEndpoints=$(enableDevBoxStorageEndpoints) \
+                                    storageSubscriptionId="$(storageSubscriptionId)" \
+                                    storageResourceGroupName="$(storageResourceGroupName)" \
+                                    devboxSubscriptionId="$(devboxSubscriptionId)" \
+                                    devboxResourceGroupName="$(devboxResourceGroupName)" \
+                                    devboxVNetName="$(devboxVNetName)" \
+                                    devboxPrivateEndpointSubnetName="$(devboxPrivateEndpointSubnetName)" \
+                                    dwFunctionAppId=$(dwFunctionAppId))
                       echo "Full Bicep Deployment Output:"
                       echo $output | jq .

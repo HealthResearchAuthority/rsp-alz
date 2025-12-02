@@ -3,7 +3,7 @@ using 'main.bicep'
 // VNet peering configuration - comma-separated list of spoke VNet IDs to peer with Management DevOps Pool
 param paramvnetPeeringsVNetIDs = ''
 
-// Service IDs for private endpoints - comma-separated list of Azure service resource IDs
+// Service IDs for private endpoints - comma-separated list of Azure service resource IDs for THIS environment
 param paramserviceIds = ''
 
 // Management DevOps Pool VNet ID - the source VNet for peering and private endpoints
@@ -22,3 +22,6 @@ param devboxSubscriptionId = ''
 param devboxResourceGroupName = 'rg-rsp-devcenter'
 param devboxVNetName = 'vnet-dbox-rsp-uksouth'
 param devboxPrivateEndpointSubnetName = 'sn-devpools'
+
+// DW Function App resource ID
+param dwFunctionAppId = ''

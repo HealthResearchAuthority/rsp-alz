@@ -7,26 +7,8 @@ targetScope = 'managementGroup'
 @description('The location where the resources will be created.')
 param paramvnetPeeringsVNetIDs string
 
-@description('The IDs of the Azure service to be used for the private endpoint.')
-param paramserviceIdsdev string
-
-@description('The IDs of the Azure service to be used for the private endpoint.')
-param paramserviceIdsdw string
-
-@description('The IDs of the Azure service to be used for the private endpoint.')
-param paramserviceIdsauto string
-
-@description('The IDs of the Azure service to be used for the private endpoint.')
-param paramserviceIdsmanual string
-
-@description('The IDs of the Azure service to be used for the private endpoint.')
-param paramserviceIdsuat string
-
-@description('The IDs of the Azure service to be used for the private endpoint.')
-param paramserviceIdspreprod string
-
-@description('The IDs of the Azure service to be used for the private endpoint.')
-param paramserviceIdsprod string
+@description('Comma-separated list of Azure service resource IDs for private endpoints in the target environment.')
+param paramserviceIds string
 
 @description('VNet ID under managed devops pool subscription where the VNet peering will be created.')
 param manageddevopspoolVnetID string
@@ -74,15 +56,7 @@ var vnetInfoArray = [
   }
 ]
 
-var pepServiceIDArraydev = split(paramserviceIdsdev, ',')
-var pepServiceIDArraydw = split(paramserviceIdsdw, ',')
-var pepServiceIDArrayauto = split(paramserviceIdsauto, ',')
-var pepServiceIDArraymanual = split(paramserviceIdsmanual, ',')
-var pepServiceIDArrayuat = split(paramserviceIdsuat, ',')
-var pepServiceIDArraypreprod = split(paramserviceIdspreprod, ',')
-var pepServiceIDArrayprod = split(paramserviceIdsprod, ',')
-
-var allserviceIDs = union(pepServiceIDArraydev, pepServiceIDArraydw, pepServiceIDArrayauto, pepServiceIDArraymanual, pepServiceIDArrayuat, pepServiceIDArraypreprod, pepServiceIDArrayprod)
+var allserviceIDs = !empty(paramserviceIds) ? split(paramserviceIds, ',') : []
 
 @description('Deploy VNet Peering')
 module vnetpeeringmodule 'modules/vnetpeering/vnetpeering.bicep' = {
