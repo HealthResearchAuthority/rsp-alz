@@ -105,6 +105,16 @@ param documentStorageAccounts object
 @description('SQL query for retrieving HARP project records')
 param harpProjectRecordsQuery string
 
+@description('BGO database IP address')
+param bgodatabase string
+
+@description('BGO harp database user')
+param bgodatabaseuser string
+
+@description('User password for BGO harp database')
+@secure()
+param bgodatabasepassword string
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -161,6 +171,11 @@ var keyValues = [
   {
     name: 'ConnectionStrings:cmsPortalDatabaseConnection'
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=cmsservice;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+    contentType: null
+  }
+  {
+    name: 'ConnectionStrings:BGOHARPConnectionString'
+    value: 'Server=${bgodatabase};Database=harp;User Id=${bgodatabaseuser};Password=${bgodatabasepassword};TrustServerCertificate=True;'
     contentType: null
   }
   {

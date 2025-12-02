@@ -127,6 +127,7 @@ stages:
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                              bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
       - job: preview
@@ -180,6 +181,7 @@ stages:
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                               harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                              bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
 
@@ -277,6 +279,7 @@ stages:
                               parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                               harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                              bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
       - deployment: deploy
@@ -342,6 +345,7 @@ stages:
                                     parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                                     processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                                     harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                                    bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                                     parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }} \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
