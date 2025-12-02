@@ -24,7 +24,8 @@ param environment string
 // ------------------
 
 var functionAppName = last(split(dwFunctionAppId, '/'))
-var privateEndpointName = 'pep-${functionAppName}-${environment}'
+var functionAppBaseName = replace(substring(functionAppName, 5), '-', '')
+var privateEndpointName = 'pep-func-${functionAppBaseName}-${environment}'
 
 // ------------------
 // EXISTING RESOURCES
