@@ -94,6 +94,9 @@ param keyVaultSecretUris object
 @description('Identity Client ID for the managed identity that will be used by the Process Document Upload function to access Application Service API')
 param processDocuUploadManagedIdentityClientId string
 
+@description('Identity Client ID for the managed identity that will be used by IRAS Portal to call func-validate-irasid')
+param irasPortalFunctionCallerIdentityClientId string
+
 @description('Application ID of the Application Service in Azure AD')
 param parMicrosoftEntraAudience string
 
@@ -311,13 +314,18 @@ var keyValues = [
     contentType: null
   }
   {
-    name: 'AppSettings:ProjectRecordValidationFunctionKey'
-    value: '{"uri":"${keyVaultSecretUris.projectRecordValidationFunctionKey}"}'
-    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
-  }
-  {
     name: 'AppSettings:ProjectRecordValidationUri'
     value: 'https://func-validate-irasid.azurewebsites.net/api'
+    contentType: null
+  }
+  {
+    name: 'AppSettings:ProjectRecordValidationScope'
+    value: 'api://aee3da6b-19a5-4c42-bdd1-bbed7b5d67d3/.default'
+    contentType: null
+  }
+  {
+    name: 'AppSettings:FunctionCallerManagedIdentityClientId'
+    value: irasPortalFunctionCallerIdentityClientId
     contentType: null
   }
 ]

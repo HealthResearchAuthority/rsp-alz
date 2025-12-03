@@ -38,3 +38,7 @@ param harpSyncResourceGroupName = 'harpSyncRG'
 
 // App Configuration Parameters
 param enableAppConfigPrivateEndpoints = true
+
+// Easy Auth Parameters for func-validate-irasid
+param validateIrasIdAuthClientId = 'aee3da6b-19a5-4c42-bdd1-bbed7b5d67d3' // App registration client ID from Entra ID
+param validateIrasIdAuthAppIdUri = 'api://aee3da6b-19a5-4c42-bdd1-bbed7b5d67d3' // Application ID URI

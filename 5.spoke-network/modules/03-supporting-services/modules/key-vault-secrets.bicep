@@ -61,12 +61,13 @@ var storageSecrets = [
   }
 ]
 
-var validationFunctionSecrets = [
-  {
-    name: 'projectRecordValidationFunctionKey'
-    value: 'placeholder-project-record-validation-function-key-to-be-updated-manually'
-  }
-]
+// NOTE: Commented out - moved to managed identity authentication with Easy Auth
+// var validationFunctionSecrets = [
+//   {
+//     name: 'projectRecordValidationFunctionKey'
+//     value: 'placeholder-project-record-validation-function-key-to-be-updated-manually'
+//   }
+// ]
 
 // ------------------
 //    RESOURCES
@@ -112,17 +113,18 @@ resource storageSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' =
   }
 ]
 
-resource validationFunctionSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = [
-  for secret in validationFunctionSecrets: if (createSecretsWithPlaceholders) {
-    parent: keyVault
-    name: secret.name
-    tags: tags
-    properties: {
-      value: secret.value
-      contentType: 'text/plain'
-    }
-  }
-]
+// NOTE: Commented out - moved to managed identity authentication with Easy Auth
+// resource validationFunctionSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = [
+//   for secret in validationFunctionSecrets: if (createSecretsWithPlaceholders) {
+//     parent: keyVault
+//     name: secret.name
+//     tags: tags
+//     properties: {
+//       value: secret.value
+//       contentType: 'text/plain'
+//     }
+//   }
+// ]
 
 // ------------------
 //    OUTPUTS
@@ -161,5 +163,6 @@ output quarantineStorageAccountKeySecretUri string = '${keyVault.properties.vaul
 @description('Key Vault URI for cleanStorageAccountKey secret.')
 output cleanStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/cleanStorageAccountKey'
 
-@description('Key Vault URI for projectRecordValidationFunctionKey secret.')
-output projectRecordValidationFunctionKey string = '${keyVault.properties.vaultUri}secrets/projectRecordValidationFunctionKey'
+// NOTE: Commented out - moved to managed identity authentication with Easy Auth
+// @description('Key Vault URI for projectRecordValidationFunctionKey secret.')
+// output projectRecordValidationFunctionKey string = '${keyVault.properties.vaultUri}secrets/projectRecordValidationFunctionKey'
