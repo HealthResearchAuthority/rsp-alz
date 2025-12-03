@@ -199,11 +199,3 @@ The template automatically:
 4. **Monitor Deployments**: Watch deployment logs for errors or warnings in the Azure DevOps portal
 5. **Use DW Checkbox Wisely**: Only check "Deploy DW Private Endpoints" when necessary to avoid unnecessary deployments
 
-## Additional Resources
-
-- [Azure Bicep Documentation](https://learn.microsoft.com/azure/azure-resource-manager/bicep/)
-- [Azure DevOps YAML Templates](https://learn.microsoft.com/azure/devops/pipelines/process/templates)
-- [VNet Peering Overview](https://learn.microsoft.com/azure/virtual-network/virtual-network-peering-overview)
-- [Private Endpoints](https://learn.microsoft.com/azure/private-link/private-endpoint-overview)
-- [Azure DevOps Variable Groups](https://learn.microsoft.com/azure/devops/pipelines/library/variable-groups)
-- [Template Best Practices](https://learn.microsoft.com/azure/devops/pipelines/security/templates)
