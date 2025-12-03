@@ -36,12 +36,20 @@ param parAppConfigurationValues appConfigurationKeyValue[] = []
 // VARIABLES
 // ------------------
 
+var normalizedKeyValues = [
+  for keyValue in parAppConfigurationValues: union({
+    label: ''
+    contentType: ''
+    tags: {}
+  }, keyValue)
+]
+
 var resolvedAppConfigValues = [
-  for keyValue in parAppConfigurationValues: {
-    name: empty(keyValue.label) ? keyValue.key : '${keyValue.key}$${keyValue.label}'
+  for keyValue in normalizedKeyValues: {
+    name: empty(string(keyValue.label)) ? keyValue.key : '${keyValue.key}$${keyValue.label}'
     value: keyValue.value
-    contentType: keyValue.contentType
-    tags: keyValue.tags
+    contentType: empty(string(keyValue.contentType)) ? null : keyValue.contentType
+    tags: empty(keyValue.tags) ? null : keyValue.tags
   }
 ]
 
