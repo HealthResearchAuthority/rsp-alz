@@ -18,7 +18,7 @@ parameters:
   - name: app_config_variable_group
     displayName: 'Optional variable group containing App Configuration secrets'
     type: string
-    default: ''
+    default: 'none'
 
 stages:
   - stage: AppConfigUpdate
@@ -48,7 +48,7 @@ stages:
           name: rsp-manageddevopspool
         variables:
           - group: ${{ parameters.env }}
-          - ${{ if ne(parameters.app_config_variable_group, '') }}:
+          - ${{ if ne(parameters.app_config_variable_group, 'none') }}:
               - group: ${{ parameters.app_config_variable_group }}
         steps:
           - checkout: self
@@ -81,7 +81,7 @@ stages:
           name: rsp-manageddevopspool
         variables:
           - group: ${{ parameters.env }}
-          - ${{ if ne(parameters.app_config_variable_group, '') }}:
+          - ${{ if ne(parameters.app_config_variable_group, 'none') }}:
               - group: ${{ parameters.app_config_variable_group }}
         steps:
           - checkout: self
@@ -116,7 +116,7 @@ stages:
         environment: 'alz-appconfig-update'
         variables:
           - group: ${{ parameters.env }}
-          - ${{ if ne(parameters.app_config_variable_group, '') }}:
+          - ${{ if ne(parameters.app_config_variable_group, 'none') }}:
               - group: ${{ parameters.app_config_variable_group }}
         strategy:
           runOnce:
