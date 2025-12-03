@@ -139,103 +139,53 @@ stages:
                               dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
                               dwEnvironment="$(dwEnvironment)"
 
-  - stage: ManualDeployment
-    displayName: 'Manual Deployment for Cross Subscription'
-    dependsOn: []
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-    jobs:
-      - job: setup
-        displayName: 'Checkout and Install Bicep'
-        pool:
-          vmImage: 'ubuntu-latest'
-        steps:
-          - checkout: self
-          - bash: |
-              az bicep install
-              az bicep version
-            displayName: 'Install Bicep CLI'
+  # Environment-specific deployment stages
 
-      - job: FinalWhatIf
-        displayName: 'Run What-If before Deployment'
-        pool:
-          vmImage: 'ubuntu-latest'
-        dependsOn: [setup]
-        variables:
-          - group: CrossSubscription-${{ parameters.env }}
-        steps:
-          - task: AzureCLI@2
-            displayName: 'Final What-If'
-            inputs:
-              azureSubscription: $(azureServiceConnection)
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                az config set bicep.use_binary_from_path=false --only-show-errors
-                az deployment mg what-if \
-                  --location $(location) \
-                  --template-file ./6.cross-subscription/main.bicep \
-                  --management-group-id $(management-group-id) \
-                  --parameters ./6.cross-subscription/main.parameters.bicepparam \
-                              paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
-                              manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                              paramserviceIds=$(paramserviceIds) \
-                              environment='${{ parameters.env }}' \
-                              storageSubscriptionId="$(storageSubscriptionId)" \
-                              devboxSubscriptionId="$(devboxSubscriptionId)" \
-                              deployDwPrivateEndpoints=${{ parameters.deploy_dw_private_endpoints }} \
-                              dwFunctionAppId=$(dwFunctionAppId) \
-                              dwFunctionAppSubscriptionId="$(dwFunctionAppSubscriptionId)" \
-                              dwNetworkingResourceGroup="$(dwNetworkingResourceGroup)" \
-                              dwVnetName="$(dwVnetName)" \
-                              dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
-                              dwEnvironment="$(dwEnvironment)"
+  - template: templates/cross-subscription-deployment-stage.yaml
+    parameters:
+      environmentName: dev
+      displayName: 'Deploy to Development'
+      deployDwPrivateEndpoints: ${{ parameters.deploy_dw_private_endpoints }}
+      selectedEnvironment: ${{ parameters.env }}
 
-      - deployment: deploy
-        displayName: 'Deploy Cross Subscription'
-        pool:
-          vmImage: 'ubuntu-latest'
-        dependsOn: [setup, FinalWhatIf]
-        condition: succeeded()
-        environment: 'alz-bicep-deployment'
-        variables:
-          - group: CrossSubscription-${{ parameters.env }}
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-                - bash: |
-                    az bicep install
-                    az bicep version
-                  displayName: 'Install Bicep CLI'
-                - task: AzureCLI@2
-                  displayName: 'Deploy Cross Subscription'
-                  name: deploy
-                  inputs:
-                    azureSubscription: $(azureServiceConnection)
-                    scriptType: bash
-                    scriptLocation: inlineScript
-                    failOnStandardError: true
-                    inlineScript: |
-                      az config set bicep.use_binary_from_path=false --only-show-errors
-                      output=$(az deployment mg create \
-                        --name "cross-subscription-$(Build.BuildId)" \
-                        --location $(location) \
-                        --management-group-id $(management-group-id) \
-                        --template-file ./6.cross-subscription/main.bicep \
-                        --parameters ./6.cross-subscription/main.parameters.bicepparam \
-                                    paramvnetPeeringsVNetIDs=$(paramvnetPeeringsVNetIDs) \
-                                    manageddevopspoolVnetID=$(manageddevopspoolVnetID) \
-                                    paramserviceIds=$(paramserviceIds) \
-                                    environment='${{ parameters.env }}' \
-                                    storageSubscriptionId="$(storageSubscriptionId)" \
-                                    devboxSubscriptionId="$(devboxSubscriptionId)" \
-                                    deployDwPrivateEndpoints=${{ parameters.deploy_dw_private_endpoints }} \
-                                    dwFunctionAppId=$(dwFunctionAppId) \
-                                    dwFunctionAppSubscriptionId="$(dwFunctionAppSubscriptionId)" \
-                                    dwNetworkingResourceGroup="$(dwNetworkingResourceGroup)" \
-                                    dwVnetName="$(dwVnetName)" \
-                                    dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
-                                    dwEnvironment="$(dwEnvironment)")
-                      echo "Full Bicep Deployment Output:"
-                      echo $output | jq .
+  - template: templates/cross-subscription-deployment-stage.yaml
+    parameters:
+      environmentName: systemtest_manual
+      displayName: 'Deploy to System Test (Manual)'
+      deployDwPrivateEndpoints: ${{ parameters.deploy_dw_private_endpoints }}
+      selectedEnvironment: ${{ parameters.env }}
+
+  - template: templates/cross-subscription-deployment-stage.yaml
+    parameters:
+      environmentName: systemtest_auto
+      displayName: 'Deploy to System Test (Auto)'
+      deployDwPrivateEndpoints: ${{ parameters.deploy_dw_private_endpoints }}
+      selectedEnvironment: ${{ parameters.env }}
+
+  - template: templates/cross-subscription-deployment-stage.yaml
+    parameters:
+      environmentName: uat
+      displayName: 'Deploy to UAT'
+      deployDwPrivateEndpoints: ${{ parameters.deploy_dw_private_endpoints }}
+      selectedEnvironment: ${{ parameters.env }}
+
+  - template: templates/cross-subscription-deployment-stage.yaml
+    parameters:
+      environmentName: pre_prod
+      displayName: 'Deploy to Pre-Production'
+      deployDwPrivateEndpoints: ${{ parameters.deploy_dw_private_endpoints }}
+      selectedEnvironment: ${{ parameters.env }}
+
+  - template: templates/cross-subscription-deployment-stage.yaml
+    parameters:
+      environmentName: production
+      displayName: 'Deploy to Production'
+      deployDwPrivateEndpoints: ${{ parameters.deploy_dw_private_endpoints }}
+      selectedEnvironment: ${{ parameters.env }}
+
+  - template: templates/cross-subscription-deployment-stage.yaml
+    parameters:
+      environmentName: dw
+      displayName: 'Deploy to Data Warehouse'
+      deployDwPrivateEndpoints: ${{ parameters.deploy_dw_private_endpoints }}
+      selectedEnvironment: ${{ parameters.env }}
