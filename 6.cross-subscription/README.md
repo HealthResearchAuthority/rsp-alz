@@ -49,11 +49,23 @@ Each environment has its own Azure DevOps variable group named `CrossSubscriptio
 - `CrossSubscription-production` for production
 - `CrossSubscription-dw` for data warehouse
 
-These variable groups contain environment-specific configuration like:
-- VNet resource IDs to peer
-- Service resource IDs for private endpoints
-- Azure service connection names
-- DevBox configuration (dev only)
+**Required Variables in Each Group:**
+- `location` - Azure region (e.g., `uksouth`)
+- `management-group-id` - Management group ID for deployment scope
+- `azureServiceConnection` - Azure DevOps service connection name
+- `paramvnetPeeringsVNetIDs` - Comma-separated VNet IDs to peer
+- `manageddevopspoolVnetID` - Managed DevOps pool VNet ID
+- `paramserviceIds` - Comma-separated service resource IDs for private endpoints
+
+**Optional DW Function App Variables** (only if deploying DW private endpoints):
+- `dwFunctionAppId` - DW function app resource ID
+- `dwFunctionAppSubscriptionId` - Subscription where endpoint should be created
+- `dwNetworkingResourceGroup` - Resource group containing target VNet
+- `dwVnetName` - Target VNet name
+- `dwPrivateEndpointSubnetName` - Target subnet name (usually `snet-pep`)
+- `dwEnvironment` - Environment name for resource naming (e.g., `dev`, `preprod`)
+
+**Note**: DevBox storage endpoint configuration (dev only) is managed via the parameter file defaults and doesn't require variable group configuration.
 
 ## Running the Pipeline
 
