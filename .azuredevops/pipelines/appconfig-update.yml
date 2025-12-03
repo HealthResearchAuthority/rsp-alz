@@ -1,6 +1,14 @@
 name: appconfig-update
 trigger: none
-pr: none
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - '5.spoke-network/main.appconfig-update.bicep'
+      - '5.spoke-network/app-config-parameters/**'
+      - '5.spoke-network/modules/app-config-update/**'
 
 parameters:
   - name: env
@@ -11,7 +19,6 @@ parameters:
       - dev
       - systemtest_manual
       - systemtest_auto
-      - systemtest_int
       - uat
       - pre_prod
       - production
@@ -25,13 +32,12 @@ parameters:
     default: uksouth
 
 stages:
-  - stage: AppConfigUpdate
-    displayName: 'App Configuration Update'
-    variables:
-      location: ${{ parameters.location }}
+  - stage: PRValidation
+    displayName: 'PR Validation App Config Update'
+    condition: eq(variables['Build.Reason'], 'PullRequest')
     jobs:
       - job: lint
-        displayName: 'Build App Configuration Template'
+        displayName: 'Lint App Configuration Templates'
         pool:
           name: rsp-manageddevopspool
         steps:
@@ -45,6 +51,7 @@ stages:
               az bicep version
             displayName: 'Install Bicep CLI'
           - bash: az bicep build --file ./5.spoke-network/main.appconfig-update.bicep
+            displayName: 'Build Bicep Template'
 
       - job: validate
         displayName: 'Validate App Configuration Changes'
@@ -67,6 +74,7 @@ stages:
               az bicep version
             displayName: 'Install Bicep CLI'
           - task: AzureCLI@2
+            displayName: 'Validate Deployment'
             inputs:
               azureSubscription: $(${{ parameters.env }})
               scriptType: bash
@@ -108,15 +116,18 @@ stages:
               failOnStandardError: true
               inlineScript: |
                 az config set bicep.use_binary_from_path=false --only-show-errors
-                az deployment sub what-if --name "AppConfig-Preview-$(Build.BuildId)" \
-                  --location $(location) \
-                  --template-file ./5.spoke-network/main.appconfig-update.bicep \
+                az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.appconfig-update.bicep \
                   --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam
 
+  - stage: ManualDeployment
+    displayName: 'Manual Deployment of App Configuration'
+    dependsOn: []
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    variables:
+      location: ${{ parameters.location }}
+    jobs:
       - deployment: deploy
         displayName: 'Deploy App Configuration Changes'
-        dependsOn: preview
-        condition: succeeded()
         pool:
           name: rsp-manageddevopspool
         environment: 'alz-appconfig-update'
