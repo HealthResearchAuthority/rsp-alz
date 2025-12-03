@@ -177,6 +177,7 @@ param parUseFrontDoor = true
 param useOneLogin = true
 
 param paramWhitelistIPs = ''
+param parEnableFrontDoorIPWhitelisting = false
 
 param parClarityProjectId = ''
 
