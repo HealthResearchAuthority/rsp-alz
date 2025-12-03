@@ -40,6 +40,24 @@ param devboxPrivateEndpointSubnetName string = ''
 @description('Resource ID of the DW Function App (func-validate-irasid)')
 param dwFunctionAppId string = ''
 
+@description('Subscription ID where the DW function endpoint should be created')
+param dwFunctionAppSubscriptionId string = ''
+
+@description('Resource group containing the VNet for DW private endpoint')
+param dwNetworkingResourceGroup string = ''
+
+@description('VNet name for DW private endpoint')
+param dwVnetName string = ''
+
+@description('Private endpoint subnet name for DW')
+param dwPrivateEndpointSubnetName string = ''
+
+@description('Environment name for DW endpoint naming')
+param dwEnvironment string = ''
+
+@description('Deploy DW Function App private endpoints')
+param deployDwPrivateEndpoints bool = false
+
 var managementVNetIdTokens = split(manageddevopspoolVnetID, '/')
 var managementSubscriptionId = managementVNetIdTokens[2]
 var managementResourceGroupName = managementVNetIdTokens[4]
@@ -97,11 +115,16 @@ module devboxStorageEndpoints 'modules/devbox-storage-endpoints/devbox-storage-e
   }
 }
 
-@description('Deploy Data Warehouse Function App private endpoints to all application subscriptions')
-module dwFunctionEndpoints 'modules/dw-function-endpoints/dw-function-endpoints.bicep' = if (!empty(dwFunctionAppId)) {
+@description('Deploy Data Warehouse Function App private endpoint to the target environment')
+module dwFunctionEndpoints 'modules/dw-function-endpoints/dw-function-endpoints.bicep' = if (deployDwPrivateEndpoints && !empty(dwFunctionAppId)) {
   name: take('dwFunctionEndpoints-${deployment().name}', 64)
   params: {
     dwFunctionAppId: dwFunctionAppId
+    dwFunctionAppSubscriptionId: dwFunctionAppSubscriptionId
+    dwNetworkingResourceGroup: dwNetworkingResourceGroup
+    dwVnetName: dwVnetName
+    dwPrivateEndpointSubnetName: dwPrivateEndpointSubnetName
+    dwEnvironment: dwEnvironment
   }
 }
 
@@ -110,7 +133,7 @@ output serviceIDs array = [for serviceId in allserviceIDs: {
 }]
 
 @description('DW Function App private endpoint IDs created')
-output dwFunctionPrivateEndpointIds array = !empty(dwFunctionAppId) ? dwFunctionEndpoints!.outputs.privateEndpointIds : []
+output dwFunctionPrivateEndpointIds array = (deployDwPrivateEndpoints && !empty(dwFunctionAppId)) ? dwFunctionEndpoints!.outputs.privateEndpointIds : []
 
 @description('DW Function App private endpoint names created')
-output dwFunctionPrivateEndpointNames array = !empty(dwFunctionAppId) ? dwFunctionEndpoints!.outputs.privateEndpointNames : []
+output dwFunctionPrivateEndpointNames array = (deployDwPrivateEndpoints && !empty(dwFunctionAppId)) ? dwFunctionEndpoints!.outputs.privateEndpointNames : []

@@ -23,5 +23,17 @@ param devboxResourceGroupName = 'rg-rsp-devcenter'
 param devboxVNetName = 'vnet-dbox-rsp-uksouth'
 param devboxPrivateEndpointSubnetName = 'sn-devpools'
 
+// DW Function App private endpoint deployment flag
+param deployDwPrivateEndpoints = false
+
 // DW Function App resource ID
 param dwFunctionAppId = ''
+
+// DW Function App subscription ID (where the private endpoint should be created)
+param dwFunctionAppSubscriptionId = ''
+
+// DW networking configuration
+param dwNetworkingResourceGroup = ''
+param dwVnetName = ''
+param dwPrivateEndpointSubnetName = ''
+param dwEnvironment = ''

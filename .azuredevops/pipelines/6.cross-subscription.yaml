@@ -19,11 +19,14 @@ parameters:
       - dev
       - systemtest_manual
       - systemtest_auto
-      - systemtest_int
       - uat
       - pre_prod
       - production
       - dw
+  - name: deploy_dw_private_endpoints
+    displayName: 'Deploy DW Function App Private Endpoints'
+    type: boolean
+    default: false
 
 stages:
   - stage: PRValidation
@@ -97,7 +100,13 @@ stages:
                               devboxResourceGroupName="$(devboxResourceGroupName)" \
                               devboxVNetName="$(devboxVNetName)" \
                               devboxPrivateEndpointSubnetName="$(devboxPrivateEndpointSubnetName)" \
-                              dwFunctionAppId=$(dwFunctionAppId)
+                              deployDwPrivateEndpoints=${{ parameters.deploy_dw_private_endpoints }} \
+                              dwFunctionAppId=$(dwFunctionAppId) \
+                              dwFunctionAppSubscriptionId="$(dwFunctionAppSubscriptionId)" \
+                              dwNetworkingResourceGroup="$(dwNetworkingResourceGroup)" \
+                              dwVnetName="$(dwVnetName)" \
+                              dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
+                              dwEnvironment="$(dwEnvironment)"
 
       - job: preview
         displayName: 'Preview Cross Subscription Deployments'
@@ -132,7 +141,13 @@ stages:
                               devboxResourceGroupName="$(devboxResourceGroupName)" \
                               devboxVNetName="$(devboxVNetName)" \
                               devboxPrivateEndpointSubnetName="$(devboxPrivateEndpointSubnetName)" \
-                              dwFunctionAppId=$(dwFunctionAppId)
+                              deployDwPrivateEndpoints=${{ parameters.deploy_dw_private_endpoints }} \
+                              dwFunctionAppId=$(dwFunctionAppId) \
+                              dwFunctionAppSubscriptionId="$(dwFunctionAppSubscriptionId)" \
+                              dwNetworkingResourceGroup="$(dwNetworkingResourceGroup)" \
+                              dwVnetName="$(dwVnetName)" \
+                              dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
+                              dwEnvironment="$(dwEnvironment)"
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment for Cross Subscription'
@@ -182,7 +197,13 @@ stages:
                               devboxResourceGroupName="$(devboxResourceGroupName)" \
                               devboxVNetName="$(devboxVNetName)" \
                               devboxPrivateEndpointSubnetName="$(devboxPrivateEndpointSubnetName)" \
-                              dwFunctionAppId=$(dwFunctionAppId)
+                              deployDwPrivateEndpoints=${{ parameters.deploy_dw_private_endpoints }} \
+                              dwFunctionAppId=$(dwFunctionAppId) \
+                              dwFunctionAppSubscriptionId="$(dwFunctionAppSubscriptionId)" \
+                              dwNetworkingResourceGroup="$(dwNetworkingResourceGroup)" \
+                              dwVnetName="$(dwVnetName)" \
+                              dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
+                              dwEnvironment="$(dwEnvironment)"
 
       - deployment: deploy
         displayName: 'Deploy Cross Subscription'
@@ -229,6 +250,12 @@ stages:
                                     devboxResourceGroupName="$(devboxResourceGroupName)" \
                                     devboxVNetName="$(devboxVNetName)" \
                                     devboxPrivateEndpointSubnetName="$(devboxPrivateEndpointSubnetName)" \
-                                    dwFunctionAppId=$(dwFunctionAppId))
+                                    deployDwPrivateEndpoints=${{ parameters.deploy_dw_private_endpoints }} \
+                                    dwFunctionAppId=$(dwFunctionAppId) \
+                                    dwFunctionAppSubscriptionId="$(dwFunctionAppSubscriptionId)" \
+                                    dwNetworkingResourceGroup="$(dwNetworkingResourceGroup)" \
+                                    dwVnetName="$(dwVnetName)" \
+                                    dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
+                                    dwEnvironment="$(dwEnvironment)")
                       echo "Full Bicep Deployment Output:"
                       echo $output | jq .

@@ -9,7 +9,7 @@ The cross-subscription deployment creates:
 - **VNet Peering**: Connects application environment VNets with the managed DevOps pool VNet
 - **Private Endpoints**: Establishes private network connectivity for Azure services across subscriptions
 - **DevBox Storage Endpoints**: Configures private endpoints for storage accounts in development environments (optional)
-- **Data Warehouse Function Endpoints**: Sets up private connectivity to data warehouse function apps
+- **Data Warehouse Function Endpoints**: Sets up private connectivity to data warehouse function apps (controlled via checkbox parameter)
 
 ## Directory Structure
 
@@ -68,9 +68,11 @@ These variable groups contain environment-specific configuration like:
 1. Navigate to the pipeline in Azure DevOps
 2. Click **Run pipeline**
 3. **Select environment** from the dropdown (e.g., `dev`, `uat`, `production`)
-4. Review the **What-If analysis** in the validation stage
-5. **Approve** the deployment if changes look correct
-6. Monitor the deployment progress
+4. **Check deployment options**:
+   - **Deploy DW Function App Private Endpoints**: Check this box only when you need to create/update DW function app private endpoints (typically only on first deployment or when changing DW configuration)
+5. Review the **What-If analysis** in the validation stage
+6. **Approve** the deployment if changes look correct
+7. Monitor the deployment progress
 
 ### Pipeline Stages
 
@@ -100,6 +102,7 @@ The main Bicep template that orchestrates all cross-subscription resources. It:
 - `manageddevopspoolVnetID` - Managed DevOps pool VNet ID
 - `environment` - Target environment name
 - `enableDevBoxStorageEndpoints` - Enable DevBox storage (dev only)
+- `deployDwPrivateEndpoints` - Control DW function app private endpoint deployment
 - `dwFunctionAppId` - Data warehouse function app ID
 
 ### main.parameters.bicepparam
@@ -110,10 +113,22 @@ Parameter file with default values. Values are overridden at runtime by the pipe
 
 Azure DevOps pipeline that:
 - Provides environment selection dropdown
+- Provides checkbox to control DW private endpoint deployment
 - Loads environment-specific variable groups
 - Validates and deploys Bicep templates
 - Runs security scanning (SAST)
 - Performs what-if analysis before deployment
+
+**Pipeline Parameters:**
+- `env` - Environment selection dropdown (default: `dev`)
+- `deploy_dw_private_endpoints` - Checkbox to control DW function app private endpoint deployment (default: `false`)
+
+**When to check "Deploy DW Function App Private Endpoints":**
+- ✅ First deployment to an environment (initial setup)
+- ✅ When DW function app configuration changes (new function app, different subscription, etc.)
+- ✅ When DW networking configuration changes (VNet, subnet, resource group)
+- ❌ Regular deployments for VNet peering or other service private endpoints (keep unchecked)
+- ❌ When deploying to `dw` environment (no DW endpoints needed for DW itself)
 
 ## Best Practices
 
