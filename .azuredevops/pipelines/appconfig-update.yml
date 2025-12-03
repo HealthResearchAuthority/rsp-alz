@@ -19,10 +19,16 @@ parameters:
     displayName: 'Optional variable group containing App Configuration secrets'
     type: string
     default: 'none'
+  - name: location
+    displayName: 'Deployment location'
+    type: string
+    default: uksouth
 
 stages:
   - stage: AppConfigUpdate
     displayName: 'App Configuration Update'
+    variables:
+      location: ${{ parameters.location }}
     jobs:
       - job: lint
         displayName: 'Build App Configuration Template'
