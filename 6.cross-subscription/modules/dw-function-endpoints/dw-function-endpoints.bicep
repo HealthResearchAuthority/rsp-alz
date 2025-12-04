@@ -7,26 +7,32 @@ targetScope = 'managementGroup'
 @description('Resource ID of the DW Function App (func-validate-irasid)')
 param dwFunctionAppId string
 
+@description('Subscription ID where the DW function endpoint should be created')
+param dwFunctionAppSubscriptionId string
+
+@description('Resource group containing the VNet for private endpoint')
+param dwNetworkingResourceGroup string
+
+@description('VNet name for private endpoint')
+param dwVnetName string
+
+@description('Private endpoint subnet name')
+param dwPrivateEndpointSubnetName string
+
+@description('Environment name for naming (e.g., dev, manualtest, automationtest, uat, preprod, prod)')
+param dwEnvironment string
+
 // ------------------
 // VARIABLES
 // ------------------
 
-var subscriptionConfigs = [
-  { subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b', environment: 'dev', rgSuffix: 'dev' }
-  { subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379', environment: 'manualtest', rgSuffix: 'systemtest' }
-  { subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65', environment: 'automationtest', rgSuffix: 'systemtestauto' }
-  { subscriptionId: 'e1a1a4ff-2db5-4de3-b7e5-6d51413f6390', environment: 'uat', rgSuffix: 'uat' }
-  { subscriptionId: 'be1174fc-09c8-470f-9409-d0054ab9586a', environment: 'preprod', rgSuffix: 'preprod' }
-  { subscriptionId: 'd27a0dcc-453d-4bfa-9c3d-1447c6ea0119', environment: 'prod', rgSuffix: 'prod' }
-]
-
-var appSubscriptions = [for config in subscriptionConfigs: {
-  subscriptionId: config.subscriptionId
-  environment: config.environment
-  networkingResourceGroup: 'rg-rsp-networking-spoke-${config.rgSuffix}-uks'
-  vnetName: 'vnet-rsp-networking-${config.environment}-uks-spoke'
-  privateEndpointSubnetName: 'snet-pep'
-}]
+var appSubscriptions = !empty(dwFunctionAppSubscriptionId) && !empty(dwNetworkingResourceGroup) ? [{
+  subscriptionId: dwFunctionAppSubscriptionId
+  environment: dwEnvironment
+  networkingResourceGroup: dwNetworkingResourceGroup
+  vnetName: dwVnetName
+  privateEndpointSubnetName: dwPrivateEndpointSubnetName
+}] : []
 
 // ------------------
 // MODULES
