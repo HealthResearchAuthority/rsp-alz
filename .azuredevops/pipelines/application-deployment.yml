@@ -126,6 +126,8 @@ stages:
                               parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
+                              harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                              bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
       - job: preview
@@ -178,6 +180,8 @@ stages:
                               parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                              harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                              bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
 
@@ -274,6 +278,8 @@ stages:
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                              harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                              bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
       - deployment: deploy
@@ -338,6 +344,8 @@ stages:
                                     parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                                     parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                                     processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                                    harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                                    bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                                     parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }} \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
