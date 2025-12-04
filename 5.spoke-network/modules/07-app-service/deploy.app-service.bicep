@@ -215,7 +215,7 @@ module storageFilesPrivateNetwork '../../../shared/bicep/network/private-network
 module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind == 'functionapp') {
   name: take('${appName}-webApp-Deployment', 64)
   params: {
-    kind: 'functionapp'
+    kind: (webAppBaseOs =~ 'linux') ? 'functionapp,linux' : 'functionapp'
     functionAppName:  appName
     location: location
     serverFarmResourceId: appSvcPlan.outputs.resourceId

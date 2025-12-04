@@ -126,6 +126,8 @@ stages:
                               parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
+                              harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                              bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
       - job: preview
@@ -178,6 +180,8 @@ stages:
                               parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                              harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                              bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
 
