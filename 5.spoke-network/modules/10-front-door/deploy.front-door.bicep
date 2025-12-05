@@ -27,7 +27,6 @@ param enableWaf bool = true
 ])
 param wafMode string = 'Prevention'
 
-
 @description('Optional. Enable rate limiting.')
 param enableRateLimiting bool = true
 
@@ -115,22 +114,24 @@ module wafPolicy '../../../shared/bicep/front-door/waf-policy.bicep' = if (enabl
     enableManagedRules: true
     enableRateLimiting: enableRateLimiting
     rateLimitThreshold: rateLimitThreshold
-    customRules: !empty(varWhitelistIPs) ? [
-      {
-        name: 'BlockNonWhitelistedIPs'
-        priority: 100
-        ruleType: 'MatchRule'
-        action: 'Block'
-        matchConditions: [
+    customRules: !empty(varWhitelistIPs)
+      ? [
           {
-            matchVariable: 'SocketAddr'
-            operator: 'IPMatch'
-            negateCondition: true
-            matchValue: normalizedWhitelistIPs
+            name: 'BlockNonWhitelistedIPs'
+            priority: 100
+            ruleType: 'MatchRule'
+            action: 'Block'
+            matchConditions: [
+              {
+                matchVariable: 'SocketAddr'
+                operator: 'IPMatch'
+                negateCondition: true
+                matchValue: normalizedWhitelistIPs
+              }
+            ]
           }
         ]
-      }
-    ] : []
+      : []
     ruleGroupOverrides: [
       {
         ruleGroupName: 'General'
@@ -148,6 +149,26 @@ module wafPolicy '../../../shared/bicep/front-door/waf-policy.bicep' = if (enabl
         ]
       }
       {
+        ruleGroupName: 'PROTOCOL-ENFORCEMENT'
+        rules: [
+          {
+            ruleId: '920120'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+          {
+            ruleId: '920121'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+          {
+            ruleId: '920300'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+        ]
+      }
+      {
         ruleGroupName: 'SQLI'
         rules: [
           {
@@ -157,6 +178,16 @@ module wafPolicy '../../../shared/bicep/front-door/waf-policy.bicep' = if (enabl
           }
           {
             ruleId: '942410'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+        ]
+      }
+      {
+        ruleGroupName: 'PHP'
+        rules: [
+          {
+            ruleId: '933210'
             enabledState: 'Enabled'
             action: 'Log'
           }
