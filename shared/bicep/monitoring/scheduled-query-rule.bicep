@@ -13,11 +13,14 @@ param ruleName string
 @description('Display name of the scheduled query rule')
 param displayName string
 
+@description('Kind of the scheduled query rule')
+param kind string = 'LogAlert'
+
 @description('Description of the scheduled query rule')
 param ruleDescription string
 
 @description('Enable or disable the scheduled query rule')
-param enabled bool = true
+param enabled bool
 
 @description('Severity of the alert (0=Critical, 1=Error, 2=Warning, 3=Informational, 4=Verbose)')
 @allowed([0, 1, 2, 3, 4])
@@ -29,8 +32,11 @@ param actionGroupIds array
 @description('KQL query to execute')
 param query string
 
+@description('Resource ID column for the alert')
+param resourceIdColumn string = ''
+
 @description('Log Analytics workspace resource IDs to query')
-param dataSourceIds array
+param dataSourceIds string
 
 @description('How often the query is evaluated (in minutes)')
 param evaluationFrequencyInMinutes int = 5
@@ -42,6 +48,9 @@ param windowSizeInMinutes int = 15
 @allowed(['GreaterThan', 'GreaterThanOrEqual', 'LessThan', 'LessThanOrEqual', 'Equal'])
 param operator string = 'GreaterThan'
 
+@description('Metric measure column for the alert')
+param metricMeasureColumn string = ''
+
 @description('Threshold value for the alert')
 param threshold int = 0
 
@@ -51,8 +60,18 @@ param numberOfEvaluationPeriods int = 1
 @description('Minimum number of violations within evaluation periods to trigger alert')
 param minFailingPeriodsToAlert int = 1
 
-@description('Auto-resolve the alert after specified time (in minutes). 0 means no auto-resolve')
-param autoMitigateInMinutes int = 0
+@description('Auto-mitigate the alert or not')
+param autoMitigate bool = false
+
+@description('Flag to mute Alert Actions')
+param muteAlertRuleAction bool = false
+
+@description('Mute notifications for this many minutes after an alert fires (throttling)')
+param muteActionsDurationInMinutes int = 30
+
+@description('Aggregation type. Relevant and required only for rules of the kind LogAlert.')
+@allowed(['Average', 'Count', 'Total', 'Maximum', 'Minimum'])
+param timeAggregation string = 'Count'
 
 @description('Check workspace linked storage account for query')
 param checkWorkspaceAlertsStorageConfigured bool = false
@@ -66,14 +85,36 @@ param tags object = {}
 @description('Location for the scheduled query rule')
 param location string = resourceGroup().location
 
-// ------------------
-// VARIABLES
-// ------------------
-
-var actionGroups = [for actionGroupId in actionGroupIds: {
-  actionGroupId: actionGroupId
-  webhookProperties: {}
-}]
+var dimensions = [
+  {
+    name: 'AlertTitle'
+    operator: 'Include'
+    values: [
+      '*'
+    ]
+  }
+  {
+    name: 'Severity'
+    operator: 'Include'
+    values: [
+      '*'
+    ]
+  }
+  {
+    name: 'Detail'
+    operator: 'Include'
+    values: [
+      '*'
+    ]
+  }
+  {
+    name: 'AffectedService'
+    operator: 'Include'
+    values: [
+      '*'
+    ]
+  }
+]
 
 // ------------------
 // RESOURCES
@@ -81,6 +122,7 @@ var actionGroups = [for actionGroupId in actionGroupIds: {
 
 resource scheduledQueryRule 'Microsoft.Insights/scheduledQueryRules@2023-03-15-preview' = {
   name: ruleName
+  kind: kind
   location: location
   tags: tags
   properties: {
@@ -90,12 +132,15 @@ resource scheduledQueryRule 'Microsoft.Insights/scheduledQueryRules@2023-03-15-p
     severity: severity
     evaluationFrequency: 'PT${evaluationFrequencyInMinutes}M'
     windowSize: 'PT${windowSizeInMinutes}M'
-    scopes: dataSourceIds
+    scopes: [dataSourceIds]
     criteria: {
       allOf: [
         {
           query: query
-          timeAggregation: 'Count'
+          dimensions: dimensions
+          resourceIdColumn: resourceIdColumn
+          timeAggregation: timeAggregation
+          metricMeasureColumn: metricMeasureColumn
           operator: operator
           threshold: threshold
           failingPeriods: {
@@ -106,9 +151,10 @@ resource scheduledQueryRule 'Microsoft.Insights/scheduledQueryRules@2023-03-15-p
       ]
     }
     actions: {
-      actionGroups: actionGroups
+      actionGroups: actionGroupIds
     }
-    autoMitigate: autoMitigateInMinutes > 0 ? true : false
+    autoMitigate: autoMitigate
+    muteActionsDuration: muteAlertRuleAction ? 'PT${muteActionsDurationInMinutes}M' : null
     checkWorkspaceAlertsStorageConfigured: checkWorkspaceAlertsStorageConfigured
     skipQueryValidation: skipQueryValidation
   }

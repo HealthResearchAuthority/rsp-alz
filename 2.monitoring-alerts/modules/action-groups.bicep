@@ -34,12 +34,19 @@ var defaultTags = union(tags, {
   Purpose: 'Monitoring Alerts'
 })
 
+var deploySecurityAg = !empty(securityEmailRecipients)
+var deployPolicyAg = !empty(policyEmailRecipients)
+var deployAdminAg = !empty(adminEmailRecipients)
+var securityAgName = actionGroupNames.security
+var policyAgName = actionGroupNames.policy
+var adminAgName = actionGroupNames.admin
+
 // ------------------
 // RESOURCES
 // ------------------
 
 // Security Action Group
-module securityActionGroup '../../shared/bicep/monitoring/action-group.bicep' = if (!empty(securityEmailRecipients)) {
+module securityActionGroup '../../shared/bicep/monitoring/action-group.bicep' = if (deploySecurityAg) {
   name: 'deploy-security-action-group'
   params: {
     actionGroupName: actionGroupNames.security
@@ -51,7 +58,7 @@ module securityActionGroup '../../shared/bicep/monitoring/action-group.bicep' = 
 }
 
 // Policy Action Group
-module policyActionGroup '../../shared/bicep/monitoring/action-group.bicep' = if (!empty(policyEmailRecipients)) {
+module policyActionGroup '../../shared/bicep/monitoring/action-group.bicep' = if (deployPolicyAg) {
   name: 'deploy-policy-action-group'
   params: {
     actionGroupName: actionGroupNames.policy
@@ -63,7 +70,7 @@ module policyActionGroup '../../shared/bicep/monitoring/action-group.bicep' = if
 }
 
 // Administrative Action Group
-module adminActionGroup '../../shared/bicep/monitoring/action-group.bicep' = if (!empty(adminEmailRecipients)) {
+module adminActionGroup '../../shared/bicep/monitoring/action-group.bicep' = if (deployAdminAg) {
   name: 'deploy-admin-action-group'
   params: {
     actionGroupName: actionGroupNames.admin
@@ -80,16 +87,16 @@ module adminActionGroup '../../shared/bicep/monitoring/action-group.bicep' = if 
 
 @description('Action group resource IDs and information')
 output actionGroups object = {
-  security: !empty(securityEmailRecipients) ? {
-    id: securityActionGroup.outputs.actionGroupId
-    name: securityActionGroup.outputs.actionGroupName
+  security: deploySecurityAg ? {
+    id: resourceId('Microsoft.Insights/actionGroups', securityAgName)
+    name: securityAgName
   } : {}
-  policy: !empty(policyEmailRecipients) ? {
-    id: policyActionGroup.outputs.actionGroupId
-    name: policyActionGroup.outputs.actionGroupName
+  policy: deployPolicyAg ? {
+    id: resourceId('Microsoft.Insights/actionGroups', policyAgName)
+    name: policyAgName
   } : {}
-  admin: !empty(adminEmailRecipients) ? {
-    id: adminActionGroup.outputs.actionGroupId
-    name: adminActionGroup.outputs.actionGroupName
+  admin: deployAdminAg ? {
+    id: resourceId('Microsoft.Insights/actionGroups', adminAgName)
+    name: adminAgName
   } : {}
 }
