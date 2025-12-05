@@ -42,6 +42,7 @@ shared/
   - `alz-bicep-pr1-build.yml`: Pipeline for building Bicep templates.
   - `alz-bicep-pr2-lint.yml`: Pipeline for linting Bicep templates.
   - `application-deployment.yml`: Pipeline for deploying application resources.
+  - `appconfig-update.yml`: Lightweight pipeline that validates and deploys App Configuration key/value updates without redeploying the full landing zone.
   - `network-deployment.yml`: Pipeline for deploying network resources.
 
 - **`1.core-services/`**: Contains Bicep templates for core services.
@@ -54,7 +55,9 @@ shared/
 
 - **`5.spoke-network/`**: Contains Bicep templates for spoke network deployments.
   - `main.application.bicep`: Entry point for application-related resources including web apps, container apps, function apps, and databases.
+  - `main.appconfig-update.bicep`: Entry point dedicated to App Configuration key/value updates using CAF naming.
   - `main.network.bicep`: Entry point for network-related resources.
+  - `app-config-parameters/`: Environment-specific parameter files for App Configuration-only deployments.
   - `modules/`: Submodules for network parameters.
 
 - **`shared/bicep/`**: Shared Bicep modules for reuse across deployments.
@@ -96,6 +99,15 @@ To run the pipeline manually to run against a different environment
 2. Select the pipeline and click Run Pipeline
 3. Select the environment from the drop down
 4. Click Run
+
+## App Configuration Update Workflow
+
+Updating or adding App Configuration key-value pairs no longer requires redeploying the entire landing zone:
+
+1. Use the environment-specific file in `5.spoke-network/app-config-parameters/` (for example `dev.parameters.bicepparam`) to set `parAppConfigurationStoreName` (match the CAF-derived name that was created during the initial deployment) and add entries under `parAppConfigurationValues`. Each entry captures the key, optional label, value, and metadata for the App Configuration store.
+2. Keep sensitive values in an Azure DevOps Library variable group (e.g., `dev-appconfig`) and pass that group name to the `app_config_variable_group` parameter when queuing the pipeline so secrets stay outside of source control.
+3. Queue `.azuredevops/pipelines/appconfig-update.yml`, select the target environment, optionally provide the variable group, and run. The pipeline builds the template, validates it, runs `what-if`, and then deploys `main.appconfig-update.bicep`, touching only App Configuration.
+4. Capture validation/what-if output for PR evidence as usual. Because the deployment scope is limited, other resources in the landing zone remain unchanged.
 
 ## Defender for Storage Implementation
 
