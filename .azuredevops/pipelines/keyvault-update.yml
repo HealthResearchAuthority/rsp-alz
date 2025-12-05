@@ -1,0 +1,200 @@
+name: keyvault-update
+trigger: none
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - '5.spoke-network/main.keyvault-update.bicep'
+      - '5.spoke-network/keyvault-parameters/**'
+      - '5.spoke-network/modules/keyvault-update/**'
+      - '.azuredevops/scripts/build-kv-secret-values.py'
+
+parameters:
+  - name: env
+    displayName: Environment
+    type: string
+    default: dev
+    values:
+      - dev
+      - systemtest_manual
+      - systemtest_auto
+      - uat
+      - pre_prod
+      - production
+  - name: keyvault_variable_group
+    displayName: 'Variable group containing Key Vault secret values (default: {env}-key-vault)'
+    type: string
+    default: 'auto'
+  - name: location
+    displayName: 'Deployment location'
+    type: string
+    default: uksouth
+
+stages:
+  - stage: PRValidation
+    displayName: 'PR Validation Key Vault Update'
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    jobs:
+      - job: lint
+        displayName: 'Lint Key Vault Templates'
+        pool:
+          name: rsp-manageddevopspool
+        steps:
+          - checkout: self
+          - script: |
+              echo "Installing Azure CLI..."
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            displayName: 'Install Azure CLI'
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - bash: az bicep build --file ./5.spoke-network/main.keyvault-update.bicep
+            displayName: 'Build Bicep Template'
+
+      - job: validate
+        displayName: 'Validate Key Vault Changes'
+        dependsOn: lint
+        condition: succeeded()
+        pool:
+          name: rsp-manageddevopspool
+        variables:
+          - group: ${{ parameters.env }}
+          - ${{ if eq(parameters.keyvault_variable_group, 'auto') }}:
+              - group: ${{ parameters.env }}-key-vault
+          - ${{ if ne(parameters.keyvault_variable_group, 'auto') }}:
+              - group: ${{ parameters.keyvault_variable_group }}
+        steps:
+          - checkout: self
+          - script: |
+              echo "Installing Azure CLI..."
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            displayName: 'Install Azure CLI'
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - bash: |
+              python3 ./.azuredevops/scripts/build-kv-secret-values.py \
+                ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.secrets.json \
+                $(Build.SourcesDirectory)/.kv-secrets.json
+            displayName: 'Prepare Key Vault secret values'
+          - task: AzureCLI@2
+            displayName: 'Validate Deployment'
+            inputs:
+              azureSubscription: $(${{ parameters.env }})
+              scriptType: bash
+              scriptLocation: inlineScript
+              failOnStandardError: true
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub validate --name "KeyVault-$(Build.BuildId)" \
+                  --location $(location) \
+                  --template-file ./5.spoke-network/main.keyvault-update.bicep \
+                  --parameters ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.parameters.bicepparam \
+                               parSecretValues=@$(Build.SourcesDirectory)/.kv-secrets.json
+          - bash: |
+              rm -f $(Build.SourcesDirectory)/.kv-secrets.json
+            displayName: 'Remove temporary secret file'
+            condition: always()
+
+      - job: preview
+        displayName: 'Preview Key Vault Changes'
+        dependsOn: validate
+        condition: succeeded()
+        pool:
+          name: rsp-manageddevopspool
+        variables:
+          - group: ${{ parameters.env }}
+          - ${{ if eq(parameters.keyvault_variable_group, 'auto') }}:
+              - group: ${{ parameters.env }}-key-vault
+          - ${{ if ne(parameters.keyvault_variable_group, 'auto') }}:
+              - group: ${{ parameters.keyvault_variable_group }}
+        steps:
+          - checkout: self
+          - script: |
+              echo "Installing Azure CLI..."
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            displayName: 'Install Azure CLI'
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - bash: |
+              python3 ./.azuredevops/scripts/build-kv-secret-values.py \
+                ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.secrets.json \
+                $(Build.SourcesDirectory)/.kv-secrets.json
+            displayName: 'Prepare Key Vault secret values'
+          - task: AzureCLI@2
+            displayName: 'What-If Key Vault Update'
+            inputs:
+              azureSubscription: $(${{ parameters.env }})
+              scriptType: bash
+              scriptLocation: inlineScript
+              failOnStandardError: true
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.keyvault-update.bicep \
+                  --parameters ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.parameters.bicepparam \
+                               parSecretValues=@$(Build.SourcesDirectory)/.kv-secrets.json
+          - bash: |
+              rm -f $(Build.SourcesDirectory)/.kv-secrets.json
+            displayName: 'Remove temporary secret file'
+            condition: always()
+
+  - stage: ManualDeployment
+    displayName: 'Manual Deployment of Key Vault Secrets'
+    dependsOn: []
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    variables:
+      location: ${{ parameters.location }}
+    jobs:
+      - deployment: deploy
+        displayName: 'Deploy Key Vault Secrets'
+        pool:
+          name: rsp-manageddevopspool
+        environment: 'alz-keyvault-update'
+        variables:
+          - group: ${{ parameters.env }}
+          - ${{ if eq(parameters.keyvault_variable_group, 'auto') }}:
+              - group: ${{ parameters.env }}-key-vault
+          - ${{ if ne(parameters.keyvault_variable_group, 'auto') }}:
+              - group: ${{ parameters.keyvault_variable_group }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - script: |
+                    echo "Installing Azure CLI..."
+                    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+                  displayName: 'Install Azure CLI'
+                - bash: |
+                    az bicep install
+                    az bicep version
+                  displayName: 'Install Bicep CLI'
+                - bash: |
+                    python3 ./.azuredevops/scripts/build-kv-secret-values.py \
+                      ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.secrets.json \
+                      $(Build.SourcesDirectory)/.kv-secrets.json
+                  displayName: 'Prepare Key Vault secret values'
+                - task: AzureCLI@2
+                  displayName: 'Deploy Key Vault Update'
+                  inputs:
+                    azureSubscription: $(${{ parameters.env }})
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    failOnStandardError: true
+                    inlineScript: |
+                      az config set bicep.use_binary_from_path=false --only-show-errors
+                      az deployment sub create --name "KeyVault-Deploy-$(Build.BuildId)" \
+                        --location $(location) \
+                        --template-file ./5.spoke-network/main.keyvault-update.bicep \
+                        --parameters ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.parameters.bicepparam \
+                                     parSecretValues=@$(Build.SourcesDirectory)/.kv-secrets.json
+                - bash: |
+                    rm -f $(Build.SourcesDirectory)/.kv-secrets.json
+                  displayName: 'Remove temporary secret file'
+                  condition: always()
