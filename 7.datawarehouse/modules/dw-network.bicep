@@ -48,6 +48,24 @@ var privateEndpointSubnetPrefix = '172.18.3.0/26'
 var functionAppSubnetPrefix = '172.18.4.0/26'
 var remoteDbSubnetPrefix = '10.10.1.0/24'
 var devboxSubnetPrefix = '10.0.0.0/24'
+var devSubnetPrefix = '10.1.8.0/22'
+var manualtestSubnetPrefix = '10.3.128.0/18'
+var automationtestSubnetPrefix = '10.1.48.0/22'
+var uatSubnetPrefix = '10.5.128.0/18'
+var preprodSubnetPrefeix = '10.6.128.0/18'
+var prodSubnetPrefix = '10.7.128.0/18'
+
+var allLocalAddressRanges = [
+  functionAppSubnetPrefix
+  devboxSubnetPrefix
+  dataSubnetPrefix
+  devSubnetPrefix
+  manualtestSubnetPrefix
+  automationtestSubnetPrefix
+  uatSubnetPrefix
+  preprodSubnetPrefeix
+  prodSubnetPrefix
+]
 
 module functionAppsNSG '../../shared/bicep/network/nsg.bicep' = {
   name: 'functionapps-nsg'
@@ -145,24 +163,6 @@ resource vpnGateway 'Microsoft.Network/virtualNetworkGateways@2024-05-01' = {
   name: vpnGatewayName
   location: resourceGroup().location
   properties: {
-    blockUpgradeOfMigratedLegacyGateways: false
-    enableHighBandwidthVpnGateway: false
-    isMigrateToCSES: false
-    isMigratedLegacySKU: false
-    packetCaptureDiagnosticState: 'None'
-    enablePrivateIpAddress: false
-    remoteVirtualNetworkPeerings: [
-      {
-        id: '/subscriptions/9ef9a127-7a6e-452e-b18d-d2e2e89ffa92/resourceGroups/rg-rsp-devcenter/providers/Microsoft.Network/virtualNetworks/vnet-dbox-rsp-uksouth/virtualNetworkPeerings/dw-devbox-link'
-      }
-      {
-        id: '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-networking-spoke-dev-uks/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-dev-uks-spoke/virtualNetworkPeerings/dev-dw-link'
-      }
-    ]
-    virtualNetworkGatewayMigrationStatus: {
-      phase: 'None'
-      state: 'None'
-    }
     ipConfigurations: [
       {
         name: 'default'
@@ -174,7 +174,6 @@ resource vpnGateway 'Microsoft.Network/virtualNetworkGateways@2024-05-01' = {
             id: '/subscriptions/461016b5-8363-472e-81be-eef6aad08353/resourceGroups/VisualStudioOnline-4140D62E99124BBBABC390FFA33D669D/providers/Microsoft.Network/virtualNetworks/HRADataWarehouseVirtualNetwork/subnets/GatewaySubnet'
           }
         }
-        type: 'Microsoft.Network/virtualNetworkGateways/ipConfigurations'
       }
     ]
     enableBgpRouteTranslationForNat: false
@@ -208,8 +207,6 @@ resource connection 'Microsoft.Network/connections@2024-05-01' = {
   name: connectionName
   location: resourceGroup().location
   properties: {
-    authenticationType: 'PSK'
-    packetCaptureDiagnosticState: 'None'
     virtualNetworkGateway1: {
       id: remoteVpnGatewayId
       properties: {}
@@ -228,32 +225,14 @@ resource connection 'Microsoft.Network/connections@2024-05-01' = {
     enablePrivateLinkFastPath: false
     dpdTimeoutSeconds: 45
     connectionMode: 'Default'
-    trafficSelectorPolicies: [
-      {
-        localAddressRanges: [
-          functionAppSubnetPrefix
-        ]
-        remoteAddressRanges: [
-          remoteDbSubnetPrefix
-        ]
-      }
-      {
-        localAddressRanges: [
-          devboxSubnetPrefix
-        ]
-        remoteAddressRanges: [
-          remoteDbSubnetPrefix
-        ]
-      }
-      {
-        localAddressRanges: [
-          dataSubnetPrefix
-        ]
-        remoteAddressRanges: [
-          remoteDbSubnetPrefix
-        ]
-      }
+    trafficSelectorPolicies: [for localAddressRange in allLocalAddressRanges : {
+      localAddressRanges: [
+        localAddressRange
     ]
+      remoteAddressRanges: [
+        remoteDbSubnetPrefix
+      ]
+    }]
   }
 }
 
@@ -333,11 +312,3 @@ resource managedDevopsPoolPeering 'Microsoft.Network/virtualNetworks/virtualNetw
     }
   }
 }
-
-// resource devopsAccount 'Microsoft.VisualStudio/account@2014-04-01-preview' = {
-//   name: devopsAccountName
-//   location: resourceGroup().location
-//   properties: {
-//     AccountURL: 'https://dev.azure.com/${devopsAccountName}/'
-//   }
-// }

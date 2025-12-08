@@ -32,7 +32,8 @@ param parFrontDoorRateLimitThreshold = 1000
 param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
-param parEnableFrontDoorPrivateLink = true
+param parEnableFrontDoorPrivateLinkForIRAS = true
+param parEnableFrontDoorPrivateLinkForCMS = true
 param parEnableFunctionAppPrivateEndpoints = true
 param parEnableKeyVaultPrivateEndpoints = true
 param parEnableAppConfigPrivateEndpoints = true
@@ -171,10 +172,10 @@ param parAllowedHosts = 'fd-rsp-applications-manualtest-uks-a9ducvbchybpasgn.a01
 // indicates whether to use Front Door for the systemtest_manual environment
 param parUseFrontDoor = true
 
-@description('Indicates whether to use One Login for the application')
 param useOneLogin = true
 
 param paramWhitelistIPs = ''
+param parEnableFrontDoorIPWhitelisting = true
 
 param parClarityProjectId = ''
 
@@ -207,3 +208,7 @@ param parMicrosoftEntraAuthority = ''
 param parMicrosoftEntraAudience = ''
 
 param processDocuUploadManagedIdentityClientId =  ''
+param harpProjectRecordsQuery = ''
+param bgodatabase= ''
+param bgodatabaseuser = ''
+param bgodatabasepassword = ''

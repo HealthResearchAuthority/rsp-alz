@@ -41,6 +41,9 @@ param rateLimitThreshold int = 1000
 @description('Optional. Custom rules for the WAF policy.')
 param customRules array = []
 
+@description('Optional. Rule group overrides for Microsoft Default Rule Set.')
+param ruleGroupOverrides array = []
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -51,7 +54,7 @@ var managedRuleSets = enableManagedRules ? [
     ruleSetVersion: '2.1'
     ruleSetAction: 'Block'
     exclusions: []
-    ruleGroupOverrides: []
+    ruleGroupOverrides: ruleGroupOverrides
   }
   {
     ruleSetType: 'Microsoft_BotManagerRuleSet'

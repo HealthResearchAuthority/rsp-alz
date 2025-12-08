@@ -126,6 +126,8 @@ stages:
                               parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
+                              harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                              bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
       - job: preview
@@ -178,168 +180,51 @@ stages:
                               parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                              harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
+                              bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
 
 
-  - stage: ManualDeployment
-    displayName: 'Manual Deployment of Applications'
-    dependsOn: []
-    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
-    jobs:
-      - job: setup
-        displayName: 'Get DevOps Public IP'
-        variables:
-          - group: ${{ parameters.env }}
-          - group: ${{ parameters.env }}-keyvault
-        pool:
-          name: rsp-manageddevopspool
-        steps:
-          - bash: | 
-              echo "$(parWhitelistIPs)"
-            name: parWhitelistIPs
-            displayName: 'WhitelistIPs'
-          - bash: | 
-              echo "$(clarityProjectId)"
-            name: clarityProjectId
-            displayName: 'Clarity Project ID'
-          - bash: | 
-              echo "$(googleTagId)"
-            name: googleTagId
-            displayName: 'Google Tag ID'
-          - bash: | 
-              echo "$(cmsUri)"
-            name: cmsUri
-            displayName: 'CMS URI'
-          - bash: | 
-              echo "$(portalUrl)"
-            name: portalUrl
-            displayName: 'Portal URI'
-          - bash: | 
-              ipaddress=$(curl -s http://ipinfo.io/ip)
-              ipaddressipify=$(curl -s https://api.ipify.org)
-              echo "##vso[task.setvariable variable=ipaddress;isOutput=true;]$ipaddress"
-              echo "##vso[task.setvariable variable=ipaddressipify;isOutput=true;]$ipaddressipify"
-            name: fetchPublicIP
-            displayName: 'Fetch Public IP'
+  # Environment-specific deployment stages
 
-      - job: FinalWhatIf
-        displayName: 'Run What-If before Deployment'
-        dependsOn: [setup]
-        condition: succeeded()
-        pool: 
-          name: rsp-manageddevopspool
-        variables:
-          - name: devOpsPublicIP
-            value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
-          - group: ${{ parameters.env }}
-          - group: ${{ parameters.env }}-keyvault
-        steps:
-          - checkout: self
-          - script: |
-              echo "Installing Azure CLI..."
-              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-            displayName: 'Install Azure CLI'
-          - bash: |
-              az bicep install
-              az bicep version
-            displayName: 'Install Bicep CLI'
+  - template: templates/application-deployment-stage.yaml
+    parameters:
+      environmentName: dev
+      displayName: 'Deploy to Development'
+      createSecretsWithPlaceholders: ${{ parameters.create_secrets_with_placeholders }}
+      selectedEnvironment: ${{ parameters.env }}
 
-          - task: AzureCLI@2
-            displayName: 'Final What-If' 
-            inputs: 
-              azureSubscription: $(${{ parameters.env }})
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                az config set bicep.use_binary_from_path=false --only-show-errors
-                az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.application.bicep \
-                  --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
-                              parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
-                              parClientID=$(clientID) parClientSecret=$(clientSecret) \
-                              logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
-                              paramWhitelistIPs=$(parWhitelistIPs) \
-                              parClarityProjectId=$(clarityProjectId) \
-                              parGoogleTagId=$(googleTagId) \
-                              parCmsUri=$(cmsUri) \
-                              parLogoutUrl=$(logoutUrl) \
-                              parRtsApiBaseUrl=$(rtsApiBaseUrl) \
-                              parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
-                              parPortalUrl=$(portalUrl)
-                              parCleanStorageAccountName=$(cleanStorageAccountName) \
-                              parCleanStorageAccountKey=$(cleanStorageAccountKey) \
-                              parStagingStorageAccountName=$(stagingStorageAccountName) \
-                              parStagingStorageAccountKey=$(stagingStorageAccountKey) \
-                              parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
-                              parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
-                              parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
-                              parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
-                              processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
-                              parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
+  - template: templates/application-deployment-stage.yaml
+    parameters:
+      environmentName: systemtest_manual
+      displayName: 'Deploy to System Test (Manual)'
+      createSecretsWithPlaceholders: ${{ parameters.create_secrets_with_placeholders }}
+      selectedEnvironment: ${{ parameters.env }}
 
-      - deployment: deploy
-        displayName: 'Deploy Applications'
-        pool:
-          name: rsp-manageddevopspool
-        dependsOn: [setup, FinalWhatIf]
-        condition: succeeded()
-        environment: 'alz-bicep-deployment'
-        variables:
-          - name: devOpsPublicIP
-            value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
-          - name: devOpsIPIFYPublicIP
-            value: $[dependencies.setup.outputs['fetchPublicIP.ipaddressipify']]
-          - group: ${{ parameters.env }}
-          - group: ${{ parameters.env }}-keyvault
-        strategy:
-          runOnce:
-            deploy:
-              steps:
-                - checkout: self
-                - script: |
-                    echo "Installing Azure CLI..."
-                    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash 
-                  displayName: 'Install Azure CLI'
-                - bash: |
-                    az bicep install
-                    az bicep version
-                  displayName: 'Install Bicep CLI'
-                - bash: echo "Azure DevOps Public IP Address is $(devOpsPublicIP)"
-                - bash: echo "Azure DevOps Public IP Address from IPIFY is $(devOpsIPIFYPublicIP)"
+  - template: templates/application-deployment-stage.yaml
+    parameters:
+      environmentName: systemtest_auto
+      displayName: 'Deploy to System Test (Auto)'
+      createSecretsWithPlaceholders: ${{ parameters.create_secrets_with_placeholders }}
+      selectedEnvironment: ${{ parameters.env }}
 
-                - task: AzureCLI@2
-                  name: deploy
-                  displayName: 'Deploy Applications'
-                  inputs:
-                    azureSubscription: $(${{ parameters.env }})
-                    scriptType: bash
-                    scriptLocation: inlineScript
-                    failOnStandardError: true
-                    inlineScript: |
-                      az config set bicep.use_binary_from_path=false --only-show-errors
-                      output=$(az stack sub create --name "application-deployment-stack" --location $(location) --template-file ./5.spoke-network/main.application.bicep  \
-                        --parameters ./5.spoke-network/app-parameters/${{ parameters.env }}.parameters.bicepparam \
-                                    parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
-                                    parClientID=$(clientID) parClientSecret=$(clientSecret) \
-                                    logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
-                                    paramWhitelistIPs=$(parWhitelistIPs) \
-                                    parClarityProjectId=$(clarityProjectId) \
-                                    parGoogleTagId=$(googleTagId) \
-                                    parCmsUri=$(cmsUri) \
-                                    parLogoutUrl=$(logoutUrl) \
-                                    parRtsApiBaseUrl=$(rtsApiBaseUrl) \
-                                    parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
-                                    parPortalUrl=$(portalUrl) \
-                                    parCleanStorageAccountName=$(cleanStorageAccountName) \
-                                    parCleanStorageAccountKey=$(cleanStorageAccountKey) \
-                                    parStagingStorageAccountName=$(stagingStorageAccountName) \
-                                    parStagingStorageAccountKey=$(stagingStorageAccountKey) \
-                                    parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
-                                    parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
-                                    parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
-                                    parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
-                                    processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
-                                    parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }} \
-                                    --deny-settings-mode none --action-on-unmanage deleteResources --yes)
-                      echo $output | jq .
-                      appResourceGroup=$(echo $output | jq -r '.properties.outputs.appResourceGroupName.value')
-                      echo "##vso[task.setvariable variable=appResourceGroupName;isoutput=true]$appResourceGroup"
+  - template: templates/application-deployment-stage.yaml
+    parameters:
+      environmentName: uat
+      displayName: 'Deploy to UAT'
+      createSecretsWithPlaceholders: ${{ parameters.create_secrets_with_placeholders }}
+      selectedEnvironment: ${{ parameters.env }}
+
+  - template: templates/application-deployment-stage.yaml
+    parameters:
+      environmentName: pre_prod
+      displayName: 'Deploy to Pre-Production'
+      createSecretsWithPlaceholders: ${{ parameters.create_secrets_with_placeholders }}
+      selectedEnvironment: ${{ parameters.env }}
+
+  - template: templates/application-deployment-stage.yaml
+    parameters:
+      environmentName: production
+      displayName: 'Deploy to Production'
+      createSecretsWithPlaceholders: ${{ parameters.create_secrets_with_placeholders }}
+      selectedEnvironment: ${{ parameters.env }}

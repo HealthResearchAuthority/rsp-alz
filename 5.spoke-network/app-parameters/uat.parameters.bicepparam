@@ -34,7 +34,8 @@ param parFrontDoorRateLimitThreshold = 1000
 param parEnableFrontDoorCaching = false
 param parFrontDoorCacheDuration = 'P1D'
 param parEnableFrontDoorHttpsRedirect = true
-param parEnableFrontDoorPrivateLink = true
+param parEnableFrontDoorPrivateLinkForIRAS = true
+param parEnableFrontDoorPrivateLinkForCMS = true
 param parEnableFunctionAppPrivateEndpoints = true
 param parEnableKeyVaultPrivateEndpoints = true
 param parEnableAppConfigPrivateEndpoints = false
@@ -176,6 +177,7 @@ param parUseFrontDoor = true
 param useOneLogin = true
 
 param paramWhitelistIPs = ''
+param parEnableFrontDoorIPWhitelisting = false
 
 param parClarityProjectId = ''
 
@@ -205,3 +207,7 @@ param parQuarantineStorageAccountName = ''
 param parMicrosoftEntraAuthority = ''
 param parMicrosoftEntraAudience = ''
 param processDocuUploadManagedIdentityClientId =  ''
+param harpProjectRecordsQuery = ''
+param bgodatabase= ''
+param bgodatabaseuser = ''
+param bgodatabasepassword = ''

@@ -37,6 +37,9 @@ param rateLimitThreshold int = 1000
 @description('Optional. Custom domains for the Front Door.')
 param customDomains array = []
 
+@description('Optional. IP addresses to be whitelisted for access.')
+param paramWhitelistIPs string = ''
+
 @description('Optional. Enable caching.')
 param enableCaching bool = true
 
@@ -57,6 +60,9 @@ param enablePrivateLink bool = false
 
 @description('Front Door SKU')
 param frontDoorSku string = 'Premium_AzureFrontDoor'
+
+@description('Optional. Resource ID of the diagnostic log analytics workspace.')
+param logAnalyticsWorkspaceId string = ''
 
 // ------------------
 // VARIABLES
@@ -88,6 +94,10 @@ var cachingConfig = {
   cacheDuration: cacheDuration
 }
 
+// Parse and normalize whitelist IPs
+var varWhitelistIPs = filter(split(paramWhitelistIPs, ','), ip => !empty(trim(ip)))
+var normalizedWhitelistIPs = [for ip in varWhitelistIPs: contains(trim(ip), '/') ? trim(ip) : '${trim(ip)}/32']
+
 // ------------------
 // RESOURCES
 // ------------------
@@ -105,7 +115,64 @@ module wafPolicy '../../../shared/bicep/front-door/waf-policy.bicep' = if (enabl
     enableManagedRules: true
     enableRateLimiting: enableRateLimiting
     rateLimitThreshold: rateLimitThreshold
-    customRules: []
+    customRules: !empty(varWhitelistIPs) ? [
+      {
+        name: 'BlockNonWhitelistedIPs'
+        priority: 100
+        ruleType: 'MatchRule'
+        action: 'Block'
+        matchConditions: [
+          {
+            matchVariable: 'SocketAddr'
+            operator: 'IPMatch'
+            negateCondition: true
+            matchValue: normalizedWhitelistIPs
+          }
+        ]
+      }
+    ] : []
+    ruleGroupOverrides: [
+      {
+        ruleGroupName: 'General'
+        rules: [
+          {
+            ruleId: '200002'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+          {
+            ruleId: '200003'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+        ]
+      }
+      {
+        ruleGroupName: 'SQLI'
+        rules: [
+          {
+            ruleId: '942100'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+          {
+            ruleId: '942410'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+        ]
+      }
+      {
+        ruleGroupName: 'MS-ThreatIntel-SQLI'
+        rules: [
+          {
+            ruleId: '99031003'
+            enabledState: 'Enabled'
+            action: 'Log'
+          }
+        ]
+      }
+    ]
   }
 }
 
@@ -119,6 +186,7 @@ module frontDoorProfile '../../../shared/bicep/front-door/front-door-profile.bic
     skuName: frontDoorSku
     identityType: 'SystemAssigned'
     originResponseTimeoutSeconds: 60
+    diagnosticWorkspaceId: logAnalyticsWorkspaceId
   }
 }
 
