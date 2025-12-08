@@ -115,6 +115,19 @@ param parMicrosoftEntraAuthority string
 
 param documentStorageAccounts object = {}
 
+@description('SQL query for retrieving HARP project records')
+param harpProjectRecordsQuery string
+
+@description('BGO database IP address')
+param bgodatabase string
+
+@description('BGO harp database user')
+param bgodatabaseuser string
+
+@description('User password for BGO harp database')
+@secure()
+param bgodatabasepassword string
+
 // ------------------
 // Varaibles
 // ------------------
@@ -237,6 +250,10 @@ module appConfiguration './modules/app-configuration.bicep' = {
     }
     documentStorageAccounts: documentStorageAccounts
     parMicrosoftEntraAuthority: parMicrosoftEntraAuthority
+    harpProjectRecordsQuery: harpProjectRecordsQuery
+    bgodatabase: bgodatabase
+    bgodatabaseuser: bgodatabaseuser
+    bgodatabasepassword: bgodatabasepassword
   }
 }
 
