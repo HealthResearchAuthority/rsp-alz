@@ -351,30 +351,6 @@ module lgApp '../../../shared/bicep/app-services/logic-app.bicep' = if(kind == '
     virtualNetworkSubnetId: subnetIdForVnetInjection
     userAssignedIdentities:  {
       type: 'UserAssigned'
-      userAssignedIdentities: reduce(union(userAssignedIdentities, [funcUaiId]), {}, (result, id) => union(result, { '${id}': {} }))
-    }
-    storageAccountName: storageAccountName
-    contentShareName: contentShareName
-    hasPrivateEndpoint: deployAppPrivateEndPoint
-    sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
-    eventGridServiceTagRestriction: eventGridServiceTagRestriction
-  }
-  dependsOn: [
-    fnstorage
-  ]
-}
-
-module lgApp '../../../shared/bicep/app-services/logic-app.bicep' = if(kind == 'functionapp,workflowapp') {
-  name: take('${appName}-logicApp-Deployment', 64)
-  params: {
-    kind: 'functionapp,workflowapp'
-    logicAppName:  appName
-    location: location
-    serverFarmResourceId: appSvcPlan.outputs.resourceId
-    appInsightId: appInsights.outputs.appInsResourceId
-    virtualNetworkSubnetId: subnetIdForVnetInjection
-    userAssignedIdentities:  {
-      type: 'UserAssigned'
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
     }
     storageAccountName: storageAccountName
