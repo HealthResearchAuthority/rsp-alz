@@ -240,17 +240,6 @@ module assignBlobContributor '../../../shared/bicep/role-assignments/role-assign
   }
 }
 
-module assignQueueContributor '../../../shared/bicep/role-assignments/role-assignment.bicep' = if(kind == 'functionapp') {
-  name: take('ra-${appName}-queue', 64)
-  params: {
-    name: take('ra-${appName}-queue', 64)
-    resourceId: storageAccountId
-    roleDefinitionId: '974c5e8b-45b9-4653-ba55-5f855dd0fb88' // Storage Queue Data Contributor
-    principalId: funcUaiPrincipalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
 module assignFileSmbContributor '../../../shared/bicep/role-assignments/role-assignment.bicep' = if(kind == 'functionapp') {
   name: take('ra-${appName}-filesmb', 64)
   params: {
@@ -262,16 +251,6 @@ module assignFileSmbContributor '../../../shared/bicep/role-assignments/role-ass
   }
 }
 
-module assignFileSmbElevated '../../../shared/bicep/role-assignments/role-assignment.bicep' = if(kind == 'functionapp') {
-  name: take('ra-${appName}-filesmb-elev', 64)
-  params: {
-    name: take('ra-${appName}-filesmb-elev', 64)
-    resourceId: storageAccountId
-    roleDefinitionId: 'a7264617-510b-434b-a828-9731dc254ea7' // Storage File Data SMB Share Elevated Contributor
-    principalId: funcUaiPrincipalId
-    principalType: 'ServicePrincipal'
-  }
-}
 
 module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind == 'functionapp') {
   name: take('${appName}-webApp-Deployment', 64)
@@ -317,26 +296,12 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
         name: 'AzureWebJobsStorage__clientId'
         value: funcUaiClientId
       }
-      {
-        name: 'WEBSITE_CONTENTAZUREFILEAUTH_TYPE'
-        value: 'ManagedIdentity'
-      }
-      {
-        name: 'WEBSITE_CONTENTAZUREFILEACCOUNTNAME'
-        value: storageAccountResourceName
-      }
-      {
-        name: 'WEBSITE_CONTENTAZUREFILECLIENTID'
-        value: funcUaiClientId
-      }
     ]
   }
   dependsOn: [
     fnstorage
     assignBlobContributor
-    assignQueueContributor
     assignFileSmbContributor
-    assignFileSmbElevated
   ]
 }
 
