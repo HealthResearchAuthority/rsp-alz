@@ -213,7 +213,7 @@ module storageFilesPrivateNetwork '../../../shared/bicep/network/private-network
 
 // Role assignments for Function App managed identity on storage account
 module assignBlobContributor '../../../shared/bicep/role-assignments/role-assignment.bicep' = if(kind == 'functionapp') {
-  name: take('ra-${appName}-blob', 64)
+  name: take('ra-${appName}-blob-${guid(deployment().name, storageAccountId)}', 64)
   params: {
     name: take('ra-${appName}-blob', 64)
     resourceId: storageAccountId
