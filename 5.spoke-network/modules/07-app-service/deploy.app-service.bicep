@@ -221,6 +221,9 @@ module assignBlobContributor '../../../shared/bicep/role-assignments/role-assign
     principalId: funcUaiPrincipalId
     principalType: 'ServicePrincipal'
   }
+  dependsOn: [
+    funcUAI
+  ]
 }
 
 
