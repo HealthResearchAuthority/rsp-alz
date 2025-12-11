@@ -128,6 +128,9 @@ param bgodatabaseuser string
 @secure()
 param bgodatabasepassword string
 
+@description('function scopes for IRAS ID validation function')
+param irasIdValidationFunctionScopes array
+
 // ------------------
 // Varaibles
 // ------------------
@@ -246,7 +249,6 @@ module appConfiguration './modules/app-configuration.bicep' = {
       stagingStorageAccountKeySecretUri: keyVaultSecrets.outputs.stagingStorageAccountKeySecretUri
       quarantineStorageAccountKeySecretUri: keyVaultSecrets.outputs.quarantineStorageAccountKeySecretUri
       cleanStorageAccountKeySecretUri: keyVaultSecrets.outputs.cleanStorageAccountKeySecretUri
-      projectRecordValidationFunctionKey: keyVaultSecrets.outputs.projectRecordValidationFunctionKey
     }
     documentStorageAccounts: documentStorageAccounts
     parMicrosoftEntraAuthority: parMicrosoftEntraAuthority
@@ -254,6 +256,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
     bgodatabase: bgodatabase
     bgodatabaseuser: bgodatabaseuser
     bgodatabasepassword: bgodatabasepassword
+    irasIdValidationFunctionScopes: irasIdValidationFunctionScopes
   }
 }
 
