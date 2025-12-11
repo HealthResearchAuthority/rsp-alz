@@ -264,6 +264,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
   dependsOn: [
     fnstorage
     assignBlobContributor
+    funcUAI
   ]
 }
 
