@@ -205,6 +205,7 @@ param parMicrosoftEntraAudience = ''
 
 param processDocuUploadManagedIdentityClientId = ''
 param harpProjectRecordsQuery = ''
-param bgodatabase= ''
+param bgodatabase = ''
 param bgodatabaseuser = ''
 param bgodatabasepassword = ''
+param irasIdValidationFunctionScopes = ['api://']

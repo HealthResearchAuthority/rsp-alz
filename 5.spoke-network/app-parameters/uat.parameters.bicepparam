@@ -20,8 +20,6 @@ param parClientSecret = ''
 
 param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
 
-
-
 param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 15
@@ -58,53 +56,53 @@ param parCreateKVSecretsWithPlaceholders = false
 param parStorageConfig = {
   clean: {
     account: {
-      sku: 'Standard_LRS'      
+      sku: 'Standard_LRS'
       accessTier: 'Hot'
       containerName: 'clean'
     }
     encryption: {
-      enabled: true                          
-      keyName: 'key-clean-storage-uat'      
-      enableInfrastructureEncryption: true  
-      keyRotationEnabled: true              
+      enabled: true
+      keyName: 'key-clean-storage-uat'
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true
     }
     retention: {
-      enabled: false                        
-      retentionDays: 7                      
+      enabled: false
+      retentionDays: 7
     }
   }
   staging: {
     account: {
-      sku: 'Standard_LRS'      
+      sku: 'Standard_LRS'
       accessTier: 'Hot'
       containerName: 'staging'
     }
     encryption: {
-      enabled: true                          
-      keyName: 'key-staging-storage-uat'    
-      enableInfrastructureEncryption: true  
-      keyRotationEnabled: true              
+      enabled: true
+      keyName: 'key-staging-storage-uat'
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true
     }
     retention: {
-      enabled: true                         
-      retentionDays: 15                     
+      enabled: true
+      retentionDays: 15
     }
   }
   quarantine: {
     account: {
-      sku: 'Standard_LRS'      
-      accessTier: 'Cool'       
+      sku: 'Standard_LRS'
+      accessTier: 'Cool'
       containerName: 'quarantine'
     }
     encryption: {
-      enabled: true                          
-      keyName: 'key-quarantine-storage-uat' 
-      enableInfrastructureEncryption: true  
-      keyRotationEnabled: true              
+      enabled: true
+      keyName: 'key-quarantine-storage-uat'
+      enableInfrastructureEncryption: true
+      keyRotationEnabled: true
     }
     retention: {
-      enabled: true                         
-      retentionDays: 30                     
+      enabled: true
+      retentionDays: 30
     }
   }
 }
@@ -138,10 +136,10 @@ param parSkuConfig = {
 
 // Network security configuration for UAT environment
 param parNetworkSecurityConfig = {
-  defaultAction: 'Deny'        
-  bypass: 'AzureServices'      
-  httpsTrafficOnly: true       
-  quarantineBypass: 'None'     
+  defaultAction: 'Deny'
+  bypass: 'AzureServices'
+  httpsTrafficOnly: true
+  quarantineBypass: 'None'
 }
 
 param parSpokeNetworks = [
@@ -193,7 +191,6 @@ param parApiRequestPageSize = 50
 
 param parRtsApiBaseUrl = ''
 
-
 param parRtsAuthApiBaseUrl = ''
 
 param parCleanStorageAccountKey = ''
@@ -203,11 +200,12 @@ param parCleanStorageAccountName = ''
 param parStagingStorageAccountName = ''
 param parQuarantineStorageAccountName = ''
 
-
 param parMicrosoftEntraAuthority = ''
 param parMicrosoftEntraAudience = ''
-param processDocuUploadManagedIdentityClientId =  ''
+param processDocuUploadManagedIdentityClientId = ''
 param harpProjectRecordsQuery = ''
-param bgodatabase= ''
+param bgodatabase = ''
 param bgodatabaseuser = ''
 param bgodatabasepassword = ''
+
+param irasIdValidationFunctionScopes = ['api://']

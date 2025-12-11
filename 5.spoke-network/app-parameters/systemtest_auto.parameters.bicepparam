@@ -18,8 +18,6 @@ param parClientSecret = ''
 
 param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
 
-
-
 param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 15
@@ -174,7 +172,7 @@ param parUseFrontDoor = true
 
 param useOneLogin = true
 
-param paramWhitelistIPs =  ''
+param paramWhitelistIPs = ''
 param parEnableFrontDoorIPWhitelisting = true
 
 param parClarityProjectId = ''
@@ -193,7 +191,6 @@ param parApiRequestPageSize = 50
 
 param parRtsApiBaseUrl = ''
 
-
 param parRtsAuthApiBaseUrl = ''
 
 param parCleanStorageAccountKey = ''
@@ -203,11 +200,11 @@ param parCleanStorageAccountName = ''
 param parStagingStorageAccountName = ''
 param parQuarantineStorageAccountName = ''
 
-
 param parMicrosoftEntraAuthority = ''
 param parMicrosoftEntraAudience = ''
-param processDocuUploadManagedIdentityClientId =  ''
+param processDocuUploadManagedIdentityClientId = ''
 param harpProjectRecordsQuery = ''
-param bgodatabase= ''
+param bgodatabase = ''
 param bgodatabaseuser = ''
 param bgodatabasepassword = ''
+param irasIdValidationFunctionScopes = ['api://']

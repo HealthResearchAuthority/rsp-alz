@@ -68,13 +68,73 @@ type skuConfig = {
   @description('App Service Plan configuration')
   appServicePlan: {
     @description('Web app SKU')
-    webApp: ('B1' | 'B3'| 'S1' | 'S2' | 'S3' | 'P1V3' | 'P2V3' | 'P3V3' | 'P1V3_AZ' | 'P2V3_AZ' | 'P3V3_AZ' | 'EP1' | 'EP2' | 'EP3' | 'ASE_I1V2_AZ' | 'ASE_I2V2_AZ' | 'ASE_I3V2_AZ' | 'ASE_I1V2' | 'ASE_I2V2' | 'ASE_I3V2')
-    
+    webApp: (
+      | 'B1'
+      | 'B3'
+      | 'S1'
+      | 'S2'
+      | 'S3'
+      | 'P1V3'
+      | 'P2V3'
+      | 'P3V3'
+      | 'P1V3_AZ'
+      | 'P2V3_AZ'
+      | 'P3V3_AZ'
+      | 'EP1'
+      | 'EP2'
+      | 'EP3'
+      | 'ASE_I1V2_AZ'
+      | 'ASE_I2V2_AZ'
+      | 'ASE_I3V2_AZ'
+      | 'ASE_I1V2'
+      | 'ASE_I2V2'
+      | 'ASE_I3V2')
+
     @description('Function app SKU')
-    functionApp: ('B1' | 'B3'| 'S1' | 'S2' | 'S3' | 'P1V3' | 'P2V3' | 'P3V3' | 'P1V3_AZ' | 'P2V3_AZ' | 'P3V3_AZ' | 'EP1' | 'EP2' | 'EP3' | 'ASE_I1V2_AZ' | 'ASE_I2V2_AZ' | 'ASE_I3V2_AZ' | 'ASE_I1V2' | 'ASE_I2V2' | 'ASE_I3V2')
-    
+    functionApp: (
+      | 'B1'
+      | 'B3'
+      | 'S1'
+      | 'S2'
+      | 'S3'
+      | 'P1V3'
+      | 'P2V3'
+      | 'P3V3'
+      | 'P1V3_AZ'
+      | 'P2V3_AZ'
+      | 'P3V3_AZ'
+      | 'EP1'
+      | 'EP2'
+      | 'EP3'
+      | 'ASE_I1V2_AZ'
+      | 'ASE_I2V2_AZ'
+      | 'ASE_I3V2_AZ'
+      | 'ASE_I1V2'
+      | 'ASE_I2V2'
+      | 'ASE_I3V2')
+
     @description('CMS app SKU')
-    cmsApp: ('B1' | 'B3'| 'S1' | 'S2' | 'S3' | 'P1V3' | 'P2V3' | 'P3V3' | 'P1V3_AZ' | 'P2V3_AZ' | 'P3V3_AZ' | 'EP1' | 'EP2' | 'EP3' | 'ASE_I1V2_AZ' | 'ASE_I2V2_AZ' | 'ASE_I3V2_AZ' | 'ASE_I1V2' | 'ASE_I2V2' | 'ASE_I3V2')
+    cmsApp: (
+      | 'B1'
+      | 'B3'
+      | 'S1'
+      | 'S2'
+      | 'S3'
+      | 'P1V3'
+      | 'P2V3'
+      | 'P3V3'
+      | 'P1V3_AZ'
+      | 'P2V3_AZ'
+      | 'P3V3_AZ'
+      | 'EP1'
+      | 'EP2'
+      | 'EP3'
+      | 'ASE_I1V2_AZ'
+      | 'ASE_I2V2_AZ'
+      | 'ASE_I3V2_AZ'
+      | 'ASE_I1V2'
+      | 'ASE_I2V2'
+      | 'ASE_I3V2')
   }
 
   @description('SQL Database configuration')
@@ -409,6 +469,9 @@ param bgodatabaseuser string
 @secure()
 param bgodatabasepassword string
 
+@description('Scopes for IRAS ID validation function')
+param irasIdValidationFunctionScopes array
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -614,6 +677,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       bgodatabase: bgodatabase
       bgodatabaseuser: bgodatabaseuser
       bgodatabasepassword: bgodatabasepassword
+      irasIdValidationFunctionScopes: irasIdValidationFunctionScopes
     }
   }
 ]

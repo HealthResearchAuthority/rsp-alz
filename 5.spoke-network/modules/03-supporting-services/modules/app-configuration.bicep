@@ -115,6 +115,9 @@ param bgodatabaseuser string
 @secure()
 param bgodatabasepassword string
 
+@description('function scopes for IRAS ID validation function')
+param irasIdValidationFunctionScopes array
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 
 var keyValues = [
@@ -339,14 +342,14 @@ var keyValues = [
     contentType: null
   }
   {
-    name: 'AppSettings:ProjectRecordValidationFunctionKey'
-    value: '{"uri":"${keyVaultSecretUris.projectRecordValidationFunctionKey}"}'
-    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
-  }
-  {
     name: 'AppSettings:ProjectRecordValidationUri'
     value: 'https://func-validate-irasid.azurewebsites.net/api'
     contentType: null
+  }
+  {
+    name: 'AppSettings:ProjectRecordValidationScopes'
+    value: irasIdValidationFunctionScopes
+    contentType: 'application/json'
   }
 ]
 
