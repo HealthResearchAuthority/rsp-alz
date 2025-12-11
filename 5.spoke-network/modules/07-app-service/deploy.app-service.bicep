@@ -148,7 +148,6 @@ module funcUAI '../../../shared/bicep/managed-identity.bicep' = if(kind == 'func
   }
 }
 
-// Safe variables to avoid conditional module output warnings
 var funcUaiId = resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'id-${appName}')
 var funcUaiClientId = kind == 'functionapp' ? reference(funcUaiId, '2023-01-31', 'Full').properties.clientId : ''
 var funcUaiPrincipalId = kind == 'functionapp' ? reference(funcUaiId, '2023-01-31', 'Full').properties.principalId : ''
@@ -162,25 +161,9 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     supportsHttpsTrafficOnly: true
-    allowSharedKeyAccess: false
+    allowSharedKeyAccess: (kind == 'functionapp') ? false : true // Logic App still needs shared accedd keys enabled on their storage accounts
     tags: {}
     networkAcls: networkAcls 
-  }
-}
-
-resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = if(kind == 'functionapp' || kind == 'functionapp,workflowapp') {
-  name: '${storageAccountResourceName}/default'
-  dependsOn: [
-    fnstorage
-  ]
-}
-
-resource storageContentShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = if((kind == 'functionapp' || kind == 'functionapp,workflowapp') && !empty(contentShareName)) {
-  parent: storageFileService
-  name: contentShareName
-  properties: {
-    enabledProtocols: 'SMB'
-    shareQuota: 10240
   }
 }
 
@@ -240,17 +223,6 @@ module assignBlobContributor '../../../shared/bicep/role-assignments/role-assign
   }
 }
 
-module assignFileSmbContributor '../../../shared/bicep/role-assignments/role-assignment.bicep' = if(kind == 'functionapp') {
-  name: take('ra-${appName}-filesmb', 64)
-  params: {
-    name: take('ra-${appName}-filesmb', 64)
-    resourceId: storageAccountId
-    roleDefinitionId: '0c867c2a-1d8c-454a-a3db-ab2ea1bdc8bb' // Storage File Data SMB Share Contributor
-    principalId: funcUaiPrincipalId
-    principalType: 'ServicePrincipal'
-  }
-}
-
 
 module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind == 'functionapp') {
   name: take('${appName}-webApp-Deployment', 64)
@@ -267,7 +239,6 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
       userAssignedIdentities: reduce(union(userAssignedIdentities, [funcUaiId]), {}, (result, id) => union(result, { '${id}': {} }))
     }
     storageAccountName: storageAccountName
-    contentShareName: contentShareName
     hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     eventGridServiceTagRestriction: eventGridServiceTagRestriction
@@ -278,19 +249,11 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
       }
       {
         name: 'AzureWebJobsStorage__accountName'
-        value: storageAccountResourceName
+        value: storageAccountName
       }
       {
         name: 'AzureWebJobsStorage__blobServiceUri'
-        value: 'https://${storageAccountResourceName}.blob.${environment().suffixes.storage}'
-      }
-      {
-        name: 'AzureWebJobsStorage__queueServiceUri'
-        value: 'https://${storageAccountResourceName}.queue.${environment().suffixes.storage}'
-      }
-      {
-        name: 'AzureWebJobsStorage__tableServiceUri'
-        value: 'https://${storageAccountResourceName}.table.${environment().suffixes.storage}'
+        value: 'https://${storageAccountName}.blob.${environment().suffixes.storage}'
       }
       {
         name: 'AzureWebJobsStorage__clientId'
@@ -301,7 +264,6 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
   dependsOn: [
     fnstorage
     assignBlobContributor
-    assignFileSmbContributor
   ]
 }
 

@@ -23,9 +23,6 @@ param sqlDBManagedIdentityClientId string = ''
 @description('Conditional. The name of the parent Storage Account. Required if the template is used in a standalone deployment.')
 param storageAccountName string
 
-@description('Optional. Name of the Azure Files share used for function content.')
-param contentShareName string = ''
-
 @description('Optional. Runtime for Function App.')
 @allowed([
   'node'
@@ -109,10 +106,6 @@ var defaultSettings = [
 // Additional settings for private endpoint scenarios
 var privateEndpointSettings = hasPrivateEndpoint ? [
   {
-    name: 'WEBSITE_CONTENTOVERVNET'
-    value: '1'
-  }
-  {
     name: 'WEBSITE_VNET_ROUTE_ALL' 
     value: '1'
   }
@@ -121,13 +114,6 @@ var privateEndpointSettings = hasPrivateEndpoint ? [
     value: 'true'
   }
 ] : []
-
-var contentShareSettings = empty(contentShareName) ? [] : [
-  {
-    name: 'WEBSITE_CONTENTSHARE'
-    value: contentShareName
-  }
-]
 
 // NEW VARIABLE FOR EVENT GRID RULE
 var eventGridRule = {
@@ -153,7 +139,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
     virtualNetworkSubnetId: !empty(virtualNetworkSubnetId) ? virtualNetworkSubnetId : any(null)
     siteConfig: {
       netFrameworkVersion: dotnetVersion
-      appSettings: concat(defaultSettings, privateEndpointSettings, contentShareSettings, appSettings)
+      appSettings: concat(defaultSettings, privateEndpointSettings, appSettings)
       alwaysOn: true
     }
   }
