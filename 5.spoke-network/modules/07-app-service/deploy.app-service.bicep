@@ -148,9 +148,9 @@ module funcUAI '../../../shared/bicep/managed-identity.bicep' = if(kind == 'func
   }
 }
 
-var funcUaiId = resourceId('Microsoft.ManagedIdentity/userAssignedIdentities', 'id-${appName}')
-var funcUaiClientId = kind == 'functionapp' ? reference(funcUaiId, '2023-01-31', 'Full').properties.clientId : ''
-var funcUaiPrincipalId = kind == 'functionapp' ? reference(funcUaiId, '2023-01-31', 'Full').properties.principalId : ''
+var funcUaiId = kind == 'functionapp' ? funcUAI!.outputs.id : ''
+var funcUaiClientId = kind == 'functionapp' ? funcUAI!.outputs.clientId : ''
+var funcUaiPrincipalId = kind == 'functionapp' ? funcUAI!.outputs.principalId : ''
 var storageAccountId = resourceId('Microsoft.Storage/storageAccounts', storageAccountResourceName)
 
 module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'functionapp' || kind == 'functionapp,workflowapp') {
@@ -221,9 +221,6 @@ module assignBlobContributor '../../../shared/bicep/role-assignments/role-assign
     principalId: funcUaiPrincipalId
     principalType: 'ServicePrincipal'
   }
-  dependsOn: [
-    funcUAI
-  ]
 }
 
 
@@ -251,27 +248,14 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
         value: 'managedidentity'
       }
       {
-        name: 'AzureWebJobsStorage__accountName'
-        value: storageAccountName
-      }
-      {
-        name: 'AzureWebJobsStorage__blobServiceUri'
-        value: 'https://${storageAccountName}.blob.${environment().suffixes.storage}'
-      }
-      {
         name: 'AzureWebJobsStorage__clientId'
         value: funcUaiClientId
       }
-      // {
-      //   name: 'WEBSITE_CONTENTSHARE'
-      //   value: storageAccountName // Dummy value to satisfy validation
-      // }
     ]
   }
   dependsOn: [
     fnstorage
     assignBlobContributor
-    funcUAI
   ]
 }
 

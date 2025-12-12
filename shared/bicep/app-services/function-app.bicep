@@ -77,14 +77,14 @@ resource fnAppAppInsights 'microsoft.insights/components@2020-02-02' existing = 
 }
 
 var defaultSettings = [
-  // {
-  //   name: 'AzureWebJobsStorage'
-  //   value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${listKeys(storageAccount.id, '2022-09-01').keys[0].value};EndpointSuffix=core.windows.net'
-  // }
-  // {
-  //   name: 'WEBSITE_CONTENTAZUREFILECONNECTIONSTRING'
-  //   value: 'DefaultEndpointsProtocol=https;AccountName=${storageAccount.name};AccountKey=${listKeys(storageAccount.id, '2022-09-01').keys[0].value};EndpointSuffix=core.windows.net'
-  // }
+  {
+    name: 'AzureWebJobsStorage__accountName'
+    value: storageAccount.name
+  }
+  {
+    name: 'AzureWebJobsStorage__blobServiceUri'
+    value: 'https://${storageAccountName}.blob.${environment().suffixes.storage}'
+  }
   {
     name: 'FUNCTIONS_EXTENSION_VERSION'
     value: runtimeVersion
