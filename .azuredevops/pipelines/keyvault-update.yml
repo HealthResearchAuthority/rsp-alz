@@ -74,6 +74,17 @@ stages:
                 ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.secrets.json \
                 $(Build.SourcesDirectory)/.kv-secrets.json
             displayName: 'Prepare Key Vault secret values'
+            env:
+              oneLoginClientId: $(oneLoginClientId)
+              oneLoginPrivateKeyPem: $(oneLoginPrivateKeyPem)
+              rtsApiClientId: $(rtsApiClientId)
+              rtsApiClientSecret: $(rtsApiClientSecret)
+              documentBlobStorageAccountKey: $(documentBlobStorageAccountKey)
+              stagingStorageAccountKey: $(stagingStorageAccountKey)
+              quarantineStorageAccountKey: $(quarantineStorageAccountKey)
+              cleanStorageAccountKey: $(cleanStorageAccountKey)
+              projectRecordValidationFunctionKey: $(projectRecordValidationFunctionKey)
+              testValueOneLoginClientId: $(testValueOneLoginClientId)
           - task: AzureCLI@2
             displayName: 'Validate Deployment'
             inputs:
@@ -117,6 +128,17 @@ stages:
                 ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.secrets.json \
                 $(Build.SourcesDirectory)/.kv-secrets.json
             displayName: 'Prepare Key Vault secret values'
+            env:
+              oneLoginClientId: $(oneLoginClientId)
+              oneLoginPrivateKeyPem: $(oneLoginPrivateKeyPem)
+              rtsApiClientId: $(rtsApiClientId)
+              rtsApiClientSecret: $(rtsApiClientSecret)
+              documentBlobStorageAccountKey: $(documentBlobStorageAccountKey)
+              stagingStorageAccountKey: $(stagingStorageAccountKey)
+              quarantineStorageAccountKey: $(quarantineStorageAccountKey)
+              cleanStorageAccountKey: $(cleanStorageAccountKey)
+              projectRecordValidationFunctionKey: $(projectRecordValidationFunctionKey)
+              testValueOneLoginClientId: $(testValueOneLoginClientId)
           - task: AzureCLI@2
             displayName: 'What-If Key Vault Update'
             inputs:
@@ -167,6 +189,17 @@ stages:
                       ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.secrets.json \
                       $(Build.SourcesDirectory)/.kv-secrets.json
                   displayName: 'Prepare Key Vault secret values'
+                  env:
+                    oneLoginClientId: $(oneLoginClientId)
+                    oneLoginPrivateKeyPem: $(oneLoginPrivateKeyPem)
+                    rtsApiClientId: $(rtsApiClientId)
+                    rtsApiClientSecret: $(rtsApiClientSecret)
+                    documentBlobStorageAccountKey: $(documentBlobStorageAccountKey)
+                    stagingStorageAccountKey: $(stagingStorageAccountKey)
+                    quarantineStorageAccountKey: $(quarantineStorageAccountKey)
+                    cleanStorageAccountKey: $(cleanStorageAccountKey)
+                    projectRecordValidationFunctionKey: $(projectRecordValidationFunctionKey)
+                    testValueOneLoginClientId: $(testValueOneLoginClientId)
                 - task: AzureCLI@2
                   displayName: 'Deploy Key Vault Update'
                   inputs:

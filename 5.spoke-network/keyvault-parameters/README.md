@@ -126,9 +126,14 @@ rtsApiClientSecret (secret)
 **Pipeline:** `.azuredevops/pipelines/keyvault-update.yml`
 
 **Parameters:**
-- `env` - Environment (dev, uat, production, etc.)
-- `keyvault_variable_group` - Variable group name (default: `auto` uses `{env}-key-vault`)
+- `env` - Environment (dev, uat, production, etc.) - **Automatically uses `{env}-key-vault` variable group**
 - `location` - Deployment location (default: uksouth)
+
+**Variable Group Resolution:**
+The pipeline automatically uses the variable group named `{env}-key-vault` based on the selected environment:
+- Select `dev` → Uses `dev-key-vault`
+- Select `uat` → Uses `uat-key-vault`
+- Select `production` → Uses `production-key-vault`
 
 **Stages:**
 1. **PR Validation** - Lint, validate, what-if (runs on PR)
