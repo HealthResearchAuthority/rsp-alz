@@ -167,6 +167,22 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
   }
 }
 
+resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = if(kind == 'functionapp,workflowapp') {
+  name: '${storageAccountResourceName}/default'
+  dependsOn: [
+    fnstorage
+  ]
+}
+
+resource storageContentShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = if((kind == 'functionapp,workflowapp') && !empty(contentShareName)) {
+  parent: storageFileService
+  name: contentShareName
+  properties: {
+    enabledProtocols: 'SMB'
+    shareQuota: 10240
+  }
+}
+
 module storageBlobPrivateNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = if((kind == 'functionapp' || kind == 'functionapp,workflowapp') && deployAppPrivateEndPoint == true) {
   name: take('pep-${appName}-blob', 64)
   scope: resourceGroup(privateEndpointRG)
