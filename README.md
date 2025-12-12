@@ -121,7 +121,7 @@ Key Vault secrets are updated via a dedicated pipeline that sources values from 
 3. **Update pipeline YAML**: Add the secret to the `env:` section in `.azuredevops/pipelines/keyvault-update.yml` in all three bash tasks (validate, preview, deploy) that have `displayName: 'Prepare Key Vault secret values'`. Add the mapping: `secretName: $(secretName)`.
 4. **Create PR and deploy**: Create a pull request for review. After merge, queue `.azuredevops/pipelines/keyvault-update.yml`, select the environment (automatically uses `<env>-key-vault` variable group), and review the `what-if` output before approving deployment.
 
-**Note**: The pipeline creates a temporary `.kv-secrets.json` file from variable group secrets during deployment and automatically cleans it up afterwards. This file is never committed to source control.
+
 
 ## Defender for Storage Implementation
 
