@@ -98,7 +98,7 @@ stages:
                   --location $(location) \
                   --template-file ./5.spoke-network/main.keyvault-update.bicep \
                   --parameters ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.parameters.bicepparam \
-                               parSecretValues=@$(Build.SourcesDirectory)/.kv-secrets.json
+                  --parameters parSecretValues=@$(Build.SourcesDirectory)/.kv-secrets.json
           - bash: |
               rm -f $(Build.SourcesDirectory)/.kv-secrets.json
             displayName: 'Remove temporary secret file'
@@ -150,7 +150,7 @@ stages:
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.keyvault-update.bicep \
                   --parameters ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.parameters.bicepparam \
-                               parSecretValues=@$(Build.SourcesDirectory)/.kv-secrets.json
+                  --parameters parSecretValues=@$(Build.SourcesDirectory)/.kv-secrets.json
           - bash: |
               rm -f $(Build.SourcesDirectory)/.kv-secrets.json
             displayName: 'Remove temporary secret file'
@@ -213,7 +213,7 @@ stages:
                         --location $(location) \
                         --template-file ./5.spoke-network/main.keyvault-update.bicep \
                         --parameters ./5.spoke-network/keyvault-parameters/${{ parameters.env }}.parameters.bicepparam \
-                                     parSecretValues=@$(Build.SourcesDirectory)/.kv-secrets.json
+                        --parameters parSecretValues=@$(Build.SourcesDirectory)/.kv-secrets.json
                 - bash: |
                     rm -f $(Build.SourcesDirectory)/.kv-secrets.json
                   displayName: 'Remove temporary secret file'

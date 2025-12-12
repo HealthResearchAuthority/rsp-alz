@@ -154,9 +154,20 @@ The pipeline automatically uses the variable group named `{env}-key-vault` based
    { "name": "newSecretName" }
    ```
 
-3. **Create PR** for review
+3. **Update pipeline YAML** (`.azuredevops/pipelines/keyvault-update.yml`):
+   - Add the new secret to the `env:` section in **all three bash tasks** (validate job, preview job, deploy job)
+   - Find sections with `displayName: 'Prepare Key Vault secret values'`
+   - Add your new environment variable mapping:
+   ```yaml
+   env:
+     oneLoginClientId: $(oneLoginClientId)
+     # ... existing mappings ...
+     newSecretName: $(newSecretName)  # Add this line
+   ```
 
-4. **Run pipeline** after merge
+4. **Create PR** for review
+
+5. **Run pipeline** after merge
 
 ### Updating Existing Secrets
 
