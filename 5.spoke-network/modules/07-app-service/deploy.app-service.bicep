@@ -139,6 +139,20 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
   }
 }
 
+module funcUAI '../../../shared/bicep/managed-identity.bicep' = if(kind == 'functionapp') {
+  name: take('mi-${appName}', 64)
+  params: {
+    name: 'id-${appName}'
+    location: location
+    tags: tags
+  }
+}
+
+var funcUaiId = kind == 'functionapp' ? funcUAI!.outputs.id : ''
+var funcUaiClientId = kind == 'functionapp' ? funcUAI!.outputs.clientId : ''
+var funcUaiPrincipalId = kind == 'functionapp' ? funcUAI!.outputs.principalId : ''
+var storageAccountId = resourceId('Microsoft.Storage/storageAccounts', storageAccountResourceName)
+
 module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'functionapp' || kind == 'functionapp,workflowapp') {
   name: take('fnAppStoragePrivateNetwork-${deployment().name}', 64)
   params: {
@@ -147,19 +161,20 @@ module fnstorage '../../../shared/bicep/storage/storage.bicep' = if(kind == 'fun
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     supportsHttpsTrafficOnly: true
+    allowSharedKeyAccess: (kind == 'functionapp') ? false : true // Logic App still needs shared accedd keys enabled on their storage accounts
     tags: {}
     networkAcls: networkAcls 
   }
 }
 
-resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = if(kind == 'functionapp' || kind == 'functionapp,workflowapp') {
+resource storageFileService 'Microsoft.Storage/storageAccounts/fileServices@2022-09-01' = if(kind == 'functionapp,workflowapp') {
   name: '${storageAccountResourceName}/default'
   dependsOn: [
     fnstorage
   ]
 }
 
-resource storageContentShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = if((kind == 'functionapp' || kind == 'functionapp,workflowapp') && !empty(contentShareName)) {
+resource storageContentShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2022-09-01' = if((kind == 'functionapp,workflowapp') && !empty(contentShareName)) {
   parent: storageFileService
   name: contentShareName
   properties: {
@@ -212,6 +227,19 @@ module storageFilesPrivateNetwork '../../../shared/bicep/network/private-network
   ]
 }
 
+// Role assignments for Function App managed identity on storage account
+module assignBlobContributor '../../../shared/bicep/role-assignments/role-assignment.bicep' = if(kind == 'functionapp') {
+  name: take('ra-${appName}-blob-${guid(deployment().name, storageAccountId)}', 64)
+  params: {
+    name: take('ra-${appName}-blob', 64)
+    resourceId: storageAccountId
+    roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe' // Storage Blob Data Contributor
+    principalId: funcUaiPrincipalId
+    principalType: 'ServicePrincipal'
+  }
+}
+
+
 module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind == 'functionapp') {
   name: take('${appName}-webApp-Deployment', 64)
   params: {
@@ -224,16 +252,26 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     appInsightId: appInsights.outputs.appInsResourceId
     userAssignedIdentities:  {
       type: 'UserAssigned'
-      userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
+      userAssignedIdentities: reduce(union(userAssignedIdentities, [funcUaiId]), {}, (result, id) => union(result, { '${id}': {} }))
     }
     storageAccountName: storageAccountName
-    contentShareName: contentShareName
     hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     eventGridServiceTagRestriction: eventGridServiceTagRestriction
+    appSettings: [
+      {
+        name: 'AzureWebJobsStorage__credential'
+        value: 'managedidentity'
+      }
+      {
+        name: 'AzureWebJobsStorage__clientId'
+        value: funcUaiClientId
+      }
+    ]
   }
   dependsOn: [
     fnstorage
+    assignBlobContributor
   ]
 }
 
