@@ -23,7 +23,7 @@ param parKeyVaultSecrets keyVaultSecretDefinition[] = []
 
 @secure()
 @description('Object keyed by secret name containing the actual secret values supplied during deployment.')
-param parSecretValues object
+param parSecretValues object = {}
 
 module keyVaultSecrets 'modules/keyvault-update/deploy.keyvault-secrets.bicep' = {
   name: take('keyVaultSecrets-${deployment().name}', 64)
