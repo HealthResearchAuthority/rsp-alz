@@ -116,10 +116,12 @@ Updating or adding App Configuration key-value pairs no longer requires redeploy
 
 Key Vault secrets are updated via a dedicated pipeline that sources values from Azure DevOps variable groups:
 
-1. Update the environment manifest in `5.spoke-network/keyvault-parameters/` (for example `dev.secrets.json`) to add or edit secret metadata (`name`, optional `contentType`, `tags`, etc.). Each entry also includes `variableName`, which must match an Azure DevOps variable name (letters, numbers, and underscores only) in the corresponding `<env>-key-vault` variable group.
-2. Ensure the secret values live in the Azure DevOps Library variable group (default `<env>-key-vault`, or provide a custom group when queuing the pipeline). Adding a new variable to the group and to the manifest is all that is required for a new secret.
-3. Queue `.azuredevops/pipelines/keyvault-update.yml`, pick the environment, optionally override the variable group name, and set the deployment location if needed. The pipeline builds a secure JSON payload from the variable group, runs `bicep build`, `validate`, `what-if`, and finally deploys `main.keyvault-update.bicep`, updating only the specified secrets.
-4. Review the `what-if` output before approving the deployment. Keep the generated `.kv-secrets.json` file out of source control—it's created transiently by the pipeline from the variable group secrets.
+1. **Add secret to Azure DevOps variable group**: Add the secret value to the corresponding `<env>-key-vault` variable group in Library and mark it as secret (lock icon).
+2. **Update environment manifest**: Edit `5.spoke-network/keyvault-parameters/<env>.secrets.json` to add the secret metadata (minimum: `{ "name": "secretName" }`). Optional fields include `variableName` (if different from `name`) and `contentType`.
+3. **Update pipeline YAML**: Add the secret to the `env:` section in `.azuredevops/pipelines/keyvault-update.yml` in all three bash tasks (validate, preview, deploy) that have `displayName: 'Prepare Key Vault secret values'`. Add the mapping: `secretName: $(secretName)`.
+4. **Create PR and deploy**: Create a pull request for review. After merge, queue `.azuredevops/pipelines/keyvault-update.yml`, select the environment (automatically uses `<env>-key-vault` variable group), and review the `what-if` output before approving deployment.
+
+**Note**: The pipeline creates a temporary `.kv-secrets.json` file from variable group secrets during deployment and automatically cleans it up afterwards. This file is never committed to source control.
 
 ## Defender for Storage Implementation
 

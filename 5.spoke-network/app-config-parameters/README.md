@@ -9,7 +9,6 @@ Environment-specific parameter files for updating Azure App Configuration withou
 3. **Create PR** for review
 4. **Run pipeline**: `.azuredevops/pipelines/appconfig-update.yml`
 
-**Result:** Configuration updates in ~2-3 minutes (vs 30+ minutes for full deployment)
 
 ---
 

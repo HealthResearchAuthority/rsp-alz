@@ -9,8 +9,6 @@ Environment-specific parameter files for updating Azure Key Vault secrets withou
 3. **Create PR** for review
 4. **Run pipeline**: `.azuredevops/pipelines/keyvault-update.yml`
 
-**Result:** Secret updates in ~2-3 minutes (vs 30+ minutes for full deployment)
-
 ---
 
 ## File Structure
