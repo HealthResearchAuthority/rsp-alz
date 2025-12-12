@@ -1,5 +1,6 @@
 # Bicep build artifacts
 *.json
+!5.spoke-network/keyvault-parameters/*.json
 
 # Azure CLI
 .azure/
