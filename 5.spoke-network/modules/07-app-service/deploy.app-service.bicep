@@ -262,6 +262,10 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
         name: 'AzureWebJobsStorage__clientId'
         value: funcUaiClientId
       }
+      {
+        name: 'WEBSITE_CONTENTSHARE'
+        value: storageAccountName // Dummy value to satisfy validation
+      }
     ]
   }
   dependsOn: [
