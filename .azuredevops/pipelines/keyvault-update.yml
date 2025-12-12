@@ -23,10 +23,6 @@ parameters:
       - uat
       - pre_prod
       - production
-  - name: keyvault_variable_group
-    displayName: 'Variable group containing Key Vault secret values (default: {env}-key-vault)'
-    type: string
-    default: 'auto'
   - name: location
     displayName: 'Deployment location'
     type: string
@@ -62,10 +58,7 @@ stages:
           name: rsp-manageddevopspool
         variables:
           - group: ${{ parameters.env }}
-          - ${{ if eq(parameters.keyvault_variable_group, 'auto') }}:
-              - group: ${{ parameters.env }}-key-vault
-          - ${{ if ne(parameters.keyvault_variable_group, 'auto') }}:
-              - group: ${{ parameters.keyvault_variable_group }}
+          - group: ${{ parameters.env }}-key-vault
         steps:
           - checkout: self
           - script: |
@@ -108,10 +101,7 @@ stages:
           name: rsp-manageddevopspool
         variables:
           - group: ${{ parameters.env }}
-          - ${{ if eq(parameters.keyvault_variable_group, 'auto') }}:
-              - group: ${{ parameters.env }}-key-vault
-          - ${{ if ne(parameters.keyvault_variable_group, 'auto') }}:
-              - group: ${{ parameters.keyvault_variable_group }}
+          - group: ${{ parameters.env }}-key-vault
         steps:
           - checkout: self
           - script: |
@@ -158,10 +148,7 @@ stages:
         environment: 'alz-keyvault-update'
         variables:
           - group: ${{ parameters.env }}
-          - ${{ if eq(parameters.keyvault_variable_group, 'auto') }}:
-              - group: ${{ parameters.env }}-key-vault
-          - ${{ if ne(parameters.keyvault_variable_group, 'auto') }}:
-              - group: ${{ parameters.keyvault_variable_group }}
+          - group: ${{ parameters.env }}-key-vault
         strategy:
           runOnce:
             deploy:
