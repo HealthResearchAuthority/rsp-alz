@@ -177,6 +177,7 @@ param parUseFrontDoor = true
 param useOneLogin = true
 
 param paramWhitelistIPs = ''
+param parEnableFrontDoorIPWhitelisting = false
 
 param parClarityProjectId = ''
 
@@ -206,3 +207,7 @@ param parQuarantineStorageAccountName = ''
 param parMicrosoftEntraAuthority = ''
 param parMicrosoftEntraAudience = ''
 param processDocuUploadManagedIdentityClientId =  ''
+param harpProjectRecordsQuery = ''
+param bgodatabase= ''
+param bgodatabaseuser = ''
+param bgodatabasepassword = ''
