@@ -100,6 +100,15 @@ module appServicePlans '../../shared/bicep/app-services/app-service-plan.bicep' 
   }
 }]
 
+module functionAppIdentities '../../shared/bicep/managed-identity.bicep' = [for (funcApp, index) in functionApps: {
+  name: take('mi-${funcApp.name}', 64)
+  params: {
+    name: 'id-${funcApp.name}'
+    location: location
+    tags: tags
+  }
+}]
+
 module storageAccounts '../../shared/bicep/storage/storage.bicep' = [for (funcApp, index) in functionApps: {
   name: 'storage-${funcApp.name}'
   params: {
@@ -108,7 +117,7 @@ module storageAccounts '../../shared/bicep/storage/storage.bicep' = [for (funcAp
     sku: 'Standard_LRS'
     kind: 'StorageV2'
     supportsHttpsTrafficOnly: true
-    allowSharedKeyAccess: true
+    allowSharedKeyAccess: false
     tags: tags
     networkAcls: {
       defaultAction: 'Deny'
@@ -205,19 +214,47 @@ module functionAppsDeployment '../../shared/bicep/app-services/function-app.bice
     hasPrivateEndpoint: true
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     storageAccountName: funcApp.storageAccountName
-    userAssignedIdentities: length(userAssignedIdentities) > 0 ? {
+    userAssignedIdentities: {
       type: 'UserAssigned'
-      userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
-    } : {
-      type: 'SystemAssigned'
+      userAssignedIdentities: reduce(union(userAssignedIdentities, [functionAppIdentities[index].outputs.id]), {}, (result, id) => union(result, { '${id}': {} }))
     }
     appInsightId: appInsights[index].outputs.appInsResourceId
     kind: 'functionapp,linux'
     virtualNetworkSubnetId: functionAppSubnet.id
+    appSettings: [
+      {
+        name: 'AzureWebJobsStorage__credential'
+        value: 'managedidentity'
+      }
+      {
+        name: 'AzureWebJobsStorage__accountName'
+        value: funcApp.storageAccountName
+      }
+      {
+        name: 'AzureWebJobsStorage__blobServiceUri'
+        value: 'https://${funcApp.storageAccountName}.blob.${az.environment().suffixes.storage}'
+      }
+      {
+        name: 'AzureWebJobsStorage__clientId'
+        value: functionAppIdentities[index].outputs.clientId
+      }
+    ]
   }
   dependsOn:  [
     storageAccounts
   ]
+}]
+
+// Role assignments for each Function App identity on its storage account
+module assignBlobContributor '../../shared/bicep/role-assignments/role-assignment.bicep' = [for (funcApp, index) in functionApps: {
+  name: take('ra-${funcApp.name}-blob', 64)
+  params: {
+    name: take('ra-${funcApp.name}-blob', 64)
+    resourceId: storageAccounts[index].outputs.id
+    roleDefinitionId: 'ba92f5b4-2d11-453d-a403-e96b0029c9fe' // Storage Blob Data Contributor
+    principalId: functionAppIdentities[index].outputs.principalId
+    principalType: 'ServicePrincipal'
+  }
 }]
 
 module functionAppPrivateEndpoints '../../shared/bicep/network/private-endpoint.bicep' = [for (funcApp, index) in functionApps: {
