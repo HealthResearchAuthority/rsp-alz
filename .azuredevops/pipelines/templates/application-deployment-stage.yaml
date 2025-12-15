@@ -112,7 +112,7 @@ stages:
           name: rsp-manageddevopspool
         dependsOn: [setup, FinalWhatIf]
         condition: succeeded()
-        environment: 'alz-bicep-deployment'
+        environment: ${{ parameters.environmentName }}
         variables:
           - name: devOpsPublicIP
             value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
