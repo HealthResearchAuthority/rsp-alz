@@ -42,6 +42,8 @@ shared/
   - `alz-bicep-pr1-build.yml`: Pipeline for building Bicep templates.
   - `alz-bicep-pr2-lint.yml`: Pipeline for linting Bicep templates.
   - `application-deployment.yml`: Pipeline for deploying application resources.
+  - `appconfig-update.yml`: Lightweight pipeline that validates and deploys App Configuration key/value updates without redeploying the full landing zone.
+  - `keyvault-update.yml`: Dedicated pipeline for updating Key Vault secrets sourced from Azure DevOps variable groups.
   - `network-deployment.yml`: Pipeline for deploying network resources.
 
 - **`1.core-services/`**: Contains Bicep templates for core services.
@@ -54,7 +56,11 @@ shared/
 
 - **`5.spoke-network/`**: Contains Bicep templates for spoke network deployments.
   - `main.application.bicep`: Entry point for application-related resources including web apps, container apps, function apps, and databases.
+  - `main.appconfig-update.bicep`: Entry point dedicated to App Configuration key/value updates using CAF naming.
+  - `main.keyvault-update.bicep`: Entry point for updating existing Key Vault secrets without redeploying other infrastructure.
   - `main.network.bicep`: Entry point for network-related resources.
+  - `app-config-parameters/`: Environment-specific parameter files for App Configuration-only deployments.
+  - `keyvault-parameters/`: Environment-specific parameter files and secret manifest files for Key Vault updates.
   - `modules/`: Submodules for network parameters.
 
 - **`shared/bicep/`**: Shared Bicep modules for reuse across deployments.
@@ -96,6 +102,26 @@ To run the pipeline manually to run against a different environment
 2. Select the pipeline and click Run Pipeline
 3. Select the environment from the drop down
 4. Click Run
+
+## App Configuration Update Workflow
+
+Updating or adding App Configuration key-value pairs no longer requires redeploying the entire landing zone:
+
+1. Use the environment-specific file in `5.spoke-network/app-config-parameters/` (for example `dev.parameters.bicepparam`) to set `parAppConfigurationStoreName` (match the CAF-derived name that was created during the initial deployment) and add entries under `parAppConfigurationValues`. Each entry captures the key, optional label, value, and metadata for the App Configuration store.
+2. Keep sensitive values in an Azure DevOps Library variable group (e.g., `dev-appconfig`) and pass that group name to the `app_config_variable_group` parameter when queuing the pipeline so secrets stay outside of source control.
+3. Queue `.azuredevops/pipelines/appconfig-update.yml`, select the target environment, optionally provide the variable group, and run. The pipeline builds the template, validates it, runs `what-if`, and then deploys `main.appconfig-update.bicep`, touching only App Configuration.
+4. Capture validation/what-if output for PR evidence as usual. Because the deployment scope is limited, other resources in the landing zone remain unchanged.
+
+## Key Vault Update Workflow
+
+Key Vault secrets are updated via a dedicated pipeline that sources values from Azure DevOps variable groups:
+
+1. **Add secret to Azure DevOps variable group**: Add the secret value to the corresponding `<env>-key-vault` variable group in Library and mark it as secret (lock icon).
+2. **Update environment manifest**: Edit `5.spoke-network/keyvault-parameters/<env>.secrets.json` to add the secret metadata (minimum: `{ "name": "secretName" }`). Optional fields include `variableName` (if different from `name`) and `contentType`.
+3. **Update pipeline YAML**: Add the secret to the `env:` section in `.azuredevops/pipelines/keyvault-update.yml` in all three bash tasks (validate, preview, deploy) that have `displayName: 'Prepare Key Vault secret values'`. Add the mapping: `secretName: $(secretName)`.
+4. **Create PR and deploy**: Create a pull request for review. After merge, queue `.azuredevops/pipelines/keyvault-update.yml`, select the environment (automatically uses `<env>-key-vault` variable group), and review the `what-if` output before approving deployment.
+
+
 
 ## Defender for Storage Implementation
 
