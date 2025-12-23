@@ -101,6 +101,7 @@ var appActionGroupNames = {
 }
 
 var allErrorsRuleName = '${namingPrefix}-all-errors'
+var allErrorsDisplayName = '${namingPrefix}-all-errors - Exceptions and Requests'
 
 var alertRuleNames = {
   security: {
@@ -215,6 +216,7 @@ module allErrorsAlert 'modules/app-all-errors-alert.bicep' = if (enableAllErrors
   scope: monitoringResourceGroup
   params: {
     ruleName: allErrorsRuleName
+    displayName: allErrorsDisplayName
     enabled: true
     severity: allErrorsSeverity
     workspaceId: logAnalyticsWorkspaceId

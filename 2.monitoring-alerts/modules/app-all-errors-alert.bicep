@@ -4,7 +4,7 @@ targetScope = 'resourceGroup'
 param ruleName string
 
 @description('Display name for the alert')
-param displayName string = 'All Errors - Exceptions and Requests'
+param displayName string
 
 @description('Environment name')
 param environment string
