@@ -1,0 +1,163 @@
+name: appconfig-update
+trigger: none
+pr:
+  branches:
+    include:
+      - main
+  paths:
+    include:
+      - '5.spoke-network/main.appconfig-update.bicep'
+      - '5.spoke-network/app-config-parameters/**'
+      - '5.spoke-network/modules/app-config-update/**'
+
+parameters:
+  - name: env
+    displayName: Environment
+    type: string
+    default: dev
+    values:
+      - dev
+      - systemtest_manual
+      - systemtest_auto
+      - uat
+      - pre_prod
+      - production
+  - name: app_config_variable_group
+    displayName: 'Optional variable group containing App Configuration secrets'
+    type: string
+    default: 'none'
+  - name: location
+    displayName: 'Deployment location'
+    type: string
+    default: uksouth
+
+stages:
+  - stage: PRValidation
+    displayName: 'PR Validation App Config Update'
+    condition: eq(variables['Build.Reason'], 'PullRequest')
+    jobs:
+      - job: lint
+        displayName: 'Lint App Configuration Templates'
+        pool:
+          name: rsp-manageddevopspool
+        steps:
+          - checkout: self
+          - script: |
+              echo "Installing Azure CLI..."
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            displayName: 'Install Azure CLI'
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - bash: az bicep build --file ./5.spoke-network/main.appconfig-update.bicep
+            displayName: 'Build Bicep Template'
+
+      - job: validate
+        displayName: 'Validate App Configuration Changes'
+        dependsOn: lint
+        condition: succeeded()
+        pool:
+          name: rsp-manageddevopspool
+        variables:
+          - group: ${{ parameters.env }}
+          - ${{ if ne(parameters.app_config_variable_group, 'none') }}:
+              - group: ${{ parameters.app_config_variable_group }}
+        steps:
+          - checkout: self
+          - script: |
+              echo "Installing Azure CLI..."
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            displayName: 'Install Azure CLI'
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - task: AzureCLI@2
+            displayName: 'Validate Deployment'
+            inputs:
+              azureSubscription: $(${{ parameters.env }})
+              scriptType: bash
+              scriptLocation: inlineScript
+              failOnStandardError: true
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub validate --name "AppConfig-$(Build.BuildId)" \
+                  --location $(location) \
+                  --template-file ./5.spoke-network/main.appconfig-update.bicep \
+                  --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam
+
+      - job: preview
+        displayName: 'Preview App Configuration Changes'
+        dependsOn: validate
+        condition: succeeded()
+        pool:
+          name: rsp-manageddevopspool
+        variables:
+          - group: ${{ parameters.env }}
+          - ${{ if ne(parameters.app_config_variable_group, 'none') }}:
+              - group: ${{ parameters.app_config_variable_group }}
+        steps:
+          - checkout: self
+          - script: |
+              echo "Installing Azure CLI..."
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            displayName: 'Install Azure CLI'
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+          - task: AzureCLI@2
+            displayName: 'What-If App Configuration Update'
+            inputs:
+              azureSubscription: $(${{ parameters.env }})
+              scriptType: bash
+              scriptLocation: inlineScript
+              failOnStandardError: true
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.appconfig-update.bicep \
+                  --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam
+
+  - stage: ManualDeployment
+    displayName: 'Manual Deployment of App Configuration'
+    dependsOn: []
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+    variables:
+      location: ${{ parameters.location }}
+    jobs:
+      - deployment: deploy
+        displayName: 'Deploy App Configuration Changes'
+        pool:
+          name: rsp-manageddevopspool
+        environment: 'alz-appconfig-update'
+        variables:
+          - group: ${{ parameters.env }}
+          - ${{ if ne(parameters.app_config_variable_group, 'none') }}:
+              - group: ${{ parameters.app_config_variable_group }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - script: |
+                    echo "Installing Azure CLI..."
+                    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+                  displayName: 'Install Azure CLI'
+                - bash: |
+                    az bicep install
+                    az bicep version
+                  displayName: 'Install Bicep CLI'
+                - task: AzureCLI@2
+                  displayName: 'Deploy App Configuration Update'
+                  inputs:
+                    azureSubscription: $(${{ parameters.env }})
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    failOnStandardError: true
+                    inlineScript: |
+                      az config set bicep.use_binary_from_path=false --only-show-errors
+                      az deployment sub create --name "AppConfig-Deploy-$(Build.BuildId)" \
+                        --location $(location) \
+                        --template-file ./5.spoke-network/main.appconfig-update.bicep \
+                        --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam
