@@ -766,7 +766,7 @@ module databaseReplica 'modules/05-database/deploy.database-replica.bicep' = [
     name: take('database-replica-${deployment().name}-deployment-${i}', 64)
     scope: resourceGroup(parSecondarySpokeNetworks[i].subscriptionId, parSecondarySpokeNetworks[i].rgStorage)
     params: {
-      secondarySqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}dr'
+      secondarySqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}replica'
       secondaryLocation: parSecondaryLocation
       adminLogin: parAdminLogin
       adminPassword: parSqlAdminPhrase
@@ -777,7 +777,7 @@ module databaseReplica 'modules/05-database/deploy.database-replica.bicep' = [
       secondaryPrivateEndpointSubnetName: 'snet-pep'
       sqlServerUAIName: secondaryStorageServicesNaming[i].?outputs.resourcesNames.sqlServerUserAssignedIdentity
       networkingResourcesNames: {
-        azuresqlserverpep: '${networkingnaming[i].outputs.resourcesNames.azuresqlserverpep}dr'
+        azuresqlserverpep: '${networkingnaming[i].outputs.resourcesNames.azuresqlserverpep}replica'
       }
       networkingResourceGroup: parSecondarySpokeNetworks[i].rgNetworking
       auditRetentionDays: parSqlAuditRetentionDays
