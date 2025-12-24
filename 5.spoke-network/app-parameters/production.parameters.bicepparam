@@ -164,6 +164,33 @@ param parSpokeNetworks = [
   }
 ]
 
+// Failover/DR Configuration
+param parEnableDatabaseFailover = true
+param parEnableStorageFailover = true
+param parSecondaryLocation = 'ukwest'
+
+param parSecondarySpokeNetworks = [
+  {
+    subscriptionId: 'd27a0dcc-453d-4bfa-9c3d-1447c6ea0119'
+    parEnvironment: 'prod'
+    workloadName: 'container-app'
+    zoneRedundancy: true
+    ddosProtectionEnabled: 'Enabled'
+    containerRegistryTier: 'Premium'
+    deploy: false
+    configurePrivateDNS: true
+    devBoxPeering: false
+    rgNetworking: 'rg-rsp-networking-spoke-prod-ukw'
+    vnet: 'vnet-rsp-networking-prod-ukw-spoke'
+    rgapplications: 'rg-rsp-applications-spoke-prod-ukw'
+    rgSharedServices: 'rg-rsp-sharedservices-spoke-prod-ukw'
+    rgStorage: 'rg-rsp-storage-spoke-prod-ukw'
+    deployWebAppSlot: false
+    IDGENV: 'production'
+    appInsightsConnectionString: ''
+  }
+]
+
 // Allowed hosts for the production environment to be used when the Web App is behind Front Door
 // NOTE: This value is used for initial deployment. When Front Door is enabled,
 // the app-config-update module will automatically update this with dynamic URLs

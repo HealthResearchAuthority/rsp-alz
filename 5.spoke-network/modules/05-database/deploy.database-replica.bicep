@@ -4,31 +4,44 @@ targetScope = 'resourceGroup'
 //    PARAMETERS
 // ------------------
 
-param sqlServerName string = 'sql-rsp-dev-uks'
+@description('Name of the secondary SQL Server (e.g., rspsqlserverdevreplica)')
+param secondarySqlServerName string
+
+@description('The location where the secondary resources will be created (secondary region).')
+param secondaryLocation string = resourceGroup().location
+
+@description('Admin login for SQL Server (must match primary)')
 param adminLogin string = ''
+
 @secure()
+@description('Admin password for SQL Server (must match primary)')
 param adminPassword string
 
-@description('Enable or disable SQL Server auditing (default: true)')
-param enableSqlAdminLogin bool = true
+@description('Enable or disable SQL Server password authentication (default: false)')
+param enableSqlAdminLogin bool = false
 
+@description('Array of primary database resource IDs to replicate')
+param primaryDatabaseIds array
+
+@description('Array of database names (must match primary databases)')
 param databases array = []
 
-@description('The location where the resources will be created.')
-param location string = resourceGroup().location
+@description('The resource ID of the secondary region VNet to which the private endpoint will be connected.')
+param secondaryVNetId string
 
-@description('The resource ID of the VNet to which the private endpoint will be connected.')
-param spokeVNetId string
-
-@description('The name of the subnet in the VNet to which the private endpoint will be connected.')
-param spokePrivateEndpointSubnetName string
+@description('The name of the subnet in the secondary VNet to which the private endpoint will be connected.')
+param secondaryPrivateEndpointSubnetName string
 
 @description('Optional. The tags to be assigned to the created resources.')
 param tags object = {}
 
+@description('Name of the SQL Server User Assigned Identity')
 param sqlServerUAIName string = ''
 
+@description('Networking resources names object')
 param networkingResourcesNames object
+
+@description('The name of the networking resource group in the secondary region')
 param networkingResourceGroup string
 
 @description('How long to keep audit logs (default: 30 days)')
@@ -37,10 +50,10 @@ param auditRetentionDays int = 30
 @description('Enable or disable SQL Server auditing (default: true)')
 param enableSqlServerAuditing bool = true
 
-@description('The resource id of an existing Azure Log Analytics Workspace.')
+@description('The resource id of an existing Log Analytics Workspace.')
 param logAnalyticsWorkspaceId string
 
-@description('SQL Database SKU configuration')
+@description('SQL Database SKU configuration (must match primary)')
 param sqlDatabaseSkuConfig object = {
   name: 'GP_S_Gen5'
   tier: 'GeneralPurpose'
@@ -58,17 +71,17 @@ param sqlDatabaseSkuConfig object = {
 var privateDnsZoneNames = 'privatelink${az.environment().suffixes.sqlServerHostname}'
 var sqlServerResourceName = 'sqlServer'
 
-var spokeVNetIdTokens = split(spokeVNetId, '/')
-var spokeSubscriptionId = spokeVNetIdTokens[2]
-var spokeResourceGroupName = spokeVNetIdTokens[4]
-var spokeVNetName = spokeVNetIdTokens[8]
+var secondaryVNetIdTokens = split(secondaryVNetId, '/')
+var secondarySubscriptionId = secondaryVNetIdTokens[2]
+var secondaryResourceGroupName = secondaryVNetIdTokens[4]
+var secondaryVNetName = secondaryVNetIdTokens[8]
 
-var sqlServerContributorRoleGuid='9b7fa17d-e63e-47b0-bb0a-15c516ac86ec'
+var sqlServerContributorRoleGuid = '9b7fa17d-e63e-47b0-bb0a-15c516ac86ec'
 
-var spokeVNetLinks = [
+var secondaryVNetLinks = [
   {
-    vnetName: spokeVNetName
-    vnetId: vnetSpoke.id
+    vnetName: secondaryVNetName
+    vnetId: secondaryVNetSpoke.id
     registrationEnabled: false
   }
 ]
@@ -77,30 +90,30 @@ var spokeVNetLinks = [
 //    Resources
 // ------------------
 
-resource vnetSpoke 'Microsoft.Network/virtualNetworks@2022-01-01' existing = {
-  scope: resourceGroup(spokeSubscriptionId, spokeResourceGroupName)
-  name: spokeVNetName
+resource secondaryVNetSpoke 'Microsoft.Network/virtualNetworks@2024-07-01' existing = {
+  scope: resourceGroup(secondarySubscriptionId, secondaryResourceGroupName)
+  name: secondaryVNetName
 }
 
-resource spokePrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2022-07-01' existing = {
-  parent: vnetSpoke
-  name: spokePrivateEndpointSubnetName
+resource secondaryPrivateEndpointSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-07-01' existing = {
+  parent: secondaryVNetSpoke
+  name: secondaryPrivateEndpointSubnetName
 }
 
 resource sqlServerUserAssignedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
   name: sqlServerUAIName
-  location: location
+  location: secondaryLocation
   tags: tags
 }
 
-// SQL Server Resource
-resource SQL_Server 'Microsoft.Sql/servers@2024-05-01-preview' = {
-  name: sqlServerName
-  location: location
+// Secondary SQL Server Resource
+resource SecondarySQL_Server 'Microsoft.Sql/servers@2024-05-01-preview' = {
+  name: secondarySqlServerName
+  location: secondaryLocation
   identity: {
     type: 'UserAssigned'
     userAssignedIdentities: {
-      '${sqlServerUserAssignedIdentity.id}': {}  
+      '${sqlServerUserAssignedIdentity.id}': {}
     }
   }
   properties: {
@@ -111,10 +124,10 @@ resource SQL_Server 'Microsoft.Sql/servers@2024-05-01-preview' = {
   }
 }
 
-// Set Azure AD Administrator
+// Set Azure AD Administrator (must match primary)
 resource azureADAdmin 'Microsoft.Sql/servers/administrators@2024-05-01-preview' = {
   name: 'activeDirectory'
-  parent: SQL_Server
+  parent: SecondarySQL_Server
   properties: {
     login: 'nikhil.bharathesh_PA@hra.nhs.uk'
     tenantId: '8e1f0aca-d87d-4f20-939e-36243d574267'
@@ -128,24 +141,24 @@ module sqlserveradminRoleAssignment '../../../shared/bicep/role-assignments/role
   params: {
     name: 'ra-sqlServerContributorRoleAssignment'
     principalId: sqlServerUserAssignedIdentity.properties.principalId
-    resourceId: SQL_Server.id
+    resourceId: SecondarySQL_Server.id
     roleDefinitionId: sqlServerContributorRoleGuid
     principalType: 'ServicePrincipal'
   }
 }
 
 resource masterDb 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
-  parent: SQL_Server
-  location: location
+  parent: SecondarySQL_Server
+  location: secondaryLocation
   name: 'master'
   properties: {}
 }
 
-// Database on SQL Server Resource
-resource sqldatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [for i in range(0, length(databases)): {
+// Secondary databases with createMode: 'Secondary' for Active Geo-Replication
+resource secondaryDatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [for i in range(0, length(primaryDatabaseIds)): {
   name: databases[i]
-  parent: SQL_Server
-  location: location
+  parent: SecondarySQL_Server
+  location: secondaryLocation
   sku: {
     name: sqlDatabaseSkuConfig.name
     tier: sqlDatabaseSkuConfig.tier
@@ -154,23 +167,22 @@ resource sqldatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [fo
     size: sqlDatabaseSkuConfig.storageSize
   }
   properties: {
-    createMode: 'Default'
-    minCapacity: sqlDatabaseSkuConfig.minCapacity
-    zoneRedundant: sqlDatabaseSkuConfig.zoneRedundant
+    createMode: 'Secondary'
+    sourceDatabaseId: primaryDatabaseIds[i]
     requestedBackupStorageRedundancy: 'Local'
   }
 }]
 
 resource advancedThreatProtection 'Microsoft.Sql/servers/advancedThreatProtectionSettings@2024-05-01-preview' = {
-  name: 'default'  // The name is typically 'default' for ATP settings.
-  parent: SQL_Server  // Link it to the SQL Server
+  name: 'default'
+  parent: SecondarySQL_Server
   properties: {
-    state: 'Enabled'  // Enable Advanced Threat Protection
+    state: 'Enabled'
   }
 }
 
 resource serverSecurityAlertPolicy 'Microsoft.Sql/servers/securityAlertPolicies@2022-11-01-preview' = {
-  parent: SQL_Server
+  parent: SecondarySQL_Server
   name: 'Default'
   properties: {
     state: 'Enabled'
@@ -187,7 +199,7 @@ resource serverSecurityAlertPolicy 'Microsoft.Sql/servers/securityAlertPolicies@
 
 resource sqlVulnerabilityAssessment 'Microsoft.Sql/servers/sqlVulnerabilityAssessments@2022-11-01-preview' = {
   name: 'default'
-  parent: SQL_Server
+  parent: SecondarySQL_Server
   properties: {
     state: 'Enabled'
   }
@@ -197,17 +209,16 @@ resource sqlVulnerabilityAssessment 'Microsoft.Sql/servers/sqlVulnerabilityAsses
 }
 
 resource sqlAuditingSetting 'Microsoft.Sql/servers/auditingSettings@2024-05-01-preview' = if (enableSqlServerAuditing) {
-  parent: SQL_Server
+  parent: SecondarySQL_Server
   name: 'default'
   properties: {
     state: 'Enabled'
     isAzureMonitorTargetEnabled: true
     retentionDays: auditRetentionDays
-
   }
 }
 
-//setting up diagnostic settings applying to "master database" so that it applies to all databases
+// Diagnostic settings for master database
 resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = {
   name: 'SQLSecurityAuditLogs'
   scope: masterDb
@@ -222,30 +233,33 @@ resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-pr
   }
 }
 
+// Private endpoint for secondary SQL Server
 module sqlServerNetwork '../../../shared/bicep/network/private-networking-spoke.bicep' = {
-  name: 'sqlServerNetwork-${uniqueString(SQL_Server.id)}'
-  scope: resourceGroup(networkingResourceGroup)
+  name: 'sqlServerNetwork-${uniqueString(SecondarySQL_Server.id)}'
+  scope: resourceGroup(secondarySubscriptionId, networkingResourceGroup)
   params: {
-    location: location
+    location: secondaryLocation
     azServicePrivateDnsZoneName: privateDnsZoneNames
-    azServiceId: SQL_Server.id
+    azServiceId: SecondarySQL_Server.id
     privateEndpointName: networkingResourcesNames.azuresqlserverpep
     privateEndpointSubResourceName: sqlServerResourceName
-    virtualNetworkLinks: spokeVNetLinks
-    subnetId: spokePrivateEndpointSubnet.id
-    //vnetSpokeResourceId: spokeVNetId
+    virtualNetworkLinks: secondaryVNetLinks
+    subnetId: secondaryPrivateEndpointSubnet.id
   }
 }
 
-// Outputs
-output sqlServer_name string = SQL_Server.name
+// ------------------
+// OUTPUTS
+// ------------------
+
+output sqlServer_name string = SecondarySQL_Server.name
+output sqlServer_id string = SecondarySQL_Server.id
 output outputsqlServerUAIID string = sqlServerUserAssignedIdentity.id
 output outputsqlServerUAIName string = sqlServerUserAssignedIdentity.name
 output outputsqlServerUAIClientID string = sqlServerUserAssignedIdentity.properties.clientId
 
 output database_names array = [for i in range(0, length(databases)): {
   name: databases[i]
-  id: sqldatabases[i].id
+  id: secondaryDatabases[i].id
 }]
 
-output database_ids array = [for i in range(0, length(databases)): sqldatabases[i].id]
