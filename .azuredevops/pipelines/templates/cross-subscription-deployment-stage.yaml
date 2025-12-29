@@ -60,7 +60,10 @@ stages:
                               dwNetworkingResourceGroup="$(dwNetworkingResourceGroup)" \
                               dwVnetName="$(dwVnetName)" \
                               dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
-                              dwEnvironment="$(dwEnvironment)"
+                              dwEnvironment="$(dwEnvironment)" \
+                              enableDevBoxSqlReplicaEndpoints=$(enableDevBoxSqlReplicaEndpoints) \
+                              replicaSqlServerResourceIds="$(replicaSqlServerResourceIds)" \
+                              replicaSqlServerNames="$(replicaSqlServerNames)"
 
       - deployment: deploy
         displayName: 'Deploy Cross Subscription'

@@ -16,6 +16,15 @@ param manageddevopspoolVnetID string
 @description('Enable DevBox storage private endpoints for dev environment')
 param enableDevBoxStorageEndpoints bool = false
 
+@description('Enable DevBox SQL replica private endpoints')
+param enableDevBoxSqlReplicaEndpoints bool = false
+
+@description('Comma-separated list of replica SQL Server resource IDs for DevBox private endpoints')
+param replicaSqlServerResourceIds string = ''
+
+@description('Comma-separated list of replica SQL Server names (for private endpoint naming)')
+param replicaSqlServerNames string = ''
+
 @description('Environment name (e.g., dev, uat, prod)')
 param environment string = 'dev'
 
@@ -112,6 +121,26 @@ module devboxStorageEndpoints 'modules/devbox-storage-endpoints/devbox-storage-e
     devboxVNetName: devboxVNetName
     devboxPrivateEndpointSubnetName: devboxPrivateEndpointSubnetName
     location: 'uksouth'
+  }
+}
+
+var replicaSqlServerResourceIdsArray = !empty(replicaSqlServerResourceIds) ? split(replicaSqlServerResourceIds, ',') : []
+var replicaSqlServerNamesArray = !empty(replicaSqlServerNames) ? split(replicaSqlServerNames, ',') : []
+
+@description('Deploy DevBox SQL replica private endpoints')
+module devboxSqlReplicaEndpoints 'modules/devbox-sql-replica-endpoints/devbox-sql-replica-endpoints.bicep' = if (enableDevBoxSqlReplicaEndpoints && length(replicaSqlServerResourceIdsArray) > 0 && length(replicaSqlServerNamesArray) > 0) {
+  name: take('devboxSqlReplicaEndpoints-${environment}', 64)
+  scope: subscription(devboxSubscriptionId)
+  params: {
+    environment: environment
+    replicaSqlServerResourceIds: replicaSqlServerResourceIdsArray
+    replicaSqlServerNames: replicaSqlServerNamesArray
+    devboxSubscriptionId: devboxSubscriptionId
+    devboxResourceGroupName: devboxResourceGroupName
+    devboxVNetName: devboxVNetName
+    devboxPrivateEndpointSubnetName: devboxPrivateEndpointSubnetName
+    location: 'uksouth'
+    tags: {}
   }
 }
 

@@ -166,7 +166,6 @@ param parSpokeNetworks = [
 
 // Failover/DR Configuration
 param parEnableDatabaseFailover = true
-param parEnableStorageFailover = true
 param parSecondaryLocation = 'ukwest'
 
 param parSecondarySpokeNetworks = [

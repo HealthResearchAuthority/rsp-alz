@@ -192,9 +192,6 @@ param parSpokeNetworks array
 @description('Enable database failover/geo-replication (only for dev, preprod, and prod environments)')
 param parEnableDatabaseFailover bool = false
 
-@description('Enable storage account failover/geo-redundancy (only for dev, preprod, and prod environments)')
-param parEnableStorageFailover bool = false
-
 @description('Secondary region location for DR/failover (e.g., ukwest)')
 param parSecondaryLocation string = ''
 
@@ -699,17 +696,17 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       }
       storageAccountConfig: {
         staging: {
-          sku: (parEnableStorageFailover && (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod' || parSpokeNetworks[i].parEnvironment == 'dev')) ? (parSpokeNetworks[i].zoneRedundancy ? 'Standard_GZRS' : 'Standard_GRS') : parStorageConfig.staging.account.sku
+          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.staging.account.sku
           accessTier: parStorageConfig.staging.account.accessTier
           containerName: parStorageConfig.staging.account.containerName
         }
         clean: {
-          sku: (parEnableStorageFailover && (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod' || parSpokeNetworks[i].parEnvironment == 'dev')) ? (parSpokeNetworks[i].zoneRedundancy ? 'Standard_GZRS' : 'Standard_GRS') : parStorageConfig.clean.account.sku
+          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.clean.account.sku
           accessTier: parStorageConfig.clean.account.accessTier
           containerName: parStorageConfig.clean.account.containerName
         }
         quarantine: {
-          sku: (parEnableStorageFailover && (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod' || parSpokeNetworks[i].parEnvironment == 'dev')) ? (parSpokeNetworks[i].zoneRedundancy ? 'Standard_GZRS' : 'Standard_GRS') : parStorageConfig.quarantine.account.sku
+          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.quarantine.account.sku
           accessTier: parStorageConfig.quarantine.account.accessTier
           containerName: parStorageConfig.quarantine.account.containerName
         }
