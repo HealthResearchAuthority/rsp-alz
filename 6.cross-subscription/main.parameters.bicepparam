@@ -15,16 +15,13 @@ param enableDevBoxStorageEndpoints = true
 // Enable DevBox SQL replica private endpoints
 param enableDevBoxSqlReplicaEndpoints = true
 
-// Replica SQL Server resource IDs (comma-separated) for DevBox private endpoints
 // Format: /subscriptions/{sub-id}/resourceGroups/{rg}/providers/Microsoft.Sql/servers/{server-name},...
 param replicaSqlServerResourceIds = '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-storage-spoke-dev-ukw/providers/Microsoft.Sql/servers/rspsqlserverdevreplica'
 
-// Replica SQL Server names (comma-separated) for private endpoint naming
-// Format: rspsqlserverdevreplica,rspsqlserverpreprodreplica,...
+// Format: rspsqlserverdevreplica...
 param replicaSqlServerNames = 'rspsqlserverdevreplica'
 
 // Secondary region VNet IDs (comma-separated) to peer with DevBox VNet
-// Format: /subscriptions/{sub-id}/resourceGroups/{rg}/providers/Microsoft.Network/virtualNetworks/{vnet-name},...
 param devBoxSecondaryVNetIds = '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-networking-spoke-dev-ukw/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-dev-ukw-spoke' //This is temporary and would be passed via variable groups
 
 // Environment name

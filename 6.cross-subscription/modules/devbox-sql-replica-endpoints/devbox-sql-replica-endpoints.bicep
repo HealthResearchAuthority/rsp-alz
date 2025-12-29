@@ -26,7 +26,7 @@ param devboxVNetName string
 param devboxPrivateEndpointSubnetName string
 
 @description('Location for the private endpoints')
-param location string = 'uksouth'
+param location string = 'ukwest'
 
 @description('Optional. Tags of the resource.')
 param tags object = {}
@@ -56,9 +56,6 @@ resource sqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' existi
   name: 'privatelink${az.environment().suffixes.sqlServerHostname}'
 }
 
-// Private endpoints for replica SQL servers
-// Using @batchSize(1) to avoid deployment conflicts when creating multiple private endpoints
-@batchSize(1)
 module replicaSqlPrivateEndpoints '../../../shared/bicep/network/private-endpoint.bicep' = [for i in range(0, length(replicaSqlServerResourceIds)): {
   name: take('replicaSqlPE-${environment}-${i}', 64)
   scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)

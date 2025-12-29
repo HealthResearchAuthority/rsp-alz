@@ -151,7 +151,7 @@ module devboxSqlReplicaEndpoints 'modules/devbox-sql-replica-endpoints/devbox-sq
     devboxResourceGroupName: devboxResourceGroupName
     devboxVNetName: devboxVNetName
     devboxPrivateEndpointSubnetName: devboxPrivateEndpointSubnetName
-    location: 'uksouth'
+    location: 'ukwest'
     tags: {}
   }
 }

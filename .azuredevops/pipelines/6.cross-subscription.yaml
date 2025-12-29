@@ -101,11 +101,7 @@ stages:
                               dwNetworkingResourceGroup="$(dwNetworkingResourceGroup)" \
                               dwVnetName="$(dwVnetName)" \
                               dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
-                              dwEnvironment="$(dwEnvironment)" \
-                              enableDevBoxSqlReplicaEndpoints=$(enableDevBoxSqlReplicaEndpoints) \
-                              replicaSqlServerResourceIds="$(replicaSqlServerResourceIds)" \
-                              replicaSqlServerNames="$(replicaSqlServerNames)" \
-                              devBoxSecondaryVNetIds="$(devBoxSecondaryVNetIds)"
+                              dwEnvironment="$(dwEnvironment)"
 
       - job: preview
         displayName: 'Preview Cross Subscription Deployments'
@@ -141,11 +137,7 @@ stages:
                               dwNetworkingResourceGroup="$(dwNetworkingResourceGroup)" \
                               dwVnetName="$(dwVnetName)" \
                               dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
-                              dwEnvironment="$(dwEnvironment)" \
-                              enableDevBoxSqlReplicaEndpoints=$(enableDevBoxSqlReplicaEndpoints) \
-                              replicaSqlServerResourceIds="$(replicaSqlServerResourceIds)" \
-                              replicaSqlServerNames="$(replicaSqlServerNames)" \
-                              devBoxSecondaryVNetIds="$(devBoxSecondaryVNetIds)"
+                              dwEnvironment="$(dwEnvironment)"
 
   # Environment-specific deployment stages
 
