@@ -57,8 +57,3 @@ param parSecondarySpokeNetworks = [
     }
   }
 ]
-
-// DevBox VNet Configuration for Secondary Region Peering
-param parDevBoxVNetSubscriptionId = '9ef9a127-7a6e-452e-b18d-d2e2e89ffa92'
-param parDevBoxVNetResourceGroup = 'rg-rsp-devcenter'
-param parDevBoxVNetName = 'vnet-dbox-rsp-uksouth'
