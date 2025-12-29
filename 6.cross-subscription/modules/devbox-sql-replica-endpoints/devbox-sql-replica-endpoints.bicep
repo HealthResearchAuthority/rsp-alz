@@ -26,7 +26,7 @@ param devboxVNetName string
 param devboxPrivateEndpointSubnetName string
 
 @description('Location for the private endpoints')
-param location string = 'ukwest'
+param location string = 'uksouth'
 
 @description('Optional. Tags of the resource.')
 param tags object = {}
