@@ -104,7 +104,8 @@ stages:
                               dwEnvironment="$(dwEnvironment)" \
                               enableDevBoxSqlReplicaEndpoints=$(enableDevBoxSqlReplicaEndpoints) \
                               replicaSqlServerResourceIds="$(replicaSqlServerResourceIds)" \
-                              replicaSqlServerNames="$(replicaSqlServerNames)"
+                              replicaSqlServerNames="$(replicaSqlServerNames)" \
+                              devBoxSecondaryVNetIds="$(devBoxSecondaryVNetIds)"
 
       - job: preview
         displayName: 'Preview Cross Subscription Deployments'
@@ -143,7 +144,8 @@ stages:
                               dwEnvironment="$(dwEnvironment)" \
                               enableDevBoxSqlReplicaEndpoints=$(enableDevBoxSqlReplicaEndpoints) \
                               replicaSqlServerResourceIds="$(replicaSqlServerResourceIds)" \
-                              replicaSqlServerNames="$(replicaSqlServerNames)"
+                              replicaSqlServerNames="$(replicaSqlServerNames)" \
+                              devBoxSecondaryVNetIds="$(devBoxSecondaryVNetIds)"
 
   # Environment-specific deployment stages
 

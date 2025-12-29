@@ -67,6 +67,9 @@ param dwEnvironment string = ''
 @description('Deploy DW Function App private endpoints')
 param deployDwPrivateEndpoints bool = false
 
+@description('Comma-separated list of secondary region VNet IDs to peer with DevBox VNet')
+param devBoxSecondaryVNetIds string = ''
+
 var managementVNetIdTokens = split(manageddevopspoolVnetID, '/')
 var managementSubscriptionId = managementVNetIdTokens[2]
 var managementResourceGroupName = managementVNetIdTokens[4]
@@ -127,6 +130,15 @@ module devboxStorageEndpoints 'modules/devbox-storage-endpoints/devbox-storage-e
 var replicaSqlServerResourceIdsArray = !empty(replicaSqlServerResourceIds) ? split(replicaSqlServerResourceIds, ',') : []
 var replicaSqlServerNamesArray = !empty(replicaSqlServerNames) ? split(replicaSqlServerNames, ',') : []
 
+var devBoxSecondaryVNetIdsArray = !empty(devBoxSecondaryVNetIds) ? split(devBoxSecondaryVNetIds, ',') : []
+var devBoxSecondaryVNetInfoArray = [
+  for vnetId in devBoxSecondaryVNetIdsArray: {
+    subscriptionId: split(vnetId, '/')[2]
+    resourceGroupName: split(vnetId, '/')[4]
+    vnetName: split(vnetId, '/')[8]
+  }
+]
+
 @description('Deploy DevBox SQL replica private endpoints')
 module devboxSqlReplicaEndpoints 'modules/devbox-sql-replica-endpoints/devbox-sql-replica-endpoints.bicep' = if (enableDevBoxSqlReplicaEndpoints && length(replicaSqlServerResourceIdsArray) > 0 && length(replicaSqlServerNamesArray) > 0) {
   name: take('devboxSqlReplicaEndpoints-${environment}', 64)
@@ -143,6 +155,40 @@ module devboxSqlReplicaEndpoints 'modules/devbox-sql-replica-endpoints/devbox-sq
     tags: {}
   }
 }
+
+// DevBox VNet Peering to Secondary Region VNets (bidirectional)
+// Peering from DevBox VNet to Secondary Region VNets
+module devBoxToSecondaryVNetPeering '../shared/bicep/network/peering.bicep' = [for (vnet, i) in devBoxSecondaryVNetInfoArray: {
+  name: take('devBox-to-${vnet.vnetName}-peering-${i}', 64)
+  scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
+  params: {
+    localVnetName: devboxVNetName
+    remoteVnetName: vnet.vnetName
+    remoteRgName: vnet.resourceGroupName
+    remoteSubscriptionId: vnet.subscriptionId
+    allowGatewayTransit: false
+    allowForwardedTraffic: true
+    useRemoteGateways: false
+  }
+}]
+
+// Peering from Secondary Region VNets to DevBox VNet
+module secondaryVNetToDevBoxPeering '../shared/bicep/network/peering.bicep' = [for (vnet, i) in devBoxSecondaryVNetInfoArray: {
+  name: take('${vnet.vnetName}-to-devBox-peering-${i}', 64)
+  scope: resourceGroup(vnet.subscriptionId, vnet.resourceGroupName)
+  params: {
+    localVnetName: vnet.vnetName
+    remoteVnetName: devboxVNetName
+    remoteRgName: devboxResourceGroupName
+    remoteSubscriptionId: devboxSubscriptionId
+    allowGatewayTransit: false
+    allowForwardedTraffic: true
+    useRemoteGateways: false
+  }
+  dependsOn: [
+    devBoxToSecondaryVNetPeering
+  ]
+}]
 
 @description('Deploy Data Warehouse Function App private endpoint to the target environment')
 module dwFunctionEndpoints 'modules/dw-function-endpoints/dw-function-endpoints.bicep' = if (deployDwPrivateEndpoints && !empty(dwFunctionAppId)) {

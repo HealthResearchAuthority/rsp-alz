@@ -23,6 +23,10 @@ param replicaSqlServerResourceIds = ''
 // Format: rspsqlserverdevreplica,rspsqlserverpreprodreplica,...
 param replicaSqlServerNames = ''
 
+// Secondary region VNet IDs (comma-separated) to peer with DevBox VNet
+// Format: /subscriptions/{sub-id}/resourceGroups/{rg}/providers/Microsoft.Network/virtualNetworks/{vnet-name},...
+param devBoxSecondaryVNetIds = ''
+
 // Environment name
 param environment = 'dev'
 

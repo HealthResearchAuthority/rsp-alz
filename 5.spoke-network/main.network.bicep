@@ -29,15 +29,6 @@ param parSecondaryLocation string = ''
 @description('Array of secondary region spoke network configurations (for DR/failover)')
 param parSecondarySpokeNetworks array = []
 
-@description('DevBox VNet Subscription ID for peering with secondary region VNets')
-param parDevBoxVNetSubscriptionId string = ''
-
-@description('DevBox VNet Resource Group Name')
-param parDevBoxVNetResourceGroup string = ''
-
-@description('DevBox VNet Name')
-param parDevBoxVNetName string = ''
-
 
 // ------------------
 // RESOURCES
@@ -126,43 +117,6 @@ module secondarySpoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0,
   ]
 }]
 
-// DevBox VNet Peering for Secondary Region (bidirectional)
-// Peering from Secondary Spoke VNet to DevBox VNet
-module secondarySpokeToDevBoxPeering '../shared/bicep/network/peering.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableFailover && length(parSecondarySpokeNetworks) > 0 && parSecondarySpokeNetworks[i].devBoxPeering && !empty(parDevBoxVNetName)) {
-  name: take('secondarySpokeToDevBoxPeering-${deployment().name}-${i}', 64)
-  scope: resourceGroup(parSecondarySpokeNetworks[i].subscriptionId, parSecondarySpokeNetworks[i].rgNetworking)
-  params: {
-    localVnetName: secondarySpoke[i].?outputs.spokeVNetName
-    remoteVnetName: parDevBoxVNetName
-    remoteRgName: parDevBoxVNetResourceGroup
-    remoteSubscriptionId: parDevBoxVNetSubscriptionId
-    allowGatewayTransit: false
-    allowForwardedTraffic: true
-    useRemoteGateways: false
-  }
-  dependsOn: [
-    secondarySpoke
-  ]
-}]
-
-// Peering from DevBox VNet to Secondary Spoke VNet
-module devBoxToSecondarySpokePeering '../shared/bicep/network/peering.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableFailover && length(parSecondarySpokeNetworks) > 0 && parSecondarySpokeNetworks[i].devBoxPeering && !empty(parDevBoxVNetName)) {
-  name: take('devBoxToSecondarySpokePeering-${deployment().name}-${i}', 64)
-  scope: resourceGroup(parDevBoxVNetSubscriptionId, parDevBoxVNetResourceGroup)
-  params: {
-    localVnetName: parDevBoxVNetName
-    remoteVnetName: secondarySpoke[i].?outputs.spokeVNetName
-    remoteRgName: parSecondarySpokeNetworks[i].rgNetworking
-    remoteSubscriptionId: parSecondarySpokeNetworks[i].subscriptionId
-    allowGatewayTransit: false
-    allowForwardedTraffic: true
-    useRemoteGateways: false
-  }
-  dependsOn: [
-    secondarySpoke
-    secondarySpokeToDevBoxPeering
-  ]
-}]
 
 // ------------------
 // OUTPUTS
