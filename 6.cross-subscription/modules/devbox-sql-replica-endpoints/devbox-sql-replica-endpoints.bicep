@@ -7,11 +7,11 @@ targetScope = 'subscription'
 @description('The environment name (e.g., dev, uat, prod)')
 param environment string
 
-@description('Array of replica SQL Server resource IDs to create private endpoints for')
-param replicaSqlServerResourceIds array
+@description('Replica SQL Server resource ID to create private endpoints for')
+param replicaSqlServerResourceId string
 
-@description('Array of replica SQL Server names (for private endpoint naming)')
-param replicaSqlServerNames array
+@description('Replica SQL Server name (for private endpoint naming)')
+param replicaSqlServerName string
 
 @description('The DevBox subscription ID')
 param devboxSubscriptionId string
@@ -35,7 +35,7 @@ param tags object = {}
 //    VARIABLES
 // ------------------
 
-var privateEndpointNames = [for i in range(0, length(replicaSqlServerNames)): 'pep-devbox-${replicaSqlServerNames[i]}']
+var privateEndpointNames = 'pep-devbox-${replicaSqlServerName}'
 
 // ------------------
 //    RESOURCES
@@ -56,23 +56,23 @@ resource sqlPrivateDnsZone 'Microsoft.Network/privateDnsZones@2024-06-01' existi
   name: 'privatelink${az.environment().suffixes.sqlServerHostname}'
 }
 
-module replicaSqlPrivateEndpoints '../../../shared/bicep/network/private-endpoint.bicep' = [for i in range(0, length(replicaSqlServerResourceIds)): {
-  name: take('replicaSqlPE-${environment}-${i}', 64)
+module replicaSqlPrivateEndpoints '../../../shared/bicep/network/private-endpoint.bicep' = {
+  name: take('replicaSqlPE-${environment}', 64)
   scope: resourceGroup(devboxSubscriptionId, devboxResourceGroupName)
   params: {
     location: location
-    name: privateEndpointNames[i]
+    name: privateEndpointNames
     snetId: devboxPrivateEndpointSubnet.id
-    privateLinkServiceId: replicaSqlServerResourceIds[i]
+    privateLinkServiceId: replicaSqlServerResourceId
     subresource: 'sqlServer'
     privateDnsZonesId: sqlPrivateDnsZone.id
     tags: tags
   }
-}]
+}
 
 // ------------------
 //    OUTPUTS
 // ------------------
 
-output privateEndpointNames array = privateEndpointNames
+output privateEndpointNames string = privateEndpointNames
 
