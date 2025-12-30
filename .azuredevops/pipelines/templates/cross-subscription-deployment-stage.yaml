@@ -60,7 +60,11 @@ stages:
                               dwNetworkingResourceGroup="$(dwNetworkingResourceGroup)" \
                               dwVnetName="$(dwVnetName)" \
                               dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
-                              dwEnvironment="$(dwEnvironment)"
+                              dwEnvironment="$(dwEnvironment)" \
+                              enableDevBoxSqlReplicaEndpoints=$(enableDevBoxSqlReplicaEndpoints) \
+                              replicaSqlServerResourceId="$(replicaSqlServerResourceId)" \
+                              replicaSqlServerName="$(replicaSqlServerName)" \
+                              devBoxSecondaryVNetIds="$(devBoxSecondaryVNetIds)"
 
       - deployment: deploy
         displayName: 'Deploy Cross Subscription'
@@ -106,6 +110,10 @@ stages:
                                     dwNetworkingResourceGroup="$(dwNetworkingResourceGroup)" \
                                     dwVnetName="$(dwVnetName)" \
                                     dwPrivateEndpointSubnetName="$(dwPrivateEndpointSubnetName)" \
-                                    dwEnvironment="$(dwEnvironment)")
+                                    dwEnvironment="$(dwEnvironment)" \
+                                    enableDevBoxSqlReplicaEndpoints=$(enableDevBoxSqlReplicaEndpoints) \
+                                    replicaSqlServerResourceId="$(replicaSqlServerResourceId)" \
+                                    replicaSqlServerName="$(replicaSqlServerName)" \
+                                    devBoxSecondaryVNetIds="$(devBoxSecondaryVNetIds)")
                       echo "Full Bicep Deployment Output:"
                       echo $output | jq .

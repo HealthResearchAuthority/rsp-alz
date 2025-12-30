@@ -13,16 +13,16 @@ param manageddevopspoolVnetID = ''
 param enableDevBoxStorageEndpoints = true
 
 // Enable DevBox SQL replica private endpoints
-param enableDevBoxSqlReplicaEndpoints = true
+param enableDevBoxSqlReplicaEndpoints = false
 
 // Format: /subscriptions/{sub-id}/resourceGroups/{rg}/providers/Microsoft.Sql/servers/{server-name},...
-param replicaSqlServerResourceId = '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-storage-spoke-dev-ukw/providers/Microsoft.Sql/servers/rspsqlserverdevreplica'
+param replicaSqlServerResourceId = ''
 
 // Format: rspsqlserverdevreplica...
-param replicaSqlServerName = 'rspsqlserverdevreplica'
+param replicaSqlServerName = ''
 
 // Secondary region VNet IDs (comma-separated) to peer with DevBox VNet
-param devBoxSecondaryVNetIds = '/subscriptions/b83b4631-b51b-4961-86a1-295f539c826b/resourceGroups/rg-rsp-networking-spoke-dev-ukw/providers/Microsoft.Network/virtualNetworks/vnet-rsp-networking-dev-ukw-spoke' //This is temporary and would be passed via variable groups
+param devBoxSecondaryVNetIds = ''
 
 // Environment name
 param environment = 'dev'
