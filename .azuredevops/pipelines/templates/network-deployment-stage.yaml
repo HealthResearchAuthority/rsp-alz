@@ -104,3 +104,4 @@ stages:
                       spokeVNetName=$(echo $output | jq -r '.properties.outputs.spokeVNetName.value')
                       echo "##vso[task.setvariable variable=spokeVNetId;isoutput=true]$spokeVNetId"
                       echo "##vso[task.setvariable variable=spokeVNetName;isoutput=true]$spokeVNetName"
+                      
