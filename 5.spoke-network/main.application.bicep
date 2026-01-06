@@ -963,11 +963,11 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       appServicePlanName: 'asp-rsp-fnsyncrtsApp-${parSpokeNetworks[i].parEnvironment}-uks'
       appName: 'func-rts-data-sync-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Windows'
-      subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
+      subnetIdForVnetInjection: webAppSubnet[i].id 
       deploySlot: parSpokeNetworks[i].deployWebAppSlot
       privateEndpointRG: parSpokeNetworks[i].rgNetworking
-      spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
-      subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
+      spokeVNetId: existingVnet[i].id 
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id 
       kind: 'functionapp'
       storageAccountName: 'strtssync${parSpokeNetworks[i].parEnvironment}'
       deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
