@@ -83,7 +83,6 @@ stages:
               stagingStorageAccountKey: $(stagingStorageAccountKey)
               quarantineStorageAccountKey: $(quarantineStorageAccountKey)
               cleanStorageAccountKey: $(cleanStorageAccountKey)
-              projectRecordValidationFunctionKey: $(projectRecordValidationFunctionKey)
           - task: AzureCLI@2
             displayName: 'Validate Deployment'
             inputs:
@@ -136,7 +135,6 @@ stages:
               stagingStorageAccountKey: $(stagingStorageAccountKey)
               quarantineStorageAccountKey: $(quarantineStorageAccountKey)
               cleanStorageAccountKey: $(cleanStorageAccountKey)
-              projectRecordValidationFunctionKey: $(projectRecordValidationFunctionKey)
           - task: AzureCLI@2
             displayName: 'What-If Key Vault Update'
             inputs:
@@ -196,7 +194,6 @@ stages:
                     stagingStorageAccountKey: $(stagingStorageAccountKey)
                     quarantineStorageAccountKey: $(quarantineStorageAccountKey)
                     cleanStorageAccountKey: $(cleanStorageAccountKey)
-                    projectRecordValidationFunctionKey: $(projectRecordValidationFunctionKey)
                 - task: AzureCLI@2
                   displayName: 'Deploy Key Vault Update'
                   inputs:
