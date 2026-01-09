@@ -49,6 +49,17 @@ param adminEmailRecipients = [
   }
 ]
 
+param enableWebhookAg = true
+param enableLogicAppAg = true
+param webhookUrl = ''
+param logAnalyticsWorkspaceId = ''
+param enableAllErrorsAlert = true
+
+param teamsGroupId = ''
+param teamsChannelId = ''
+param teamsApiConnectionId = ''
+param teamsConnectionId = ''
+
 // ------------------
 // TAGS
 // ------------------
