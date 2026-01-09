@@ -115,7 +115,26 @@ param bgodatabaseuser string
 @secure()
 param bgodatabasepassword string
 
+@description('App Configuration encryption configuration')
+param appConfigEncryptionConfig object = {
+  enabled: false
+  keyName: ''
+  keyRotationEnabled: true
+}
+
+@description('Key Vault resource ID for encryption key')
+param keyVaultId string = ''
+
+// ------------------
+// VARIABLES
+// ------------------
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
+var keyVaultResourceIdTokens = split(keyVaultId, '/')
+var keyVaultName = !empty(keyVaultId) ? keyVaultResourceIdTokens[8] : ''
+var keyVaultUri = !empty(keyVaultId) ? 'https://${keyVaultName}.vault.azure.net/' : ''
+var keyName = !empty(appConfigEncryptionConfig.keyName) ? appConfigEncryptionConfig.keyName : 'key-appconfig-encryption'
+var keyIdentifier = appConfigEncryptionConfig.enabled && !empty(keyVaultUri) ? '${keyVaultUri}keys/${keyName}' : ''
 
 var keyValues = [
   {
@@ -463,6 +482,12 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
       authenticationMode: 'Pass-through'
       privateLinkDelegation: 'Enabled'
     }
+    encryption: appConfigEncryptionConfig.enabled ? {
+      keyVaultProperties: {
+        identityClientId: appConfigurationUserAssignedIdentity.properties.clientId
+        keyIdentifier: keyIdentifier
+      }
+    } : null
   }
 }
 
@@ -508,6 +533,16 @@ module appConfigurationDataReaderAssignment '../../../../shared/bicep/role-assig
     resourceId: configStore.id
     roleDefinitionId: appConfigurationDataReaderRoleGUID
     principalType: 'ServicePrincipal'
+  }
+}
+
+module appConfigEncryptionKey '../../../../shared/bicep/key-vault/storage-encryption-key.bicep' = if (appConfigEncryptionConfig.enabled && !empty(keyVaultId)) {
+  name: 'appConfigEncryptionKey-${uniqueString(configStore.id)}'
+  params: {
+    keyVaultName: keyVaultName
+    keyName: keyName
+    managedIdentityPrincipalId: appConfigurationUserAssignedIdentity.properties.principalId
+    tags: tags
   }
 }
 

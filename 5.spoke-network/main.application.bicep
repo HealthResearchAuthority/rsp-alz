@@ -63,6 +63,18 @@ type allStorageConfig = {
   quarantine: storageTypeConfig
 }
 
+@description('App Configuration encryption configuration type definition')
+type appConfigEncryptionConfig = {
+  @description('Enable customer-managed key encryption')
+  enabled: bool
+
+  @description('Name of the encryption key (auto-generated if empty)')
+  keyName: string
+
+  @description('Enable automatic key version updates')
+  keyRotationEnabled: bool
+}
+
 @description('Complete SKU configuration for all resource types')
 type skuConfig = {
   @description('App Service Plan configuration')
@@ -353,6 +365,13 @@ param parSkuConfig skuConfig = {
   frontDoor: 'Premium_AzureFrontDoor'
 }
 
+@description('App Configuration encryption configuration')
+param parAppConfigEncryptionConfig appConfigEncryptionConfig = {
+  enabled: false
+  keyName: ''
+  keyRotationEnabled: true
+}
+
 @description('Network security configuration for storage accounts')
 param parNetworkSecurityConfig object = {
   defaultAction: 'Deny'
@@ -597,6 +616,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       clarityProjectId: parClarityProjectId
       keyVaultSku: parSkuConfig.keyVault
       appConfigurationSku: parSkuConfig.appConfiguration
+      appConfigEncryptionConfig: parAppConfigEncryptionConfig
       googleTagId: parGoogleTagId
       cmsUri: parCmsUri
       portalUrl: parPortalUrl
