@@ -338,16 +338,6 @@ var keyValues = [
     value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=${documentStorageAccounts.cleanStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
-  {
-    name: 'AppSettings:ProjectRecordValidationFunctionKey'
-    value: '{"uri":"${keyVaultSecretUris.projectRecordValidationFunctionKey}"}'
-    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
-  }
-  {
-    name: 'AppSettings:ProjectRecordValidationUri'
-    value: 'https://func-validate-irasid.azurewebsites.net/api'
-    contentType: null
-  }
 ]
 
 var featureFlags = [
