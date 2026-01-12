@@ -135,7 +135,7 @@ param parSkuConfig = {
 }
 
 param parAppConfigEncryptionConfig = {
-  enabled: false
+  enabled: true
   keyName: 'key-appconfig-pre-prod'
   keyRotationEnabled: true
 }

@@ -133,6 +133,8 @@ var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 var keyVaultResourceIdTokens = split(keyVaultId, '/')
 var keyVaultName = !empty(keyVaultId) ? keyVaultResourceIdTokens[8] : ''
 var keyName = !empty(appConfigEncryptionConfig.keyName) ? appConfigEncryptionConfig.keyName : 'key-appconfig-encryption'
+var keyVaultUri = !empty(keyVaultId) ? 'https://${keyVaultName}.${environment().suffixes.keyvaultDns}/' : ''
+var keyIdentifier = appConfigEncryptionConfig.enabled && !empty(keyVaultUri) ? '${keyVaultUri}keys/${keyName}' : ''
 
 var keyValues = [
   {
@@ -493,10 +495,13 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
     encryption: appConfigEncryptionConfig.enabled && !empty(keyVaultId) ? {
       keyVaultProperties: {
         identityClientId: appConfigurationUserAssignedIdentity.properties.clientId
-        keyIdentifier: appConfigEncryptionKey.outputs.keyUri
+        keyIdentifier: keyIdentifier
       }
     } : null
   }
+  dependsOn: [
+    appConfigEncryptionKey
+  ]
 }
 
 resource configStoreKeyValue 'Microsoft.AppConfiguration/configurationStores/keyValues@2023-03-01' = [
