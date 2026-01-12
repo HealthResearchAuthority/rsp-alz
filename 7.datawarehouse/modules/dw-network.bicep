@@ -54,6 +54,7 @@ var automationtestSubnetPrefix = '10.1.48.0/22'
 var uatSubnetPrefix = '10.5.128.0/18'
 var preprodSubnetPrefeix = '10.6.128.0/18'
 var prodSubnetPrefix = '10.7.128.0/18'
+var dataGatewaySubnetPrefix = '172.18.5.0/26'
 
 var allLocalAddressRanges = [
   functionAppSubnetPrefix
@@ -65,6 +66,7 @@ var allLocalAddressRanges = [
   uatSubnetPrefix
   preprodSubnetPrefeix
   prodSubnetPrefix
+  dataGatewaySubnetPrefix
 ]
 
 module functionAppsNSG '../../shared/bicep/network/nsg.bicep' = {
@@ -127,6 +129,21 @@ module vnet '../../shared/bicep/network/vnet.bicep' = {
               name: 'Microsoft.Web.serverFarms'
               properties: {
                 serviceName: 'Microsoft.Web/serverFarms'
+              }
+            }
+          ]
+        }
+      }
+      {
+        name: 'DataGatewaySubnet'
+        properties: {
+          addressPrefix: dataGatewaySubnetPrefix
+          privateEndpointNetworkPolicies: 'Disabled'
+          delegations: [
+            {
+              name: 'Microsoft.PowerPlatform/vnetaccesslinks'
+              properties: {
+                serviceName: 'Microsoft.PowerPlatform/vnetaccesslinks'
               }
             }
           ]
