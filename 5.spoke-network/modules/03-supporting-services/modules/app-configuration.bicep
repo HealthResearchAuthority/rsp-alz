@@ -132,7 +132,7 @@ param keyVaultId string = ''
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 var keyVaultResourceIdTokens = split(keyVaultId, '/')
 var keyVaultName = !empty(keyVaultId) ? keyVaultResourceIdTokens[8] : ''
-var keyVaultUri = !empty(keyVaultId) ? 'https://${keyVaultName}.vault.azure.net/' : ''
+var keyVaultUri = !empty(keyVaultId) ? 'https://${keyVaultName}.${environment().suffixes.keyvaultDns}/' : ''
 var keyName = !empty(appConfigEncryptionConfig.keyName) ? appConfigEncryptionConfig.keyName : 'key-appconfig-encryption'
 var keyIdentifier = appConfigEncryptionConfig.enabled && !empty(keyVaultUri) ? '${keyVaultUri}keys/${keyName}' : ''
 
