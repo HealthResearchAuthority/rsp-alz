@@ -132,9 +132,7 @@ param keyVaultId string = ''
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
 var keyVaultResourceIdTokens = split(keyVaultId, '/')
 var keyVaultName = !empty(keyVaultId) ? keyVaultResourceIdTokens[8] : ''
-var keyVaultUri = !empty(keyVaultId) ? 'https://${keyVaultName}.${environment().suffixes.keyvaultDns}/' : ''
 var keyName = !empty(appConfigEncryptionConfig.keyName) ? appConfigEncryptionConfig.keyName : 'key-appconfig-encryption'
-var keyIdentifier = appConfigEncryptionConfig.enabled && !empty(keyVaultUri) ? '${keyVaultUri}keys/${keyName}' : ''
 
 var keyValues = [
   {
@@ -463,6 +461,16 @@ resource appConfigurationUserAssignedIdentity 'Microsoft.ManagedIdentity/userAss
   tags: tags
 }
 
+module appConfigEncryptionKey '../../../../shared/bicep/key-vault/storage-encryption-key.bicep' = if (appConfigEncryptionConfig.enabled && !empty(keyVaultId)) {
+  name: 'appConfigEncryptionKey-${uniqueString(keyVaultId)}'
+  params: {
+    keyVaultName: keyVaultName
+    keyName: keyName
+    managedIdentityPrincipalId: appConfigurationUserAssignedIdentity.properties.principalId
+    tags: tags
+  }
+}
+
 resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01' = {
   name: configStoreName
   location: location
@@ -482,10 +490,10 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
       authenticationMode: 'Pass-through'
       privateLinkDelegation: 'Enabled'
     }
-    encryption: appConfigEncryptionConfig.enabled ? {
+    encryption: appConfigEncryptionConfig.enabled && !empty(keyVaultId) ? {
       keyVaultProperties: {
         identityClientId: appConfigurationUserAssignedIdentity.properties.clientId
-        keyIdentifier: keyIdentifier
+        keyIdentifier: appConfigEncryptionKey.outputs.keyUri
       }
     } : null
   }
@@ -533,16 +541,6 @@ module appConfigurationDataReaderAssignment '../../../../shared/bicep/role-assig
     resourceId: configStore.id
     roleDefinitionId: appConfigurationDataReaderRoleGUID
     principalType: 'ServicePrincipal'
-  }
-}
-
-module appConfigEncryptionKey '../../../../shared/bicep/key-vault/storage-encryption-key.bicep' = if (appConfigEncryptionConfig.enabled && !empty(keyVaultId)) {
-  name: 'appConfigEncryptionKey-${uniqueString(configStore.id)}'
-  params: {
-    keyVaultName: keyVaultName
-    keyName: keyName
-    managedIdentityPrincipalId: appConfigurationUserAssignedIdentity.properties.principalId
-    tags: tags
   }
 }
 
