@@ -134,6 +134,12 @@ param parSkuConfig = {
   frontDoor: 'Premium_AzureFrontDoor'
 }
 
+param parAppConfigEncryptionConfig = {
+  enabled: true
+  keyName: 'key-appconfig-dev'
+  keyRotationEnabled: true
+}
+
 // Network security configuration for dev environment
 param parNetworkSecurityConfig = {
   defaultAction: 'Deny'

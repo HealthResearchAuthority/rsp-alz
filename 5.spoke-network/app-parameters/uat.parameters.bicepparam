@@ -136,6 +136,12 @@ param parSkuConfig = {
   frontDoor: 'Premium_AzureFrontDoor'
 }
 
+param parAppConfigEncryptionConfig = {
+  enabled: true
+  keyName: 'key-appconfig-uat'
+  keyRotationEnabled: true
+}
+
 // Network security configuration for UAT environment
 param parNetworkSecurityConfig = {
   defaultAction: 'Deny'        

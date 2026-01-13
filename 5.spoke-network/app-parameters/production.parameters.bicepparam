@@ -134,6 +134,12 @@ param parSkuConfig = {
   frontDoor: 'Premium_AzureFrontDoor'
 }
 
+param parAppConfigEncryptionConfig = {
+  enabled: true
+  keyName: 'key-appconfig-production'
+  keyRotationEnabled: true
+}
+
 // Network security configuration for production environment
 param parNetworkSecurityConfig = {
   defaultAction: 'Deny'

@@ -134,6 +134,12 @@ param parSkuConfig = {
   frontDoor: 'Premium_AzureFrontDoor'
 }
 
+param parAppConfigEncryptionConfig = {
+  enabled: true
+  keyName: 'key-appconfig-systemtest-manual'
+  keyRotationEnabled: true
+}
+
 // Network security configuration for manual test environment
 param parNetworkSecurityConfig = {
   defaultAction: 'Deny'
