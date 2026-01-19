@@ -39,6 +39,16 @@ param parEnableKeyVaultPrivateEndpoints = true
 param parEnableAppConfigPrivateEndpoints = true
 param parFrontDoorCustomDomains = []
 
+// ValidateIRASID Function Authentication Configuration
+// Note: Allowed applications and principals are automatically retrieved from App Configuration Managed Identity
+param parEnableValidateIrasIdAuth = true
+param parValidateIrasIdClientId = '2032f90d-d672-4ea3-9116-acd0cf20d4e3'
+param parValidateIrasIdClientSecretSettingName = 'MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'
+param parValidateIrasIdOpenIdIssuer = 'https://login.microsoftonline.com/8e1f0aca-d87d-4f20-939e-36243d574267/v2.0'
+param parValidateIrasIdAllowedAudiences = [
+  'api://2032f90d-d672-4ea3-9116-acd0cf20d4e3'
+]
+
 param parDefenderForStorageConfig = {
   enabled: true
   enableMalwareScanning: false

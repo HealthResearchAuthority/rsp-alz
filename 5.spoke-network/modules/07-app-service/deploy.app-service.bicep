@@ -59,6 +59,26 @@ param eventGridServiceTagRestriction bool = false
 @description('Override to allow public access even when private endpoint exists')
 param allowPublicAccessOverride bool = false
 
+@description('Optional. Enable Azure AD authentication')
+param enableAzureAdAuth bool = false
+
+@description('Optional. Azure AD Client ID')
+param azureAdClientId string = ''
+
+@description('Optional. Azure AD Client Secret Setting Name')
+param azureAdClientSecretSettingName string = 'MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'
+
+@description('Optional. Azure AD OpenID Issuer URL')
+param azureAdOpenIdIssuer string = ''
+
+@description('Optional. Allowed token audiences')
+param azureAdAllowedAudiences array = []
+
+@description('Optional. Allowed application IDs for authorization')
+param azureAdAllowedApplications array = []
+
+@description('Optional. Allowed principal identities for authorization')
+param azureAdAllowedPrincipals array = []
 
 var slotName = 'staging'
 
@@ -258,6 +278,13 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
     eventGridServiceTagRestriction: eventGridServiceTagRestriction
+    enableAzureAdAuth: enableAzureAdAuth
+    azureAdClientId: azureAdClientId
+    azureAdClientSecretSettingName: azureAdClientSecretSettingName
+    azureAdOpenIdIssuer: azureAdOpenIdIssuer
+    azureAdAllowedAudiences: azureAdAllowedAudiences
+    azureAdAllowedApplications: azureAdAllowedApplications
+    azureAdAllowedPrincipals: azureAdAllowedPrincipals
     appSettings: [
       {
         name: 'AzureWebJobsStorage__credential'

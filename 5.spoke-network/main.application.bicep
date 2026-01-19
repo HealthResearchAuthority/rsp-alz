@@ -241,6 +241,21 @@ param parEnableKeyVaultPrivateEndpoints bool = false
 @description('Enable App Configuration Private Endpoints')
 param parEnableAppConfigPrivateEndpoints bool = false
 
+@description('Enable Azure AD authentication for ValidateIRASID function')
+param parEnableValidateIrasIdAuth bool = false
+
+@description('Azure AD Client ID for ValidateIRASID function')
+param parValidateIrasIdClientId string = ''
+
+@description('Azure AD Client Secret Setting Name for ValidateIRASID function')
+param parValidateIrasIdClientSecretSettingName string = 'MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'
+
+@description('Azure AD OpenID Issuer URL for ValidateIRASID function')
+param parValidateIrasIdOpenIdIssuer string = ''
+
+@description('Allowed token audiences for ValidateIRASID function')
+param parValidateIrasIdAllowedAudiences array = []
+
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
 
@@ -1031,6 +1046,17 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+      enableAzureAdAuth: parEnableValidateIrasIdAuth
+      azureAdClientId: parValidateIrasIdClientId
+      azureAdClientSecretSettingName: parValidateIrasIdClientSecretSettingName
+      azureAdOpenIdIssuer: parValidateIrasIdOpenIdIssuer
+      azureAdAllowedAudiences: parValidateIrasIdAllowedAudiences
+      azureAdAllowedApplications: [
+        supportingServices[i].outputs.appConfigIdentityClientID
+      ]
+      azureAdAllowedPrincipals: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityPrincipalId
+      ]
     }
     dependsOn: [
       webApp
