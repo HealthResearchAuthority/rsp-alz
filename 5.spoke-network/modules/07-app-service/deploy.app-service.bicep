@@ -66,7 +66,8 @@ param enableAzureAdAuth bool = false
 param azureAdClientId string = ''
 
 @description('Optional. Azure AD Client Secret Setting Name')
-param azureAdClientSecretSettingName string = 'MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'
+@secure()
+param azureAdClientSecretSettingName string = ''
 
 @description('Optional. Azure AD OpenID Issuer URL')
 param azureAdOpenIdIssuer string = ''

@@ -248,7 +248,8 @@ param parEnableValidateIrasIdAuth bool = false
 param parValidateIrasIdClientId string = ''
 
 @description('Azure AD Client Secret Setting Name for ValidateIRASID function')
-param parValidateIrasIdClientSecretSettingName string = 'MICROSOFT_PROVIDER_AUTHENTICATION_SECRET'
+@secure()
+param parValidateIrasIdClientSecretSettingName string = ''
 
 @description('Azure AD OpenID Issuer URL for ValidateIRASID function')
 param parValidateIrasIdOpenIdIssuer string = ''
