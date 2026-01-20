@@ -104,6 +104,8 @@ stages:
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                              parValidateIrasIdClientId=$(parValidateIrasIdClientId) \
+                              parValidateIrasIdAllowedAudiences="$(parValidateIrasIdAllowedAudiences)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.createSecretsWithPlaceholders }}
 
       - deployment: deploy
@@ -168,6 +170,8 @@ stages:
                                     parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                                     parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                                     processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                                    parValidateIrasIdClientId=$(parValidateIrasIdClientId) \
+                                    parValidateIrasIdAllowedAudiences="$(parValidateIrasIdAllowedAudiences)" \
                                     parCreateKVSecretsWithPlaceholders=${{ parameters.createSecretsWithPlaceholders }} \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
