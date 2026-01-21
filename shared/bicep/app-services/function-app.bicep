@@ -67,6 +67,28 @@ param kind string
 @description('Optional. Azure Resource Manager ID of the Virtual network and subnet to be joined by Regional VNET Integration. This must be of the form /subscriptions/{subscriptionName}/resourceGroups/{resourceGroupName}/providers/Microsoft.Network/virtualNetworks/{vnetName}/subnets/{subnetName}.')
 param virtualNetworkSubnetId string = ''
 
+@description('Optional. Enable Azure AD authentication')
+param enableAzureAdAuth bool = false
+
+@description('Optional. Azure AD Client ID')
+param azureAdClientId string = ''
+
+@description('Optional. Azure AD Client Secret Setting Name')
+@secure()
+param azureAdClientSecretSettingName string = ''
+
+@description('Optional. Azure AD OpenID Issuer URL')
+param azureAdOpenIdIssuer string = ''
+
+@description('Optional. Allowed token audiences')
+param azureAdAllowedAudiences array = []
+
+@description('Optional. Allowed application IDs for authorization')
+param azureAdAllowedApplications array = []
+
+@description('Optional. Allowed principal identities for authorization')
+param azureAdAllowedPrincipals array = []
+
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
   name: storageAccountName
 }
@@ -153,6 +175,51 @@ resource webConfig 'Microsoft.Web/sites/config@2022-09-01' = if (!empty(networkR
     // UPDATED: Use the combined array of IP restrictions
     ipSecurityRestrictions: combinedIpRestrictions
   }
+}
+
+var azureAdAuthProperties = {
+  platform: {
+    enabled: true
+    runtimeVersion: '~1'
+  }
+  globalValidation: {
+    requireAuthentication: true
+    unauthenticatedClientAction: 'Return401'
+  }
+  httpSettings: {
+    requireHttps: true
+  }
+  identityProviders: {
+    azureActiveDirectory: {
+      enabled: true
+      isAutoProvisioned: true
+      registration: {
+        clientId: azureAdClientId
+        clientSecretSettingName: azureAdClientSecretSettingName
+        openIdIssuer: azureAdOpenIdIssuer
+      }
+      login: {
+        disableWWWAuthenticate: false
+      }
+      validation: {
+        allowedAudiences: azureAdAllowedAudiences
+        defaultAuthorizationPolicy: {
+          allowedApplications: azureAdAllowedApplications
+          allowedPrincipals: {
+            identities: azureAdAllowedPrincipals
+          }
+        }
+        jwtClaimChecks: {}
+      }
+    }
+  }
+}
+
+// Azure AD Authentication Configuration
+resource authSettings 'Microsoft.Web/sites/config@2022-09-01' = if (enableAzureAdAuth && !empty(azureAdClientId)) {
+  parent: functionApp
+  name: 'authsettingsV2'
+  properties: azureAdAuthProperties
 }
 
 output functionAppName string = functionApp.name
