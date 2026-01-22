@@ -1031,7 +1031,7 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
-      appServicePlanName: 'asp-rsp-fnvalidateirasid-${parSpokeNetworks[i].parEnvironment}-uks'
+      appServicePlanName: 'asp-rsp-fnvalid-${parSpokeNetworks[i].parEnvironment}-uks'
       appName: 'func-validate-irasid-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Linux'
       subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
@@ -1079,7 +1079,7 @@ module harpdatasyncfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
-      appServicePlanName: 'asp-rsp-fnharpdatasync-${parSpokeNetworks[i].parEnvironment}-uks'
+      appServicePlanName: 'asp-rsp-fnharpsync-${parSpokeNetworks[i].parEnvironment}-uks'
       appName: 'func-harp-data-sync-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Linux'
       subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
