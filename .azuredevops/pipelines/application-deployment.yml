@@ -127,7 +127,7 @@ stages:
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               parValidateIrasIdClientId=$(parValidateIrasIdClientId) \
-                              parValidateIrasIdAllowedAudiences=$(parValidateIrasIdAllowedAudiences) \
+                              parValidateIrasIdAllowedAudiences='$(parValidateIrasIdAllowedAudiences)' \
                               harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
                               bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
@@ -183,7 +183,7 @@ stages:
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
                               parValidateIrasIdClientId=$(parValidateIrasIdClientId) \
-                              parValidateIrasIdAllowedAudiences=$(parValidateIrasIdAllowedAudiences) \
+                              parValidateIrasIdAllowedAudiences='$(parValidateIrasIdAllowedAudiences)' \
                               harpProjectRecordsQuery="$(harpProjectRecordsQuery)" \
                               bgodatabase=$(bgodatabase) bgodatabaseuser=$(bgodatabaseuser) bgodatabasepassword="$(bgodatabasepassword)" \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.create_secrets_with_placeholders }}
