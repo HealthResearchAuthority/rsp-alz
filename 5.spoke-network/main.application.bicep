@@ -1040,7 +1040,7 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'functionapp'
-      storageAccountName: 'stvalid${parSpokeNetworks[i].parEnvironment}'
+      storageAccountName: 'stvid${parSpokeNetworks[i].parEnvironment}'
       deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
