@@ -63,6 +63,18 @@ type allStorageConfig = {
   quarantine: storageTypeConfig
 }
 
+@description('App Configuration encryption configuration type definition')
+type appConfigEncryptionConfig = {
+  @description('Enable customer-managed key encryption')
+  enabled: bool
+
+  @description('Name of the encryption key (auto-generated if empty)')
+  keyName: string
+
+  @description('Enable automatic key version updates')
+  keyRotationEnabled: bool
+}
+
 @description('Complete SKU configuration for all resource types')
 type skuConfig = {
   @description('App Service Plan configuration')
@@ -229,6 +241,22 @@ param parEnableKeyVaultPrivateEndpoints bool = false
 @description('Enable App Configuration Private Endpoints')
 param parEnableAppConfigPrivateEndpoints bool = false
 
+@description('Enable Azure AD authentication for ValidateIRASID function')
+param parEnableValidateIrasIdAuth bool = false
+
+@description('Azure AD Client ID for ValidateIRASID function')
+param parValidateIrasIdClientId string = ''
+
+@description('Azure AD Client Secret Setting Name for ValidateIRASID function')
+@secure()
+param parValidateIrasIdClientSecretSettingName string = ''
+
+@description('Azure AD OpenID Issuer URL for ValidateIRASID function')
+param parValidateIrasIdOpenIdIssuer string = ''
+
+@description('Allowed token audiences for ValidateIRASID function')
+param parValidateIrasIdAllowedAudiences array = []
+
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
 
@@ -351,6 +379,13 @@ param parSkuConfig skuConfig = {
   keyVault: 'standard'
   appConfiguration: 'standard'
   frontDoor: 'Premium_AzureFrontDoor'
+}
+
+@description('App Configuration encryption configuration')
+param parAppConfigEncryptionConfig appConfigEncryptionConfig = {
+  enabled: false
+  keyName: ''
+  keyRotationEnabled: true
 }
 
 @description('Network security configuration for storage accounts')
@@ -597,6 +632,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       clarityProjectId: parClarityProjectId
       keyVaultSku: parSkuConfig.keyVault
       appConfigurationSku: parSkuConfig.appConfiguration
+      appConfigEncryptionConfig: parAppConfigEncryptionConfig
       googleTagId: parGoogleTagId
       cmsUri: parCmsUri
       portalUrl: parPortalUrl
@@ -995,7 +1031,7 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
-      appServicePlanName: 'asp-rsp-fnvalidateirasid-${parSpokeNetworks[i].parEnvironment}-uks'
+      appServicePlanName: 'asp-fnvalIRASID-${parSpokeNetworks[i].parEnvironment}-uk'
       appName: 'func-validate-irasid-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Linux'
       subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
@@ -1004,13 +1040,24 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'functionapp'
-      storageAccountName: 'strvalidateirasid${parSpokeNetworks[i].parEnvironment}'
+      storageAccountName: 'stvid${parSpokeNetworks[i].parEnvironment}'
       deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         databaseserver[i].outputs.outputsqlServerUAIID
       ]
       sqlDBManagedIdentityClientId: databaseserver[i].outputs.outputsqlServerUAIClientID
+      enableAzureAdAuth: parEnableValidateIrasIdAuth
+      azureAdClientId: parValidateIrasIdClientId
+      azureAdClientSecretSettingName: parValidateIrasIdClientSecretSettingName
+      azureAdOpenIdIssuer: parValidateIrasIdOpenIdIssuer
+      azureAdAllowedAudiences: parValidateIrasIdAllowedAudiences
+      azureAdAllowedApplications: [
+        supportingServices[i].outputs.appConfigIdentityClientID
+      ]
+      azureAdAllowedPrincipals: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityPrincipalId
+      ]
     }
     dependsOn: [
       webApp
@@ -1032,7 +1079,7 @@ module harpdatasyncfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
-      appServicePlanName: 'asp-rsp-fnharpdatasync-${parSpokeNetworks[i].parEnvironment}-uks'
+      appServicePlanName: 'asp-fnharpsync-${parSpokeNetworks[i].parEnvironment}-uk'
       appName: 'func-harp-data-sync-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Linux'
       subnetIdForVnetInjection: webAppSubnet[i].id // spoke[i].outputs.spokeWebAppSubnetId
@@ -1041,7 +1088,7 @@ module harpdatasyncfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id // spoke[i].outputs.spokeVNetId
       subnetPrivateEndpointSubnetId: pepSubnet[i].id // spoke[i].outputs.spokePepSubnetId
       kind: 'functionapp'
-      storageAccountName: 'strharpdatasync${parSpokeNetworks[i].parEnvironment}'
+      storageAccountName: 'stharp${parSpokeNetworks[i].parEnvironment}'
       deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
