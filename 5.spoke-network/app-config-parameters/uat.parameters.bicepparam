@@ -8,4 +8,17 @@ param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-uat-uks'
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-p2ntz-uat-uks'
 
-param parAppConfigurationValues = []
+param parAppConfigurationValues = [
+  {
+    key: 'AppSettings:ProjectRecordValidationScopes'
+    label: 'portal'
+    value: 'api://[YOUR-UAT-CLIENT-ID]'
+    contentType: 'text/plain'
+  }
+  {
+    key: 'AppSettings:ProjectRecordValidationUri'
+    label: 'portal'
+    value: 'https://func-validate-irasid-uat.azurewebsites.net/api'
+    contentType: 'text/plain'
+  }
+]

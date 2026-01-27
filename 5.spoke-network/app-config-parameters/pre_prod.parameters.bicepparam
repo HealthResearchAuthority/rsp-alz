@@ -8,4 +8,17 @@ param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-preprod-uks'
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-psz73-preprod-uks'
 
-param parAppConfigurationValues = []
+param parAppConfigurationValues = [
+  {
+    key: 'AppSettings:ProjectRecordValidationScopes'
+    label: 'portal'
+    value: 'api://[YOUR-PREPROD-CLIENT-ID]'
+    contentType: 'text/plain'
+  }
+  {
+    key: 'AppSettings:ProjectRecordValidationUri'
+    label: 'portal'
+    value: 'https://func-validate-irasid-preprod.azurewebsites.net/api'
+    contentType: 'text/plain'
+  }
+]

@@ -8,4 +8,17 @@ param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-systemtest-u
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-rwcwe-manualtest-uks'
 
-param parAppConfigurationValues = []
+param parAppConfigurationValues = [
+  {
+    key: 'AppSettings:ProjectRecordValidationScopes'
+    label: 'portal'
+    value: 'api://[YOUR-SYSTEMTEST-MANUAL-CLIENT-ID]'
+    contentType: 'text/plain'
+  }
+  {
+    key: 'AppSettings:ProjectRecordValidationUri'
+    label: 'portal'
+    value: 'https://func-validate-irasid-manualtest.azurewebsites.net/api'
+    contentType: 'text/plain'
+  }
+]
