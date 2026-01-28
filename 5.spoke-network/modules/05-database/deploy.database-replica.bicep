@@ -117,8 +117,8 @@ resource SecondarySQL_Server 'Microsoft.Sql/servers@2024-05-01-preview' = {
     }
   }
   properties: {
-    administratorLogin: enableSqlAdminLogin ? adminLogin : null
-    administratorLoginPassword: enableSqlAdminLogin ? adminPassword : null
+    administratorLogin: adminLogin
+    administratorLoginPassword: adminPassword
     publicNetworkAccess: 'Disabled'
     primaryUserAssignedIdentityId: sqlServerUserAssignedIdentity.id
   }

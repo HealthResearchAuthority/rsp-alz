@@ -2,6 +2,9 @@ using '../main.application.bicep'
 
 param logAnalyticsWorkspaceId = ''
 
+// SQL Server admin credentials (used for both primary and replica server creation)
+// Note: SQL authentication is disabled by Azure AD-only authentication setting
+// Values are provided by Azure DevOps pipeline variables: $(rspsqladminloginname) and $(rspsqladminphrase)
 param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
