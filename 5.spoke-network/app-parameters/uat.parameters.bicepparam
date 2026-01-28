@@ -26,6 +26,9 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 15
 
+// Enable SQL authentication for UAT environment
+param parEnableSqlAdminLogin = true
+
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
 param parFrontDoorWafMode = 'Detection'
