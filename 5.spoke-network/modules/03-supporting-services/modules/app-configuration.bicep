@@ -115,7 +115,24 @@ param bgodatabaseuser string
 @secure()
 param bgodatabasepassword string
 
+@description('App Configuration encryption configuration')
+param appConfigEncryptionConfig object = {
+  enabled: false
+  keyName: ''
+  keyRotationEnabled: true
+}
+
+@description('Key Vault resource ID for encryption key')
+param keyVaultId string = ''
+
+// ------------------
+// VARIABLES
+// ------------------
+
 var appConfigurationDataReaderRoleGUID = '516239f1-63e1-4d78-a4de-a74fb236a071'
+var keyVaultResourceIdTokens = split(keyVaultId, '/')
+var keyVaultName = !empty(keyVaultId) ? keyVaultResourceIdTokens[8] : ''
+var keyName = !empty(appConfigEncryptionConfig.keyName) ? appConfigEncryptionConfig.keyName : 'key-appconfig-encryption'
 
 var keyValues = [
   {
@@ -338,16 +355,6 @@ var keyValues = [
     value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=${documentStorageAccounts.cleanStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
-  {
-    name: 'AppSettings:ProjectRecordValidationFunctionKey'
-    value: '{"uri":"${keyVaultSecretUris.projectRecordValidationFunctionKey}"}'
-    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
-  }
-  {
-    name: 'AppSettings:ProjectRecordValidationUri'
-    value: 'https://func-validate-irasid.azurewebsites.net/api'
-    contentType: null
-  }
 ]
 
 var featureFlags = [
@@ -444,6 +451,17 @@ resource appConfigurationUserAssignedIdentity 'Microsoft.ManagedIdentity/userAss
   tags: tags
 }
 
+// Create encryption key in Key Vault before App Configuration (when encryption enabled)
+module appConfigEncryptionKey '../../../../shared/bicep/key-vault/storage-encryption-key.bicep' = if (appConfigEncryptionConfig.enabled && !empty(keyVaultId)) {
+  name: 'appConfigEncryptionKey-${uniqueString(keyVaultId)}'
+  params: {
+    keyVaultName: keyVaultName
+    keyName: keyName
+    managedIdentityPrincipalId: appConfigurationUserAssignedIdentity.properties.principalId
+    tags: tags
+  }
+}
+
 resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01' = {
   name: configStoreName
   location: location
@@ -463,7 +481,16 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
       authenticationMode: 'Pass-through'
       privateLinkDelegation: 'Enabled'
     }
+    encryption: appConfigEncryptionConfig.enabled && !empty(keyVaultId) ? {
+      keyVaultProperties: {
+        identityClientId: appConfigurationUserAssignedIdentity.properties.clientId
+        keyIdentifier: appConfigEncryptionKey!.outputs.keyUri
+      }
+    } : null
   }
+  dependsOn: appConfigEncryptionConfig.enabled && !empty(keyVaultId) ? [
+    appConfigEncryptionKey
+  ] : []
 }
 
 resource configStoreKeyValue 'Microsoft.AppConfiguration/configurationStores/keyValues@2023-03-01' = [

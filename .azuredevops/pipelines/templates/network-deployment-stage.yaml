@@ -1,0 +1,107 @@
+# Reusable stage template for network deployment
+
+parameters:
+  - name: environmentName
+    type: string
+  - name: displayName
+    type: string
+  - name: selectedEnvironment
+    type: string
+
+stages:
+  - stage: ${{ parameters.environmentName }}
+    displayName: ${{ parameters.displayName }}
+    dependsOn: []
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'), eq('${{ parameters.selectedEnvironment }}', '${{ parameters.environmentName }}'))
+    jobs:
+      - job: setup
+        displayName: 'Checkout and Install Bicep'
+        variables:
+          - group: ${{ parameters.environmentName }}
+        pool:
+          name: rsp-manageddevopspool
+        steps:
+          - checkout: self
+          - script: |
+              echo "Installing Azure CLI..."
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            displayName: 'Install Azure CLI'
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+
+      - job: FinalWhatIf
+        displayName: 'Run What-If before Deployment'
+        dependsOn: [setup]
+        condition: succeeded()
+        pool:
+          name: rsp-manageddevopspool
+        variables:
+          - group: ${{ parameters.environmentName }}
+        steps:
+          - checkout: self
+          - script: |
+              echo "Installing Azure CLI..."
+              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+            displayName: 'Install Azure CLI'
+          - bash: |
+              az bicep install
+              az bicep version
+            displayName: 'Install Bicep CLI'
+
+          - task: AzureCLI@2
+            displayName: 'Final What-If'
+            inputs:
+              azureSubscription: $(${{ parameters.environmentName }})
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                az config set bicep.use_binary_from_path=false --only-show-errors
+                az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.network.bicep \
+                  --parameters ./5.spoke-network/network-parameters/${{ parameters.environmentName }}.parameters.bicepparam \
+                              logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
+
+      - deployment: deploy
+        displayName: 'Deploy Network'
+        pool:
+          name: rsp-manageddevopspool
+        dependsOn: [setup, FinalWhatIf]
+        condition: succeeded()
+        environment: ${{ parameters.environmentName }}
+        variables:
+          - group: ${{ parameters.environmentName }}
+        strategy:
+          runOnce:
+            deploy:
+              steps:
+                - checkout: self
+                - script: |
+                    echo "Installing Azure CLI..."
+                    curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+                  displayName: 'Install Azure CLI'
+                - bash: |
+                    az bicep install
+                    az bicep version
+                  displayName: 'Install Bicep CLI'
+
+                - task: AzureCLI@2
+                  name: deploy
+                  displayName: 'Deploy Network'
+                  inputs:
+                    azureSubscription: $(${{ parameters.environmentName }})
+                    scriptType: bash
+                    scriptLocation: inlineScript
+                    failOnStandardError: true
+                    inlineScript: |
+                      az config set bicep.use_binary_from_path=false --only-show-errors
+                      output=$(az stack sub create --name "network-deployment-stack" --location $(location) --template-file ./5.spoke-network/main.network.bicep  \
+                        --parameters ./5.spoke-network/network-parameters/${{ parameters.environmentName }}.parameters.bicepparam \
+                                    logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                                    --deny-settings-mode none --action-on-unmanage deleteResources --yes)
+                      echo $output | jq .
+                      spokeVNetId=$(echo $output | jq -r '.properties.outputs.spokeVNetId.value')
+                      spokeVNetName=$(echo $output | jq -r '.properties.outputs.spokeVNetName.value')
+                      echo "##vso[task.setvariable variable=spokeVNetId;isoutput=true]$spokeVNetId"
+                      echo "##vso[task.setvariable variable=spokeVNetName;isoutput=true]$spokeVNetName"
+                      

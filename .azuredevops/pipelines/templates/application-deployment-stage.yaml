@@ -104,6 +104,8 @@ stages:
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                              parValidateIrasIdClientId=$(parValidateIrasIdClientId) \
+                              parValidateIrasIdAllowedAudiences='$(parValidateIrasIdAllowedAudiences)' \
                               parCreateKVSecretsWithPlaceholders=${{ parameters.createSecretsWithPlaceholders }}
 
       - deployment: deploy
@@ -112,7 +114,7 @@ stages:
           name: rsp-manageddevopspool
         dependsOn: [setup, FinalWhatIf]
         condition: succeeded()
-        environment: 'alz-bicep-deployment'
+        environment: ${{ parameters.environmentName }}
         variables:
           - name: devOpsPublicIP
             value: $[dependencies.setup.outputs['fetchPublicIP.ipaddress']]
@@ -168,6 +170,8 @@ stages:
                                     parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                                     parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                                     processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
+                                    parValidateIrasIdClientId=$(parValidateIrasIdClientId) \
+                                    parValidateIrasIdAllowedAudiences='$(parValidateIrasIdAllowedAudiences)' \
                                     parCreateKVSecretsWithPlaceholders=${{ parameters.createSecretsWithPlaceholders }} \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .

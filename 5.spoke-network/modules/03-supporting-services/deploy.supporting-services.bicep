@@ -81,6 +81,13 @@ param keyVaultSku string = 'standard'
 @description('App Configuration SKU')
 param appConfigurationSku string = 'standard'
 
+@description('App Configuration encryption configuration')
+param appConfigEncryptionConfig object = {
+  enabled: false
+  keyName: ''
+  keyRotationEnabled: true
+}
+
 @secure()
 @description('The key for the Google Analytics project this is associated with.')
 param googleTagId string
@@ -246,7 +253,6 @@ module appConfiguration './modules/app-configuration.bicep' = {
       stagingStorageAccountKeySecretUri: keyVaultSecrets.outputs.stagingStorageAccountKeySecretUri
       quarantineStorageAccountKeySecretUri: keyVaultSecrets.outputs.quarantineStorageAccountKeySecretUri
       cleanStorageAccountKeySecretUri: keyVaultSecrets.outputs.cleanStorageAccountKeySecretUri
-      projectRecordValidationFunctionKey: keyVaultSecrets.outputs.projectRecordValidationFunctionKey
     }
     documentStorageAccounts: documentStorageAccounts
     parMicrosoftEntraAuthority: parMicrosoftEntraAuthority
@@ -254,6 +260,8 @@ module appConfiguration './modules/app-configuration.bicep' = {
     bgodatabase: bgodatabase
     bgodatabaseuser: bgodatabaseuser
     bgodatabasepassword: bgodatabasepassword
+    appConfigEncryptionConfig: appConfigEncryptionConfig
+    keyVaultId: keyVault.outputs.keyVaultId
   }
 }
 

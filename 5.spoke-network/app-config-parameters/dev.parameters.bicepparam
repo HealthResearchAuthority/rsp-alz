@@ -16,4 +16,16 @@ param parAppConfigurationValues = [
   //   value: 'https://api-rts-dev.example.com'
   //   contentType: null
   // }
+  {
+    key: 'AppSettings:ProjectRecordValidationScopes'
+    label: 'portal'
+    value: 'api://2032f90d-d672-4ea3-9116-acd0cf20d4e3'
+    contentType: 'text/plain'
+  }
+  {
+    key: 'AppSettings:ProjectRecordValidationUri'
+    label: 'portal'
+    value: 'https://func-validate-irasid-dev.azurewebsites.net/api'
+    contentType: 'text/plain'
+  }
 ]
