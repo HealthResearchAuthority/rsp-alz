@@ -20,6 +20,15 @@ param deployAzurePolicies bool = true
 @description('Array of spoke network configurations')
 param parSpokeNetworks array = []
 
+@description('Enable failover/DR networking deployment for secondary region')
+param parEnableFailover bool = false
+
+@description('Secondary region location (e.g., ukwest)')
+param parSecondaryLocation string = ''
+
+@description('Array of secondary region spoke network configurations (for DR/failover)')
+param parSecondarySpokeNetworks array = []
+
 
 // ------------------
 // RESOURCES
@@ -63,6 +72,51 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
   }
 }]
 
+// Secondary region networking for DR/failover
+module secondaryNetworkingRG '../shared/bicep/resourceGroup.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableFailover && length(parSecondarySpokeNetworks) > 0) {
+  name: take('secondaryNetworkingRG-${deployment().name}-${i}', 64)
+  scope: subscription(parSecondarySpokeNetworks[i].subscriptionId)
+  params: {
+    parLocation: parSecondaryLocation
+    parResourceGroupName: parSecondarySpokeNetworks[i].rgNetworking
+  }
+}]
+
+module secondaryNetworkingnaming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableFailover && length(parSecondarySpokeNetworks) > 0) {
+  name: take('secondaryNetworkingNaming-${deployment().name}-${i}', 64)
+  scope: resourceGroup(parSecondarySpokeNetworks[i].subscriptionId, parSecondarySpokeNetworks[i].rgNetworking)
+  params: {
+    uniqueId: uniqueString(secondaryNetworkingRG[i].?outputs.outResourceGroupId)
+    environment: parSecondarySpokeNetworks[i].parEnvironment
+    workloadName: 'networking'
+    location: parSecondaryLocation
+  }
+  dependsOn: [
+    secondaryNetworkingRG
+  ]
+}]
+
+module secondarySpoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableFailover && length(parSecondarySpokeNetworks) > 0) {
+  name: take('secondarySpoke-${deployment().name}-deployment-${i}', 64)
+  scope: subscription(parSecondarySpokeNetworks[i].subscriptionId)
+  params: {
+    location: parSecondaryLocation
+    tags: tags
+    spokeApplicationGatewaySubnetAddressPrefix: parSecondarySpokeNetworks[i].subnets.appGatewaySubnet.addressPrefix
+    spokeInfraSubnetAddressPrefix: parSecondarySpokeNetworks[i].subnets.infraSubnet.addressPrefix
+    spokePrivateEndpointsSubnetAddressPrefix: parSecondarySpokeNetworks[i].subnets.privateEndPointSubnet.addressPrefix
+    spokeWebAppSubnetAddressPrefix: parSecondarySpokeNetworks[i].subnets.webAppSubnet.addressPrefix
+    spokeVNetAddressPrefixes: [parSecondarySpokeNetworks[i].ipRange]
+    deployAzurePolicies: deployAzurePolicies
+    logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+    resourcesNames: secondaryNetworkingnaming[i].?outputs.resourcesNames
+    spokeNetworkingRGName: parSecondarySpokeNetworks[i].rgNetworking
+  }
+  dependsOn: [
+    secondaryNetworkingnaming
+  ]
+}]
+
 
 // ------------------
 // OUTPUTS
@@ -102,4 +156,17 @@ output spokeApplicationGatewaySubnetIds array = [for i in range(0, length(parSpo
 output spokeApplicationGatewaySubnetNames array = [for i in range(0, length(parSpokeNetworks)): {
   Name: spoke[i].outputs.spokeApplicationGatewaySubnetName
 }]
+
+// Secondary region outputs (only populated when failover is enabled)
+@description('The resource ID of the Secondary Region Spoke Virtual Network.')
+output secondarySpokeVNetIds array = []
+
+@description('The name of the Secondary Region Spoke Virtual Network.')
+output secondarySpokeVnetNames array = []
+
+@description('The resource ID of the Secondary Region Spoke Private Endpoints Subnet.')
+output secondarySpokePrivateEndpointsSubnetIds array = []
+
+@description('The name of the Secondary Region Spoke Private Endpoints Subnet.')
+output secondarySpokePrivateEndpointsSubnetNames array = []
 
