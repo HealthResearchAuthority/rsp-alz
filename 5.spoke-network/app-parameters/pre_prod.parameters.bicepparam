@@ -24,6 +24,9 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 30
 
+// Disable SQL authentication - use Azure AD only
+param parEnableSqlAdminLogin = true
+
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
 param parFrontDoorWafMode = 'Prevention'
