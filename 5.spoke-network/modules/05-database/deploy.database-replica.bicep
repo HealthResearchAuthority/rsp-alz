@@ -136,6 +136,18 @@ resource azureADAdmin 'Microsoft.Sql/servers/administrators@2024-05-01-preview' 
   }
 }
 
+// Enable Azure AD-only authentication (disables SQL authentication)
+resource azureADOnlyAuth 'Microsoft.Sql/servers/azureADOnlyAuthentications@2024-05-01-preview' = if (!enableSqlAdminLogin) {
+  name: 'Default'
+  parent: SecondarySQL_Server
+  properties: {
+    azureADOnlyAuthentication: true
+  }
+  dependsOn: [
+    azureADAdmin
+  ]
+}
+
 module sqlserveradminRoleAssignment '../../../shared/bicep/role-assignments/role-assignment.bicep' = {
   name: take('sqlServerContributorRoleAssignmentDeployment-${deployment().name}', 64)
   params: {
