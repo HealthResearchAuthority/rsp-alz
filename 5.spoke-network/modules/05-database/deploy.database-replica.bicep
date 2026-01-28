@@ -167,6 +167,8 @@ resource masterDb 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
 }
 
 // Secondary databases with createMode: 'Secondary' for Active Geo-Replication
+// Note: batchSize(1) ensures databases are created sequentially to avoid "Server is busy" conflicts
+@batchSize(1)
 resource secondaryDatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [for i in range(0, length(primaryDatabaseIds)): {
   name: databases[i]
   parent: SecondarySQL_Server
