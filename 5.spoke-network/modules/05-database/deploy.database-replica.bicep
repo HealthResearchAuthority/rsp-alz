@@ -168,6 +168,7 @@ resource masterDb 'Microsoft.Sql/servers/databases@2021-11-01-preview' = {
 
 // Secondary databases with createMode: 'Secondary' for Active Geo-Replication
 // Note: batchSize(1) ensures databases are created sequentially to avoid "Server is busy" conflicts
+// dependsOn azureADOnlyAuth to ensure Azure AD configuration completes before geo-replication starts
 @batchSize(1)
 resource secondaryDatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview' = [for i in range(0, length(primaryDatabaseIds)): {
   name: databases[i]
@@ -185,6 +186,9 @@ resource secondaryDatabases 'Microsoft.Sql/servers/databases@2024-05-01-preview'
     sourceDatabaseId: primaryDatabaseIds[i]
     requestedBackupStorageRedundancy: 'Local'
   }
+  dependsOn: [
+    azureADOnlyAuth  // Wait for Azure AD async operations to complete before starting geo-replication
+  ]
 }]
 
 resource advancedThreatProtection 'Microsoft.Sql/servers/advancedThreatProtectionSettings@2024-05-01-preview' = {
