@@ -260,6 +260,9 @@ module sqlServerNetwork '../../../shared/bicep/network/private-networking-spoke.
     virtualNetworkLinks: secondaryVNetLinks
     subnetId: secondaryPrivateEndpointSubnet.id
   }
+  dependsOn: [
+    secondaryDatabases  // Wait for geo-replication to complete before exposing via private endpoint
+  ]
 }
 
 // ------------------
