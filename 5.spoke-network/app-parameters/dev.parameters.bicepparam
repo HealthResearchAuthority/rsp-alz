@@ -2,6 +2,9 @@ using '../main.application.bicep'
 
 param logAnalyticsWorkspaceId = ''
 
+// SQL Server admin credentials (used for both primary and replica server creation)
+// Note: SQL authentication is disabled by Azure AD-only authentication setting
+// Values are provided by Azure DevOps pipeline variables: $(rspsqladminloginname) and $(rspsqladminphrase)
 param parAdminLogin = ''
 
 param parSqlAdminPhrase = ''
@@ -221,5 +224,31 @@ param harpProjectRecordsQuery = ''
 param bgodatabase= ''
 param bgodatabaseuser = ''
 param bgodatabasepassword = ''
+
+// Failover/DR Configuration
+param parEnableDatabaseFailover = true
+param parSecondaryLocation = 'ukwest'
+
+param parSecondarySpokeNetworks = [
+  {
+    subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'
+    parEnvironment: 'dev'
+    workloadName: 'container-app'
+    zoneRedundancy: false
+    ddosProtectionEnabled: 'Disabled'
+    containerRegistryTier: 'Premium'
+    deploy: false
+    configurePrivateDNS: true
+    devBoxPeering: false
+    rgNetworking: 'rg-rsp-networking-spoke-dev-ukw'
+    vnet: 'vnet-rsp-networking-dev-ukw-spoke'
+    rgapplications: 'rg-rsp-applications-spoke-dev-ukw'
+    rgSharedServices: 'rg-rsp-sharedservices-spoke-dev-ukw'
+    rgStorage: 'rg-rsp-storage-spoke-dev-ukw'
+    deployWebAppSlot: false
+    IDGENV: 'dev'
+    appInsightsConnectionString: ''
+  }
+]
 
 

@@ -201,6 +201,15 @@ param parSqlAuditRetentionDays int = 15
 @description('Spoke Networks Configuration')
 param parSpokeNetworks array
 
+@description('Enable database failover/geo-replication (only for dev, preprod, and prod environments)')
+param parEnableDatabaseFailover bool = false
+
+@description('Secondary region location for DR/failover (e.g., ukwest)')
+param parSecondaryLocation string = ''
+
+@description('Secondary region spoke network configurations for DR/failover')
+param parSecondarySpokeNetworks array = []
+
 @description('Enable Azure Front Door deployment')
 param parEnableFrontDoor bool = true
 
@@ -535,7 +544,7 @@ module networkingnaming '../shared/bicep/naming/naming.module.bicep' = [
 resource existingVnet 'Microsoft.Network/virtualNetworks@2024-03-01' existing = [
   for i in range(0, length(parSpokeNetworks)): {
     name: parSpokeNetworks[i].vnet
-    scope: resourceGroup(parSpokeNetworks[i].rgNetworking)
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgNetworking)
   }
 ]
 
@@ -560,6 +569,7 @@ resource webAppSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-03-01' exi
   }
 ]
 
+// Secondary region VNet ID is constructed directly in the database replica module
 module sharedServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('sharedNamingDeployment-${deployment().name}', 64)
@@ -585,6 +595,30 @@ module storageServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
     }
   }
 ]
+
+// Secondary region resource groups and naming (for DR/failover)
+module secondaryStorageRG '../shared/bicep/resourceGroup.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableDatabaseFailover && length(parSecondarySpokeNetworks) > 0) {
+  name: take('secondaryStorageRG-${deployment().name}-${i}', 64)
+  scope: subscription(parSecondarySpokeNetworks[i].subscriptionId)
+  params: {
+    parLocation: parSecondaryLocation
+    parResourceGroupName: parSecondarySpokeNetworks[i].rgStorage
+  }
+}]
+
+module secondaryStorageServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableDatabaseFailover && length(parSecondarySpokeNetworks) > 0) {
+  name: take('secondaryStorageServicesNaming-${deployment().name}-${i}', 64)
+  scope: resourceGroup(parSecondarySpokeNetworks[i].subscriptionId, parSecondarySpokeNetworks[i].rgStorage)
+  params: {
+    uniqueId: uniqueString(secondaryStorageRG[i].?outputs.outResourceGroupId)
+    environment: parSecondarySpokeNetworks[i].parEnvironment
+    workloadName: 'storage'
+    location: parSecondaryLocation
+  }
+  dependsOn: [
+    secondaryStorageRG
+  ]
+}]
 
 module applicationServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -697,9 +731,21 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
         quarantine: parStorageConfig.quarantine.retention.retentionDays
       }
       storageAccountConfig: {
-        staging: parStorageConfig.staging.account
-        clean: parStorageConfig.clean.account
-        quarantine: parStorageConfig.quarantine.account
+        staging: {
+          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.staging.account.sku
+          accessTier: parStorageConfig.staging.account.accessTier
+          containerName: parStorageConfig.staging.account.containerName
+        }
+        clean: {
+          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.clean.account.sku
+          accessTier: parStorageConfig.clean.account.accessTier
+          containerName: parStorageConfig.clean.account.containerName
+        }
+        quarantine: {
+          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.quarantine.account.sku
+          accessTier: parStorageConfig.quarantine.account.accessTier
+          containerName: parStorageConfig.quarantine.account.containerName
+        }
       }
       networkSecurityConfig: parNetworkSecurityConfig
       cleanStorageEncryption: createStorageEncryptionConfig(
@@ -744,6 +790,39 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       sqlDatabaseSkuConfig: parSkuConfig.sqlDatabase
       enableSqlAdminLogin: parEnableSqlAdminLogin
     }
+  }
+]
+
+// Database replica module for secondary region (only for dev, preprod, and prod when failover is enabled)
+module databaseReplica 'modules/05-database/deploy.database-replica.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): if (parEnableDatabaseFailover && (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod' || parSpokeNetworks[i].parEnvironment == 'dev') && length(parSecondarySpokeNetworks) > i) {
+    name: take('database-replica-${deployment().name}-deployment-${i}', 64)
+    scope: resourceGroup(parSecondarySpokeNetworks[i].subscriptionId, parSecondarySpokeNetworks[i].rgStorage)
+    params: {
+      secondarySqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}replica'
+      secondaryLocation: parSecondaryLocation
+      adminLogin: parAdminLogin
+      adminPassword: parSqlAdminPhrase
+      enableSqlAdminLogin: parEnableSqlAdminLogin
+      primaryDatabaseIds: databaseserver[i].outputs.database_ids
+      databases: ['applicationservice', 'identityservice', 'rtsservice', 'cmsservice', 'harpprojectdata']
+      secondaryVNetId: '/subscriptions/${parSecondarySpokeNetworks[i].subscriptionId}/resourceGroups/${parSecondarySpokeNetworks[i].rgNetworking}/providers/Microsoft.Network/virtualNetworks/${parSecondarySpokeNetworks[i].vnet}'
+      secondaryPrivateEndpointSubnetName: 'snet-pep'
+      sqlServerUAIName: secondaryStorageServicesNaming[i].?outputs.resourcesNames.sqlServerUserAssignedIdentity
+      networkingResourcesNames: {
+        azuresqlserverpep: '${networkingnaming[i].outputs.resourcesNames.azuresqlserverpep}replica'
+      }
+      networkingResourceGroup: parSecondarySpokeNetworks[i].rgNetworking
+      auditRetentionDays: parSqlAuditRetentionDays
+      enableSqlServerAuditing: true
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      sqlDatabaseSkuConfig: parSkuConfig.sqlDatabase
+      tags: tags
+    }
+    dependsOn: [
+      databaseserver[i]
+      secondaryStorageServicesNaming[i]
+    ]
   }
 ]
 
