@@ -31,42 +31,42 @@ stages:
               az bicep version
             displayName: 'Install Bicep CLI'
 
-      - job: FinalWhatIf
-        displayName: 'Run What-If before Deployment'
-        dependsOn: [setup]
-        condition: succeeded()
-        pool:
-          name: rsp-manageddevopspool
-        variables:
-          - group: ${{ parameters.environmentName }}
-        steps:
-          - checkout: self
-          - script: |
-              echo "Installing Azure CLI..."
-              curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
-            displayName: 'Install Azure CLI'
-          - bash: |
-              az bicep install
-              az bicep version
-            displayName: 'Install Bicep CLI'
+      # - job: FinalWhatIf
+      #   displayName: 'Run What-If before Deployment'
+      #   dependsOn: [setup]
+      #   condition: succeeded()
+      #   pool:
+      #     name: rsp-manageddevopspool
+      #   variables:
+      #     - group: ${{ parameters.environmentName }}
+      #   steps:
+      #     - checkout: self
+      #     - script: |
+      #         echo "Installing Azure CLI..."
+      #         curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
+      #       displayName: 'Install Azure CLI'
+      #     - bash: |
+      #         az bicep install
+      #         az bicep version
+      #       displayName: 'Install Bicep CLI'
 
-          - task: AzureCLI@2
-            displayName: 'Final What-If'
-            inputs:
-              azureSubscription: $(${{ parameters.environmentName }})
-              scriptType: bash
-              scriptLocation: inlineScript
-              inlineScript: |
-                az config set bicep.use_binary_from_path=false --only-show-errors
-                az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.network.bicep \
-                  --parameters ./5.spoke-network/network-parameters/${{ parameters.environmentName }}.parameters.bicepparam \
-                              logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
+      #     - task: AzureCLI@2
+      #       displayName: 'Final What-If'
+      #       inputs:
+      #         azureSubscription: $(${{ parameters.environmentName }})
+      #         scriptType: bash
+      #         scriptLocation: inlineScript
+      #         inlineScript: |
+      #           az config set bicep.use_binary_from_path=false --only-show-errors
+      #           az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.network.bicep \
+      #             --parameters ./5.spoke-network/network-parameters/${{ parameters.environmentName }}.parameters.bicepparam \
+      #                         logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
       - deployment: deploy
         displayName: 'Deploy Network'
         pool:
           name: rsp-manageddevopspool
-        dependsOn: [setup, FinalWhatIf]
+        dependsOn: [setup]
         condition: succeeded()
         environment: ${{ parameters.environmentName }}
         variables:
