@@ -690,7 +690,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
       overrideSubscriptionLevelSettings: parOverrideSubscriptionLevelSettings
       logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
       enableEventGridIntegration: true
-      enableEventGridSubscriptions: false // Set to true only after Function App code is deployed and webhook endpoint is ready
+      enableEventGridSubscriptions: true // Set to true only after Function App code is deployed and webhook endpoint is ready
       retentionPolicyDays: {
         staging: parStorageConfig.staging.retention.retentionDays
         clean: parStorageConfig.clean.retention.retentionDays
