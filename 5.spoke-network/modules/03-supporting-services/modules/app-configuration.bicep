@@ -395,6 +395,12 @@ var featureFlags = [
     enabled: true
   }
   {
+    id: 'Modifications.RevisionAndAuthorisation'
+    description: 'If this flag is enabled, allows revision request or revise and authorise modifications'
+    label: null
+    enabled: false
+  }
+  {
     id: 'UX.MyResearchPage'
     description: 'If this flag is enabled, show projects added to new service in my research dashboard'
     label: 'portal'
