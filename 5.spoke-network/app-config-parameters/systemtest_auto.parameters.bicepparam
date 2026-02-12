@@ -8,17 +8,4 @@ param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-systemtestau
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-ryefn-automationtest-uks'
 
-param parAppConfigurationValues = [
-  {
-    key: 'AppSettings:ProjectRecordValidationScopes'
-    label: 'portal'
-    value: 'api://a858e7ac-b7f5-4fc6-b993-ebd3c7082a17'
-    contentType: 'text/plain'
-  }
-  {
-    key: 'AppSettings:ProjectRecordValidationUri'
-    label: 'portal'
-    value: 'https://func-validate-irasid-automationtest.azurewebsites.net/api'
-    contentType: 'text/plain'
-  }
-]
+param parAppConfigurationValues = []
