@@ -1040,7 +1040,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
       spokeVNetId: existingVnet[i].id
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
       kind: 'functionapp'
-      storageAccountName: 'stnotify${parSpokeNetworks[i].parEnvironment}'
+      storageAccountName: 'stntfy${parSpokeNetworks[i].parEnvironment}'
       deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
