@@ -253,6 +253,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
       stagingStorageAccountKeySecretUri: keyVaultSecrets.outputs.stagingStorageAccountKeySecretUri
       quarantineStorageAccountKeySecretUri: keyVaultSecrets.outputs.quarantineStorageAccountKeySecretUri
       cleanStorageAccountKeySecretUri: keyVaultSecrets.outputs.cleanStorageAccountKeySecretUri
+      projectRecordValidationFunctionKey: keyVaultSecrets.outputs.projectRecordValidationFunctionKey
     }
     documentStorageAccounts: documentStorageAccounts
     parMicrosoftEntraAuthority: parMicrosoftEntraAuthority
