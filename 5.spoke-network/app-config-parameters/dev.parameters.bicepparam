@@ -17,15 +17,9 @@ param parAppConfigurationValues = [
   //   contentType: null
   // }
   {
-    key: 'AppSettings:ProjectRecordValidationScopes'
-    label: 'portal'
-    value: 'api://2032f90d-d672-4ea3-9116-acd0cf20d4e3'
-    contentType: 'text/plain'
-  }
-  {
-    key: 'AppSettings:ProjectRecordValidationUri'
-    label: 'portal'
-    value: 'https://func-validate-irasid-dev.azurewebsites.net/api'
+    key: 'AppSettings:ManagedIdentityRtsClientID'
+    label: ''
+    value: '056ae900-5905-45e7-ae2c-a67764b5c9e2'
     contentType: 'text/plain'
   }
 ]
