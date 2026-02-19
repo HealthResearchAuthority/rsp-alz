@@ -412,6 +412,146 @@ var featureFlags = [
     label: 'portal'
     enabled: useFrontDoor
   }
+  {
+    id: 'Modifications.RevisionAndAuthorisation'
+    enabled: true
+    description: 'When enabled, additional options for `Revise and authorise` and `Request for revision` will be available for a sponsor when authorising the modifications.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'Modifications.ParticipatingOrganisations'
+    enabled: true
+    description: 'When enabled participating organisations feature will be available.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'Modifications.DownloadPack'
+    enabled: true
+    description: 'When enabled, the download pack option will be available for modifications.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'Modifications.SupersedingDocuments'
+    enabled: true
+    description: 'When enabled, the superseding documents feature will be available for modifications.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'Modifications.Withdraw'
+    enabled: true
+    description: 'When enabled, the withdraw option will be available for modifications.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'ProjectOverview.BackButton'
+    enabled: true
+    description: 'When enabled, the back button will be available on the project overview page.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'Modifications.RequestForInformation'
+    enabled: true
+    description: 'When enabled, the request for information option will be available for sponsor authorisation.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
 ]
 
 var privateDnsZoneNames = 'privatelink.azconfig.io'
@@ -482,14 +622,14 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
       privateLinkDelegation: 'Enabled'
     }
     encryption: appConfigEncryptionConfig.enabled && !empty(keyVaultId) ? {
-      keyVaultProperties: {
-        identityClientId: appConfigurationUserAssignedIdentity.properties.clientId
-        keyIdentifier: appConfigEncryptionKey!.outputs.keyUri
-      }
+          keyVaultProperties: {
+            identityClientId: appConfigurationUserAssignedIdentity.properties.clientId
+            keyIdentifier: appConfigEncryptionKey!.outputs.keyUri
+          }
     } : null
   }
   dependsOn: appConfigEncryptionConfig.enabled && !empty(keyVaultId) ? [
-    appConfigEncryptionKey
+        appConfigEncryptionKey
   ] : []
 }
 

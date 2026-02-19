@@ -24,6 +24,9 @@ param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 15
 
+// Enable SQL authentication for systemtest_auto environment
+param parEnableSqlAdminLogin = true
+
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
 param parFrontDoorWafMode = 'Detection'
@@ -36,7 +39,7 @@ param parEnableFrontDoorPrivateLinkForIRAS = true
 param parEnableFrontDoorPrivateLinkForCMS = true
 param parEnableFunctionAppPrivateEndpoints = true
 param parEnableKeyVaultPrivateEndpoints = true
-param parEnableAppConfigPrivateEndpoints = false
+param parEnableAppConfigPrivateEndpoints = true
 param parFrontDoorCustomDomains = []
 
 // ValidateIRASID Function Authentication Configuration
