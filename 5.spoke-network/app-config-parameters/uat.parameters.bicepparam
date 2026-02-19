@@ -8,17 +8,21 @@ param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-uat-uks'
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-p2ntz-uat-uks'
 
+// Values for ProjectRecordValidationScopes and ProjectRecordValidationUri are passed from Azure DevOps variable group
+param parProjectRecordValidationScopes = ''
+param parProjectRecordValidationUri = ''
+
 param parAppConfigurationValues = [
   {
     key: 'AppSettings:ProjectRecordValidationScopes'
     label: 'portal'
-    value: 'api://[YOUR-UAT-CLIENT-ID]'
+    value: parProjectRecordValidationScopes
     contentType: 'text/plain'
   }
   {
     key: 'AppSettings:ProjectRecordValidationUri'
     label: 'portal'
-    value: 'https://func-validate-irasid-uat.azurewebsites.net/api'
+    value: parProjectRecordValidationUri
     contentType: 'text/plain'
   }
 ]

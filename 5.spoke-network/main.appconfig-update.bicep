@@ -47,6 +47,14 @@ param parNamingWorkloadName string = 'shared'
 @description('List of App Configuration key-values to upsert.')
 param parAppConfigurationValues appConfigurationKeyValue[] = []
 
+@description('ProjectRecordValidationScopes value (sourced from Azure DevOps variable group).')
+#disable-next-line no-unused-params
+param parProjectRecordValidationScopes string
+
+@description('ProjectRecordValidationUri value (sourced from Azure DevOps variable group).')
+#disable-next-line no-unused-params
+param parProjectRecordValidationUri string
+
 // ------------------
 // MODULES
 // ------------------

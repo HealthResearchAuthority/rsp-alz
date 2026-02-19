@@ -8,17 +8,21 @@ param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-prod-uks'
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-67jvv-prod-uks'
 
+// Values for ProjectRecordValidationScopes and ProjectRecordValidationUri are passed from Azure DevOps variable group
+param parProjectRecordValidationScopes = ''
+param parProjectRecordValidationUri = ''
+
 param parAppConfigurationValues = [
   {
     key: 'AppSettings:ProjectRecordValidationScopes'
     label: 'portal'
-    value: 'api://[YOUR-PRODUCTION-CLIENT-ID]'
+    value: parProjectRecordValidationScopes
     contentType: 'text/plain'
   }
   {
     key: 'AppSettings:ProjectRecordValidationUri'
     label: 'portal'
-    value: 'https://func-validate-irasid-prod.azurewebsites.net/api'
+    value: parProjectRecordValidationUri
     contentType: 'text/plain'
   }
 ]

@@ -85,7 +85,9 @@ stages:
                 az deployment sub validate --name "AppConfig-$(Build.BuildId)" \
                   --location $(location) \
                   --template-file ./5.spoke-network/main.appconfig-update.bicep \
-                  --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam
+                  --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam \
+                  --parameters parProjectRecordValidationScopes='$(ProjectRecordValidationScopes)' \
+                  --parameters parProjectRecordValidationUri='$(ProjectRecordValidationUri)'
 
       - job: preview
         displayName: 'Preview App Configuration Changes'
@@ -117,7 +119,9 @@ stages:
               inlineScript: |
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.appconfig-update.bicep \
-                  --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam
+                  --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam \
+                  --parameters parProjectRecordValidationScopes='$(ProjectRecordValidationScopes)' \
+                  --parameters parProjectRecordValidationUri='$(ProjectRecordValidationUri)'
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment of App Configuration'
@@ -160,4 +164,6 @@ stages:
                       az deployment sub create --name "AppConfig-Deploy-$(Build.BuildId)" \
                         --location $(location) \
                         --template-file ./5.spoke-network/main.appconfig-update.bicep \
-                        --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam
+                        --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam \
+                        --parameters parProjectRecordValidationScopes='$(ProjectRecordValidationScopes)' \
+                        --parameters parProjectRecordValidationUri='$(ProjectRecordValidationUri)'

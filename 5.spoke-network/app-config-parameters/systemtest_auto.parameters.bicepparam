@@ -8,17 +8,21 @@ param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-systemtestau
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-ryefn-automationtest-uks'
 
+// Values for ProjectRecordValidationScopes and ProjectRecordValidationUri are passed from Azure DevOps variable group
+param parProjectRecordValidationScopes = ''
+param parProjectRecordValidationUri = ''
+
 param parAppConfigurationValues = [
   {
     key: 'AppSettings:ProjectRecordValidationScopes'
     label: 'portal'
-    value: 'api://a858e7ac-b7f5-4fc6-b993-ebd3c7082a17'
+    value: parProjectRecordValidationScopes
     contentType: 'text/plain'
   }
   {
     key: 'AppSettings:ProjectRecordValidationUri'
     label: 'portal'
-    value: 'https://func-validate-irasid-automationtest.azurewebsites.net/api'
+    value: parProjectRecordValidationUri
     contentType: 'text/plain'
   }
 ]
