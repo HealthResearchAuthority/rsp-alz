@@ -39,7 +39,7 @@ param parEnableFrontDoorPrivateLinkForIRAS = true
 param parEnableFrontDoorPrivateLinkForCMS = true
 param parEnableFunctionAppPrivateEndpoints = true
 param parEnableKeyVaultPrivateEndpoints = true
-param parEnableAppConfigPrivateEndpoints = false
+param parEnableAppConfigPrivateEndpoints = true
 param parFrontDoorCustomDomains = []
 
 // ValidateIRASID Function Authentication Configuration
