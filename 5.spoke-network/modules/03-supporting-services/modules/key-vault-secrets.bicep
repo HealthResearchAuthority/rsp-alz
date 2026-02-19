@@ -105,25 +105,6 @@ resource storageSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' =
   }
 ]
 
-var validationFunctionSecrets = [
-  {
-    name: 'projectRecordValidationFunctionKey'
-    value: 'placeholder-project-record-validation-function-key-to-be-updated-manually'
-  }
-]
-
-resource validationFunctionSecretResources 'Microsoft.KeyVault/vaults/secrets@2022-07-01' = [
-  for secret in validationFunctionSecrets: if (createSecretsWithPlaceholders) {
-    parent: keyVault
-    name: secret.name
-    tags: tags
-    properties: {
-      value: secret.value
-      contentType: 'text/plain'
-    }
-  }
-]
-
 // ------------------
 //    OUTPUTS
 // ------------------
@@ -160,6 +141,3 @@ output quarantineStorageAccountKeySecretUri string = '${keyVault.properties.vaul
 
 @description('Key Vault URI for cleanStorageAccountKey secret.')
 output cleanStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/cleanStorageAccountKey'
-
-@description('Key Vault URI for projectRecordValidationFunctionKey secret.')
-output projectRecordValidationFunctionKey string = '${keyVault.properties.vaultUri}secrets/projectRecordValidationFunctionKey'
