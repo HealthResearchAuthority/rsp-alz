@@ -12,7 +12,7 @@ param parAppConfigurationValues = [
   {
     key: 'AppSettings:ProjectRecordValidationScopes'
     label: 'portal'
-    value: 'api://[YOUR-SYSTEMTEST-MANUAL-CLIENT-ID]'
+    value: 'api://ca77020d-4001-42a6-9d4a-505b9d1f7572'
     contentType: 'text/plain'
   }
   {
