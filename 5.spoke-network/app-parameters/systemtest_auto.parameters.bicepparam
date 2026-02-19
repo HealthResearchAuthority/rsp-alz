@@ -228,7 +228,7 @@ param bgodatabaseuser = ''
 param bgodatabasepassword = ''
 
 // Failover/DR Configuration
-param parEnableDatabaseFailover = true
+param parEnableDatabaseFailover = false
 param parSecondaryLocation = 'ukwest'
 
 param parSecondarySpokeNetworks = [
