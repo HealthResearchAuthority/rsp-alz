@@ -8,18 +8,14 @@ param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-dev-uks'
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-2i2oq-dev-uks'
 
+// Value for ManagedIdentityRtsClientID is passed from Azure DevOps variable group
+param parManagedIdentityRtsClientID = ''
+
 param parAppConfigurationValues = [
-  // Example:
-  // {
-  //   key: 'AppSettings:RtsApiBaseUrl'
-  //   label: ''
-  //   value: 'https://api-rts-dev.example.com'
-  //   contentType: null
-  // }
   {
     key: 'AppSettings:ManagedIdentityRtsClientID'
     label: ''
-    value: '056ae900-5905-45e7-ae2c-a67764b5c9e2'
+    value: parManagedIdentityRtsClientID
     contentType: 'text/plain'
   }
 ]

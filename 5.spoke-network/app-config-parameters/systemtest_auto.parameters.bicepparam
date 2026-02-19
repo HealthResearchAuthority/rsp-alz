@@ -8,11 +8,14 @@ param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-systemtestau
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-ryefn-automationtest-uks'
 
+// Value for ManagedIdentityRtsClientID is passed from Azure DevOps variable group
+param parManagedIdentityRtsClientID = ''
+
 param parAppConfigurationValues = [
   {
     key: 'AppSettings:ManagedIdentityRtsClientID'
     label: ''
-    value: '47626cc0-009a-4f48-94d7-b0160145eff8'
+    value: parManagedIdentityRtsClientID
     contentType: 'text/plain'
   }
 ]
