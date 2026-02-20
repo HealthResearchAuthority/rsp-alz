@@ -11,11 +11,27 @@ param parAppConfigurationStoreName = 'appcs-rsp-shared-2i2oq-dev-uks'
 // Value for ManagedIdentityRtsClientID is passed from Azure DevOps variable group
 param parManagedIdentityRtsClientID = ''
 
+// Values for ProjectRecordValidationScopes and ProjectRecordValidationUri are passed from Azure DevOps variable group
+param parProjectRecordValidationScopes = ''
+param parProjectRecordValidationUri = ''
+
 param parAppConfigurationValues = [
   {
     key: 'AppSettings:ManagedIdentityRtsClientID'
     label: ''
     value: parManagedIdentityRtsClientID
+    contentType: 'text/plain'
+  }
+  {
+    key: 'AppSettings:ProjectRecordValidationScopes'
+    label: 'portal'
+    value: parProjectRecordValidationScopes
+    contentType: 'text/plain'
+  }
+  {
+    key: 'AppSettings:ProjectRecordValidationUri'
+    label: 'portal'
+    value: parProjectRecordValidationUri
     contentType: 'text/plain'
   }
 ]
