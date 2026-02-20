@@ -226,3 +226,29 @@ param harpProjectRecordsQuery = ''
 param bgodatabase= ''
 param bgodatabaseuser = ''
 param bgodatabasepassword = ''
+
+// Failover/DR Configuration
+param parEnableDatabaseFailover = false
+param parSecondaryLocation = 'ukwest'
+
+param parSecondarySpokeNetworks = [
+  {
+    subscriptionId: 'e1a1a4ff-2db5-4de3-b7e5-6d51413f6390'
+    parEnvironment: 'uat'
+    workloadName: 'container-app'
+    zoneRedundancy: true
+    ddosProtectionEnabled: 'Disabled'
+    containerRegistryTier: 'Premium'
+    deploy: false
+    configurePrivateDNS: true
+    devBoxPeering: false
+    rgNetworking: 'rg-rsp-networking-spoke-uat-ukw'
+    vnet: 'vnet-rsp-networking-uat-ukw-spoke'
+    rgapplications: 'rg-rsp-applications-spoke-uat-ukw'
+    rgSharedServices: 'rg-rsp-sharedservices-spoke-uat-ukw'
+    rgStorage: 'rg-rsp-storage-spoke-uat-ukw'
+    deployWebAppSlot: false
+    IDGENV: 'uat'
+    appInsightsConnectionString: ''
+  }
+]

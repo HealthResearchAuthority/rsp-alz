@@ -8,11 +8,18 @@ param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-preprod-uks'
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-psz73-preprod-uks'
 
-// Values for ProjectRecordValidationScopes and ProjectRecordValidationUri are passed from Azure DevOps variable group
+// Values are passed from Azure DevOps variable group
+param parManagedIdentityRtsClientID = ''
 param parProjectRecordValidationScopes = ''
 param parProjectRecordValidationUri = ''
 
 param parAppConfigurationValues = [
+  {
+    key: 'AppSettings:ManagedIdentityRtsClientID'
+    label: ''
+    value: parManagedIdentityRtsClientID
+    contentType: 'text/plain'
+  }
   {
     key: 'AppSettings:ProjectRecordValidationScopes'
     label: 'portal'
@@ -26,3 +33,5 @@ param parAppConfigurationValues = [
     contentType: 'text/plain'
   }
 ]
+
+

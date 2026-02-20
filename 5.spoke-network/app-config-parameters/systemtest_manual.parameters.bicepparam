@@ -1,6 +1,6 @@
 using '../main.appconfig-update.bicep'
 
-param parEnvironment = 'systemtest_manual'
+param parEnvironment = 'manualtest'
 
 param parSharedServicesSubscriptionId = '66482e26-764b-4717-ae2f-fab6b8dd1379'
 
@@ -8,11 +8,18 @@ param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-systemtest-u
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-rwcwe-manualtest-uks'
 
-// Values for ProjectRecordValidationScopes and ProjectRecordValidationUri are passed from Azure DevOps variable group
+// Values are passed from Azure DevOps variable group
+param parManagedIdentityRtsClientID = ''
 param parProjectRecordValidationScopes = ''
 param parProjectRecordValidationUri = ''
 
 param parAppConfigurationValues = [
+  {
+    key: 'AppSettings:ManagedIdentityRtsClientID'
+    label: ''
+    value: parManagedIdentityRtsClientID
+    contentType: 'text/plain'
+  }
   {
     key: 'AppSettings:ProjectRecordValidationScopes'
     label: 'portal'
