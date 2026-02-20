@@ -5,7 +5,8 @@ targetScope = 'resourceGroup'
 // ------------------
 
 param sqlServerName string = 'sql-rsp-dev-uks'
-param adminLogin string = ''
+@minLength(1)
+param adminLogin string
 @secure()
 param adminPassword string
 
@@ -104,8 +105,8 @@ resource SQL_Server 'Microsoft.Sql/servers@2024-05-01-preview' = {
     }
   }
   properties: {
-    administratorLogin: enableSqlAdminLogin ? adminLogin : null
-    administratorLoginPassword: enableSqlAdminLogin ? adminPassword : null
+    administratorLogin: adminLogin
+    administratorLoginPassword: adminPassword
     publicNetworkAccess: 'Disabled'
     primaryUserAssignedIdentityId: sqlServerUserAssignedIdentity.id
   }

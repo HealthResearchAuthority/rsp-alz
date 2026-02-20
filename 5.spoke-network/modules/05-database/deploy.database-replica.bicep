@@ -11,7 +11,8 @@ param secondarySqlServerName string
 param secondaryLocation string = resourceGroup().location
 
 @description('Admin login for SQL Server (must match primary)')
-param adminLogin string = ''
+@minLength(1)
+param adminLogin string
 
 @secure()
 @description('Admin password for SQL Server (must match primary)')
@@ -117,8 +118,8 @@ resource SecondarySQL_Server 'Microsoft.Sql/servers@2024-05-01-preview' = {
     }
   }
   properties: {
-    administratorLogin: enableSqlAdminLogin ? adminLogin : null
-    administratorLoginPassword: enableSqlAdminLogin ? adminPassword : null
+    administratorLogin: adminLogin
+    administratorLoginPassword: adminPassword
     publicNetworkAccess: 'Disabled'
     primaryUserAssignedIdentityId: sqlServerUserAssignedIdentity.id
   }
