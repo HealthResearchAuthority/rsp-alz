@@ -287,18 +287,21 @@ module processScanFunctionIdentity '../../../shared/bicep/managed-identity.bicep
   }
 }
 
-// module serviceBus './modules/service-bus.module.bicep' = {
-//   name: 'serviceBus-${uniqueString(resourceGroup().id)}'
-//   params: {
-//     serviceBusNamespaceName: resourcesNames.serviceBus
-//     serviceBusPrivateEndpointName: resourcesNames.serviceBusPep
-//     serviceBusReceiverUserAssignedIdentityName: resourcesNames.serviceBusReceiverUserAssignedIdentity
-//     serviceBusSenderUserAssignedIdentityName: resourcesNames.serviceBusSenderUserAssignedIdentity
-//     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
-//     spokeVNetId: spokeVNetId
-//     diagnosticWorkspaceId: logAnalyticsWorkspaceId
-//   }
-// }
+module serviceBus './modules/service-bus.module.bicep' = {
+  name: 'serviceBus-${uniqueString(resourceGroup().id)}'
+  params: {
+    serviceBusNamespaceName: resourcesNames.serviceBus
+    serviceBusPrivateEndpointName: resourcesNames.serviceBusPep
+    serviceBusReceiverUserAssignedIdentityName: resourcesNames.serviceBusReceiverUserAssignedIdentity
+    serviceBusSenderUserAssignedIdentityName: resourcesNames.serviceBusSenderUserAssignedIdentity
+    spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
+    spokeVNetId: spokeVNetId
+    diagnosticWorkspaceId: logAnalyticsWorkspaceId
+    deployZoneRedundantResources: deployZoneRedundantResources
+    location: location
+    tags: tags
+  }
+}
 
 // ------------------
 // OUTPUTS
@@ -340,5 +343,11 @@ output processScanFunctionUserAssignedIdentityId string = processScanFunctionIde
 @description('The principal ID of the user-assigned managed identity for the Process Scan Function App.')
 output processScanFunctionUserAssignedIdentityPrincipalId string = processScanFunctionIdentity.outputs.principalId
 
-// output serviceBusReceiverManagedIdentityID string = serviceBus.outputs.serviceBusReceiverManagedIdentityId
-// output serviceBusSenderManagedIdentity string = serviceBus.outputs.serviceBusSenderManagedIdentityId
+@description('The resource ID of the Service Bus namespace.')
+output serviceBusId string = serviceBus.outputs.serviceBusId
+
+@description('The resource ID of the user-assigned managed identity for receiving messages from Service Bus.')
+output serviceBusReceiverManagedIdentityID string = serviceBus.outputs.serviceBusReceiverManagedIdentityId
+
+@description('The resource ID of the user-assigned managed identity for sending messages to Service Bus.')
+output serviceBusSenderManagedIdentityId string = serviceBus.outputs.serviceBusSenderManagedIdentityId
