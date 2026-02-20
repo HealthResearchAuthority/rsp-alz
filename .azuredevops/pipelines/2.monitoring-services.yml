@@ -20,7 +20,6 @@ parameters:
       - dev
       - systemtest_manual
       - systemtest_auto
-      - systemtest_int
       - uat
       - pre_prod
       - production
