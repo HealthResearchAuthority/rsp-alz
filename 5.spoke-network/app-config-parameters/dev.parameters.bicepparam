@@ -16,13 +16,6 @@ param parProjectRecordValidationScopes = ''
 param parProjectRecordValidationUri = ''
 
 param parAppConfigurationValues = [
-  // Example:
-  // {
-  //   key: 'AppSettings:RtsApiBaseUrl'
-  //   label: ''
-  //   value: 'https://api-rts-dev.example.com'
-  //   contentType: null
-  // }
   {
     key: 'AppSettings:ManagedIdentityRtsClientID'
     label: ''
