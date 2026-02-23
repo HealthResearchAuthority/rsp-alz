@@ -121,6 +121,12 @@ resource storage 'Microsoft.Storage/storageAccounts@2023-05-01' = {
         file: {
           enabled: true
         }
+        queue: {
+          enabled: true
+        }
+        table: {
+          enabled: true
+        }
       }
       keyvaultproperties: {
         keyname: keyName
