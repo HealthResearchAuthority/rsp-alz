@@ -206,14 +206,6 @@ param parRtsApiBaseUrl = ''
 
 param parRtsAuthApiBaseUrl = ''
 
-param parCleanStorageAccountKey = ''
-param parStagingStorageAccountKey = ''
-param parQuarantineStorageAccountKey = ''
-param parCleanStorageAccountName = ''
-param parStagingStorageAccountName = ''
-param parQuarantineStorageAccountName = ''
-
-
 param parMicrosoftEntraAuthority = ''
 param parMicrosoftEntraAudience = '' 
 param processDocuUploadManagedIdentityClientId =  ''

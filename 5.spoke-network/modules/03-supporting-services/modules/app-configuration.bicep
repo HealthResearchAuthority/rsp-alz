@@ -99,8 +99,8 @@ param parMicrosoftEntraAudience string
 
 param parMicrosoftEntraAuthority string
 
-@description('Key Vault secret URIs for OneLogin integration')
-param documentStorageAccounts object
+@description('Environment name for constructing storage account names')
+param environment string
 
 @description('SQL query for retrieving HARP project records')
 param harpProjectRecordsQuery string
@@ -341,18 +341,18 @@ var keyValues = [
     contentType: null
   }
   {
-    name: 'AppSettings:DocumentStorage:StagingBlobConnectionString'
-    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.stagingStorageAccountName};AccountKey=${documentStorageAccounts.stagingStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
+    name: 'AppSettings:DocumentStorage:StagingBlobServiceUri'
+    value: 'https://strspstagng${environment}.blob.${az.environment().suffixes.storage}/'
     contentType: null
   }
   {
-    name: 'AppSettings:DocumentStorage:QuarantineBlobConnectionString'
-    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.quarantineStorageAccountName};AccountKey=${documentStorageAccounts.quarantineStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
+    name: 'AppSettings:DocumentStorage:QuarantineBlobServiceUri'
+    value: 'https://strspquar${environment}.blob.${az.environment().suffixes.storage}/'
     contentType: null
   }
   {
-    name: 'AppSettings:DocumentStorage:CleanBlobConnectionString'
-    value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=${documentStorageAccounts.cleanStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
+    name: 'AppSettings:DocumentStorage:CleanBlobServiceUri'
+    value: 'https://strspclean${environment}.blob.${az.environment().suffixes.storage}/'
     contentType: null
   }
 ]

@@ -169,6 +169,7 @@ module storageAccount '../../../../shared/bicep/storage/storage-with-encryption.
     kind: storageConfig.?kind ?? 'StorageV2'
     sku: storageConfig.sku
     accessTier: storageConfig.accessTier
+    allowSharedKeyAccess: false
     supportsHttpsTrafficOnly: effectiveNetworkSecurity.httpsTrafficOnly
     networkAcls: {
       defaultAction: effectiveNetworkSecurity.defaultAction
