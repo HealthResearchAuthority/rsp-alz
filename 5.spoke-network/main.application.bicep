@@ -731,21 +731,9 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
         quarantine: parStorageConfig.quarantine.retention.retentionDays
       }
       storageAccountConfig: {
-        staging: {
-          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.staging.account.sku
-          accessTier: parStorageConfig.staging.account.accessTier
-          containerName: parStorageConfig.staging.account.containerName
-        }
-        clean: {
-          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.clean.account.sku
-          accessTier: parStorageConfig.clean.account.accessTier
-          containerName: parStorageConfig.clean.account.containerName
-        }
-        quarantine: {
-          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.quarantine.account.sku
-          accessTier: parStorageConfig.quarantine.account.accessTier
-          containerName: parStorageConfig.quarantine.account.containerName
-        }
+        staging: parStorageConfig.staging.account
+        clean: parStorageConfig.clean.account
+        quarantine: parStorageConfig.quarantine.account
       }
       networkSecurityConfig: parNetworkSecurityConfig
       cleanStorageEncryption: createStorageEncryptionConfig(

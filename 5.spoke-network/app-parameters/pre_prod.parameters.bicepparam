@@ -82,7 +82,7 @@ param parStorageConfig = {
   }
   staging: {
     account: {
-      sku: 'Standard_LRS'
+      sku: 'Standard_GRS'
       accessTier: 'Hot'
       containerName: 'staging'
     }
