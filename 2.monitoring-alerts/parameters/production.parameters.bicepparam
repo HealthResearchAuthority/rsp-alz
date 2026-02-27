@@ -5,9 +5,9 @@ using '../main.bicep'
 // ------------------
 
 param location = 'uksouth'
-param environment = 'uat'
+param environment = 'prod'
 param organizationPrefix = 'hra'
-param monitoringResourceGroupName = 'rg-hra-monitoring-uat'
+param monitoringResourceGroupName = 'rg-hra-monitoring-prod'
 
 
 // ------------------
@@ -49,25 +49,23 @@ param adminEmailRecipients = [
   }
 ]
 
-param enableWebhookAg = false
-param enableLogicAppAg = false
+param enableWebhookAg = true
+param enableLogicAppAg = true
 param webhookUrl = ''
 param logAnalyticsWorkspaceId = ''
-param enableAllErrorsAlert = false
+param enableAllErrorsAlert = true
 
 param teamsGroupId = ''
 param teamsChannelId = ''
 param teamsApiConnectionId = ''
 param teamsConnectionId = ''
 
+
 // ------------------
 // TAGS
 // ------------------
 
 param tags = {
-  Environment: 'Development'
-  // Owner: 'Platform Team'
-  // CostCenter: 'IT Operations'
-  // Project: 'Azure Landing Zone'
+  Environment: 'Prod'
   Purpose: 'Monitoring and Alerting'
 }

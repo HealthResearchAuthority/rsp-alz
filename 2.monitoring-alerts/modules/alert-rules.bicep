@@ -40,6 +40,10 @@ var defaultTags = union(tags, {
   Purpose: 'Activity Log Monitoring'
 })
 
+var deploySecurity = enableSecurityAlerts && contains(actionGroups, 'security') && !empty(actionGroups.security)
+var deployPolicy = enablePolicyAlerts && contains(actionGroups, 'policy') && !empty(actionGroups.policy)
+var deployAdmin = enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin)
+
 // ------------------
 // SECURITY ALERT RULES
 // ------------------
@@ -50,7 +54,7 @@ module securityOperationsAlerts '../../shared/bicep/monitoring/activity-log-aler
   params: {
     alertRuleName: alertRuleNames.security.securityOperations
     alertDescription: 'Alert on security policy and solution operations'
-    enabled: true
+    enabled: false
     actionGroupIds: [actionGroups.security.id]
     scopes: [subscriptionScope]
     category: 'Administrative'
@@ -74,7 +78,7 @@ module policyOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.
   params: {
     alertRuleName: alertRuleNames.policy.policyOperations
     alertDescription: 'Alert on policy assignment operations'
-    enabled: true
+    enabled: false
     actionGroupIds: [actionGroups.policy.id]
     scopes: [subscriptionScope]
     category: 'Administrative'
@@ -82,6 +86,7 @@ module policyOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.
       'Microsoft.Authorization/policyAssignments/write'
       'Microsoft.Authorization/policyAssignments/delete'
     ]
+    level: contains(alertSeverityLevels, 0) ? 'Critical' : contains(alertSeverityLevels, 1) ? 'Error' : 'Warning'
     tags: defaultTags
   }
 }
@@ -96,7 +101,7 @@ module adminOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.b
   params: {
     alertRuleName: alertRuleNames.admin.adminOperations
     alertDescription: 'Alert on SQL firewall rules and NSG operations'
-    enabled: true
+    enabled:false
     actionGroupIds: [actionGroups.admin.id]
     scopes: [subscriptionScope]
     category: 'Administrative'
@@ -112,6 +117,7 @@ module adminOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.b
       'Microsoft.ClassicNetwork/networkSecurityGroups/securityRules/write'
       'Microsoft.ClassicNetwork/networkSecurityGroups/securityRules/delete'
     ]
+    level: contains(alertSeverityLevels, 0) ? 'Critical' : contains(alertSeverityLevels, 1) ? 'Error' : 'Warning'
     tags: defaultTags
   }
 }
@@ -123,12 +129,12 @@ module adminOperationsAlerts '../../shared/bicep/monitoring/activity-log-alert.b
 @description('Alert rule resource IDs')
 output alertRuleIds object = {
   security: {
-    securityOperations: enableSecurityAlerts && contains(actionGroups, 'security') && !empty(actionGroups.security) ? securityOperationsAlerts.outputs.activityLogAlertId : ''
+    securityOperations: deploySecurity ? resourceId('Microsoft.Insights/activityLogAlerts', alertRuleNames.security.securityOperations) : ''
   }
   policy: {
-    policyOperations: enablePolicyAlerts && contains(actionGroups, 'policy') && !empty(actionGroups.policy) ? policyOperationsAlerts.outputs.activityLogAlertId : ''
+    policyOperations: deployPolicy ? resourceId('Microsoft.Insights/activityLogAlerts', alertRuleNames.policy.policyOperations) : ''
   }
   admin: {
-    adminOperations: enableAdminAlerts && contains(actionGroups, 'admin') && !empty(actionGroups.admin) ? adminOperationsAlerts.outputs.activityLogAlertId : ''
+    adminOperations: deployAdmin ? resourceId('Microsoft.Insights/activityLogAlerts', alertRuleNames.admin.adminOperations) : ''
   }
 }
