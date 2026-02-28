@@ -1089,6 +1089,41 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
+module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('fnNotifyApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: parSkuConfig.appServicePlan.functionApp
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: 'asp-rsp-fnnotify-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'func-notify-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Windows'
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stntfy${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
+      ]
+    }
+    dependsOn: [
+      webApp
+      umbracoCMS
+      processScanFnApp
+      rtsfnApp
+      documentUpload
+    ]
+  }
+]
+
 module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)

@@ -48,7 +48,7 @@ var spokeVNetName = spokeVNetIdTokens[8]
 
 var serviceBusDataReceiverRoleGuid='4f6d3b9b-027b-4f4c-9142-0e5a2a2247e0'
 var serviceBusDataSenderRoleGuid='69a216fc-b8fb-44d8-bc22-1f3c2cd27a39'
-var queuename = 'sendEmail'
+var queuename = 'notificationqueue'
 
 var spokeVNetLinks = [
   {
