@@ -24,8 +24,9 @@ param parOneLoginIssuers = ['https://oidc.account.gov.uk/']
 
 param parSqlAuditRetentionDays = 30
 
-// Disable SQL authentication - use Azure AD only
-param parEnableSqlAdminLogin = false
+// Temporarily enable SQL authentication for initial replica creation
+// Will be set back to false after replica is created
+param parEnableSqlAdminLogin = true
 
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
