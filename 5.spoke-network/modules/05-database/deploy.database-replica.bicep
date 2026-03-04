@@ -10,11 +10,12 @@ param secondarySqlServerName string
 @description('The location where the secondary resources will be created (secondary region).')
 param secondaryLocation string = resourceGroup().location
 
-@description('Admin login for SQL Server (must match primary)')
-param adminLogin string = ''
+@description('Admin login for SQL Server (required for replica creation)')
+@minLength(1)
+param adminLogin string
 
 @secure()
-@description('Admin password for SQL Server (must match primary)')
+@description('Admin password for SQL Server (required for replica creation)')
 param adminPassword string
 
 @description('Enable or disable SQL Server password authentication (default: false)')
@@ -117,8 +118,11 @@ resource SecondarySQL_Server 'Microsoft.Sql/servers@2024-05-01-preview' = {
     }
   }
   properties: {
-    administratorLogin: enableSqlAdminLogin ? adminLogin : null
-    administratorLoginPassword: enableSqlAdminLogin ? adminPassword : null
+    // TEMPORARY: Always provide credentials for initial replica creation
+    // The azureADOnlyAuth resource will disable SQL auth after creation
+    // Revert to conditional logic after first successful deployment
+    administratorLogin: adminLogin
+    administratorLoginPassword: adminPassword
     publicNetworkAccess: 'Disabled'
     primaryUserAssignedIdentityId: sqlServerUserAssignedIdentity.id
   }
