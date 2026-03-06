@@ -51,6 +51,10 @@ param parAppConfigurationValues appConfigurationKeyValue[] = []
 #disable-next-line no-unused-params
 param parManagedIdentityRtsClientID string
 
+@description('ManagedIdentityManageNotificationsClientID value (sourced from Azure DevOps variable group).')
+#disable-next-line no-unused-params
+param parManagedIdentityManageNotificationsClientID string
+
 // ------------------
 // MODULES
 // ------------------
