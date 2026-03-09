@@ -1160,7 +1160,7 @@ module fnManageNotificationsApp 'modules/07-app-service/deploy.app-service.bicep
       spokeVNetId: existingVnet[i].id
       subnetPrivateEndpointSubnetId: pepSubnet[i].id
       kind: 'functionapp'
-      storageAccountName: concat('stmgntfy', take(replace(toLower(parSpokeNetworks[i].parEnvironment), '_', ''), 16))
+      storageAccountName: 'stmgntfy${take(replace(toLower(parSpokeNetworks[i].parEnvironment), '_', ''), 16)}'
       deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
       userAssignedIdentities: [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
