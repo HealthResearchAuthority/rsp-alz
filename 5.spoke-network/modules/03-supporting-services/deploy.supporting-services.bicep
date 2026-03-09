@@ -351,3 +351,9 @@ output serviceBusReceiverManagedIdentityID string = serviceBus.outputs.serviceBu
 
 @description('The resource ID of the user-assigned managed identity for sending messages to Service Bus.')
 output serviceBusSenderManagedIdentityId string = serviceBus.outputs.serviceBusSenderManagedIdentityId
+
+@description('The client ID of the user-assigned managed identity for receiving messages from Service Bus.')
+output serviceBusReceiverManagedIdentityClientId string = serviceBus.outputs.serviceBusReceiverManagedIdentityClientId
+
+@description('The client ID of the user-assigned managed identity for sending messages to Service Bus.')
+output serviceBusSenderManagedIdentityClientId string = serviceBus.outputs.serviceBusSenderManagedIdentityClientId

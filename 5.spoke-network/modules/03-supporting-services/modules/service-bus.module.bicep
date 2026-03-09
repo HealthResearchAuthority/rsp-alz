@@ -147,6 +147,8 @@ module serviceBusSenderRoleAssignment '../../../../shared/bicep/role-assignments
 output serviceBusId string = servicebus.outputs.id
 output serviceBusReceiverManagedIdentityId string = serviceBusReceiverUserAssignedIdentity.id
 output serviceBusSenderManagedIdentityId string = serviceBusSenderUserAssignedIdentity.id
+output serviceBusReceiverManagedIdentityClientId string = serviceBusReceiverUserAssignedIdentity.properties.clientId
+output serviceBusSenderManagedIdentityClientId string = serviceBusSenderUserAssignedIdentity.properties.clientId
 
 
 

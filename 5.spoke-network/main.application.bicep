@@ -1113,6 +1113,24 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
         supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
         supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
       ]
+      appSettings: [
+        {
+          name: 'ServiceBusConnection__fullyQualifiedNamespace'
+          value: '${sharedServicesNaming[i].outputs.resourcesNames.serviceBus}.servicebus.windows.net'
+        }
+        {
+          name: 'ServiceBusConnection__clientId'
+          value: supportingServices[i].outputs.serviceBusReceiverManagedIdentityClientId
+        }
+        {
+          name: 'ServiceBusConnection__credential'
+          value: 'managedidentity'
+        }
+        {
+          name: 'AppSettings:NotificationQueueName'
+          value: 'notificationqueue'
+        }
+      ]
     }
     dependsOn: [
       webApp
@@ -1199,7 +1217,9 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     dependsOn: [
       webApp
       umbracoCMS
-      rtsfnApp // dependencies such as this is to avoid private dns zone conflict
+      fnNotifyApp
+      fnManageNotificationsApp
+      rtsfnApp
       processScanFnApp
       documentUpload
       databaseserver

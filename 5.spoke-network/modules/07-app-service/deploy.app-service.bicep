@@ -54,6 +54,8 @@ param deploySlot bool
 
 param deployAppPrivateEndPoint bool
 param userAssignedIdentities array
+@description('Optional. Additional app settings for the deployed app service resource.')
+param appSettings array = []
 param eventGridServiceTagRestriction bool = false
 
 @description('Override to allow public access even when private endpoint exists')
@@ -286,7 +288,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     azureAdAllowedAudiences: azureAdAllowedAudiences
     azureAdAllowedApplications: azureAdAllowedApplications
     azureAdAllowedPrincipals: azureAdAllowedPrincipals
-    appSettings: [
+    appSettings: concat([
       {
         name: 'AzureWebJobsStorage__credential'
         value: 'managedidentity'
@@ -295,7 +297,7 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
         name: 'AzureWebJobsStorage__clientId'
         value: funcUaiClientId
       }
-    ]
+    ], appSettings)
   }
   dependsOn: [
     fnstorage
