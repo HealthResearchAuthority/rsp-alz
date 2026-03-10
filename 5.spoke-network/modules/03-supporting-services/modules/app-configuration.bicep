@@ -572,6 +572,26 @@ var featureFlags = [
       ]
     }
   }
+  {
+    id: 'System.UserNotifications'
+    enabled: true
+    description: 'When enabled, the user notifications area is available to all logged in users.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
 ]
 
 var privateDnsZoneNames = 'privatelink.azconfig.io'
