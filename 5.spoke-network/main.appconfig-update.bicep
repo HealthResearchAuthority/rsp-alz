@@ -47,6 +47,18 @@ param parNamingWorkloadName string = 'shared'
 @description('List of App Configuration key-values to upsert.')
 param parAppConfigurationValues appConfigurationKeyValue[] = []
 
+@description('ManagedIdentityRtsClientID value (sourced from Azure DevOps variable group).')
+#disable-next-line no-unused-params
+param parManagedIdentityRtsClientID string
+
+@description('ManagedIdentityManageNotificationsClientID value (sourced from Azure DevOps variable group).')
+#disable-next-line no-unused-params
+param parManagedIdentityManageNotificationsClientID string
+
+@description('ManagedIdentityNotifyClientID value (sourced from Azure DevOps variable group).')
+#disable-next-line no-unused-params
+param parManagedIdentityNotifyClientID string
+
 // ------------------
 // MODULES
 // ------------------

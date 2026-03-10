@@ -201,6 +201,15 @@ param parSqlAuditRetentionDays int = 15
 @description('Spoke Networks Configuration')
 param parSpokeNetworks array
 
+@description('Enable database failover/geo-replication (only for dev, preprod, and prod environments)')
+param parEnableDatabaseFailover bool = false
+
+@description('Secondary region location for DR/failover (e.g., ukwest)')
+param parSecondaryLocation string = ''
+
+@description('Secondary region spoke network configurations for DR/failover')
+param parSecondarySpokeNetworks array = []
+
 @description('Enable Azure Front Door deployment')
 param parEnableFrontDoor bool = true
 
@@ -511,7 +520,7 @@ module networkingnaming '../shared/bicep/naming/naming.module.bicep' = [
 resource existingVnet 'Microsoft.Network/virtualNetworks@2024-03-01' existing = [
   for i in range(0, length(parSpokeNetworks)): {
     name: parSpokeNetworks[i].vnet
-    scope: resourceGroup(parSpokeNetworks[i].rgNetworking)
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgNetworking)
   }
 ]
 
@@ -536,6 +545,7 @@ resource webAppSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-03-01' exi
   }
 ]
 
+// Secondary region VNet ID is constructed directly in the database replica module
 module sharedServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('sharedNamingDeployment-${deployment().name}', 64)
@@ -561,6 +571,30 @@ module storageServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
     }
   }
 ]
+
+// Secondary region resource groups and naming (for DR/failover)
+module secondaryStorageRG '../shared/bicep/resourceGroup.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableDatabaseFailover && length(parSecondarySpokeNetworks) > 0) {
+  name: take('secondaryStorageRG-${deployment().name}-${i}', 64)
+  scope: subscription(parSecondarySpokeNetworks[i].subscriptionId)
+  params: {
+    parLocation: parSecondaryLocation
+    parResourceGroupName: parSecondarySpokeNetworks[i].rgStorage
+  }
+}]
+
+module secondaryStorageServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableDatabaseFailover && length(parSecondarySpokeNetworks) > 0) {
+  name: take('secondaryStorageServicesNaming-${deployment().name}-${i}', 64)
+  scope: resourceGroup(parSecondarySpokeNetworks[i].subscriptionId, parSecondarySpokeNetworks[i].rgStorage)
+  params: {
+    uniqueId: uniqueString(secondaryStorageRG[i].?outputs.outResourceGroupId)
+    environment: parSecondarySpokeNetworks[i].parEnvironment
+    workloadName: 'storage'
+    location: parSecondaryLocation
+  }
+  dependsOn: [
+    secondaryStorageRG
+  ]
+}]
 
 module applicationServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
@@ -720,6 +754,39 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
       sqlDatabaseSkuConfig: parSkuConfig.sqlDatabase
       enableSqlAdminLogin: parEnableSqlAdminLogin
     }
+  }
+]
+
+// Database replica module for secondary region (only for dev, preprod, and prod when failover is enabled)
+module databaseReplica 'modules/05-database/deploy.database-replica.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): if (parEnableDatabaseFailover && (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod' || parSpokeNetworks[i].parEnvironment == 'dev') && length(parSecondarySpokeNetworks) > i) {
+    name: take('database-replica-${deployment().name}-deployment-${i}', 64)
+    scope: resourceGroup(parSecondarySpokeNetworks[i].subscriptionId, parSecondarySpokeNetworks[i].rgStorage)
+    params: {
+      secondarySqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}replica'
+      secondaryLocation: parSecondaryLocation
+      adminLogin: parAdminLogin
+      adminPassword: parSqlAdminPhrase
+      enableSqlAdminLogin: parEnableSqlAdminLogin
+      primaryDatabaseIds: databaseserver[i].outputs.database_ids
+      databases: ['applicationservice', 'identityservice', 'rtsservice', 'cmsservice', 'harpprojectdata']
+      secondaryVNetId: '/subscriptions/${parSecondarySpokeNetworks[i].subscriptionId}/resourceGroups/${parSecondarySpokeNetworks[i].rgNetworking}/providers/Microsoft.Network/virtualNetworks/${parSecondarySpokeNetworks[i].vnet}'
+      secondaryPrivateEndpointSubnetName: 'snet-pep'
+      sqlServerUAIName: secondaryStorageServicesNaming[i].?outputs.resourcesNames.sqlServerUserAssignedIdentity
+      networkingResourcesNames: {
+        azuresqlserverpep: '${networkingnaming[i].outputs.resourcesNames.azuresqlserverpep}replica'
+      }
+      networkingResourceGroup: parSecondarySpokeNetworks[i].rgNetworking
+      auditRetentionDays: parSqlAuditRetentionDays
+      enableSqlServerAuditing: true
+      logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
+      sqlDatabaseSkuConfig: parSkuConfig.sqlDatabase
+      tags: tags
+    }
+    dependsOn: [
+      databaseserver[i]
+      secondaryStorageServicesNaming[i]
+    ]
   }
 ]
 
@@ -998,6 +1065,94 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
+module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('fnNotifyApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: parSkuConfig.appServicePlan.functionApp
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: 'asp-rsp-fnnotify-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'func-notify-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Windows'
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stntfy${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
+      ]
+      appSettings: [
+        {
+          name: 'ServiceBusConnection__fullyQualifiedNamespace'
+          value: '${sharedServicesNaming[i].outputs.resourcesNames.serviceBus}.servicebus.windows.net'
+        }
+        {
+          name: 'ServiceBusConnection__clientId'
+          value: supportingServices[i].outputs.serviceBusReceiverManagedIdentityClientId
+        }
+        {
+          name: 'ServiceBusConnection__credential'
+          value: 'managedidentity'
+        }
+        {
+          name: 'AppSettings:NotificationQueueName'
+          value: 'notificationqueue'
+        }
+      ]
+    }
+    dependsOn: [
+      webApp
+      umbracoCMS
+      processScanFnApp
+      rtsfnApp
+      documentUpload
+    ]
+  }
+]
+
+module fnManageNotificationsApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('fnManageNotificationsApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: parSkuConfig.appServicePlan.functionApp
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: 'asp-rsp-fnmgntfy-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'func-manage-notifications-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Windows'
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stmgntfy${take(replace(toLower(parSpokeNetworks[i].parEnvironment), '_', ''), 16)}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      ]
+    }
+    dependsOn: [
+      webApp
+      umbracoCMS
+      processScanFnApp
+      rtsfnApp
+      fnNotifyApp
+      documentUpload
+    ]
+  }
+]
+
 module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
@@ -1038,7 +1193,9 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     dependsOn: [
       webApp
       umbracoCMS
-      rtsfnApp // dependencies such as this is to avoid private dns zone conflict
+      fnNotifyApp
+      fnManageNotificationsApp
+      rtsfnApp
       processScanFnApp
       documentUpload
       databaseserver
