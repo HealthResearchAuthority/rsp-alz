@@ -1089,6 +1089,94 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
+module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('fnNotifyApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: parSkuConfig.appServicePlan.functionApp
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: 'asp-rsp-fnnotify-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'func-notify-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Windows'
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stntfy${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
+      ]
+      appSettings: [
+        {
+          name: 'ServiceBusConnection__fullyQualifiedNamespace'
+          value: '${sharedServicesNaming[i].outputs.resourcesNames.serviceBus}.servicebus.windows.net'
+        }
+        {
+          name: 'ServiceBusConnection__clientId'
+          value: supportingServices[i].outputs.serviceBusReceiverManagedIdentityClientId
+        }
+        {
+          name: 'ServiceBusConnection__credential'
+          value: 'managedidentity'
+        }
+        {
+          name: 'AppSettings:NotificationQueueName'
+          value: 'notificationqueue'
+        }
+      ]
+    }
+    dependsOn: [
+      webApp
+      umbracoCMS
+      processScanFnApp
+      rtsfnApp
+      documentUpload
+    ]
+  }
+]
+
+module fnManageNotificationsApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('fnManageNotificationsApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: parSkuConfig.appServicePlan.functionApp
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: 'asp-rsp-fnmgntfy-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'func-manage-notifications-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Windows'
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stmgntfy${take(replace(toLower(parSpokeNetworks[i].parEnvironment), '_', ''), 16)}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      ]
+    }
+    dependsOn: [
+      webApp
+      umbracoCMS
+      processScanFnApp
+      rtsfnApp
+      fnNotifyApp
+      documentUpload
+    ]
+  }
+]
+
 module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
@@ -1129,7 +1217,9 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     dependsOn: [
       webApp
       umbracoCMS
-      rtsfnApp // dependencies such as this is to avoid private dns zone conflict
+      fnNotifyApp
+      fnManageNotificationsApp
+      rtsfnApp
       processScanFnApp
       documentUpload
       databaseserver
