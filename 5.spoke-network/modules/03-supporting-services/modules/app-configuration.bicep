@@ -433,6 +433,26 @@ var featureFlags = [
     }
   }
   {
+    id: 'Modifications.ChangeOfSponsorOrganisation'
+    enabled: true
+    description: 'When enabled, allows changing sponsor organisation via modification journey'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
     id: 'Modifications.ParticipatingOrganisations'
     enabled: true
     description: 'When enabled participating organisations feature will be available.'
