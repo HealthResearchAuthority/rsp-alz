@@ -269,21 +269,6 @@ param parValidateIrasIdAllowedAudiences array = []
 @description('Front Door custom domains configuration')
 param parFrontDoorCustomDomains array = []
 
-param parCleanStorageAccountName string
-@secure()
-@description('The key for the storage account where the blob connection string will be stored.')
-param parCleanStorageAccountKey string
-
-param parStagingStorageAccountName string
-@secure()
-@description('The key for the storage account where the blob connection string will be stored.')
-param parStagingStorageAccountKey string
-
-param parQuarantineStorageAccountName string
-@secure()
-@description('The key for the storage account where the blob connection string will be stored.')
-param parQuarantineStorageAccountKey string
-
 param parMicrosoftEntraAudience string
 
 param parMicrosoftEntraAuthority string
@@ -458,15 +443,6 @@ param bgodatabasepassword string
 // ------------------
 
 var sqlServerNamePrefix = 'rspsqlserver'
-
-var documentStorageAccounts = {
-  cleanStorageAccountName: parCleanStorageAccountName
-  cleanStorageAccountKey: parCleanStorageAccountKey
-  stagingStorageAccountName: parStagingStorageAccountName
-  stagingStorageAccountKey: parStagingStorageAccountKey
-  quarantineStorageAccountName: parQuarantineStorageAccountName
-  quarantineStorageAccountKey: parQuarantineStorageAccountKey
-}
 
 // DRY helper function for storage encryption configuration
 func createStorageEncryptionConfig(config storageEncryptionConfig, keyVaultId string) object =>
@@ -676,7 +652,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       rtsApiBaseUrl: parRtsApiBaseUrl
       rtsAuthApiBaseUrl: parRtsAuthApiBaseUrl
       createSecretsWithPlaceholders: parCreateKVSecretsWithPlaceholders
-      documentStorageAccounts: documentStorageAccounts
+      environment: parSpokeNetworks[i].parEnvironment
       parMicrosoftEntraAudience: parMicrosoftEntraAudience
       processDocuUploadManagedIdentityClientId: processDocuUploadManagedIdentityClientId
       parMicrosoftEntraAuthority: parMicrosoftEntraAuthority

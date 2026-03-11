@@ -94,13 +94,7 @@ stages:
                               parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
-                              parPortalUrl=$(portalUrl)
-                              parCleanStorageAccountName=$(cleanStorageAccountName) \
-                              parCleanStorageAccountKey=$(cleanStorageAccountKey) \
-                              parStagingStorageAccountName=$(stagingStorageAccountName) \
-                              parStagingStorageAccountKey=$(stagingStorageAccountKey) \
-                              parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
-                              parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
+                              parPortalUrl=$(portalUrl) \
                               parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                               parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                               processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
@@ -161,12 +155,6 @@ stages:
                                     parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                                     parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
                                     parPortalUrl=$(portalUrl) \
-                                    parCleanStorageAccountName=$(cleanStorageAccountName) \
-                                    parCleanStorageAccountKey=$(cleanStorageAccountKey) \
-                                    parStagingStorageAccountName=$(stagingStorageAccountName) \
-                                    parStagingStorageAccountKey=$(stagingStorageAccountKey) \
-                                    parQuarantineStorageAccountName=$(quarantineStorageAccountName) \
-                                    parQuarantineStorageAccountKey=$(quarantineStorageAccountKey) \
                                     parMicrosoftEntraAuthority=$(parMicrosoftEntraAuthority) \
                                     parMicrosoftEntraAudience=$(parMicrosoftEntraAudience) \
                                     processDocuUploadManagedIdentityClientId=$(processDocuUploadManagedIdentityClientId) \
