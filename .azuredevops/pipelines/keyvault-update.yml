@@ -79,10 +79,6 @@ stages:
               oneLoginPrivateKeyPem: $(oneLoginPrivateKeyPem)
               rtsApiClientId: $(rtsApiClientId)
               rtsApiClientSecret: $(rtsApiClientSecret)
-              documentBlobStorageAccountKey: $(documentBlobStorageAccountKey)
-              stagingStorageAccountKey: $(stagingStorageAccountKey)
-              quarantineStorageAccountKey: $(quarantineStorageAccountKey)
-              cleanStorageAccountKey: $(cleanStorageAccountKey)
               govUkNotifyApiKey: $(govUkNotifyApiKey)
           - task: AzureCLI@2
             displayName: 'Validate Deployment'
@@ -132,10 +128,6 @@ stages:
               oneLoginPrivateKeyPem: $(oneLoginPrivateKeyPem)
               rtsApiClientId: $(rtsApiClientId)
               rtsApiClientSecret: $(rtsApiClientSecret)
-              documentBlobStorageAccountKey: $(documentBlobStorageAccountKey)
-              stagingStorageAccountKey: $(stagingStorageAccountKey)
-              quarantineStorageAccountKey: $(quarantineStorageAccountKey)
-              cleanStorageAccountKey: $(cleanStorageAccountKey)
               govUkNotifyApiKey: $(govUkNotifyApiKey)
           - task: AzureCLI@2
             displayName: 'What-If Key Vault Update'
@@ -192,10 +184,6 @@ stages:
                     oneLoginPrivateKeyPem: $(oneLoginPrivateKeyPem)
                     rtsApiClientId: $(rtsApiClientId)
                     rtsApiClientSecret: $(rtsApiClientSecret)
-                    documentBlobStorageAccountKey: $(documentBlobStorageAccountKey)
-                    stagingStorageAccountKey: $(stagingStorageAccountKey)
-                    quarantineStorageAccountKey: $(quarantineStorageAccountKey)
-                    cleanStorageAccountKey: $(cleanStorageAccountKey)
                 - task: AzureCLI@2
                   displayName: 'Deploy Key Vault Update'
                   inputs:
