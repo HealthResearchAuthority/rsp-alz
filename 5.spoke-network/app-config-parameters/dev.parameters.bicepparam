@@ -14,6 +14,9 @@ param parManagedIdentityRtsClientID = ''
 // Value for ManagedIdentityManageNotificationsClientID is passed from Azure DevOps variable group
 param parManagedIdentityManageNotificationsClientID = ''
 
+// Value for ManagedIdentityNotifyClientID is passed from Azure DevOps variable group
+param parManagedIdentityNotifyClientID = ''
+
 param parAppConfigurationValues = [
   {
     key: 'AppSettings:ManagedIdentityRtsClientID'
@@ -25,6 +28,12 @@ param parAppConfigurationValues = [
     key: 'AppSettings:ManagedIdentityManageNotificationsClientID'
     label: ''
     value: parManagedIdentityManageNotificationsClientID
+    contentType: 'text/plain'
+  }
+  {
+    key: 'AppSettings:ManagedIdentityNotifyClientID'
+    label: ''
+    value: parManagedIdentityNotifyClientID
     contentType: 'text/plain'
   }
 ]

@@ -86,8 +86,9 @@ stages:
                   --location $(location) \
                   --template-file ./5.spoke-network/main.appconfig-update.bicep \
                   --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam \
-                  --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' \
-                  --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' 
+                  --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' `# RTS Data Sync Function App MI` \
+                  --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' `# Manage Notifications Function App MI` \
+                  --parameters parManagedIdentityNotifyClientID='$(ManagedIdentityNotifyClientID)' `# Notify Service MI` 
       - job: preview
         displayName: 'Preview App Configuration Changes'
         dependsOn: validate
@@ -119,8 +120,9 @@ stages:
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.appconfig-update.bicep \
                   --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam \
-                  --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' \
-                  --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' 
+                  --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' `# RTS Data Sync Function App MI` \
+                  --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' `# Manage Notifications Function App MI` \
+                  --parameters parManagedIdentityNotifyClientID='$(ManagedIdentityNotifyClientID)' `# Notify Service MI` 
 
   - stage: ManualDeployment
     displayName: 'Manual Deployment of App Configuration'
@@ -164,5 +166,6 @@ stages:
                         --location $(location) \
                         --template-file ./5.spoke-network/main.appconfig-update.bicep \
                         --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam \
-                        --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' \
-                        --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' 
+                        --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' `# RTS Data Sync Function App MI` \
+                        --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' `# Manage Notifications Function App MI` \
+                        --parameters parManagedIdentityNotifyClientID='$(ManagedIdentityNotifyClientID)' `# Notify Service MI` 
