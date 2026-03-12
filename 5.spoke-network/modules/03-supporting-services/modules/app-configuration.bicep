@@ -400,6 +400,12 @@ var featureFlags = [
     label: 'portal'
     enabled: true
   }
+   {
+    id: 'UX.SponsorManagementWorkspace'
+    description: 'If this flag is enabled, show the sponsor management area in the sponsor workspace'
+    label: 'portal'
+    enabled: false
+  }
   {
     id: 'Auth.UseOneLogin'
     description: 'When enabled, Gov UK One Login will be used for authentication'
