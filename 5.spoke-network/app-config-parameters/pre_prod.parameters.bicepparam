@@ -27,4 +27,10 @@ param parAppConfigurationValues = [
     value: parManagedIdentityManageNotificationsClientID
     contentType: 'text/plain'
   }
+  {
+    key: 'AppSettings:ManagedIdentityNotifyClientID'
+    label: ''
+    value: parManagedIdentityNotifyClientID
+    contentType: 'text/plain'
+  }
 ]

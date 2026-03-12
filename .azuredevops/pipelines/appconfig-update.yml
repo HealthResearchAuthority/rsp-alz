@@ -87,6 +87,7 @@ stages:
                   --template-file ./5.spoke-network/main.appconfig-update.bicep \
                   --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam \
                   --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' \
+                  --parameters parManagedIdentityNotifyClientID='$(ManagedIdentityNotifyClientID)' \
                   --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' 
       - job: preview
         displayName: 'Preview App Configuration Changes'
@@ -120,6 +121,7 @@ stages:
                 az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.appconfig-update.bicep \
                   --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam \
                   --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' \
+                  --parameters parManagedIdentityNotifyClientID='$(ManagedIdentityNotifyClientID)' \
                   --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' 
 
   - stage: ManualDeployment
@@ -165,4 +167,5 @@ stages:
                         --template-file ./5.spoke-network/main.appconfig-update.bicep \
                         --parameters ./5.spoke-network/app-config-parameters/${{ parameters.env }}.parameters.bicepparam \
                         --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' \
+                        --parameters parManagedIdentityNotifyClientID='$(ManagedIdentityNotifyClientID)' \
                         --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' 
