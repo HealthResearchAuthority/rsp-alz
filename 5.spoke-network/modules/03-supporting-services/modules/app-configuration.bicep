@@ -433,6 +433,26 @@ var featureFlags = [
     }
   }
   {
+    id: 'Modifications.ChangeOfSponsorOrganisation'
+    enabled: true
+    description: 'When enabled, allows changing sponsor organisation via modification journey'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
     id: 'Modifications.ParticipatingOrganisations'
     enabled: true
     description: 'When enabled participating organisations feature will be available.'
@@ -556,6 +576,26 @@ var featureFlags = [
     id: 'Modifications.NotAuthorisedReason'
     enabled: true
     description: 'When enabled, the not authorised reason will be available for sponsor authorisation.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'System.UserNotifications'
+    enabled: true
+    description: 'When enabled, the user notifications area is available to all logged in users.'
     label: null
     conditions: {
       client_filters: [
