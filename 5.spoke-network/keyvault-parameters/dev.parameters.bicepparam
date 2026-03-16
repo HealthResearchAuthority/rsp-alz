@@ -1,6 +1,6 @@
 using '../main.keyvault-update.bicep'
 
-param parSharedServicesSubscriptionId = 'b83b4631-b51b-4961-86a1-295f539c826b'
+param parSharedServicesSubscriptionId = ''
 
 param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-dev-uks'
 
