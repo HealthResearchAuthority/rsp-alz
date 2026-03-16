@@ -1,5 +1,7 @@
 using '../main.application.bicep'
 
+param parSubscriptionId = ''
+
 param parLogoutUrl = ''
 
 param logAnalyticsWorkspaceId = ''
@@ -159,7 +161,6 @@ param parNetworkSecurityConfig = {
 
 param parSpokeNetworks = [
   {
-    subscriptionId: 'd27a0dcc-453d-4bfa-9c3d-1447c6ea0119'
     parEnvironment: 'prod'
     workloadName: 'container-app'
     zoneRedundancy: true
@@ -185,7 +186,6 @@ param parSecondaryLocation = 'ukwest'
 
 param parSecondarySpokeNetworks = [
   {
-    subscriptionId: 'd27a0dcc-453d-4bfa-9c3d-1447c6ea0119'
     parEnvironment: 'prod'
     workloadName: 'container-app'
     zoneRedundancy: true
