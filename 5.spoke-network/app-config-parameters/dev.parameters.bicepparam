@@ -2,6 +2,8 @@ using '../main.appconfig-update.bicep'
 
 param parEnvironment = 'dev'
 
+param parSharedServicesSubscriptionId = ''
+
 param parSharedServicesResourceGroup = 'rg-rsp-sharedservices-spoke-dev-uks'
 
 param parAppConfigurationStoreName = 'appcs-rsp-shared-2i2oq-dev-uks'
