@@ -1,5 +1,7 @@
 using '../main.network.bicep'
 
+param parSubscriptionId = ''
+
 param logAnalyticsWorkspaceId = ''
 
 param parEnableFailover = true
@@ -8,7 +10,6 @@ param parSecondaryLocation = 'ukwest'
 
 param parSpokeNetworks = [
   {
-    subscriptionId: 'be1174fc-09c8-470f-9409-d0054ab9586a'
     ipRange: '10.6.0.0/16'
     parEnvironment: 'preprod'
     zoneRedundancy: true
@@ -34,7 +35,6 @@ param parSpokeNetworks = [
 
 param parSecondarySpokeNetworks = [
   {
-    subscriptionId: 'be1174fc-09c8-470f-9409-d0054ab9586a'
     ipRange: '10.16.0.0/16' // Secondary region VNet for preprod
     parEnvironment: 'preprod'
     zoneRedundancy: true

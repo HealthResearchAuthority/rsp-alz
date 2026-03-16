@@ -1,10 +1,11 @@
 using '../main.network.bicep'
 
+param parSubscriptionId = ''
+
 param logAnalyticsWorkspaceId = ''
 
 param parSpokeNetworks = [
   {
-    subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65'
     ipRange: '10.2.0.0/16' // 65536 IPs: 10.2.0.0 – 10.2.255.255
     parEnvironment: 'automationtest'
     zoneRedundancy: false
@@ -34,7 +35,6 @@ param parSecondaryLocation = 'ukwest'
 
 param parSecondarySpokeNetworks = [
   {
-    subscriptionId: '75875981-b04d-42c7-acc5-073e2e5e2e65'
     ipRange: '10.11.32.0/19' // Secondary region IP range: 10.11.32.0 – 10.11.63.255
     parEnvironment: 'automationtest'
     zoneRedundancy: false

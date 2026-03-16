@@ -29,14 +29,17 @@ param parSecondaryLocation string = ''
 @description('Array of secondary region spoke network configurations (for DR/failover)')
 param parSecondarySpokeNetworks array = []
 
+@description('Subscription ID for spoke network deployment')
+param parSubscriptionId string = ''
+
 
 // ------------------
 // RESOURCES
 // ------------------
 
 module networkingRG '../shared/bicep/resourceGroup.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-  name: take('networkingRG-${deployment().name}', 64)
-  scope: subscription(parSpokeNetworks[i].subscriptionId)
+  name: take('networkingRG-${deployment().name}-${i}', 64)
+  scope: subscription(parSubscriptionId)
   params:{
     parLocation: location
     parResourceGroupName: parSpokeNetworks[i].rgNetworking
@@ -44,8 +47,8 @@ module networkingRG '../shared/bicep/resourceGroup.bicep' = [for i in range(0, l
 }]
 
 module networkingnaming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSpokeNetworks)): {
-  name: take('03-sharedNamingDeployment-${deployment().name}', 64)
-  scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgNetworking)
+  name: take('03-sharedNamingDeployment-${deployment().name}-${i}', 64)
+  scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgNetworking)
   params: {
     uniqueId: uniqueString(networkingRG[i].outputs.outResourceGroupId)
     environment: parSpokeNetworks[i].parEnvironment
@@ -56,7 +59,7 @@ module networkingnaming '../shared/bicep/naming/naming.module.bicep' = [for i in
 
 module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(parSpokeNetworks)): {
   name: take('spoke-${deployment().name}-deployment-${i}', 64)
-  scope: subscription(parSpokeNetworks[i].subscriptionId)
+  scope: subscription(parSubscriptionId)
   params: {
     location: location
     tags: tags
@@ -75,7 +78,7 @@ module spoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(p
 // Secondary region networking for DR/failover
 module secondaryNetworkingRG '../shared/bicep/resourceGroup.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableFailover && length(parSecondarySpokeNetworks) > 0) {
   name: take('secondaryNetworkingRG-${deployment().name}-${i}', 64)
-  scope: subscription(parSecondarySpokeNetworks[i].subscriptionId)
+  scope: subscription(parSubscriptionId)
   params: {
     parLocation: parSecondaryLocation
     parResourceGroupName: parSecondarySpokeNetworks[i].rgNetworking
@@ -84,7 +87,7 @@ module secondaryNetworkingRG '../shared/bicep/resourceGroup.bicep' = [for i in r
 
 module secondaryNetworkingnaming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableFailover && length(parSecondarySpokeNetworks) > 0) {
   name: take('secondaryNetworkingNaming-${deployment().name}-${i}', 64)
-  scope: resourceGroup(parSecondarySpokeNetworks[i].subscriptionId, parSecondarySpokeNetworks[i].rgNetworking)
+  scope: resourceGroup(parSubscriptionId, parSecondarySpokeNetworks[i].rgNetworking)
   params: {
     uniqueId: uniqueString(secondaryNetworkingRG[i].?outputs.outResourceGroupId)
     environment: parSecondarySpokeNetworks[i].parEnvironment
@@ -98,7 +101,7 @@ module secondaryNetworkingnaming '../shared/bicep/naming/naming.module.bicep' = 
 
 module secondarySpoke 'modules/02-spoke/deploy.spoke.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableFailover && length(parSecondarySpokeNetworks) > 0) {
   name: take('secondarySpoke-${deployment().name}-deployment-${i}', 64)
-  scope: subscription(parSecondarySpokeNetworks[i].subscriptionId)
+  scope: subscription(parSubscriptionId)
   params: {
     location: parSecondaryLocation
     tags: tags

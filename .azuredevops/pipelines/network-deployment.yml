@@ -91,6 +91,7 @@ stages:
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub validate --name "Network-$(Build.BuildId)" --location $(location) --template-file ./5.spoke-network/main.network.bicep  \
                   --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam \
+                              parSubscriptionId=$(subscriptionId) \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
       - job: preview
@@ -119,6 +120,7 @@ stages:
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.network.bicep \
                   --parameters ./5.spoke-network/network-parameters/${{ parameters.env }}.parameters.bicepparam \
+                              parSubscriptionId=$(subscriptionId) \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
 
