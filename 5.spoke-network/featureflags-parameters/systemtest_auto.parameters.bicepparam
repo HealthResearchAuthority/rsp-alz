@@ -55,7 +55,7 @@ param parFeatureFlags = [
     id: 'Auth.UseOneLogin'
     description: 'When enabled, Gov UK One Login will be used for authentication'
     label: null
-    enabled: false
+    enabled: true
   }
   {
     id: 'WebApp.UseFrontDoor'
