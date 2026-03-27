@@ -9,6 +9,7 @@ pr:
     include:
       - '2.monitoring-alerts/main.bicep'
       - '2.monitoring-alerts/parameters/**'
+      - '2.monitoring-alerts/modules/**'
 
 
 parameters:
@@ -23,6 +24,9 @@ parameters:
       - uat
       - pre_prod
       - production
+
+variables:
+  - group: ${{ parameters.env }}-monitoring
 
 stages:
   - stage: PRValidation
@@ -76,7 +80,13 @@ stages:
               inlineScript: |
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub validate --name "Monitoring-$(Build.BuildId)" --location $(location) --template-file ./2.monitoring-alerts/main.bicep  \
-                  --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam
+                  --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam \
+                  webhookUrl=$(webhookUrl) \
+                  teamsGroupId=$(teamsGroupId) \
+                  teamsChannelId=$(teamsChannelId) \
+                  teamsApiConnectionId=$(teamsApiConnectionId) \
+                  teamsConnectionId=$(teamsConnectionId) \
+                  logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
       - job: preview
         displayName: 'Preview Monitoring Deployment'
@@ -93,7 +103,13 @@ stages:
               inlineScript: |
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub what-if --location $(location) --template-file ./2.monitoring-alerts/main.bicep \
-                  --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam
+                  --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam \
+                  webhookUrl=$(webhookUrl) \
+                  teamsGroupId=$(teamsGroupId) \
+                  teamsChannelId=$(teamsChannelId) \
+                  teamsApiConnectionId=$(teamsApiConnectionId) \
+                  teamsConnectionId=$(teamsConnectionId) \
+                  logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
 
   - stage: ManualDeployment
@@ -126,7 +142,13 @@ stages:
               inlineScript: |
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub what-if --location $(location) --template-file ./2.monitoring-alerts/main.bicep \
-                  --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam
+                  --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam \
+                  webhookUrl=$(webhookUrl) \
+                  teamsGroupId=$(teamsGroupId) \
+                  teamsChannelId=$(teamsChannelId) \
+                  teamsApiConnectionId=$(teamsApiConnectionId) \
+                  teamsConnectionId=$(teamsConnectionId) \
+                  logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
       - deployment: deploy
         pool:
@@ -154,5 +176,11 @@ stages:
                       az config set bicep.use_binary_from_path=false --only-show-errors
                       output=$(az stack sub create --name "monitoring-deployment-stack" --location $(location) --template-file ./2.monitoring-alerts/main.bicep  \
                         --parameters ./2.monitoring-alerts/parameters/${{ parameters.env }}.parameters.bicepparam \
-                                    --deny-settings-mode none --action-on-unmanage deleteResources --yes)
+                        webhookUrl=$(webhookUrl) \
+                        teamsGroupId=$(teamsGroupId) \
+                        teamsChannelId=$(teamsChannelId) \
+                        teamsApiConnectionId=$(teamsApiConnectionId) \
+                        teamsConnectionId=$(teamsConnectionId) \
+                        logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
+                        --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .
