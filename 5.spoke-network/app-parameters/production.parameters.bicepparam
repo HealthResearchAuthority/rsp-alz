@@ -31,7 +31,7 @@ param parEnableSqlAdminLogin = false
 
 // Azure Front Door Configuration
 param parEnableFrontDoor = true
-param parFrontDoorWafMode = 'Prevention'
+param parFrontDoorWafMode = 'Detection'
 param parEnableFrontDoorRateLimiting = true
 param parFrontDoorRateLimitThreshold = 2000
 param parEnableFrontDoorCaching = false
