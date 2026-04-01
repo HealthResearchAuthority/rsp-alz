@@ -612,6 +612,26 @@ var featureFlags = [
       ]
     }
   }
+    {
+    id: 'Notifications'
+    enabled: true
+    description: 'When enabled, the email notifications will send via Gov.uk Notify.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
 ]
 
 var privateDnsZoneNames = 'privatelink.azconfig.io'
