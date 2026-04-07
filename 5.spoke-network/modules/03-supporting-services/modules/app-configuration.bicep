@@ -613,7 +613,7 @@ var featureFlags = [
     }
   }
     {
-    id: 'Notifications'
+    id: 'System.EmailNotifications'
     enabled: true
     description: 'When enabled, the email notifications will send via Gov.uk Notify.'
     label: null
