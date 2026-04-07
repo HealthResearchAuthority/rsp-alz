@@ -17,6 +17,10 @@ param parManagedIdentityManageNotificationsClientID = ''
 // Value for ManagedIdentityNotifyClientID is passed from Azure DevOps variable group
 param parManagedIdentityNotifyClientID = ''
 
+// Values for ProjectRecordValidationScopes and ProjectRecordValidationUri are passed from Azure DevOps variable group
+param parProjectRecordValidationScopes = ''
+param parProjectRecordValidationUri = ''
+
 param parAppConfigurationValues = [
   {
     key: 'AppSettings:ManagedIdentityRtsClientID'
@@ -34,6 +38,18 @@ param parAppConfigurationValues = [
     key: 'AppSettings:ManagedIdentityNotifyClientID'
     label: ''
     value: parManagedIdentityNotifyClientID
+    contentType: 'text/plain'
+  }
+  {
+    key: 'AppSettings:ProjectRecordValidationScopes'
+    label: 'portal'
+    value: parProjectRecordValidationScopes
+    contentType: 'text/plain'
+  }
+  {
+    key: 'AppSettings:ProjectRecordValidationUri'
+    label: 'portal'
+    value: parProjectRecordValidationUri
     contentType: 'text/plain'
   }
 ]

@@ -117,6 +117,9 @@ resource SecondarySQL_Server 'Microsoft.Sql/servers@2024-05-01-preview' = {
     }
   }
   properties: {
+    // Use conditional logic to handle both CREATE and UPDATE scenarios
+    // CREATE (new server): Requires valid credentials
+    // UPDATE (existing server with AD-only auth): Pass null to skip credential update
     administratorLogin: enableSqlAdminLogin ? adminLogin : null
     administratorLoginPassword: enableSqlAdminLogin ? adminPassword : null
     publicNetworkAccess: 'Disabled'
