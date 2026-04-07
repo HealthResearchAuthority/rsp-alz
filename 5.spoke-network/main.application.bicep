@@ -210,6 +210,9 @@ param parSecondaryLocation string = ''
 @description('Secondary region spoke network configurations for DR/failover')
 param parSecondarySpokeNetworks array = []
 
+@description('Subscription ID for spoke network deployment')
+param parSubscriptionId string = ''
+
 @description('Enable Azure Front Door deployment')
 param parEnableFrontDoor bool = true
 
@@ -480,7 +483,7 @@ func createStorageEncryptionConfig(config storageEncryptionConfig, keyVaultId st
 
 module defenderStorage '../shared/bicep/security/defender-storage.bicep' = {
   name: take('defenderStorage-${deployment().name}', 64)
-  scope: subscription()
+  scope: subscription(parSubscriptionId)
   params: {
     enableDefenderForStorage: parDefenderForStorageConfig.enabled
     enableMalwareScanning: parDefenderForStorageConfig.enableMalwareScanning
@@ -491,8 +494,8 @@ module defenderStorage '../shared/bicep/security/defender-storage.bicep' = {
 
 module sharedServicesRG '../shared/bicep/resourceGroup.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    name: take('sharedServicesRG-${deployment().name}', 64)
-    scope: subscription(parSpokeNetworks[i].subscriptionId)
+    name: take('sharedServicesRG-${deployment().name}-${i}', 64)
+    scope: subscription(parSubscriptionId)
     params: {
       parLocation: location
       parResourceGroupName: parSpokeNetworks[i].rgSharedServices
@@ -502,8 +505,8 @@ module sharedServicesRG '../shared/bicep/resourceGroup.bicep' = [
 
 module storageRG '../shared/bicep/resourceGroup.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    name: take('storageRG-${deployment().name}', 64)
-    scope: subscription(parSpokeNetworks[i].subscriptionId)
+    name: take('storageRG-${deployment().name}-${i}', 64)
+    scope: subscription(parSubscriptionId)
     params: {
       parLocation: location
       parResourceGroupName: parSpokeNetworks[i].rgStorage
@@ -513,8 +516,8 @@ module storageRG '../shared/bicep/resourceGroup.bicep' = [
 
 module applicationsRG '../shared/bicep/resourceGroup.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    name: take('applicationsRG-${deployment().name}', 64)
-    scope: subscription(parSpokeNetworks[i].subscriptionId)
+    name: take('applicationsRG-${deployment().name}-${i}', 64)
+    scope: subscription(parSubscriptionId)
     params: {
       parLocation: location
       parResourceGroupName: parSpokeNetworks[i].rgapplications
@@ -524,14 +527,14 @@ module applicationsRG '../shared/bicep/resourceGroup.bicep' = [
 
 resource networkRgResource 'Microsoft.Resources/resourceGroups@2023-07-01' existing = {
   name: parSpokeNetworks[0].rgNetworking
-  scope: subscription(parSpokeNetworks[0].subscriptionId)
+  scope: subscription(parSubscriptionId)
 }
 
 @description('User-configured naming rules')
 module networkingnaming '../shared/bicep/naming/naming.module.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    name: take('03-sharedNamingDeployment-${deployment().name}', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgNetworking)
+    name: take('03-sharedNamingDeployment-${deployment().name}-${i}', 64)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgNetworking)
     params: {
       uniqueId: uniqueString(networkRgResource.id)
       environment: parSpokeNetworks[i].parEnvironment
@@ -544,7 +547,7 @@ module networkingnaming '../shared/bicep/naming/naming.module.bicep' = [
 resource existingVnet 'Microsoft.Network/virtualNetworks@2024-03-01' existing = [
   for i in range(0, length(parSpokeNetworks)): {
     name: parSpokeNetworks[i].vnet
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgNetworking)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgNetworking)
   }
 ]
 
@@ -572,8 +575,8 @@ resource webAppSubnet 'Microsoft.Network/virtualNetworks/subnets@2024-03-01' exi
 // Secondary region VNet ID is constructed directly in the database replica module
 module sharedServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    name: take('sharedNamingDeployment-${deployment().name}', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgSharedServices)
+    name: take('sharedNamingDeployment-${deployment().name}-${i}', 64)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgSharedServices)
     params: {
       uniqueId: uniqueString(sharedServicesRG[i].outputs.outResourceGroupId)
       environment: parSpokeNetworks[i].parEnvironment
@@ -585,8 +588,8 @@ module sharedServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
 
 module storageServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    name: take('storageServicesNaming-${deployment().name}', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgStorage)
+    name: take('storageServicesNaming-${deployment().name}-${i}', 64)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgStorage)
     params: {
       uniqueId: uniqueString(storageRG[i].outputs.outResourceGroupId)
       environment: parSpokeNetworks[i].parEnvironment
@@ -599,7 +602,7 @@ module storageServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
 // Secondary region resource groups and naming (for DR/failover)
 module secondaryStorageRG '../shared/bicep/resourceGroup.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableDatabaseFailover && length(parSecondarySpokeNetworks) > 0) {
   name: take('secondaryStorageRG-${deployment().name}-${i}', 64)
-  scope: subscription(parSecondarySpokeNetworks[i].subscriptionId)
+  scope: subscription(parSubscriptionId)
   params: {
     parLocation: parSecondaryLocation
     parResourceGroupName: parSecondarySpokeNetworks[i].rgStorage
@@ -608,7 +611,7 @@ module secondaryStorageRG '../shared/bicep/resourceGroup.bicep' = [for i in rang
 
 module secondaryStorageServicesNaming '../shared/bicep/naming/naming.module.bicep' = [for i in range(0, length(parSecondarySpokeNetworks)): if (parEnableDatabaseFailover && length(parSecondarySpokeNetworks) > 0) {
   name: take('secondaryStorageServicesNaming-${deployment().name}-${i}', 64)
-  scope: resourceGroup(parSecondarySpokeNetworks[i].subscriptionId, parSecondarySpokeNetworks[i].rgStorage)
+  scope: resourceGroup(parSubscriptionId, parSecondarySpokeNetworks[i].rgStorage)
   params: {
     uniqueId: uniqueString(secondaryStorageRG[i].?outputs.outResourceGroupId)
     environment: parSecondarySpokeNetworks[i].parEnvironment
@@ -622,8 +625,8 @@ module secondaryStorageServicesNaming '../shared/bicep/naming/naming.module.bice
 
 module applicationServicesNaming '../shared/bicep/naming/naming.module.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    name: take('applicationServicesNaming-${deployment().name}', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('applicationServicesNaming-${deployment().name}-${i}', 64)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     params: {
       uniqueId: uniqueString(applicationsRG[i].outputs.outResourceGroupId)
       environment: parSpokeNetworks[i].parEnvironment
@@ -636,7 +639,7 @@ module applicationServicesNaming '../shared/bicep/naming/naming.module.bicep' = 
 module supportingServices 'modules/03-supporting-services/deploy.supporting-services.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('supportingServices-${deployment().name}-deployment-${i}', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgSharedServices)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgSharedServices)
     params: {
       location: location
       tags: tags
@@ -691,7 +694,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
 module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.aca-environment.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('containerAppsEnvironment-${deployment().name}-deployment', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     params: {
       location: location
       tags: tags
@@ -712,7 +715,7 @@ module containerAppsEnvironment 'modules/04-container-apps-environment/deploy.ac
 module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('documentUpload-${deployment().name}-deployment', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgStorage)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgStorage)
     params: {
       location: location
       tags: tags
@@ -731,21 +734,9 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
         quarantine: parStorageConfig.quarantine.retention.retentionDays
       }
       storageAccountConfig: {
-        staging: {
-          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.staging.account.sku
-          accessTier: parStorageConfig.staging.account.accessTier
-          containerName: parStorageConfig.staging.account.containerName
-        }
-        clean: {
-          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.clean.account.sku
-          accessTier: parStorageConfig.clean.account.accessTier
-          containerName: parStorageConfig.clean.account.containerName
-        }
-        quarantine: {
-          sku: (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod') ? 'Standard_GRS' : parStorageConfig.quarantine.account.sku
-          accessTier: parStorageConfig.quarantine.account.accessTier
-          containerName: parStorageConfig.quarantine.account.containerName
-        }
+        staging: parStorageConfig.staging.account
+        clean: parStorageConfig.clean.account
+        quarantine: parStorageConfig.quarantine.account
       }
       networkSecurityConfig: parNetworkSecurityConfig
       cleanStorageEncryption: createStorageEncryptionConfig(
@@ -772,7 +763,7 @@ module documentUpload 'modules/09-document-upload/deploy.document-upload.bicep' 
 module databaseserver 'modules/05-database/deploy.database.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('database-${deployment().name}-deployment', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgStorage)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgStorage)
     params: {
       location: location
       sqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}'
@@ -797,7 +788,7 @@ module databaseserver 'modules/05-database/deploy.database.bicep' = [
 module databaseReplica 'modules/05-database/deploy.database-replica.bicep' = [
   for i in range(0, length(parSpokeNetworks)): if (parEnableDatabaseFailover && (parSpokeNetworks[i].parEnvironment == 'prod' || parSpokeNetworks[i].parEnvironment == 'preprod' || parSpokeNetworks[i].parEnvironment == 'dev') && length(parSecondarySpokeNetworks) > i) {
     name: take('database-replica-${deployment().name}-deployment-${i}', 64)
-    scope: resourceGroup(parSecondarySpokeNetworks[i].subscriptionId, parSecondarySpokeNetworks[i].rgStorage)
+    scope: resourceGroup(parSubscriptionId, parSecondarySpokeNetworks[i].rgStorage)
     params: {
       secondarySqlServerName: '${sqlServerNamePrefix}${parSpokeNetworks[i].parEnvironment}replica'
       secondaryLocation: parSecondaryLocation
@@ -806,7 +797,7 @@ module databaseReplica 'modules/05-database/deploy.database-replica.bicep' = [
       enableSqlAdminLogin: parEnableSqlAdminLogin
       primaryDatabaseIds: databaseserver[i].outputs.database_ids
       databases: ['applicationservice', 'identityservice', 'rtsservice', 'cmsservice', 'harpprojectdata']
-      secondaryVNetId: '/subscriptions/${parSecondarySpokeNetworks[i].subscriptionId}/resourceGroups/${parSecondarySpokeNetworks[i].rgNetworking}/providers/Microsoft.Network/virtualNetworks/${parSecondarySpokeNetworks[i].vnet}'
+      secondaryVNetId: '/subscriptions/${parSubscriptionId}/resourceGroups/${parSecondarySpokeNetworks[i].rgNetworking}/providers/Microsoft.Network/virtualNetworks/${parSecondarySpokeNetworks[i].vnet}'
       secondaryPrivateEndpointSubnetName: 'snet-pep'
       sqlServerUAIName: secondaryStorageServicesNaming[i].?outputs.resourcesNames.sqlServerUserAssignedIdentity
       networkingResourcesNames: {
@@ -829,7 +820,7 @@ module databaseReplica 'modules/05-database/deploy.database-replica.bicep' = [
 module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('iraserviceapp-${deployment().name}-deployment', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     params: {
       location: location
       tags: tags
@@ -867,7 +858,7 @@ module irasserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
 module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('usermanagementapp-${deployment().name}-deployment', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     params: {
       location: location
       tags: tags
@@ -905,7 +896,7 @@ module usermanagementapp 'modules/06-container-app/deploy.container-app.bicep' =
 module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('rtsserviceapp-${deployment().name}-deployment', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     params: {
       location: location
       tags: tags
@@ -943,7 +934,7 @@ module rtsserviceapp 'modules/06-container-app/deploy.container-app.bicep' = [
 
 module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('webApp-${deployment().name}-deployment', 64)
     params: {
       tags: {}
@@ -970,7 +961,7 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
 
 module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('cmsApp-${deployment().name}-deployment', 64)
     params: {
       tags: {}
@@ -1004,7 +995,7 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
 // Malware Scan Processing Function App
 module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('processScanFnApp-${deployment().name}-deployment', 64)
     params: {
       appName: 'func-processdocupload-${parSpokeNetworks[i].parEnvironment}'
@@ -1043,7 +1034,7 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
 module customTopicEventSubscription '../shared/bicep/event-grid/custom-topic-role-assignment-subscription.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
     name: take('stagingEventSubscription-${deployment().name}-${i}', 64)
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     params: {
       subscriptionName: 'staging-defender-scan-processing'
       customTopicId: documentUpload[i].outputs.customEventGridTopicId
@@ -1068,7 +1059,7 @@ module customTopicEventSubscription '../shared/bicep/event-grid/custom-topic-rol
 
 module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('rtsfnApp-${deployment().name}-deployment', 64)
     params: {
       tags: {}
@@ -1101,9 +1092,97 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   }
 ]
 
+module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('fnNotifyApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: parSkuConfig.appServicePlan.functionApp
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: 'asp-rsp-fnnotify-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'func-notify-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Windows'
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stntfy${parSpokeNetworks[i].parEnvironment}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+        supportingServices[i].outputs.serviceBusReceiverManagedIdentityID
+      ]
+      appSettings: [
+        {
+          name: 'ServiceBusConnection__fullyQualifiedNamespace'
+          value: '${sharedServicesNaming[i].outputs.resourcesNames.serviceBus}.servicebus.windows.net'
+        }
+        {
+          name: 'ServiceBusConnection__clientId'
+          value: supportingServices[i].outputs.serviceBusReceiverManagedIdentityClientId
+        }
+        {
+          name: 'ServiceBusConnection__credential'
+          value: 'managedidentity'
+        }
+        {
+          name: 'AppSettings:NotificationQueueName'
+          value: 'notificationqueue'
+        }
+      ]
+    }
+    dependsOn: [
+      webApp
+      umbracoCMS
+      processScanFnApp
+      rtsfnApp
+      documentUpload
+    ]
+  }
+]
+
+module fnManageNotificationsApp 'modules/07-app-service/deploy.app-service.bicep' = [
+  for i in range(0, length(parSpokeNetworks)): {
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
+    name: take('fnManageNotificationsApp-${deployment().name}-deployment', 64)
+    params: {
+      tags: {}
+      sku: parSkuConfig.appServicePlan.functionApp
+      logAnalyticsWsId: logAnalyticsWorkspaceId
+      location: location
+      appServicePlanName: 'asp-rsp-fnmgntfy-${parSpokeNetworks[i].parEnvironment}-uks'
+      appName: 'func-manage-notifications-${parSpokeNetworks[i].parEnvironment}'
+      webAppBaseOs: 'Windows'
+      subnetIdForVnetInjection: webAppSubnet[i].id
+      deploySlot: parSpokeNetworks[i].deployWebAppSlot
+      privateEndpointRG: parSpokeNetworks[i].rgNetworking
+      spokeVNetId: existingVnet[i].id
+      subnetPrivateEndpointSubnetId: pepSubnet[i].id
+      kind: 'functionapp'
+      storageAccountName: 'stmgntfy${take(replace(toLower(parSpokeNetworks[i].parEnvironment), '_', ''), 16)}'
+      deployAppPrivateEndPoint: parEnableFunctionAppPrivateEndpoints
+      userAssignedIdentities: [
+        supportingServices[i].outputs.appConfigurationUserAssignedIdentityId
+      ]
+    }
+    dependsOn: [
+      webApp
+      umbracoCMS
+      processScanFnApp
+      rtsfnApp
+      fnNotifyApp
+      documentUpload
+    ]
+  }
+]
+
 module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('validateirasidfnApp-${deployment().name}-deployment', 64)
     params: {
       tags: {}
@@ -1141,7 +1220,9 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
     dependsOn: [
       webApp
       umbracoCMS
-      rtsfnApp // dependencies such as this is to avoid private dns zone conflict
+      fnNotifyApp
+      fnManageNotificationsApp
+      rtsfnApp
       processScanFnApp
       documentUpload
       databaseserver
@@ -1151,7 +1232,7 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
 
 module harpdatasyncfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('harpdatasyncfnApp-${deployment().name}-deployment', 64)
     params: {
       tags: {}
@@ -1185,7 +1266,7 @@ module harpdatasyncfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
 // Daily CSV export Logic App (Standard, WS1)
 module dailyCsvLogicApp 'modules/07-app-service/deploy.app-service.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('dailyCsvLogicApp-${deployment().name}-deployment', 64)
     params: {
       location: location
@@ -1219,7 +1300,7 @@ module dailyCsvLogicApp 'modules/07-app-service/deploy.app-service.bicep' = [
 // Grant process scan function permissions to all document storage accounts. Handled seperately as there was circular dependency.
 module processScanFunctionPermissions '../shared/bicep/role-assignments/process-scan-function-permissions.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('processScanFunctionPermissions-${deployment().name}-deployment', 64)
     params: {
       functionAppPrincipalId: supportingServices[i].outputs.appConfigurationUserAssignedIdentityPrincipalId
@@ -1235,7 +1316,7 @@ module processScanFunctionPermissions '../shared/bicep/role-assignments/process-
 
 module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
   for i in range(0, length(parSpokeNetworks)): if (parEnableFrontDoor) {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('frontDoor-${deployment().name}-deployment', 64)
     params: {
       location: location
@@ -1267,7 +1348,7 @@ module frontDoor 'modules/10-front-door/deploy.front-door.bicep' = [
 // Post-deployment App Configuration update with Front Door and Web App URLs
 module appConfigUpdate 'modules/11-app-config-update/deploy.app-config-update.bicep' = [
   for i in range(0, length(parSpokeNetworks)): if (parEnableFrontDoor && parUseFrontDoor) {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgSharedServices)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgSharedServices)
     name: take('appConfigUpdate-${deployment().name}-deployment-${i}', 64)
     params: {
       configStoreName: sharedServicesNaming[i].outputs.resourcesNames.azureappconfigurationstore
@@ -1286,7 +1367,7 @@ module appConfigUpdate 'modules/11-app-config-update/deploy.app-config-update.bi
 // Application Insights Dashboards
 module dashboards '../shared/bicep/portal-dashboard/deploy-dashboards.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('dashboards-${deployment().name}-deployment', 64)
     params: {
       irasPortalAppInsightsId: webApp[i].outputs.appInsightsResourceId
@@ -1305,11 +1386,11 @@ module dashboards '../shared/bicep/portal-dashboard/deploy-dashboards.bicep' = [
 // Resource Dashboard
 module resourceDashboard '../shared/bicep/portal-dashboard/deploy-resource-dashboard.bicep' = [
   for i in range(0, length(parSpokeNetworks)): {
-    scope: resourceGroup(parSpokeNetworks[i].subscriptionId, parSpokeNetworks[i].rgapplications)
+    scope: resourceGroup(parSubscriptionId, parSpokeNetworks[i].rgapplications)
     name: take('resource-dashboard-${deployment().name}-deployment', 64)
     params: {
       environment: parSpokeNetworks[i].parEnvironment
-      subscriptionId: parSpokeNetworks[i].subscriptionId
+      subscriptionId: parSubscriptionId
       resourceGroupName: parSpokeNetworks[i].rgapplications
       location: location
       tags: tags

@@ -59,6 +59,14 @@ param parProjectRecordValidationUri string
 #disable-next-line no-unused-params
 param parManagedIdentityRtsClientID string
 
+@description('ManagedIdentityManageNotificationsClientID value (sourced from Azure DevOps variable group).')
+#disable-next-line no-unused-params
+param parManagedIdentityManageNotificationsClientID string
+
+@description('ManagedIdentityNotifyClientID value (sourced from Azure DevOps variable group).')
+#disable-next-line no-unused-params
+param parManagedIdentityNotifyClientID string
+
 // ------------------
 // MODULES
 // ------------------

@@ -1,5 +1,7 @@
 using '../main.network.bicep'
 
+param parSubscriptionId = ''
+
 param logAnalyticsWorkspaceId = ''
 
 param parEnableFailover = true
@@ -8,7 +10,6 @@ param parSecondaryLocation = 'ukwest'
 
 param parSpokeNetworks = [
   {
-    subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'
     ipRange: '10.8.0.0/16' // 65536 IPs: 10.8.0.0 – 10.8.255.255
     parEnvironment: 'dev'
     zoneRedundancy: false
@@ -34,7 +35,6 @@ param parSpokeNetworks = [
 
 param parSecondarySpokeNetworks = [
   {
-    subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'
     ipRange: '10.11.0.0/19' // 8192 IPs: 10.11.0.0 – 10.11.31.255
     parEnvironment: 'dev'
     zoneRedundancy: false

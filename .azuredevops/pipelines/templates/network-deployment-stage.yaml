@@ -60,6 +60,7 @@ stages:
                 az config set bicep.use_binary_from_path=false --only-show-errors
                 az deployment sub what-if --location $(location) --template-file ./5.spoke-network/main.network.bicep \
                   --parameters ./5.spoke-network/network-parameters/${{ parameters.environmentName }}.parameters.bicepparam \
+                              parSubscriptionId=$(subscriptionId) \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId)
 
       - deployment: deploy
@@ -97,6 +98,7 @@ stages:
                       az config set bicep.use_binary_from_path=false --only-show-errors
                       output=$(az stack sub create --name "network-deployment-stack" --location $(location) --template-file ./5.spoke-network/main.network.bicep  \
                         --parameters ./5.spoke-network/network-parameters/${{ parameters.environmentName }}.parameters.bicepparam \
+                                    parSubscriptionId=$(subscriptionId) \
                                     logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) \
                                     --deny-settings-mode none --action-on-unmanage deleteResources --yes)
                       echo $output | jq .

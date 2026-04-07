@@ -1,5 +1,7 @@
 using '../main.application.bicep'
 
+param parSubscriptionId = ''
+
 param logAnalyticsWorkspaceId = ''
 
 // SQL Server admin credentials (used for both primary and replica server creation)
@@ -20,8 +22,6 @@ param parClientID = ''
 param parClientSecret = ''
 
 param parOneLoginAuthority = 'https://oidc.integration.account.gov.uk'
-
-
 
 param parOneLoginIssuers = ['https://oidc.integration.account.gov.uk/']
 
@@ -162,7 +162,6 @@ param parNetworkSecurityConfig = {
 
 param parSpokeNetworks = [
   {
-    subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'
     parEnvironment: 'dev'
     workloadName: 'container-app'
     zoneRedundancy: false
@@ -231,7 +230,6 @@ param parSecondaryLocation = 'ukwest'
 
 param parSecondarySpokeNetworks = [
   {
-    subscriptionId: 'b83b4631-b51b-4961-86a1-295f539c826b'
     parEnvironment: 'dev'
     workloadName: 'container-app'
     zoneRedundancy: false

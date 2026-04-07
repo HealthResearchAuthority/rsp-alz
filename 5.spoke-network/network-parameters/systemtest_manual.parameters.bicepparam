@@ -1,8 +1,9 @@
 using '../main.network.bicep'
 
+param parSubscriptionId = ''
+
 param parSpokeNetworks = [
   {
-    subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379'
     ipRange: '10.3.0.0/16'
     parEnvironment: 'manualtest'
     zoneRedundancy: false
@@ -34,7 +35,6 @@ param parSecondaryLocation = 'ukwest'
 
 param parSecondarySpokeNetworks = [
   {
-    subscriptionId: '66482e26-764b-4717-ae2f-fab6b8dd1379'
     ipRange: '10.13.0.0/16' // Secondary region IP range: 10.13.0.0 – 10.13.255.255
     parEnvironment: 'manualtest'
     zoneRedundancy: false
