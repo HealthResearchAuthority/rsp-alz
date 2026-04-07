@@ -38,7 +38,6 @@ param parAppConfigurationValues = [
     value: parManagedIdentityNotifyClientID
     contentType: 'text/plain'
   }
-]
   {
     key: 'AppSettings:ProjectRecordValidationScopes'
     label: 'portal'
