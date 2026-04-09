@@ -107,7 +107,7 @@ stages:
                               parSubscriptionId=$(subscriptionId) \
                               parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
                               parClientID=$(clientID) parClientSecret=$(clientSecret) \
-                              parEmailNotificationServiceBus="$(parEmailNotificationServiceBus)" \
+                              emailNotificationServiceBus="$(emailNotificationServiceBus)" \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                               paramWhitelistIPs=$(parWhitelistIPs) \
                               parClarityProjectId=$(clarityProjectId) \
@@ -165,7 +165,7 @@ stages:
                               parSubscriptionId=$(subscriptionId) \
                               parAdminLogin=$(rspsqladminloginname) parSqlAdminPhrase=$(rspsqladminphrase) \
                               parClientID=$(clientID) parClientSecret=$(clientSecret) \
-                              parEmailNotificationServiceBus="$(parEmailNotificationServiceBus)" \
+                              emailNotificationServiceBus="$(emailNotificationServiceBus)" \
                               logAnalyticsWorkspaceId=$(logAnalyticsWorkspaceId) parDevOpsPublicIPAddress=$(devOpsPublicIP) \
                               paramWhitelistIPs=$(parWhitelistIPs) \
                               parClarityProjectId=$(clarityProjectId) \

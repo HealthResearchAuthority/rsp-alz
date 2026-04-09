@@ -22,7 +22,7 @@ param parProjectRecordValidationScopes = ''
 param parProjectRecordValidationUri = ''
 
 // Value for EmailNotificationServiceBus is passed from Azure DevOps variable group
-param parEmailNotificationServiceBus = ''
+param emailNotificationServiceBus = ''
 
 param parAppConfigurationValues = [
   {
@@ -58,7 +58,7 @@ param parAppConfigurationValues = [
   {
     key: 'ConnectionStrings:EmailNotificationServiceBus'
     label: ''
-    value: parEmailNotificationServiceBus
+    value: emailNotificationServiceBus
     contentType: 'text/plain'
   }
 ]
