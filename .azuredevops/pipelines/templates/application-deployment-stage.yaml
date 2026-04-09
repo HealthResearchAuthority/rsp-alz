@@ -95,7 +95,7 @@ stages:
                               parLogoutUrl=$(logoutUrl) \
                               parRtsApiBaseUrl=$(rtsApiBaseUrl) \
                               parRtsAuthApiBaseUrl=$(rtsAuthApiBaseUrl) \
-                              parPortalUrl=$(portalUrl)
+                              parPortalUrl=$(portalUrl) \
                               parCleanStorageAccountName=$(cleanStorageAccountName) \
                               parCleanStorageAccountKey=$(cleanStorageAccountKey) \
                               parStagingStorageAccountName=$(stagingStorageAccountName) \
