@@ -691,7 +691,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       bgodatabase: bgodatabase
       bgodatabaseuser: bgodatabaseuser
       bgodatabasepassword: bgodatabasepassword
-      emailNotificationServiceBusConnectionString: parEmailNotificationServiceBus
+      emailNotificationServiceBus: parEmailNotificationServiceBus
     }
   }
 ]

@@ -127,7 +127,7 @@ param keyVaultId string = ''
 
 @secure()
 @description('Service Bus connection string for email notifications')
-param emailNotificationServiceBusConnectionString string
+param emailNotificationServiceBus string
 
 // ------------------
 // VARIABLES
@@ -204,11 +204,7 @@ var keyValues = [
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=harpprojectdata;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
     contentType: null
   }
-  {
-    name: 'ConnectionStrings:EmailNotificationServiceBus'
-    value: emailNotificationServiceBusConnectionString
-    contentType: null
-  }
+
   {
     name: 'HarpQueries:GetProjectRecordsQuery' // Harp Project Query
     value: harpProjectRecordsQuery
@@ -362,6 +358,11 @@ var keyValues = [
   {
     name: 'AppSettings:DocumentStorage:CleanBlobConnectionString'
     value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=${documentStorageAccounts.cleanStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
+    contentType: null
+  }
+    {
+    name: 'ConnectionStrings:EmailNotificationServiceBus'
+    value: emailNotificationServiceBus
     contentType: null
   }
 ]
