@@ -20,8 +20,6 @@ param parClientID = ''
 
 param parClientSecret = ''
 
-param emailNotificationServiceBus = ''
-
 param parOneLoginAuthority = 'https://oidc.account.gov.uk'
 
 param parOneLoginIssuers = ['https://oidc.account.gov.uk/']

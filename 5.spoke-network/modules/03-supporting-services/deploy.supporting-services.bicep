@@ -135,9 +135,6 @@ param bgodatabaseuser string
 @secure()
 param bgodatabasepassword string
 
-@description('Service Bus connection string for email notifications')
-param emailNotificationServiceBus string
-
 // ------------------
 // Varaibles
 // ------------------
@@ -265,7 +262,6 @@ module appConfiguration './modules/app-configuration.bicep' = {
     bgodatabasepassword: bgodatabasepassword
     appConfigEncryptionConfig: appConfigEncryptionConfig
     keyVaultId: keyVault.outputs.keyVaultId
-    emailNotificationServiceBus: emailNotificationServiceBus
   }
 }
 

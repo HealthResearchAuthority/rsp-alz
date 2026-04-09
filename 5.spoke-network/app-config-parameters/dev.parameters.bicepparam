@@ -21,9 +21,6 @@ param parManagedIdentityNotifyClientID = ''
 param parProjectRecordValidationScopes = ''
 param parProjectRecordValidationUri = ''
 
-// Value for EmailNotificationServiceBus is passed from Azure DevOps variable group
-param emailNotificationServiceBus = ''
-
 param parAppConfigurationValues = [
   {
     key: 'AppSettings:ManagedIdentityRtsClientID'
@@ -53,12 +50,6 @@ param parAppConfigurationValues = [
     key: 'AppSettings:ProjectRecordValidationUri'
     label: 'portal'
     value: parProjectRecordValidationUri
-    contentType: 'text/plain'
-  }
-  {
-    key: 'ConnectionStrings:EmailNotificationServiceBus'
-    label: ''
-    value: emailNotificationServiceBus
     contentType: 'text/plain'
   }
 ]

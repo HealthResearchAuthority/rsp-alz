@@ -125,10 +125,6 @@ param appConfigEncryptionConfig object = {
 @description('Key Vault resource ID for encryption key')
 param keyVaultId string = ''
 
-@secure()
-@description('Service Bus connection string for email notifications')
-param emailNotificationServiceBus string
-
 // ------------------
 // VARIABLES
 // ------------------
@@ -358,11 +354,6 @@ var keyValues = [
   {
     name: 'AppSettings:DocumentStorage:CleanBlobConnectionString'
     value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=${documentStorageAccounts.cleanStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
-    contentType: null
-  }
-    {
-    name: 'ConnectionStrings:EmailNotificationServiceBus'
-    value: emailNotificationServiceBus
     contentType: null
   }
 ]

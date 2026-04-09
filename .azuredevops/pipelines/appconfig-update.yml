@@ -90,7 +90,6 @@ stages:
                   --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' `# RTS Data Sync Function App MI` \
                   --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' `# Manage Notifications Function App MI` \
                   --parameters parManagedIdentityNotifyClientID='$(ManagedIdentityNotifyClientID)' `# Notify Service MI` 
-                  --parameters emailNotificationServiceBus='$(EmailNotificationServiceBus)' \
                   --parameters parProjectRecordValidationScopes='$(ProjectRecordValidationScopes)' \
                   --parameters parProjectRecordValidationUri='$(ProjectRecordValidationUri)'
 
@@ -130,7 +129,6 @@ stages:
                   --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' `# Manage Notifications Function App MI` \
                   --parameters parManagedIdentityNotifyClientID='$(ManagedIdentityNotifyClientID)' `# Notify Service MI` 
                   --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' \
-                  --parameters emailNotificationServiceBus='$(EmailNotificationServiceBus)' \
                   --parameters parProjectRecordValidationScopes='$(ProjectRecordValidationScopes)' \
                   --parameters parProjectRecordValidationUri='$(ProjectRecordValidationUri)'
 
@@ -180,7 +178,6 @@ stages:
                         --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' `# RTS Data Sync Function App MI` \
                         --parameters parManagedIdentityManageNotificationsClientID='$(ManagedIdentityManageNotificationsClientID)' `# Manage Notifications Function App MI` \
                         --parameters parManagedIdentityNotifyClientID='$(ManagedIdentityNotifyClientID)' `# Notify Service MI` 
-                        --parameters emailNotificationServiceBus='$(EmailNotificationServiceBus)' \
                         --parameters parManagedIdentityRtsClientID='$(ManagedIdentityRtsClientID)' \
                         --parameters parProjectRecordValidationScopes='$(ProjectRecordValidationScopes)' \
                         --parameters parProjectRecordValidationUri='$(ProjectRecordValidationUri)'

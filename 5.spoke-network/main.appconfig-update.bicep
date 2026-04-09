@@ -67,10 +67,6 @@ param parManagedIdentityManageNotificationsClientID string
 #disable-next-line no-unused-params
 param parManagedIdentityNotifyClientID string
 
-@description('EmailNotificationServiceBus connection string (sourced from Azure DevOps variable group).')
-#disable-next-line no-unused-params
-param emailNotificationServiceBus string = ''
-
 // ------------------
 // MODULES
 // ------------------
