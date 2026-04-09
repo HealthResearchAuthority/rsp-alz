@@ -198,6 +198,10 @@ param parOneLoginIssuers array
 @description('How long to keep SQL audit logs in days (default: 15 days)')
 param parSqlAuditRetentionDays int = 15
 
+@secure()
+@description('Service Bus connection string for email notifications')
+param parEmailNotificationServiceBus string
+
 @description('Spoke Networks Configuration')
 param parSpokeNetworks array
 
@@ -687,6 +691,7 @@ module supportingServices 'modules/03-supporting-services/deploy.supporting-serv
       bgodatabase: bgodatabase
       bgodatabaseuser: bgodatabaseuser
       bgodatabasepassword: bgodatabasepassword
+      emailNotificationServiceBusConnectionString: parEmailNotificationServiceBus
     }
   }
 ]

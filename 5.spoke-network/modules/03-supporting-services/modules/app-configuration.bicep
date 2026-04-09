@@ -125,6 +125,10 @@ param appConfigEncryptionConfig object = {
 @description('Key Vault resource ID for encryption key')
 param keyVaultId string = ''
 
+@secure()
+@description('Service Bus connection string for email notifications')
+param emailNotificationServiceBusConnectionString string
+
 // ------------------
 // VARIABLES
 // ------------------
@@ -198,6 +202,11 @@ var keyValues = [
   {
     name: 'ConnectionStrings:HarpProjectDataConnectionString' // Harp database conn string
     value: 'Server=tcp:${sqlServerName}${az.environment().suffixes.sqlServerHostname},1433;Database=harpprojectdata;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;Authentication=\'Active Directory Default\';'
+    contentType: null
+  }
+  {
+    name: 'ConnectionStrings:EmailNotificationServiceBus'
+    value: emailNotificationServiceBusConnectionString
     contentType: null
   }
   {
@@ -612,7 +621,7 @@ var featureFlags = [
       ]
     }
   }
-    {
+  {
     id: 'System.EmailNotifications'
     enabled: true
     description: 'When enabled, the email notifications will send via Gov.uk Notify.'
@@ -702,14 +711,14 @@ resource configStore 'Microsoft.AppConfiguration/configurationStores@2024-05-01'
       privateLinkDelegation: 'Enabled'
     }
     encryption: appConfigEncryptionConfig.enabled && !empty(keyVaultId) ? {
-          keyVaultProperties: {
-            identityClientId: appConfigurationUserAssignedIdentity.properties.clientId
-            keyIdentifier: appConfigEncryptionKey!.outputs.keyUri
-          }
+      keyVaultProperties: {
+        identityClientId: appConfigurationUserAssignedIdentity.properties.clientId
+        keyIdentifier: appConfigEncryptionKey!.outputs.keyUri
+      }
     } : null
   }
   dependsOn: appConfigEncryptionConfig.enabled && !empty(keyVaultId) ? [
-        appConfigEncryptionKey
+    appConfigEncryptionKey
   ] : []
 }
 
