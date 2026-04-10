@@ -361,7 +361,7 @@ var keyValues = [
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
   {
-    name: 'AppSettings.EmailNotificationServiceBus'
+    name: 'AppSettings:EmailNotificationServiceBus'
     value: '{"uri":"${keyVaultSecretUris.emailNotificationServiceBusSecretUri}"}'
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
