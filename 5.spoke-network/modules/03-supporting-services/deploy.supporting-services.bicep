@@ -253,7 +253,7 @@ module appConfiguration './modules/app-configuration.bicep' = {
       stagingStorageAccountKeySecretUri: keyVaultSecrets.outputs.stagingStorageAccountKeySecretUri
       quarantineStorageAccountKeySecretUri: keyVaultSecrets.outputs.quarantineStorageAccountKeySecretUri
       cleanStorageAccountKeySecretUri: keyVaultSecrets.outputs.cleanStorageAccountKeySecretUri
-      govUkNotifyApiKeyKeySecretUri: keyVaultSecrets.outputs.govUkNotifyApiKeySecretUri
+      govUkNotifyApiKeySecretUri: keyVaultSecrets.outputs.govUkNotifyApiKeySecretUri
       emailNotificationServiceBusSecretUri: keyVaultSecrets.outputs.emailNotificationServiceBusSecretUri
     }
     documentStorageAccounts: documentStorageAccounts
