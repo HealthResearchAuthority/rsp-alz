@@ -142,8 +142,5 @@ output quarantineStorageAccountKeySecretUri string = '${keyVault.properties.vaul
 @description('Key Vault URI for cleanStorageAccountKey secret.')
 output cleanStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}secrets/cleanStorageAccountKey'
 
-@description('Key Vault URI for rtsApiClientId secret.')
+@description('Key Vault URI for govUkNotifyApiKey secret.')
 output govUkNotifyApiKeySecretUri string = '${keyVault.properties.vaultUri}secrets/govUkNotifyApiKey'
-
-@description('Key Vault URI for rtsApiClientId secret.')
-output emailNotificationServiceBusSecretUri string = '${keyVault.properties.vaultUri}secrets/emailNotificationServiceBus'

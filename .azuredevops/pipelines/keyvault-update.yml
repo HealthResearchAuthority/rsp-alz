@@ -84,7 +84,6 @@ stages:
               quarantineStorageAccountKey: $(quarantineStorageAccountKey)
               cleanStorageAccountKey: $(cleanStorageAccountKey)
               govUkNotifyApiKey: $(govUkNotifyApiKey)
-              emailNotificationServiceBus: $(emailNotificationServiceBus)
           - task: AzureCLI@2
             displayName: 'Validate Deployment'
             inputs:
@@ -139,7 +138,6 @@ stages:
               quarantineStorageAccountKey: $(quarantineStorageAccountKey)
               cleanStorageAccountKey: $(cleanStorageAccountKey)
               govUkNotifyApiKey: $(govUkNotifyApiKey)
-              emailNotificationServiceBus: $(emailNotificationServiceBus)
           - task: AzureCLI@2
             displayName: 'What-If Key Vault Update'
             inputs:
@@ -201,7 +199,6 @@ stages:
                     quarantineStorageAccountKey: $(quarantineStorageAccountKey)
                     cleanStorageAccountKey: $(cleanStorageAccountKey)
                     govUkNotifyApiKey: $(govUkNotifyApiKey)
-                    emailNotificationServiceBus: $(emailNotificationServiceBus)
                 - task: AzureCLI@2
                   displayName: 'Deploy Key Vault Update'
                   inputs:
