@@ -21,7 +21,12 @@ param tags object
 @description('Optional. The IP ACL rules. Note, requires the \'acrSku\' to be \'Premium\'.')
 param paramWhitelistIPs string = ''
 
+@description('The types of managed identities to create for the app service. Allowed values are SystemAssigned, UserAssigned, or both separated by comma. Default is empty which means no managed identity will be created.')
+param managedIdentityTypes string
+
 param subnetPrivateEndpointSubnetId string
+
+param systemAssignedIdentity bool = false
 
 @description('Resource Group where PEP and PEP DNS needs to be deployed')
 param privateEndpointRG string
@@ -64,6 +69,9 @@ param allowPublicAccessOverride bool = false
 @description('Optional. Enable Azure AD authentication')
 param enableAzureAdAuth bool = false
 
+@description('Optional. System Assigned Managed Identity Principal ID for existing app service. If provided, the template will skip creating system assigned identity and use this principal ID for role assignments and other configurations. This is useful for scenarios where the app service already has a system assigned identity and we want to reuse it without causing disruption by reassigning a new identity.')
+param systemAssignedMIPricipalId string = ''
+
 @description('Optional. Azure AD Client ID')
 param azureAdClientId string = ''
 
@@ -76,12 +84,6 @@ param azureAdOpenIdIssuer string = ''
 
 @description('Optional. Allowed token audiences')
 param azureAdAllowedAudiences array = []
-
-@description('Optional. Allowed application IDs for authorization')
-param azureAdAllowedApplications array = []
-
-@description('Optional. Allowed principal identities for authorization')
-param azureAdAllowedPrincipals array = []
 
 var slotName = 'staging'
 
@@ -143,9 +145,9 @@ module webApp '../../../shared/bicep/app-services/web-app.bicep' = if(kind == 'a
     operatingSystem:  (webAppBaseOs =~ 'linux') ? 'linuxNet9' : 'windowsNet9'
     hasPrivateLink: deployAppPrivateEndPoint
     allowPublicAccessOverride: allowPublicAccessOverride
-    systemAssignedIdentity: false
+    systemAssignedIdentity: systemAssignedIdentity
     userAssignedIdentities:  {
-      type: 'UserAssigned'
+      type: managedIdentityTypes
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
     }
     slots: deploySlot ? [
@@ -274,9 +276,11 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     virtualNetworkSubnetId: subnetIdForVnetInjection
     appInsightId: appInsights.outputs.appInsResourceId
     userAssignedIdentities:  {
-      type: 'UserAssigned'
+      type: managedIdentityTypes
+      //type: 'SystemAssigned,UserAssigned'
       userAssignedIdentities: reduce(union(userAssignedIdentities, [funcUaiId]), {}, (result, id) => union(result, { '${id}': {} }))
     }
+    systemAssignedMIPricipalId: systemAssignedMIPricipalId
     storageAccountName: storageAccountName
     hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
@@ -286,8 +290,6 @@ module fnApp '../../../shared/bicep/app-services/function-app.bicep' = if(kind =
     azureAdClientSecretSettingName: azureAdClientSecretSettingName
     azureAdOpenIdIssuer: azureAdOpenIdIssuer
     azureAdAllowedAudiences: azureAdAllowedAudiences
-    azureAdAllowedApplications: azureAdAllowedApplications
-    azureAdAllowedPrincipals: azureAdAllowedPrincipals
     appSettings: concat([
       {
         name: 'AzureWebJobsStorage__credential'
@@ -316,6 +318,7 @@ module lgApp '../../../shared/bicep/app-services/logic-app.bicep' = if(kind == '
     virtualNetworkSubnetId: subnetIdForVnetInjection
     userAssignedIdentities:  {
       type: 'UserAssigned'
+      //type: 'UserAssigned'
       userAssignedIdentities: reduce(userAssignedIdentities, {}, (result, id) => union(result, { '${id}': {} }))
     }
     storageAccountName: storageAccountName

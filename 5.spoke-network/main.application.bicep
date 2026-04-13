@@ -940,7 +940,9 @@ module webApp 'modules/07-app-service/deploy.app-service.bicep' = [
       tags: {}
       sku: parSkuConfig.appServicePlan.webApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
+      systemAssignedIdentity: true
       location: location
+      managedIdentityTypes: 'SystemAssigned,UserAssigned'
       appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
       appName: 'irasportal-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Linux'
@@ -968,6 +970,7 @@ module umbracoCMS 'modules/07-app-service/deploy.app-service.bicep' = [
       sku: parSkuConfig.appServicePlan.cmsApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
+      managedIdentityTypes: 'UserAssigned'
       appServicePlanName: applicationServicesNaming[i].outputs.resourcesNames.appServicePlan
       appName: 'cmsportal-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Linux'
@@ -1005,6 +1008,7 @@ module processScanFnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sku: parSkuConfig.appServicePlan.functionApp
       appServicePlanName: 'asp-rsp-fnprocessdoc-${parSpokeNetworks[i].parEnvironment}-uks'
       webAppBaseOs: 'Windows'
+      managedIdentityTypes: 'UserAssigned'
       logAnalyticsWsId: logAnalyticsWorkspaceId
       subnetIdForVnetInjection: webAppSubnet[i].id
       deploySlot: false
@@ -1066,6 +1070,7 @@ module rtsfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
+      managedIdentityTypes: 'UserAssigned'
       appServicePlanName: 'asp-rsp-fnsyncrtsApp-${parSpokeNetworks[i].parEnvironment}-uks'
       appName: 'func-rts-data-sync-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Windows'
@@ -1101,6 +1106,7 @@ module fnNotifyApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
+      managedIdentityTypes: 'UserAssigned'
       appServicePlanName: 'asp-rsp-fnnotify-${parSpokeNetworks[i].parEnvironment}-uks'
       appName: 'func-notify-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Windows'
@@ -1154,6 +1160,7 @@ module fnManageNotificationsApp 'modules/07-app-service/deploy.app-service.bicep
       sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
+      managedIdentityTypes: 'UserAssigned' 
       appServicePlanName: 'asp-rsp-fnmgntfy-${parSpokeNetworks[i].parEnvironment}-uks'
       appName: 'func-manage-notifications-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Windows'
@@ -1189,6 +1196,8 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
       location: location
+      systemAssignedMIPricipalId: webApp[i].outputs.systemAssignedPrincipalId
+      managedIdentityTypes: 'SystemAssigned,UserAssigned'
       appServicePlanName: 'asp-fnvalIRASID-${parSpokeNetworks[i].parEnvironment}-uk'
       appName: 'func-validate-irasid-${parSpokeNetworks[i].parEnvironment}'
       webAppBaseOs: 'Linux'
@@ -1210,12 +1219,6 @@ module validateirasidfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       azureAdClientSecretSettingName: parValidateIrasIdClientSecretSettingName
       azureAdOpenIdIssuer: parValidateIrasIdOpenIdIssuer
       azureAdAllowedAudiences: parValidateIrasIdAllowedAudiences
-      azureAdAllowedApplications: [
-        supportingServices[i].outputs.appConfigIdentityClientID
-      ]
-      azureAdAllowedPrincipals: [
-        supportingServices[i].outputs.appConfigurationUserAssignedIdentityPrincipalId
-      ]
     }
     dependsOn: [
       webApp
@@ -1238,6 +1241,7 @@ module harpdatasyncfnApp 'modules/07-app-service/deploy.app-service.bicep' = [
       tags: {}
       sku: parSkuConfig.appServicePlan.functionApp
       logAnalyticsWsId: logAnalyticsWorkspaceId
+      managedIdentityTypes: 'UserAssigned'
       location: location
       appServicePlanName: 'asp-fnharpsync-${parSpokeNetworks[i].parEnvironment}-uk'
       appName: 'func-harp-data-sync-${parSpokeNetworks[i].parEnvironment}'
@@ -1271,6 +1275,7 @@ module dailyCsvLogicApp 'modules/07-app-service/deploy.app-service.bicep' = [
     params: {
       location: location
       tags: tags
+      managedIdentityTypes: 'UserAssigned'
       logAnalyticsWsId: logAnalyticsWorkspaceId
       appServicePlanName: 'asp-rsp-la-csvexport-${parSpokeNetworks[i].parEnvironment}-uks'
       appName: 'la-csv-export-${parSpokeNetworks[i].parEnvironment}'

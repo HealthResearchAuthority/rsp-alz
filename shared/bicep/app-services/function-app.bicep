@@ -70,6 +70,9 @@ param virtualNetworkSubnetId string = ''
 @description('Optional. Enable Azure AD authentication')
 param enableAzureAdAuth bool = false
 
+@description('Optional. System Assigned Managed Identity Principal ID for existing app service. If provided, the template will skip creating system assigned identity and use this principal ID for role assignments and other configurations. This is useful for scenarios where the app service already has a system assigned identity and we want to reuse it without causing disruption by reassigning a new identity.')
+param systemAssignedMIPricipalId string = ''
+
 @description('Optional. Azure AD Client ID')
 param azureAdClientId string = ''
 
@@ -82,12 +85,6 @@ param azureAdOpenIdIssuer string = ''
 
 @description('Optional. Allowed token audiences')
 param azureAdAllowedAudiences array = []
-
-@description('Optional. Allowed application IDs for authorization')
-param azureAdAllowedApplications array = []
-
-@description('Optional. Allowed principal identities for authorization')
-param azureAdAllowedPrincipals array = []
 
 resource storageAccount 'Microsoft.Storage/storageAccounts@2021-06-01' existing = {
   name: storageAccountName
@@ -121,7 +118,7 @@ var defaultSettings = [
   }
   {
     name: 'AZURE_CLIENT_ID'
-    value: sqlDBManagedIdentityClientId
+    value: sqlDBManagedIdentityClientId //This is to allow function app to connect to DB using the assigned managed identity. The client ID of the managed identity will be passed in this parameter and set as an app setting in the function app. The application code can then read this app setting to get the client ID and use it for authentication when connecting to the database.
   }
 ]
 
@@ -192,7 +189,7 @@ var azureAdAuthProperties = {
   identityProviders: {
     azureActiveDirectory: {
       enabled: true
-      isAutoProvisioned: true
+      isAutoProvisioned: false //We are not auto provisioning the AAD app, so set this to false. We will have a separate process to create the AAD app and provide the client ID and secret as parameters to this template. Refer to azureAdClientId below
       registration: {
         clientId: azureAdClientId
         clientSecretSettingName: azureAdClientSecretSettingName
@@ -204,9 +201,8 @@ var azureAdAuthProperties = {
       validation: {
         allowedAudiences: azureAdAllowedAudiences
         defaultAuthorizationPolicy: {
-          allowedApplications: azureAdAllowedApplications
           allowedPrincipals: {
-            identities: azureAdAllowedPrincipals
+            identities: systemAssignedMIPricipalId != '' ? [systemAssignedMIPricipalId] : []
           }
         }
         jwtClaimChecks: {}
