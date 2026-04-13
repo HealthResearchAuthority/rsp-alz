@@ -198,6 +198,7 @@ stages:
                     stagingStorageAccountKey: $(stagingStorageAccountKey)
                     quarantineStorageAccountKey: $(quarantineStorageAccountKey)
                     cleanStorageAccountKey: $(cleanStorageAccountKey)
+                    govUkNotifyApiKey: $(govUkNotifyApiKey)
                 - task: AzureCLI@2
                   displayName: 'Deploy Key Vault Update'
                   inputs:

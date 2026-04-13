@@ -355,6 +355,11 @@ var keyValues = [
     value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=${documentStorageAccounts.cleanStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
+  {
+    name: 'AppSettings:GovUkNotifyApiKey'
+    value: '{"uri":"${keyVaultSecretUris.govUkNotifyApiKeySecretUri}"}'
+    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+  }
 ]
 
 var featureFlags = [
