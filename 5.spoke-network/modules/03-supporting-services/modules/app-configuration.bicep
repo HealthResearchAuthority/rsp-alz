@@ -640,7 +640,7 @@ var featureFlags = [
   {
     id: 'Rec.MemberManagement'
     enabled: true
-    description: 'When enabled, the email notifications will send via Gov.uk Notify.'
+    description: 'When enabled, the user member management area is available to all logged in users.'
     label: null
     conditions: {
       client_filters: [
