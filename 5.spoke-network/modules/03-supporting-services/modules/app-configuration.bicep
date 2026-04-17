@@ -617,7 +617,7 @@ var featureFlags = [
       ]
     }
   }
-    {
+  {
     id: 'System.EmailNotifications'
     enabled: true
     description: 'When enabled, the email notifications will send via Gov.uk Notify.'
@@ -642,6 +642,26 @@ var featureFlags = [
     enabled: true
     description: 'When enabled, the user member management area is available to all logged in users.'
     label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'Project.TeamRoles'
+    enabled: true
+    description: 'When enabled, allows searching / adding / removing collaborators'
+    label: 'portal'
     conditions: {
       client_filters: [
         {
