@@ -677,6 +677,26 @@ var featureFlags = [
       ]
     }
   }
+  {
+    id: 'Modifications.RequestForInformation.SponsorAuthorisation'
+    enabled: true
+    description: 'When enabled, allows sponsor to authorise the modifications of request for further information'
+    label: 'portal'
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
 ]
 
 var privateDnsZoneNames = 'privatelink.azconfig.io'
