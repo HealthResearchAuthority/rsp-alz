@@ -76,7 +76,7 @@ param parFeatureFlags = [
             Audience: {
               Users: []
               Groups: []
-              DefaultRolloutPercentage: 0
+              DefaultRolloutPercentage: 100
             }
           }
         }
@@ -96,7 +96,7 @@ param parFeatureFlags = [
             Audience: {
               Users: []
               Groups: []
-              DefaultRolloutPercentage: 0
+              DefaultRolloutPercentage: 100
             }
           }
         }
@@ -136,7 +136,7 @@ param parFeatureFlags = [
             Audience: {
               Users: []
               Groups: []
-              DefaultRolloutPercentage: 0
+              DefaultRolloutPercentage: 100
             }
           }
         }
@@ -156,7 +156,7 @@ param parFeatureFlags = [
             Audience: {
               Users: []
               Groups: []
-              DefaultRolloutPercentage: 0
+              DefaultRolloutPercentage: 100
             }
           }
         }
@@ -176,7 +176,7 @@ param parFeatureFlags = [
             Audience: {
               Users: []
               Groups: []
-              DefaultRolloutPercentage: 0
+              DefaultRolloutPercentage: 100
             }
           }
         }
@@ -236,7 +236,7 @@ param parFeatureFlags = [
             Audience: {
               Users: []
               Groups: []
-              DefaultRolloutPercentage: 0
+              DefaultRolloutPercentage: 100
             }
           }
         }
