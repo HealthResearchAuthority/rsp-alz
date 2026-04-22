@@ -355,6 +355,11 @@ var keyValues = [
     value: 'DefaultEndpointsProtocol=https;AccountName=${documentStorageAccounts.cleanStorageAccountName};AccountKey=${documentStorageAccounts.cleanStorageAccountKey};EndpointSuffix=${az.environment().suffixes.storage};'
     contentType: null
   }
+  {
+    name: 'AppSettings:GovUkNotifyApiKey'
+    value: '{"uri":"${keyVaultSecretUris.govUkNotifyApiKeySecretUri}"}'
+    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+  }
 ]
 
 var featureFlags = [
@@ -597,6 +602,86 @@ var featureFlags = [
     enabled: true
     description: 'When enabled, the user notifications area is available to all logged in users.'
     label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'System.EmailNotifications'
+    enabled: true
+    description: 'When enabled, the email notifications will send via Gov.uk Notify.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'Rec.MemberManagement'
+    enabled: true
+    description: 'When enabled, the user member management area is available to all logged in users.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'Project.TeamRoles'
+    enabled: true
+    description: 'When enabled, allows searching / adding / removing collaborators'
+    label: 'portal'
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 0
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
+    id: 'Modifications.RequestForInformation.SponsorAuthorisation'
+    enabled: true
+    description: 'When enabled, allows sponsor to authorise the modifications of request for further information'
+    label: 'portal'
     conditions: {
       client_filters: [
         {
