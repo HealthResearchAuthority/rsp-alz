@@ -186,11 +186,13 @@ var siteConfigConfigurationMap  = {
     netFrameworkVersion: 'v9.0'
     use32BitWorkerProcess: false
     minTlsVersion: '1.2'
+    ftpsState: 'Disabled'
   }
   linuxNet9: {
     linuxFxVersion: 'DOTNETCORE|9.0'
     use32BitWorkerProcess: false
     minTlsVersion: '1.2'
+    ftpsState: 'Disabled'
   }
 }
 

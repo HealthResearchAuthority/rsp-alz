@@ -161,6 +161,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       appSettings: concat(defaultSettings, privateEndpointSettings, appSettings)
       alwaysOn: true
       minTlsVersion: '1.2'
+      ftpsState: 'Disabled'
     }
   }
   tags: tags
