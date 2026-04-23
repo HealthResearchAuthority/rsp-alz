@@ -325,6 +325,7 @@ module lgApp '../../../shared/bicep/app-services/logic-app.bicep' = if(kind == '
     contentShareName: contentShareName
     hasPrivateEndpoint: deployAppPrivateEndPoint
     sqlDBManagedIdentityClientId: sqlDBManagedIdentityClientId
+    diagnosticWorkspaceId: logAnalyticsWsId
   }
   dependsOn: [
     fnstorage

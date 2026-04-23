@@ -42,8 +42,11 @@ param runtimeVersion string = '~4'
 param dotnetVersion string = '8.0'
 
 
-// @description('Optional. Resource ID of log analytics workspace.')
-// param diagnosticWorkspaceId string = ''
+@description('Optional. Resource ID of log analytics workspace.')
+param diagnosticWorkspaceId string = ''
+
+@description('Optional. The name of the diagnostic setting, if deployed.')
+param diagnosticSettingsName string = '${logicAppName}-diagnosticSettings'
 
 @description('Optional. The ID(s) to assign to the resource.')
 param userAssignedIdentities object = {}
@@ -138,6 +141,21 @@ var defaultSettings = [
 ]
 
 
+var diagnosticsLogs = [
+  {
+    category: 'WorkflowRuntime'
+    enabled: true
+  }
+]
+
+var diagnosticsMetrics = [
+  {
+    category: 'AllMetrics'
+    timeGrain: null
+    enabled: true
+  }
+]
+
 var contentShareSettings = empty(contentShareName) ? [] : [
   {
     name: 'WEBSITE_CONTENTSHARE'
@@ -170,6 +188,16 @@ resource logicApp 'Microsoft.Web/sites@2024-04-01' = {
     }
   }
   tags: tags
+}
+
+resource diagnosticSettings 'Microsoft.Insights/diagnosticSettings@2021-05-01-preview' = if (!empty(diagnosticWorkspaceId)) {
+  name: diagnosticSettingsName
+  properties: {
+    workspaceId: !empty(diagnosticWorkspaceId) ? diagnosticWorkspaceId : null
+    metrics: diagnosticsMetrics
+    logs: diagnosticsLogs
+  }
+  scope: logicApp
 }
 
 output logicAppName string = logicApp.name
