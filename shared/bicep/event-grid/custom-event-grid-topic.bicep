@@ -24,7 +24,7 @@ param publicNetworkAccess string = 'Enabled'
 param inputSchema string = 'EventGridSchema'
 
 @description('Local authentication settings for the topic.')
-param disableLocalAuth bool = false
+param disableLocalAuth bool = true
 
 param logAnalyticsWorkspaceId string
 

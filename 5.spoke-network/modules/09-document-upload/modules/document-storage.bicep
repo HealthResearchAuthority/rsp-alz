@@ -277,7 +277,7 @@ module customEventGridTopic '../../../../shared/bicep/event-grid/custom-event-gr
     enableSystemAssignedIdentity: true
     publicNetworkAccess: 'Enabled'
     inputSchema: 'EventGridSchema'
-    disableLocalAuth: false
+    disableLocalAuth: true
     logAnalyticsWorkspaceId: logAnalyticsWorkspaceId
     spokeVNetId: spokeVNetId
     spokePrivateEndpointSubnetName: spokePrivateEndpointSubnetName
