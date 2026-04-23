@@ -197,6 +197,40 @@ resource serverSecurityAlertPolicy 'Microsoft.Sql/servers/securityAlertPolicies@
   ]
 }
 
+resource masterDbSecurityAlertPolicy 'Microsoft.Sql/servers/databases/securityAlertPolicies@2022-11-01-preview' = {
+  name: 'Default'
+  parent: masterDb
+  properties: {
+    state: 'Enabled'
+    emailAccountAdmins: true
+    emailAddresses: [
+      'nikhil.bharathesh_pa@hra.nhs.uk'
+    ]
+    retentionDays: 90
+    disabledAlerts: []
+  }
+  dependsOn: [
+    serverSecurityAlertPolicy
+  ]
+}
+
+resource sqldatabasesSecurityAlertPolicy 'Microsoft.Sql/servers/databases/securityAlertPolicies@2022-11-01-preview' = [for i in range(0, length(databases)): {
+  name: 'Default'
+  parent: sqldatabases[i]
+  properties: {
+    state: 'Enabled'
+    emailAccountAdmins: true
+    emailAddresses: [
+      'nikhil.bharathesh_pa@hra.nhs.uk'
+    ]
+    retentionDays: 90
+    disabledAlerts: []
+  }
+  dependsOn: [
+    serverSecurityAlertPolicy
+  ]
+}]
+
 resource sqlVulnerabilityAssessment 'Microsoft.Sql/servers/sqlVulnerabilityAssessments@2022-11-01-preview' = {
   name: 'default'
   parent: SQL_Server
