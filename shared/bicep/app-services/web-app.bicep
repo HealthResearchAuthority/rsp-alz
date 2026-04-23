@@ -184,11 +184,13 @@ var siteConfigConfigurationMap  = {
       }
     ]
     netFrameworkVersion: 'v9.0'
-    use32BitWorkerProcess: false    
+    use32BitWorkerProcess: false
+    minTlsVersion: '1.2'
   }
   linuxNet9: {
     linuxFxVersion: 'DOTNETCORE|9.0'
-    use32BitWorkerProcess: false    
+    use32BitWorkerProcess: false
+    minTlsVersion: '1.2'
   }
 }
 
@@ -230,6 +232,7 @@ resource webConfig 'Microsoft.Web/sites/config@2022-09-01' = if (!empty(networkR
   name: 'web'
   properties: {
     ipSecurityRestrictions: networkRuleSetIpRules
+    minTlsVersion: '1.2'
   }
 }
 

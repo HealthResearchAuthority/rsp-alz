@@ -160,6 +160,7 @@ resource functionApp 'Microsoft.Web/sites@2024-04-01' = {
       netFrameworkVersion: dotnetVersion
       appSettings: concat(defaultSettings, privateEndpointSettings, appSettings)
       alwaysOn: true
+      minTlsVersion: '1.2'
     }
   }
   tags: tags
@@ -171,6 +172,7 @@ resource webConfig 'Microsoft.Web/sites/config@2022-09-01' = if (!empty(networkR
   properties: {
     // UPDATED: Use the combined array of IP restrictions
     ipSecurityRestrictions: combinedIpRestrictions
+    minTlsVersion: '1.2'
   }
 }
 
