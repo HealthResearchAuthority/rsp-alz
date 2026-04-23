@@ -84,6 +84,26 @@ param parFeatureFlags = [
     }
   }
   {
+    id: 'Modifications.RequestRevisions'
+    enabled: true
+    description: 'When enabled, allow to enter revision response by applicant for the modification.'
+    label: null
+    conditions: {
+      client_filters: [
+        {
+          name: 'Microsoft.Targeting'
+          parameters: {
+            Audience: {
+              Users: []
+              Groups: []
+              DefaultRolloutPercentage: 100
+            }
+          }
+        }
+      ]
+    }
+  }
+  {
     id: 'Modifications.ChangeOfSponsorOrganisation'
     enabled: true
     description: 'When enabled, allows changing sponsor organisation via modification journey'
