@@ -360,6 +360,11 @@ var keyValues = [
     value: '{"uri":"${keyVaultSecretUris.govUkNotifyApiKeySecretUri}"}'
     contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
   }
+  {
+    name: 'EmailNotificationServiceBus'
+    value: '{"uri":"${keyVaultSecretUris.emailNotificationServiceBusSecretUri}"}'
+    contentType: 'application/vnd.microsoft.appconfig.keyvaultref+json;charset=utf-8'
+  }
 ]
 
 var featureFlags = [

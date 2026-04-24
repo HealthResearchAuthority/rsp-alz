@@ -144,3 +144,6 @@ output cleanStorageAccountKeySecretUri string = '${keyVault.properties.vaultUri}
 
 @description('Key Vault URI for govUkNotifyApiKey secret.')
 output govUkNotifyApiKeySecretUri string = '${keyVault.properties.vaultUri}secrets/govUkNotifyApiKey'
+
+@description('Key Vault URI for emailNotificationServiceBus secret.')
+output emailNotificationServiceBusSecretUri string = '${keyVault.properties.vaultUri}secrets/emailNotificationServiceBus'
